@@ -1,0 +1,15 @@
+<widget data-th-id="cs-plus-widget-layers">
+    <link rel="stylesheet" data-th-href="${portal.assetUrl({'_path=styles/widgets/layers.css'})}" type="text/css" media="all"/>
+    <script data-th-src="${portal.assetUrl({'_path=js/widgets/layers.js'})}"></script>
+</widget>
+
+
+<script data-th-inline="javascript">
+    /*<![CDATA[*/
+    var CS_PLUS_LAYERS_CONFIG = {
+        contentId: [[${contentId}]],
+        repository: [[${repository}]]
+    };
+
+    /*]]>*/
+</script>

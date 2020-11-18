@@ -16,3 +16,4 @@ npm-debug.log
 .tmp
 generated-java
 node_modules/
+.xp
