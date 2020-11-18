@@ -22,17 +22,16 @@ dependencies {
     include "com.enonic.xp:lib-event:${xpVersion}"
     include "com.enonic.lib:lib-admin-ui:${libAdminUiVersion}"
     include "com.enonic.lib:lib-thymeleaf:2.0.0"
-
-    testImplementation 'org.mockito:mockito-core:3.3.3'
-    testImplementation 'org.mockito:mockito-junit-jupiter:3.3.3'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.6.2'
-    testImplementation "com.enonic.xp:testing:${xpVersion}"
 }
 
 repositories {
     mavenLocal()
     jcenter()
-    xp.enonicRepo()
+    xp.enonicRepo('dev')
+}
+
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
 
 node {
@@ -40,7 +39,7 @@ node {
     version = '14.15.0'
 }
 
-task flush( type: org.gradle.api.tasks.Delete, dependsOn: clean ) {
+task flush( type: Delete, dependsOn: clean ) {
     description = 'Clean the project from built sources and dependencies'
     delete '.xp'
 }
@@ -50,9 +49,11 @@ task npmInstallForce( type: NpmTask ) {
     args = ['install', '--force']
 }
 
-task cleanNode( type: org.gradle.api.tasks.Delete ) {
+task cleanNode( type: Delete ) {
     delete 'node_modules'
 }
+
+npmInstall.mustRunAfter unpackDevResources
 
 task lint( type: NpmTask, dependsOn: npmInstall ) {
     args = [ 'run', 'lint' ]
@@ -61,7 +62,7 @@ task lint( type: NpmTask, dependsOn: npmInstall ) {
     outputs.upToDateWhen { false }
 }
 
-task webpack( type: NpmTask, dependsOn: lint ) {
+task webpack( type: NpmTask, dependsOn: [npmInstall, lint] ) {
     environment = [ 'NODE_ENV': nodeEnvironment() ]
     description = 'Build UI resources (ts, css, etc).'
     args = [ 'run', 'build' ]
