@@ -54,6 +54,8 @@ task cleanNode( type: org.gradle.api.tasks.Delete ) {
     delete 'node_modules'
 }
 
+npmInstall.mustRunAfter unpackDevResources
+
 task lint( type: NpmTask, dependsOn: npmInstall ) {
     args = [ 'run', 'lint' ]
     inputs.files fileTree( dir: 'modules', include: '**/src/main/**.*' )
