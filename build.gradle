@@ -27,7 +27,7 @@ dependencies {
     include "com.enonic.xp:lib-portal:${xpVersion}"
     include "com.enonic.xp:lib-event:${xpVersion}"
     include "com.enonic.lib:lib-admin-ui:${libAdminUiVersion}"
-    include "com.enonic.lib:lib-contentstudio:${QlibContentStudioVersion}"
+    include "com.enonic.lib:lib-contentstudio:${libContentStudioVersion}"
     include "com.enonic.lib:lib-thymeleaf:2.0.0"
 }
 
@@ -85,6 +85,7 @@ project.afterEvaluate {
 }
 
 processResources.dependsOn += unpackDevResources
+npmInstall.mustRunAfter unpackDevResources
 
 if ( hasEnvironment() )
 {
