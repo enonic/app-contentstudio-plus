@@ -16,6 +16,7 @@
     "jquery": "^3.5.1",
     "jquery-ui": "^1.12.1",
     "lib-admin-ui": "file:./.xp/dev/lib-admin-ui",
+    "lib-contentstudio": "file:./.xp/dev/lib-contentstudio",
     "normalize-url": "^5.3.0",
     "q": "^1.5.1"
   },

@@ -1,0 +1,40 @@
+def isLibContentStudioIncluded()
+{
+    return new File( "$rootDir/../app-contentstudio" ).exists()
+}
+
+def hasLibContentStudio()
+{
+    return hasEnvironment() && isLibContentStudioIncluded()
+}
+
+def hasFlushTask()
+{
+    return project.tasks.hasProperty( 'flush' )
+}
+
+if ( hasLibContentStudio() )
+{
+    def appContentStudio = gradle.includedBuild( 'app-contentstudio' )
+    def excludedTasks = gradle.startParameter.getExcludedTaskNames().findAll( { it == 'lint' || it == 'test' } )
+    appContentStudio.getLoadedSettings().getStartParameter().setExcludedTaskNames( excludedTasks )
+
+    ext {
+        libContentStudioBuildTask = appContentStudio.task( ':lib-contentstudio:build' )
+        libContentStudioCleanTask = appContentStudio.task( ':lib-contentstudio:clean' )
+        libContentStudioFlushTask = appContentStudio.task( ':lib-contentstudio:flush' )
+    }
+}
+
+ext {
+    hasLibContentStudio = this.&hasLibContentStudio
+    isLibContentStudioIncluded = this.&isLibContentStudioIncluded
+}
+
+if ( !hasFlushTask() )
+{
+    task flush( type: Delete, dependsOn: clean ) {
+        description = 'Clean the project from built sources and dependencies'
+        delete '.xp'
+    }
+}
