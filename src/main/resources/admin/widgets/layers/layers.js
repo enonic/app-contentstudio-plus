@@ -1,7 +1,6 @@
 var portalLib = require('/lib/xp/portal');
 var thymeleaf = require('/lib/thymeleaf');
 
-
 function handleGet(req) {
 
     var contentId = req.params.contentId;

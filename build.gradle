@@ -78,9 +78,11 @@ jar {
     dependsOn += webpack
 }
 
+def sourcePaths = "$projectDir/src/main/resources,$buildDir/resources/main".replaceAll( '\\\\',  '/' )
 project.afterEvaluate {
     jar {
-        bnd ('Private-Package': '!dev.*, *;-split-package:=merge-first')
+        bnd ( 'Private-Package': '!dev.*, *;-split-package:=merge-first' )
+        bnd ( 'X-Source-Paths': sourcePaths )
     }
 }
 
