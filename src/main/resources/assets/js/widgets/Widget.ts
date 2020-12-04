@@ -7,8 +7,8 @@ export class Widget
     extends DivEl {
 
     private readonly loadMask: LoadMask;
-    private readonly contentId: string;
-    private readonly repository: string;
+    protected readonly contentId: string;
+    protected readonly repository: string;
     private readonly button: OnOffButton;
 
     constructor(config: WidgetConfig, cls?: string) {
