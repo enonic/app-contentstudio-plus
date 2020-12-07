@@ -1,5 +1,6 @@
 var portalLib = require('/lib/xp/portal');
 var thymeleaf = require('/lib/thymeleaf');
+var portal = require('/lib/xp/portal');
 
 function handleGet(req) {
 
@@ -19,7 +20,8 @@ function handleGet(req) {
     var view = resolve('layers.html');
     var params = {
         contentId: contentId,
-        repository: req.params.repository
+        repository: req.params.repository,
+        i18nUrl: portal.serviceUrl({service: 'i18n'}),
     };
 
     return {
