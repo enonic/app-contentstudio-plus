@@ -26,4 +26,5 @@ export class Widget
 export type WidgetConfig = {
     contentId: string,
     repository: string,
+    i18nUrl: string
 };
