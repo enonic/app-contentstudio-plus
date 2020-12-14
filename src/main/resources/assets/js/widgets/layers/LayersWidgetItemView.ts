@@ -19,7 +19,7 @@ export class LayersWidgetItemView
     private readonly loader: MultiLayersContentLoader;
 
     constructor() {
-        super('widget-item-view');
+        super('layers-widget-item-view');
 
         this.layersView = new LayersView();
         this.loader = new MultiLayersContentLoader();

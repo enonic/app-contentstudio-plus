@@ -10,8 +10,6 @@ import {ProjectGetRequest} from 'lib-contentstudio/app/settings/resource/Project
 import * as Q from 'q';
 import {Project} from 'lib-contentstudio/app/settings/data/project/Project';
 import {ProjectContext} from 'lib-contentstudio/app/project/ProjectContext';
-import {ContentServerEventsHandler} from 'lib-contentstudio/app/event/ContentServerEventsHandler';
-import {ContentServerChangeItem} from 'lib-contentstudio/app/event/ContentServerChangeItem';
 
 export class LayersWidget
     extends Widget {
@@ -29,16 +27,6 @@ export class LayersWidget
             }).catch(DefaultErrorHandler.handle);
         });
 
-        const contentServerEventsHandler = ContentServerEventsHandler.getInstance();
-        contentServerEventsHandler.start();
-
-        const onCreateUpdate = this.createUpdateHandler.bind(this);
-        const onDelete = this.deleteHandler.bind(this);
-        contentServerEventsHandler.onContentCreated(onCreateUpdate);
-        contentServerEventsHandler.onContentUpdated(onCreateUpdate);
-        contentServerEventsHandler.onContentDeleted(onDelete);
-        contentServerEventsHandler.onContentDeletedInOtherRepos(onDelete);
-        contentServerEventsHandler.onContentPublished(onCreateUpdate);
     }
 
     private initProjectContext(): Q.Promise<void> {
@@ -52,22 +40,6 @@ export class LayersWidget
 
     private  fetchContent(): Q.Promise<ContentSummaryAndCompareStatus> {
         return ContentSummaryAndCompareStatusFetcher.fetch(new ContentId(this.contentId));
-    }
-
-    private createUpdateHandler(data: ContentSummaryAndCompareStatus[]) {
-        const itemIds: string[] = data.map((d: ContentSummaryAndCompareStatus) => d.getId());
-        this.createUpdateDeleteHandler(itemIds);
-    }
-
-    private deleteHandler(data: ContentServerChangeItem[]) {
-        const itemIds: string[] = data.map((d: ContentServerChangeItem) => d.getId());
-        this.createUpdateDeleteHandler(itemIds);
-    }
-
-    private createUpdateDeleteHandler(itemsIds: string[]) {
-        if (itemsIds.some((itemId: string) => itemId === this.contentId)) {
-            this.layersWidgetItemView.reload();
-        }
     }
 
     doRender(): Q.Promise<boolean> {
