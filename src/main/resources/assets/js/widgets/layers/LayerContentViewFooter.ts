@@ -5,20 +5,25 @@ import {LayersContentActionButton} from './LayersContentActionButton';
 
 export class LayerContentViewFooter extends DivEl {
 
-    private layerContent: LayerContent;
+    private readonly layerContent: LayerContent;
 
-    private actionButton: ActionButton;
+    private readonly actionButton?: ActionButton;
 
     constructor(layerContent: LayerContent, cls: string) {
         super(cls);
 
         this.layerContent = layerContent;
-        this.actionButton = new LayersContentActionButton(layerContent);
+
+        if (layerContent.hasItem()) {
+            this.actionButton = new LayersContentActionButton(layerContent);
+        }
     }
 
     doRender(): Q.Promise<boolean> {
         return super.doRender().then((rendered) => {
-            this.appendChild(this.actionButton);
+            if (this.actionButton) {
+                this.appendChild(this.actionButton);
+            }
 
             return rendered;
         });

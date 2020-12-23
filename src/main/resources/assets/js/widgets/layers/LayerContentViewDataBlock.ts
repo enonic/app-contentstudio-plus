@@ -45,12 +45,16 @@ export class LayerContentViewDataBlock extends DivEl {
                 this.addClass(LayerContentViewDataBlock.CURRENT_CLASS);
             }
 
-            if (this.layerContent.getItem().isDataInherited()) {
-                this.addClass(LayerContentViewDataBlock.INHERITED_CLASS);
-            }
+            if (this.layerContent.hasItem()) {
+                if (this.layerContent.getItem().isDataInherited()) {
+                    this.addClass(LayerContentViewDataBlock.INHERITED_CLASS);
+                }
 
-            if (this.layerContent.getItem().isReadOnly()) {
-                this.addClass(LayerContentViewDataBlock.READONLY_CLASS);
+                if (this.layerContent.getItem().isReadOnly()) {
+                    this.addClass(LayerContentViewDataBlock.READONLY_CLASS);
+                }
+            } else {
+                this.addClass('not-available');
             }
 
             return rendered;

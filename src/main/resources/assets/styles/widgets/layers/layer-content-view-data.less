@@ -2,11 +2,14 @@
   border: 1px solid @admin-medium-gray-border;
   box-shadow: 2px 1px 2px 1px rgba(0, 0, 0, 0.1);
   padding: 7px 10px 7px 10px;
-  cursor: pointer;
   position: relative;
 
-  *:not(:disabled) {
+  &:not(.not-available) {
     cursor: pointer;
+
+    *:not(:disabled) {
+      cursor: pointer;
+    }
   }
 
   &-header {
@@ -76,5 +79,15 @@
 
   &:hover {
     background-color: @admin-almost-white;
+  }
+
+  &.not-available {
+    opacity: 0.5;
+
+    .not-available-info {
+      text-align: center;
+      font-size: 16px;
+      height: 32px;
+    }
   }
 }

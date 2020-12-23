@@ -41,6 +41,10 @@ export class LayerContentView extends LiEl {
         return this.item.getItem();
     }
 
+    hasItem(): boolean {
+        return this.item.hasItem();
+    }
+
     getRelationBlock(): DivEl {
         return this.relationBlock;
     }
