@@ -42,7 +42,7 @@ export class LayersView extends ListBox<LayerContent> {
     }
 
     getItemId(item: LayerContent): string {
-        return `${item.getItem().getId()}:${item.getProject().getName()}`;
+        return item.hasItem() ? `${item.getItem().getId()}:${item.getProject().getName()}` : item.getProject().getName();
     }
 
     setItems(items: LayerContent[], silent?: boolean): void {
@@ -105,7 +105,7 @@ export class LayersView extends ListBox<LayerContent> {
         let parentIndex: number = -1;
         reversedItemViews.find((item: LayerContentView, index: number) => {
             parentIndex = index;
-            return (index !== 0 && !item.getItem().isDataInherited()) || index === reversedItemViews.length -1;
+            return (index !== 0 && item.hasItem() && !item.getItem().isDataInherited()) || index === reversedItemViews.length -1;
         });
 
         const totalBetweenCurrentAndParent: number = parentIndex - 1;

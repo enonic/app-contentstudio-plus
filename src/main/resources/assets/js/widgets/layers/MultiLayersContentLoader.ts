@@ -1,12 +1,13 @@
 import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import * as Q from 'q';
 import {Project} from 'lib-contentstudio/app/settings/data/project/Project';
-import {ProjectListRequest} from 'lib-contentstudio/app/settings/resource/ProjectListRequest';
+import {ProjectListWithMissingRequest} from 'lib-contentstudio/app/settings/resource/ProjectListWithMissingRequest';
 import {ContentSummaryAndCompareStatusFetcher} from 'lib-contentstudio/app/resource/ContentSummaryAndCompareStatusFetcher';
 import {ContentsExistRequest} from 'lib-contentstudio/app/resource/ContentsExistRequest';
 import {ContentsExistResult} from 'lib-contentstudio/app/resource/ContentsExistResult';
 import {LayerContent} from './LayerContent';
 import {MultiLayersContentFilter} from './MultiLayersContentFilter';
+import {ProjectHelper} from 'lib-contentstudio/app/settings/data/project/ProjectHelper';
 
 export class MultiLayersContentLoader {
 
@@ -25,10 +26,10 @@ export class MultiLayersContentLoader {
     }
 
     private loadSameContentInOtherProjects(): Q.Promise<LayerContent[]> {
-        return new ProjectListRequest().sendAndParse().then((projects: Project[]) => {
+        return new ProjectListWithMissingRequest().sendAndParse().then((projects: Project[]) => {
             const loadPromises: Q.Promise<LayerContent>[] = [];
 
-            projects.forEach((project) => {
+            projects.forEach((project: Project) => {
                 loadPromises.push(this.doLoadContentFromProject(project));
             });
 
@@ -37,6 +38,10 @@ export class MultiLayersContentLoader {
     }
 
     private doLoadContentFromProject(project: Project): Q.Promise<LayerContent> {
+        if (!ProjectHelper.isAvailable(project)) {
+            return Q(new LayerContent(null, project));
+        }
+
         const id: string = this.item.getId();
 
         return new ContentsExistRequest([id])

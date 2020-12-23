@@ -1,6 +1,7 @@
 import {DivEl} from 'lib-admin-ui/dom/DivEl';
 import {CompareStatusFormatter} from 'lib-contentstudio/app/content/CompareStatus';
 import {LayerContent} from './LayerContent';
+import {ProjectHelper} from 'lib-contentstudio/app/settings/data/project/ProjectHelper';
 
 export class LayerContentViewHeader extends DivEl {
 
@@ -8,7 +9,7 @@ export class LayerContentViewHeader extends DivEl {
 
     private layerNameBlock: DivEl;
 
-    private itemStatusBlock: DivEl;
+    private itemStatusBlock?: DivEl;
 
     constructor(layerContent: LayerContent, cls: string) {
         super(cls);
@@ -21,7 +22,9 @@ export class LayerContentViewHeader extends DivEl {
     private initElements() {
         this.layerNameBlock = new DivEl('layer-details');
         const layerName: DivEl = new DivEl('layer-name');
-        layerName.setHtml(this.layerContent.getProject().getDisplayName());
+        layerName.setHtml(ProjectHelper.isAvailable(this.layerContent.getProject())
+                          ? this.layerContent.getProject().getDisplayName()
+                          : this.layerContent.getProject().getName());
         this.layerNameBlock.appendChild(layerName);
 
         if (this.layerContent.getProject().getLanguage()) {
@@ -30,14 +33,20 @@ export class LayerContentViewHeader extends DivEl {
             this.layerNameBlock.appendChild(layerLang);
         }
 
-        this.itemStatusBlock = new DivEl('status');
-        this.itemStatusBlock.setHtml(CompareStatusFormatter.formatStatusText(this.layerContent.getItem().getCompareStatus()));
-        this.itemStatusBlock.addClass(CompareStatusFormatter.formatStatusClass(this.layerContent.getItem().getCompareStatus()));
+        if (this.layerContent.hasItem()) {
+            this.itemStatusBlock = new DivEl('status');
+            this.itemStatusBlock.setHtml(CompareStatusFormatter.formatStatusText(this.layerContent.getItem().getCompareStatus()));
+            this.itemStatusBlock.addClass(CompareStatusFormatter.formatStatusClass(this.layerContent.getItem().getCompareStatus()));
+        }
     }
 
     doRender(): Q.Promise<boolean> {
         return super.doRender().then((rendered) => {
-            this.appendChildren(this.layerNameBlock, this.itemStatusBlock);
+            this.appendChild(this.layerNameBlock);
+
+            if (this.itemStatusBlock) {
+                this.appendChild(this.itemStatusBlock);
+            }
 
             return rendered;
         });
