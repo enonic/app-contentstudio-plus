@@ -1,10 +1,26 @@
 var portalLib = require('/lib/xp/portal');
 var thymeleaf = require('/lib/thymeleaf');
 var portal = require('/lib/xp/portal');
+const license = require("/lib/license");
 
 function handleGet(req) {
+    if (isLicensePresentAndValid()) {
+        return renderWidgetView(req);
+    }
 
-    var contentId = req.params.contentId;
+    return renderNoLicenseView();
+}
+
+function isLicensePresentAndValid() {
+    const licenseDetail = license.validateLicense({
+        appKey: app.name,
+    });
+
+    return !!licenseDetail && !licenseDetail.expired;
+}
+
+function renderWidgetView(req) {
+    let contentId = req.params.contentId;
 
     if (!contentId && portalLib.getContent()) {
         contentId = portalLib.getContent()._id;
@@ -17,8 +33,8 @@ function handleGet(req) {
         };
     }
 
-    var view = resolve('layers.html');
-    var params = {
+    const view = resolve('layers.html');
+    const params = {
         contentId: contentId,
         repository: req.params.repository,
         i18nUrl: portal.serviceUrl({service: 'i18n'}),
@@ -29,4 +45,21 @@ function handleGet(req) {
         body: thymeleaf.render(view, params)
     };
 }
+
+function renderNoLicenseView() {
+    const licenseView = resolve("license.html");
+    const assetsUrl = portal.assetUrl({
+        path: "",
+    });
+    const licenseUrl = portal.serviceUrl({
+        service: "license",
+        type: "absolute",
+    });
+
+    return {
+        contentType: 'text/html',
+        body: thymeleaf.render(licenseView, {assetsUrl, licenseUrl}),
+    };
+}
+
 exports.get = handleGet;
