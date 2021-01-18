@@ -14,10 +14,9 @@
         })
             .then(response => response.json())
             .then(data => {
-                console.log(data);
-
                 if (data.licenseValid) {
-                    location.reload();
+                    window.dispatchEvent(new CustomEvent('ReloadActiveWidgetEvent'));
+                    console.log('ReloadActiveWidgetEvent');
                 }
             });
     });
