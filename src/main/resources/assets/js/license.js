@@ -16,7 +16,6 @@
             .then(data => {
                 if (data.licenseValid) {
                     window.dispatchEvent(new CustomEvent('ReloadActiveWidgetEvent'));
-                    console.log('ReloadActiveWidgetEvent');
                 }
             });
     });

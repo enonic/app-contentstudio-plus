@@ -1,3 +1,5 @@
+@import "~enonic-admin-artifacts";
+
 #license {
   margin: 10px;
 
@@ -6,34 +8,26 @@
     flex-direction: column;
     align-items: center;
 
-    h4 {
-      line-height: 24px;
-    }
-
     form {
       width: 100%;
 
       .input-field {
         width: 100%;
-        margin-top: 10px;
+        margin-top: 15px;
         display: flex;
         justify-content: center;
 
-        input[type="file"] {
-          font-size: 14px;
-        }
-
         label {
           display: inline-block;
-          width: 100%;
           text-align: center;
-          background-color: #2c76e9;
-          color: white;
+          font-size: 14px;
+          background-color: @admin-button-blue2;
+          color: @admin-white;
           cursor: pointer;
           padding: 8px 19px;
 
           &:hover {
-            background-color: #5a94ee;
+            background-color: @admin-button-blue1;
           }
         }
       }
