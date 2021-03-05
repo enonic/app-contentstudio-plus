@@ -2,7 +2,7 @@
   "name": "app-contentstudio-plus",
   "version": "1.0.0",
   "description": "Enterprise extension for Content Studio",
-  "license": "GPL-3.0",
+  "license": "Enonic License 1.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/enonic/app-contentstudio-plus"
