@@ -1,22 +1,15 @@
-var portalLib = require('/lib/xp/portal');
-var thymeleaf = require('/lib/thymeleaf');
-var portal = require('/lib/xp/portal');
-const license = require("/lib/license");
+const portalLib = require('/lib/xp/portal');
+const thymeleaf = require('/lib/thymeleaf');
+const portal = require('/lib/xp/portal');
+const licenseManager = require("/lib/license-manager");
 
 function handleGet(req) {
-    if (isLicensePresentAndValid()) {
+    const licenseValid = licenseManager.isCurrentLicenseValid();
+    if (licenseValid) {
         return renderWidgetView(req);
     }
 
     return renderNoLicenseView();
-}
-
-function isLicensePresentAndValid() {
-    const licenseDetail = license.validateLicense({
-        appKey: app.name,
-    });
-
-    return !!licenseDetail && !licenseDetail.expired;
 }
 
 function renderWidgetView(req) {
