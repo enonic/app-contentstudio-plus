@@ -14,7 +14,7 @@
     "postinstall": "cd node_modules/lib-contentstudio && npm install"
   },
   "dependencies": {
-    "jquery": "^3.5.1",
+    "jquery": "^3.6.0",
     "jquery-ui": "^1.12.1",
     "lib-admin-ui": "file:./.xp/dev/lib-admin-ui",
     "lib-contentstudio": "file:./.xp/dev/lib-contentstudio",
