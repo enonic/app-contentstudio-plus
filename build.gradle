@@ -11,6 +11,14 @@ apply from: "$rootDir/gradle/lib-admin.gradle"
 apply from: "$rootDir/gradle/lib-contentstudio.gradle"
 apply from: "$rootDir/gradle/node.gradle"
 
+configurations {
+    devResources {
+        attributes {
+            attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(LibraryElements, 'dev-resources'))
+        }
+    }
+}
+
 app {
     name = project.appName
     displayName = 'Content Studio +'
@@ -33,6 +41,8 @@ dependencies {
     include "com.enonic.lib:lib-thymeleaf:2.0.1"
     include "com.enonic.xp:lib-io:${xpVersion}"
     include 'com.enonic.lib:lib-license:3.0.0'
+    devResources "com.enonic.lib:lib-admin-ui:${libAdminUiVersion}"
+    devResources "com.enonic.lib:lib-contentstudio:${libContentStudioVersion}"
 }
 
 repositories {
@@ -50,7 +60,17 @@ node {
     version = '14.15.0'
 }
 
-npmInstall.mustRunAfter unpackDevResources
+task copyDevResources {
+    doLast {
+        copy {
+            from configurations.devResources.files.collect { zipTree( it ) }
+            include 'dev/**'
+            into '.xp'
+        }
+    }
+}
+
+npmInstall.dependsOn copyDevResources
 
 task lint( type: NpmTask, dependsOn: npmInstall ) {
     args = [ 'run', 'lint' ]
@@ -79,19 +99,15 @@ jar {
 
     outputs.dir "${buildDir}/resources/main"
 
-    dependsOn += webpack
+    dependsOn webpack
 }
 
 def sourcePaths = "$projectDir/src/main/resources,$buildDir/resources/main".replaceAll( '\\\\',  '/' )
 project.afterEvaluate {
     jar {
-        bnd ( 'Private-Package': '!dev.*, *;-split-package:=merge-first' )
         bnd ( 'X-Source-Paths': sourcePaths )
     }
 }
-
-processResources.dependsOn += unpackDevResources
-npmInstall.mustRunAfter unpackDevResources
 
 if ( hasEnvironment() )
 {
@@ -99,16 +115,9 @@ if ( hasEnvironment() )
 }
 
 def addBuildDependency() {
-    def unpackDevResources = tasks.findByPath( ':unpackDevResources' )
-    def webpackTask = tasks.findByPath( ':webpack' )
-
-    if ( webpackTask != null ) {
-        webpackTask.dependsOn += unpackDevResources
-    }
-
     if ( isLibAdminUiIncluded() )
     {
-        unpackDevResources.dependsOn += libAdminBuildTask
+        copyDevResources.dependsOn += libAdminBuildTask
         build.dependsOn += libAdminBuildTask
         clean.dependsOn += libAdminCleanTask
         flush.dependsOn += libAdminFlushTask
@@ -116,7 +125,7 @@ def addBuildDependency() {
 
     if ( isLibContentStudioIncluded() )
     {
-        unpackDevResources.dependsOn += libContentStudioBuildTask
+        copyDevResources.dependsOn += libContentStudioBuildTask
         build.dependsOn += libContentStudioBuildTask
         clean.dependsOn += libContentStudioCleanTask
         flush.dependsOn += libContentStudioFlushTask
