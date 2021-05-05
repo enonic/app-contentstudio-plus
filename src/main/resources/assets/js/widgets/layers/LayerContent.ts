@@ -1,6 +1,6 @@
 import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import {Project} from 'lib-contentstudio/app/settings/data/project/Project';
-import {ContentId} from 'lib-admin-ui/content/ContentId';
+import {ContentId} from 'lib-contentstudio/app/content/ContentId';
 
 export class LayerContent {
 
