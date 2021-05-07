@@ -2,7 +2,7 @@ import {WidgetConfig, Widget} from '../Widget';
 import {AppHelper} from '../../util/AppHelper';
 import {LayersWidgetItemView} from './LayersWidgetItemView';
 import {ContentSummaryAndCompareStatusFetcher} from 'lib-contentstudio/app/resource/ContentSummaryAndCompareStatusFetcher';
-import {ContentId} from 'lib-admin-ui/content/ContentId';
+import {ContentId} from 'lib-contentstudio/app/content/ContentId';
 import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
 import {RepositoryId} from 'lib-contentstudio/app/repository/RepositoryId';
