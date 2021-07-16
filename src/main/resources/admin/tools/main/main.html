@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+    <meta name="viewport" content="width=device-width, user-scalable=no">
+    <meta name="theme-color" content="#ffffff">
+
+    <title>{{appName}} - Enonic XP Admin</title>
+
+    <!-- Styles -->
+    <link rel="stylesheet" type="text/css" href="{{assetsUri}}/admin/common/styles/lib.css">
+    <link rel="stylesheet" type="text/css" href="{{assetsUri}}/styles/main.css">
+    <script type="text/javascript" src="{{assetsUri}}/admin/common/js/lib.js"></script>
+
+</head>
+<body>
+
+<!-- Configuration -->
+<script type="text/javascript">
+    var CONFIG = {
+        appId: '{{appId}}',
+        appVersion: '{{appVersion}}',
+        assetsUri: '{{assetsUri}}',
+        adminUrl: '{{adminUrl}}',
+        adminAssetsUri: '{{adminAssetsUri}}',
+        launcherUrl: '{{launcherUrl}}',
+        services: {
+            stylesUrl: '{{services.stylesUrl}}',
+            i18nUrl: '{{services.i18nUrl}}',
+            contentUrl: '{{services.contentServiceUrl}}',
+        },
+        mainUrl: '{{mainUrl}}',
+        theme: 'light',
+        launcher: {
+            theme: 'light'
+        }
+    };
+</script>
+
+<!-- App javascript -->
+<script type="text/javascript" src="{{assetsUri}}/js/main.js"></script>
+
+<!-- Append the launcher -->
+<script type="text/javascript" src="{{launcherPath}}" async></script>
+
+</body>
+</html>
