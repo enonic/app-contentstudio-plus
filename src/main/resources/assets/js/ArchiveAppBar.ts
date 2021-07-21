@@ -14,7 +14,7 @@ export class ArchiveAppBar extends AppBar {
     private selectedProjectViewer: ProjectViewer;
 
     constructor(application: Application) {
-        super(application);ArchiveAppBar
+        super(application);
 
         this.initElements();
         this.initListeners();
@@ -65,6 +65,7 @@ export class ArchiveAppBar extends AppBar {
 
     doRender(): Q.Promise<boolean> {
         return super.doRender().then((rendered: boolean) => {
+            this.addClass('archive-appbar');
             this.selectedProjectViewer.setTitle(i18n('text.selectContext'));
             this.addClass('appbar-content');
             this.insertChild(this.selectedProjectViewer, 0);
