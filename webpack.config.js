@@ -42,7 +42,7 @@ module.exports = {
                 ]
             },
             {
-                test: /\.(eot|woff|woff2|ttf)$|icomoon.svg/,
+                test: /\.(eot|woff|woff2|ttf)$|icomoon-studio-plus.svg/,
                 use: 'file-loader?name=fonts/[name].[ext]'
             },
             {
