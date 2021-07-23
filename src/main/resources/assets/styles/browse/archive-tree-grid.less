@@ -1,0 +1,49 @@
+.archive-tree-grid {
+
+  .slick-viewport {
+    > .grid-canvas {
+      width: 100% !important;
+
+      .slick-row {
+        display: flex;
+
+        .slick-cell {
+          position: static;
+
+          &.name {
+            flex-grow: 1;
+
+            .viewer {
+              overflow: hidden;
+
+              .@{_COMMON_PREFIX}wrapper:before {
+                display: none;
+              }
+            }
+          }
+
+          &.status, &.modified {
+            flex-shrink: 0;
+          }
+
+          &.modified {
+            padding-left: 8px;
+          }
+        }
+      }
+    }
+  }
+
+  &._0-240, &._240-360, &._360-540, &._540-720 {
+    .slick-cell.modified {
+      display: none;
+    }
+  }
+
+  &._0-240, &._240-360 {
+    .slick-cell.status {
+      display: none;
+    }
+  }
+
+}
