@@ -11,11 +11,14 @@ exports.get = function () {
 };
 
 var getPhrases = function() {
-    var locales = admin.getLocales();
-    var bundle = i18n.getPhrases(locales, ['i18n/common']);
-    var phrases = i18n.getPhrases(locales, ['i18n/phrases']);
+    const locales = admin.getLocales();
+    const phrases = {};
+    const bundles = ['i18n/common', 'i18n/phrases', 'i18n/dialogs'];
 
-    for (var key in phrases) { bundle[key] = phrases[key] }
+    for (const bundleIndex in bundles) {
+        const bundlePhrases = i18n.getPhrases(locales, [bundles[bundleIndex]]);
+        for (const key in bundlePhrases) { phrases[key] = bundlePhrases[key] }
+    }
 
-    return bundle;
+    return phrases;
 };
