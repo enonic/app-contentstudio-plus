@@ -20,6 +20,8 @@ import {ContentApp} from 'lib-contentstudio/app/ContentApp';
 import {SettingsApp} from 'lib-contentstudio/app/settings/SettingsApp';
 import {ArchiveApp} from './ArchiveApp';
 
+declare const CONFIG;
+
 // Dynamically import and execute all input types, since they are used
 // on-demand, when parsing XML schemas and has not real usage in app
 declare var require: { context: (directory: string, useSubdirectories: boolean, filter: RegExp) => void };
