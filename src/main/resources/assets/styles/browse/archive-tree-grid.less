@@ -16,8 +16,12 @@
             .viewer {
               overflow: hidden;
 
-              .@{_COMMON_PREFIX}wrapper:before {
-                display: none;
+              .@{_COMMON_PREFIX}wrapper {
+                flex-shrink: 0;
+
+                &:before {
+                  display: none;
+                }
               }
             }
           }
