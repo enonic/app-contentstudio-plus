@@ -8,6 +8,7 @@ import { ProjectSelectionDialog } from 'lib-contentstudio/app/settings/dialog/Pr
 import { ProjectUpdatedEvent } from 'lib-contentstudio/app/settings/event/ProjectUpdatedEvent';
 import { ProjectListWithMissingRequest } from 'lib-contentstudio/app/settings/resource/ProjectListWithMissingRequest';
 import { Project } from 'lib-contentstudio/app/settings/data/project/Project';
+import {DivEl} from 'lib-admin-ui/dom/DivEl';
 
 export class ArchiveAppBar extends AppBar {
 
@@ -66,9 +67,12 @@ export class ArchiveAppBar extends AppBar {
     doRender(): Q.Promise<boolean> {
         return super.doRender().then((rendered: boolean) => {
             this.addClass('archive-appbar');
+            this.appendChild(new DivEl('separator').setHtml('/'));
+            const iconEl: DivEl = new DivEl('project-selection-icon icon-compare');
+            this.selectedProjectViewer.appendChild(iconEl);
             this.selectedProjectViewer.setTitle(i18n('text.selectContext'));
             this.addClass('appbar-content');
-            this.insertChild(this.selectedProjectViewer, 0);
+            this.appendChild(this.selectedProjectViewer);
 
             return rendered;
         });
