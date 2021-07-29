@@ -1,9 +1,10 @@
-import { SpanEl } from "lib-admin-ui/dom/SpanEl";
-import { DateTimeFormatter } from "lib-admin-ui/ui/treegrid/DateTimeFormatter";
-import { ContentSummaryAndCompareStatus } from "lib-contentstudio/app/content/ContentSummaryAndCompareStatus";
-import {ContentStatusToolbar} from "lib-contentstudio/app/ContentStatusToolbar";
+import {SpanEl} from 'lib-admin-ui/dom/SpanEl';
+import {DateTimeFormatter} from 'lib-admin-ui/ui/treegrid/DateTimeFormatter';
+import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
+import {ContentStatusToolbar} from 'lib-contentstudio/app/ContentStatusToolbar';
 
-export class ArchiveItemPreviewToolbar extends ContentStatusToolbar {
+export class ArchiveItemPreviewToolbar
+    extends ContentStatusToolbar {
 
     private whenArchived: SpanEl;
 

@@ -140,8 +140,8 @@ function getTheme(): string {
 
 async function startContentBrowser(application: Application) {
     const AppWrapper = (await import ('lib-contentstudio/app/AppWrapper')).AppWrapper;
-    const apps = [new ContentApp(), new ArchiveApp(), new SettingsApp()];
-    const activeApp = apps[1];
+    const apps = [new ArchiveApp()];
+    const activeApp = apps[0];
 
     const commonWrapper = new AppWrapper(application, activeApp, apps, getTheme());
     body.appendChild(commonWrapper);
