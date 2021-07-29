@@ -1,8 +1,9 @@
-import { ContentItemPreviewPanel } from "lib-contentstudio/app/view/ContentItemPreviewPanel";
-import { ContentItemPreviewToolbar } from "lib-contentstudio/app/view/ContentItemPreviewToolbar";
+import {ContentItemPreviewPanel} from 'lib-contentstudio/app/view/ContentItemPreviewPanel';
+import {ContentItemPreviewToolbar} from 'lib-contentstudio/app/view/ContentItemPreviewToolbar';
 import {ArchiveItemPreviewToolbar} from './ArchiveItemPreviewToolbar';
 
-export class ArchiveItemPreviewPanel extends ContentItemPreviewPanel {
+export class ArchiveItemPreviewPanel
+    extends ContentItemPreviewPanel {
 
     createToolbar(): ContentItemPreviewToolbar {
         return <any>new ArchiveItemPreviewToolbar();
