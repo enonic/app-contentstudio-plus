@@ -1,6 +1,6 @@
-import {BrowseItemPanel} from "lib-admin-ui/app/browse/BrowseItemPanel";
-import {BrowsePanel} from "lib-admin-ui/app/browse/BrowsePanel";
-import {Toolbar} from "lib-admin-ui/ui/toolbar/Toolbar";
+import {BrowseItemPanel} from 'lib-admin-ui/app/browse/BrowseItemPanel';
+import {BrowsePanel} from 'lib-admin-ui/app/browse/BrowsePanel';
+import {Toolbar} from 'lib-admin-ui/ui/toolbar/Toolbar';
 import {ArchiveTreeGrid} from './ArchiveTreeGrid';
 import {ArchiveBrowseItemPanel} from './ArchiveBrowseItemPanel';
 

@@ -44,7 +44,8 @@ export class ArchiveTreeGrid extends TreeGrid<ContentSummaryAndCompareStatus> {
     }
 
     protected hasChildren(data: ContentSummaryAndCompareStatus): boolean {
-        return data.hasChildren();
+        // return data.hasChildren(); // won't work until we know item's path
+        return false;
     }
 
 }

@@ -1,8 +1,9 @@
-import { AppId } from "lib-contentstudio/app/AppId";
+import {AppId} from 'lib-contentstudio/app/AppId';
 
-export class ArchiveAppId extends AppId {
+export class ArchiveAppId
+    extends AppId {
 
-    static ID: string = 'archive';
+    static ID: string = 'main';
 
     constructor() {
         super(ArchiveAppId.ID);
