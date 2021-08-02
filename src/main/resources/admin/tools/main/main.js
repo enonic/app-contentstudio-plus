@@ -1,7 +1,6 @@
 var admin = require('/lib/xp/admin');
 var mustache = require('/lib/mustache');
 var portal = require('/lib/xp/portal');
-var contextLib = require('/lib/xp/context');
 
 function handleGet() {
     var view = resolve('./main.html');
@@ -12,7 +11,10 @@ function handleGet() {
         assetsUri: portal.assetUrl({
             path: ''
         }),
-        appName: 'Content Studio Plus',
+        faviconsAssetsUri: portal.assetUrl({
+            path: ''
+        }).replace(/\.plus/g, ''),
+        appName: 'Archive',
         appId: app.name,
         appVersion: app.version,
         locale: admin.getLocale(),
