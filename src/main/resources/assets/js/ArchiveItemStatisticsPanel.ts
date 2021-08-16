@@ -1,7 +1,8 @@
 import {ItemStatisticsPanel} from 'lib-admin-ui/app/view/ItemStatisticsPanel';
 import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
-import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import {ArchiveItemPreviewPanel} from './ArchiveItemPreviewPanel';
+import {ArchiveViewItem} from './ArchiveViewItem';
+import {ArchiveContentViewItem} from './ArchiveContentViewItem';
 
 export class ArchiveItemStatisticsPanel
     extends ItemStatisticsPanel {
@@ -16,10 +17,16 @@ export class ArchiveItemStatisticsPanel
         this.appendChild(this.previewPanel);
     }
 
-    setItem(item: ContentSummaryAndCompareStatus) {
-        if (!ObjectHelper.equals(this.getItem(), item)) {
+    setItem(item: ArchiveViewItem) {
+        if (ObjectHelper.equals(this.getItem(), item)) {
+            return;
+        }
+
+        if (ObjectHelper.iFrameSafeInstanceOf(item, ArchiveContentViewItem)) {
             super.setItem(item);
-            this.previewPanel.setItem(item);
+            this.previewPanel.setItem((<ArchiveContentViewItem>item).getData());
+        } else {
+            this.clearItem();
         }
     }
 

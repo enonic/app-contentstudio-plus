@@ -8,15 +8,18 @@ import {ConfirmationDialog} from 'lib-admin-ui/ui/dialog/ConfirmationDialog';
 import {RestoreArchivedRequest} from './resource/RestoreArchivedRequest';
 import {ContentId} from 'lib-contentstudio/app/content/ContentId';
 import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
+import {ArchiveViewItem} from './ArchiveViewItem';
+import {ArchiveBundleViewItem} from './ArchiveBundleViewItem';
+import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
 
 export class ArchiveTreeGridActions
-    implements TreeGridActions<ContentSummaryAndCompareStatus> {
+    implements TreeGridActions<ArchiveViewItem> {
 
-    private restoreAction: Action;
+    private readonly restoreAction: Action;
 
-    private deleteAction: Action;
+    private readonly deleteAction: Action;
 
-    private selectedItems: ContentSummaryAndCompareStatus[] = [];
+    private selectedItems: ArchiveViewItem[] = [];
 
     private confirmValueDialog?: ConfirmValueDialog;
 
@@ -76,7 +79,7 @@ export class ArchiveTreeGridActions
     }
 
     private restoreSelectedItems() {
-        const ids: ContentId[] = this.selectedItems.map((item: ContentSummaryAndCompareStatus) => item.getContentId());
+        const ids: string[] = this.selectedItems.map((item: ArchiveViewItem) => item.getId());
         new RestoreArchivedRequest(ids).sendAndParse().catch(DefaultErrorHandler.handle);
     }
 
@@ -112,17 +115,15 @@ export class ArchiveTreeGridActions
         return [this.restoreAction, this.deleteAction];
     }
 
-    updateActionsEnabledState(selectedItems: ContentSummaryAndCompareStatus[]): Q.Promise<void> {
+    updateActionsEnabledState(selectedItems: ArchiveViewItem[]): Q.Promise<void> {
         this.selectedItems = selectedItems;
 
-        if (selectedItems.length === 0) {
-            this.restoreAction.setEnabled(false);
-            this.deleteAction.setEnabled(false);
-            return Q(null);
-        }
+        const state: boolean =
+            selectedItems.length === 1 &&
+            selectedItems.every((item: ArchiveViewItem) => ObjectHelper.iFrameSafeInstanceOf(item, ArchiveBundleViewItem));
 
-        this.restoreAction.setEnabled(true);
-        this.deleteAction.setEnabled(true);
+        this.restoreAction.setEnabled(state);
+        this.deleteAction.setEnabled(state);
 
         return Q(null);
     }

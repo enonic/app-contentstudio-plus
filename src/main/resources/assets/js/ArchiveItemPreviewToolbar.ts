@@ -23,4 +23,9 @@ export class ArchiveItemPreviewToolbar
         }
     }
 
+    clearItem(): void {
+        super.clearItem();
+
+        this.whenArchived.setHtml('');
+    }
 }
