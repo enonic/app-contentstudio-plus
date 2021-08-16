@@ -1,17 +1,19 @@
-import {TreeGrid} from 'lib-admin-ui/ui/treegrid/TreeGrid';
-import {ContentSummary} from 'lib-contentstudio/app/content/ContentSummary';
 import {TreeGridBuilder} from 'lib-admin-ui/ui/treegrid/TreeGridBuilder';
 import {GridColumnConfig} from 'lib-admin-ui/ui/grid/GridColumn';
-import {DateTimeFormatter} from 'lib-admin-ui/ui/treegrid/DateTimeFormatter';
 import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import {TreeNode} from 'lib-admin-ui/ui/treegrid/TreeNode';
-import {SpanEl} from 'lib-admin-ui/dom/SpanEl';
-import {ContentSummaryListViewer} from 'lib-contentstudio/app/content/ContentSummaryListViewer';
+import {ArchiveViewItem} from './ArchiveViewItem';
+import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
+import {ArchiveContentViewItem} from './ArchiveContentViewItem';
+import {ContentSummaryAndCompareStatusViewer} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatusViewer';
+import {Viewer} from 'lib-admin-ui/ui/Viewer';
+import {ArchiveBundleViewItem} from './ArchiveBundleViewItem';
+import {ArchiveBundleViewer} from './ArchiveBundleViewer';
 
 export class ArchiveTreeGridHelper {
 
-    static createTreeGridBuilder(): TreeGridBuilder<ContentSummaryAndCompareStatus> {
-        return new TreeGridBuilder<ContentSummaryAndCompareStatus>()
+    static createTreeGridBuilder(): TreeGridBuilder<ArchiveViewItem> {
+        return new TreeGridBuilder<ArchiveViewItem>()
             .setColumnConfig(ArchiveTreeGridHelper.createColumnConfig())
             .setPartialLoadEnabled(true)
             .setLoadBufferSize(20)
@@ -22,44 +24,31 @@ export class ArchiveTreeGridHelper {
         return [{
             name: 'Name',
             id: 'displayName',
-            field: 'contentSummary.displayName',
+            field: 'displayName',
             formatter: ArchiveTreeGridHelper.nameFormatter,
             style: {cssClass: 'name', minWidth: 130}
-        }, {
-            name: 'CompareStatus',
-            id: 'compareStatus',
-            field: 'compareStatus',
-            formatter: ArchiveTreeGridHelper.formatStatus,
-            style: {cssClass: 'status', minWidth: 75, maxWidth: 75}
-        }, {
-            name: 'ModifiedTime',
-            id: 'modifiedTime',
-            field: 'contentSummary.modifiedTime',
-            formatter: DateTimeFormatter.format,
-            style: {cssClass: 'modified', minWidth: 135, maxWidth: 135}
         }];
     }
 
-    static nameFormatter(_row: number, _cell: number, _value: any, _columnDef: any, node: TreeNode<ContentSummaryAndCompareStatus>) {
-        const data: ContentSummaryAndCompareStatus = node.getData();
-
-        if (data.getContentSummary()) {
-            let viewer = <ContentSummaryListViewer> node.getViewer('name');
-            if (!viewer) {
-                viewer = new ContentSummaryListViewer();
-                node.setViewer('name', viewer);
-            }
-            viewer.setIsRelativePath(node.calcLevel() > 1);
-            viewer.setObject(node.getData());
-            return viewer ? viewer.toString() : '';
-        }
-
-        return '';
+    public static nameFormatter({}: any, {}: any, {}: any, {}: any, dataContext: TreeNode<ArchiveViewItem>) {
+        return ArchiveTreeGridHelper.getViewerForArchiveItem(dataContext).toString();
     }
 
-    static formatStatus({}: any, {}: any, {}: any, {}: any, dataContext: TreeNode<ContentSummaryAndCompareStatus>): string {
-        const data: ContentSummaryAndCompareStatus = dataContext.getData();
+    private static getViewerForArchiveItem(dataContext: TreeNode<ArchiveViewItem>): Viewer<any> {
+        if (ObjectHelper.iFrameSafeInstanceOf(dataContext.getData(), ArchiveContentViewItem)) {
+            const viewer: Viewer<ContentSummaryAndCompareStatus> = dataContext.getViewer('displayName') ||
+                                                                   new ContentSummaryAndCompareStatusViewer();
+            viewer.setObject((<ArchiveContentViewItem>dataContext.getData()).getData());
 
-        return data?.getContentSummary() ? new SpanEl().addClass(data.getStatusClass()).setHtml(data.getStatusText()).toString() : null;
+            return viewer;
+        }
+
+        if (ObjectHelper.iFrameSafeInstanceOf(dataContext.getData(), ArchiveBundleViewItem)) {
+            const viewer: Viewer<ArchiveBundleViewItem> = dataContext.getViewer('displayName') || new ArchiveBundleViewer();
+            viewer.setObject(<ArchiveBundleViewItem>dataContext.getData());
+            return viewer;
+        }
+
+        return null;
     }
 }

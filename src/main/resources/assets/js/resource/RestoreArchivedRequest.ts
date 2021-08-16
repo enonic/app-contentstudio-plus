@@ -4,9 +4,9 @@ import {ArchiveResourceRequest} from './ArchiveResourceRequest';
 
 export class RestoreArchivedRequest extends ArchiveResourceRequest<any> {
 
-    private readonly ids: ContentId[];
+    private readonly ids: string[];
 
-    constructor(ids: ContentId[]) {
+    constructor(ids: string[]) {
         super();
 
         this.ids = ids;
@@ -16,7 +16,7 @@ export class RestoreArchivedRequest extends ArchiveResourceRequest<any> {
 
     getParams(): Object {
         return {
-            contentIds: this.ids.map(id => id.toString())
+            contentIds: this.ids
         };
     }
 }
