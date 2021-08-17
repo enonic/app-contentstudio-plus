@@ -2,6 +2,7 @@ import {SpanEl} from 'lib-admin-ui/dom/SpanEl';
 import {DateTimeFormatter} from 'lib-admin-ui/ui/treegrid/DateTimeFormatter';
 import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import {ContentStatusToolbar} from 'lib-contentstudio/app/ContentStatusToolbar';
+import {i18n} from 'lib-admin-ui/util/Messages';
 
 export class ArchiveItemPreviewToolbar
     extends ContentStatusToolbar {
@@ -19,6 +20,7 @@ export class ArchiveItemPreviewToolbar
         super.setItem(item);
 
         if (item) {
+            this.status.setHtml(i18n('status.archived'));
             this.whenArchived.setHtml(DateTimeFormatter.createHtmlNoTimestamp(item.getContentSummary().getModifiedTime()));
         }
     }
