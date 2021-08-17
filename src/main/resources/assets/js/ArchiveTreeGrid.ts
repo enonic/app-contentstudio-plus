@@ -3,10 +3,7 @@ import {TreeGrid} from 'lib-admin-ui/ui/treegrid/TreeGrid';
 import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import {ContentSummaryAndCompareStatusFetcher} from 'lib-contentstudio/app/resource/ContentSummaryAndCompareStatusFetcher';
 import {ArchiveTreeGridHelper} from './ArchiveTreeGridHelper';
-import {ListArchivedItemsRequest} from './resource/ListArchivedItemsRequest';
-import {ListArchivedItemsResult} from './ListArchivedItemsResult';
 import {ContentId} from 'lib-contentstudio/app/content/ContentId';
-import {CompareStatus} from 'lib-contentstudio/app/content/CompareStatus';
 import {TreeGridContextMenu} from 'lib-admin-ui/ui/treegrid/TreeGridContextMenu';
 import {ArchiveTreeGridActions} from './ArchiveTreeGridActions';
 import {ArchiveViewItem} from './ArchiveViewItem';
@@ -15,6 +12,11 @@ import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
 import {ArchiveBundleViewItem, ArchiveBundleViewItemBuilder} from './ArchiveBundleViewItem';
 import {ArchiveContentViewItem, ArchiveContentViewItemBuilder} from './ArchiveContentViewItem';
 import {ContentResponse} from 'lib-contentstudio/app/resource/ContentResponse';
+import {GetContentByPathRequest} from 'lib-contentstudio/app/resource/GetContentByPathRequest';
+import {ContentPath} from 'lib-contentstudio/app/content/ContentPath';
+import {ListContentByIdRequest} from 'lib-contentstudio/app/resource/ListContentByIdRequest';
+import {Content} from 'lib-contentstudio/app/content/Content';
+import {ContentSummary} from 'lib-contentstudio/app/content/ContentSummary';
 
 export class ArchiveTreeGrid extends TreeGrid<ArchiveViewItem> {
 
@@ -25,13 +27,14 @@ export class ArchiveTreeGrid extends TreeGrid<ArchiveViewItem> {
     }
 
     protected fetchRoot(): Q.Promise<ArchiveViewItem[]> {
-        return new ListArchivedItemsRequest().sendAndParse().then((result: ListArchivedItemsResult[]) => {
-            return result.map((archiveBundle: ListArchivedItemsResult) => {
-                return new ArchiveBundleViewItemBuilder()
-                    .setBundleId(archiveBundle.id)
-                    .setArchiveTimeAsString(archiveBundle.archiveTime)
-                    .setContentIdsAsStrings(archiveBundle.contentIds)
-                    .build();
+        return new GetContentByPathRequest(ContentPath.fromString('/__archive__')).sendAndParse().then((content: Content) => {
+            return new ListContentByIdRequest(content.getContentId()).sendAndParse().then((response: ContentResponse<ContentSummary>) => {
+                return response.getContents().map((archiveBundleContent: ContentSummary) => {
+                    return new ArchiveBundleViewItemBuilder()
+                        .setBundleId(archiveBundleContent.getId())
+                        .setArchiveTime(archiveBundleContent.getCreatedTime())
+                        .build();
+                });
             });
         });
     }
@@ -45,8 +48,9 @@ export class ArchiveTreeGrid extends TreeGrid<ArchiveViewItem> {
     }
 
     private fetchArchiveBundleChildren(archiveBundle: ArchiveBundleViewItem): Q.Promise<ArchiveViewItem[]> {
-        return ContentSummaryAndCompareStatusFetcher.fetchByIds(archiveBundle.getContentIds()).then(
-            (items: ContentSummaryAndCompareStatus[]) => {
+        return ContentSummaryAndCompareStatusFetcher.fetchChildren(new ContentId(archiveBundle.getId())).then(
+            (response: ContentResponse<ContentSummaryAndCompareStatus> ) => {
+                const items: ContentSummaryAndCompareStatus[] = response.getContents();
                 return ContentSummaryAndCompareStatusFetcher.updateRenderableContents(items).then(() => {
                     return items.map((item: ContentSummaryAndCompareStatus) => {
                         return new ArchiveContentViewItemBuilder()
