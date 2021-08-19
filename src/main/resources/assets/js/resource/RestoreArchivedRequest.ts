@@ -2,7 +2,7 @@ import { HttpMethod } from 'lib-admin-ui/rest/HttpMethod';
 import { ContentId } from 'lib-contentstudio/app/content/ContentId';
 import {ArchiveResourceRequest} from './ArchiveResourceRequest';
 
-export class RestoreArchivedRequest extends ArchiveResourceRequest<any> {
+export class RestoreArchivedRequest extends ArchiveResourceRequest {
 
     private readonly ids: string[];
 

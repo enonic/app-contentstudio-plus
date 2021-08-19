@@ -20,6 +20,7 @@ import {ContentSummary} from 'lib-contentstudio/app/content/ContentSummary';
 import {GetPrincipalByKeyRequest} from 'lib-contentstudio/app/resource/GetPrincipalByKeyRequest';
 import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
 import {Principal} from 'lib-admin-ui/security/Principal';
+import {ArchiveTreeGridRefreshRequiredEvent} from './ArchiveTreeGridRefreshRequiredEvent';
 
 export class ArchiveTreeGrid extends TreeGrid<ArchiveViewItem> {
 
@@ -27,6 +28,10 @@ export class ArchiveTreeGrid extends TreeGrid<ArchiveViewItem> {
         super(ArchiveTreeGridHelper.createTreeGridBuilder());
 
         this.setContextMenu(new TreeGridContextMenu(new ArchiveTreeGridActions()));
+
+        ArchiveTreeGridRefreshRequiredEvent.on(() => {
+            this.reload();
+        });
     }
 
     protected fetchRoot(): Q.Promise<ArchiveViewItem[]> {
