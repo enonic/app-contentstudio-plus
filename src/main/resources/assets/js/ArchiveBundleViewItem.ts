@@ -1,17 +1,15 @@
 import {ArchiveViewItem, ArchiveViewItemBuilder} from './ArchiveViewItem';
 import {i18n} from 'lib-admin-ui/util/Messages';
+import {Principal} from 'lib-admin-ui/security/Principal';
 
 export class ArchiveBundleViewItem extends ArchiveViewItem {
 
-    private readonly bundleId: string;
-
-    private readonly archiveTime: Date;
+    private readonly archivedBy: Principal;
 
     constructor(builder: ArchiveBundleViewItemBuilder) {
         super(builder);
 
-        this.bundleId = builder.bundleId;
-        this.archiveTime = builder.archiveTime;
+        this.archivedBy = builder.archivedBy;
     }
 
     getDisplayName(): string {
@@ -26,38 +24,26 @@ export class ArchiveBundleViewItem extends ArchiveViewItem {
         return null;
     }
 
-    getId(): string {
-        return this.bundleId;
-    }
-
     hasChildren(): boolean {
         return true;
     }
 
     getArchiveTime(): Date {
-        return this.archiveTime;
+        return this.data.getContentSummary().getCreatedTime();
+    }
+
+    getArchivedBy(): Principal {
+        return this.archivedBy;
     }
 
 }
 
 export class ArchiveBundleViewItemBuilder extends ArchiveViewItemBuilder {
 
-    bundleId: string;
+    archivedBy: Principal;
 
-    archiveTime: Date;
-
-    setBundleId(value: string): ArchiveBundleViewItemBuilder {
-        this.bundleId = value;
-        return this;
-    }
-
-    setArchiveTime(archiveTime: Date): ArchiveBundleViewItemBuilder {
-        this.archiveTime = archiveTime;
-        return this;
-    }
-
-    setArchiveTimeAsString(archiveTimeAsString: string): ArchiveBundleViewItemBuilder {
-        this.archiveTime = new Date(Date.parse(archiveTimeAsString));
+    setArchivedBy(value: Principal): ArchiveBundleViewItemBuilder {
+        this.archivedBy = value;
         return this;
     }
 

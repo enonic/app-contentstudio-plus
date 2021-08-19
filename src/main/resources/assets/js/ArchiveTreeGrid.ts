@@ -17,6 +17,9 @@ import {ContentPath} from 'lib-contentstudio/app/content/ContentPath';
 import {ListContentByIdRequest} from 'lib-contentstudio/app/resource/ListContentByIdRequest';
 import {Content} from 'lib-contentstudio/app/content/Content';
 import {ContentSummary} from 'lib-contentstudio/app/content/ContentSummary';
+import {GetPrincipalByKeyRequest} from 'lib-contentstudio/app/resource/GetPrincipalByKeyRequest';
+import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
+import {Principal} from 'lib-admin-ui/security/Principal';
 
 export class ArchiveTreeGrid extends TreeGrid<ArchiveViewItem> {
 
@@ -29,13 +32,40 @@ export class ArchiveTreeGrid extends TreeGrid<ArchiveViewItem> {
     protected fetchRoot(): Q.Promise<ArchiveViewItem[]> {
         return new GetContentByPathRequest(ContentPath.fromString('/__archive__')).sendAndParse().then((content: Content) => {
             return new ListContentByIdRequest(content.getContentId()).sendAndParse().then((response: ContentResponse<ContentSummary>) => {
-                return response.getContents().map((archiveBundleContent: ContentSummary) => {
-                    return new ArchiveBundleViewItemBuilder()
-                        .setBundleId(archiveBundleContent.getId())
-                        .setArchiveTime(archiveBundleContent.getCreatedTime())
-                        .build();
+                return this.fetchPrincipals(response.getContents()).then((usersMap: Map<string, Principal>) => {
+                    return response.getContents().map((archiveBundleContent: ContentSummary) => {
+                        return new ArchiveBundleViewItemBuilder()
+                            .setArchivedBy(usersMap.get(archiveBundleContent.getModifier()))
+                            .setData(ContentSummaryAndCompareStatus.fromContentSummary(archiveBundleContent))
+                            .build();
+                    });
                 });
             });
+        });
+    }
+
+    private fetchPrincipals(bundles: ContentSummary[]): Q.Promise<Map<string, Principal>> {
+        const usersMap: Map<string, Q.Promise<Principal>> = new Map();
+        const promises: Q.Promise<Principal>[] = [];
+
+        bundles.forEach((item: ContentSummary) => {
+            const id: string = item.getModifier();
+
+            if (!usersMap.has(id)) {
+                const requestPromise: Q.Promise<Principal> = new GetPrincipalByKeyRequest(PrincipalKey.fromString(id)).sendAndParse();
+                usersMap.set(id, requestPromise);
+                promises.push(requestPromise);
+            }
+        });
+
+        return Q.all(promises).then((principals: Principal[]) => {
+            const resultsMap: Map<string, Principal> = new Map();
+
+            principals.forEach((principal: Principal) => {
+                resultsMap.set(principal.getKey().toString(), principal);
+            });
+
+            return resultsMap;
         });
     }
 
@@ -51,6 +81,7 @@ export class ArchiveTreeGrid extends TreeGrid<ArchiveViewItem> {
         return ContentSummaryAndCompareStatusFetcher.fetchChildren(new ContentId(archiveBundle.getId())).then(
             (response: ContentResponse<ContentSummaryAndCompareStatus> ) => {
                 const items: ContentSummaryAndCompareStatus[] = response.getContents();
+
                 return ContentSummaryAndCompareStatusFetcher.updateRenderableContents(items).then(() => {
                     return items.map((item: ContentSummaryAndCompareStatus) => {
                         return new ArchiveContentViewItemBuilder()

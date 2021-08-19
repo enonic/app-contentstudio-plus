@@ -24,17 +24,6 @@
                 }
               }
             }
-
-            .extended-viewer {
-              .names-and-icon-view {
-
-                .@{_COMMON_PREFIX}main-name {
-                  .display-name-postfix {
-                    color: initial;
-                  }
-                }
-              }
-            }
           }
 
           &.status, &.modified {
@@ -43,6 +32,19 @@
 
           &.modified {
             padding-left: 8px;
+          }
+
+          &.highlight {
+            .extended-viewer {
+              .names-and-icon-view {
+
+                .@{_COMMON_PREFIX}main-name {
+                  .display-name-postfix {
+                    color: @admin-white;
+                  }
+                }
+              }
+            }
           }
         }
       }
