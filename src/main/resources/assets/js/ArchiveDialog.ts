@@ -1,4 +1,3 @@
-import {i18n} from 'lib-admin-ui/util/Messages';
 import {ModalDialog, ModalDialogConfig} from 'lib-admin-ui/ui/dialog/ModalDialog';
 import {ConfirmValueDialog} from 'lib-contentstudio/app/remove/ConfirmValueDialog';
 import {ArchiveBundleViewItem} from './ArchiveBundleViewItem';
@@ -6,14 +5,11 @@ import {ArchiveBundleViewer} from './ArchiveBundleViewer';
 import {H6El} from 'lib-admin-ui/dom/H6El';
 import {ListBox} from 'lib-admin-ui/ui/selector/list/ListBox';
 import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
-import {ContentSummaryAndCompareStatusViewer} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatusViewer';
-import {ArchiveContentViewItemBuilder} from './ArchiveContentViewItem';
 import {ContentSummaryAndCompareStatusFetcher} from 'lib-contentstudio/app/resource/ContentSummaryAndCompareStatusFetcher';
 import {ContentId} from 'lib-contentstudio/app/content/ContentId';
 import {ContentResponse} from 'lib-contentstudio/app/resource/ContentResponse';
 import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
 import {Action} from 'lib-admin-ui/ui/Action';
-import {ArchiveContentViewer} from './ArchiveContentViewer';
 import {ArchiveContentDialogViewer} from './ArchiveContentDialogViewer';
 import {GetDescendantsOfContentsRequest} from 'lib-contentstudio/app/resource/GetDescendantsOfContentsRequest';
 

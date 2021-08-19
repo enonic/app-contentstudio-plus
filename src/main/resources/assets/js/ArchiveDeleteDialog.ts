@@ -1,8 +1,8 @@
 import {ArchiveDialog} from './ArchiveDialog';
 import {i18n} from 'lib-admin-ui/util/Messages';
-import {Action} from 'lib-admin-ui/ui/Action';
 import {DeleteContentRequest} from 'lib-contentstudio/app/resource/DeleteContentRequest';
 import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
+import {ArchiveTreeGridRefreshRequiredEvent} from './ArchiveTreeGridRefreshRequiredEvent';
 
 export class ArchiveDeleteDialog extends ArchiveDialog {
 
@@ -30,7 +30,10 @@ export class ArchiveDeleteDialog extends ArchiveDialog {
     protected doAction() {
         new DeleteContentRequest()
             .addContentPath(this.archiveBundle.getData().getPath())
-            .sendAndParse()
+            .sendAndParseWithPolling()
+            .then(() => {
+                new ArchiveTreeGridRefreshRequiredEvent().fire();
+            })
             .catch(DefaultErrorHandler.handle);
     }
 

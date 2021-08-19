@@ -1,12 +1,13 @@
 import {ArchiveDialog} from './ArchiveDialog';
 import {i18n} from 'lib-admin-ui/util/Messages';
-import {Action} from 'lib-admin-ui/ui/Action';
-import {ArchiveViewItem} from './ArchiveViewItem';
 import {RestoreArchivedRequest} from './resource/RestoreArchivedRequest';
 import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
 import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
+import {ArchiveTreeGridRefreshRequiredEvent} from './ArchiveTreeGridRefreshRequiredEvent';
+import {DeleteContentRequest} from 'lib-contentstudio/app/resource/DeleteContentRequest';
 
-export class ArchiveRestoreDialog extends ArchiveDialog {
+export class ArchiveRestoreDialog
+    extends ArchiveDialog {
 
     private static INSTANCE: ArchiveRestoreDialog;
 
@@ -31,11 +32,21 @@ export class ArchiveRestoreDialog extends ArchiveDialog {
 
     protected doAction() {
         const ids: string[] = this.itemsList.getItems().map((item: ContentSummaryAndCompareStatus) => item.getId());
-        new RestoreArchivedRequest(ids).sendAndParse().catch(DefaultErrorHandler.handle);
+        new RestoreArchivedRequest(ids)
+            .sendAndParseWithPolling()
+            .then(() => {
+                new DeleteContentRequest()
+                    .addContentPath(this.archiveBundle.getData().getPath())
+                    .sendAndParseWithPolling()
+                    .then(() => {
+                        new ArchiveTreeGridRefreshRequiredEvent().fire();
+                    });
+            })
+            .catch(DefaultErrorHandler.handle);
     }
 
     protected getConfirmValueDialogTitle(): string {
-        return  i18n('dialog.confirmRestore.title');
+        return i18n('dialog.confirmRestore.title');
     }
 
     protected getConfirmValueDialogSubTitle(): string {
