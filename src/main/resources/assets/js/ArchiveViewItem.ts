@@ -1,11 +1,14 @@
 import {Equitable} from 'lib-admin-ui/Equitable';
 import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
 import {ViewItem} from 'lib-admin-ui/app/view/ViewItem';
+import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 
 export abstract class ArchiveViewItem implements ViewItem {
 
+    protected readonly data: ContentSummaryAndCompareStatus;
+
     protected constructor(builder: ArchiveViewItemBuilder) {
-    //
+        this.data = builder.data;
     }
 
     equals(o: Equitable): boolean {
@@ -34,7 +37,9 @@ export abstract class ArchiveViewItem implements ViewItem {
         return true;
     }
 
-    abstract getId(): string;
+    getId(): string {
+        return this.data.getContentSummary().getId();
+    }
 
     abstract getDisplayName(): string;
 
@@ -43,12 +48,23 @@ export abstract class ArchiveViewItem implements ViewItem {
     abstract getIconUrl();
 
     abstract hasChildren(): boolean;
+
+    getData(): ContentSummaryAndCompareStatus {
+        return this.data;
+    }
 }
 
 export abstract class ArchiveViewItemBuilder {
 
+    data: ContentSummaryAndCompareStatus;
+
     constructor(source?: ArchiveViewItem) {
         return;
+    }
+
+    setData(value: ContentSummaryAndCompareStatus): ArchiveViewItemBuilder {
+        this.data = value;
+        return this;
     }
 
     abstract build(): ArchiveViewItem;

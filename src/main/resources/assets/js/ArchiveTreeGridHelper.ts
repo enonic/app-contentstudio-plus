@@ -5,10 +5,10 @@ import {TreeNode} from 'lib-admin-ui/ui/treegrid/TreeNode';
 import {ArchiveViewItem} from './ArchiveViewItem';
 import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
 import {ArchiveContentViewItem} from './ArchiveContentViewItem';
-import {ContentSummaryAndCompareStatusViewer} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatusViewer';
 import {Viewer} from 'lib-admin-ui/ui/Viewer';
 import {ArchiveBundleViewItem} from './ArchiveBundleViewItem';
 import {ArchiveBundleViewer} from './ArchiveBundleViewer';
+import {ArchiveContentViewer} from './ArchiveContentViewer';
 
 export class ArchiveTreeGridHelper {
 
@@ -37,7 +37,7 @@ export class ArchiveTreeGridHelper {
     private static getViewerForArchiveItem(dataContext: TreeNode<ArchiveViewItem>): Viewer<any> {
         if (ObjectHelper.iFrameSafeInstanceOf(dataContext.getData(), ArchiveContentViewItem)) {
             const viewer: Viewer<ContentSummaryAndCompareStatus> = dataContext.getViewer('displayName') ||
-                                                                   new ContentSummaryAndCompareStatusViewer();
+                                                                   new ArchiveContentViewer();
             viewer.setObject((<ArchiveContentViewItem>dataContext.getData()).getData());
 
             return viewer;

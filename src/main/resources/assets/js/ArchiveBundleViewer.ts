@@ -7,6 +7,10 @@ import {ArchiveBundleViewItem} from './ArchiveBundleViewItem';
 export class ArchiveBundleViewer
     extends ExtendedViewer<ArchiveBundleViewItem> {
 
+    constructor() {
+        super('archive-bundle-viewer');
+    }
+
     resolveDisplayName(item: ArchiveBundleViewItem): string {
         return item.getDisplayName();
     }
@@ -16,7 +20,8 @@ export class ArchiveBundleViewer
     }
 
     resolveSubName(item: ArchiveBundleViewItem): string {
-        return `<${i18n('text.noDescription')}>`;
+        return i18n('field.preview.toolbar.status',
+            item.getArchivedBy()?.getDisplayName() || item.getData().getContentSummary().getModifier());
     }
 
     resolveIconClass(item: ArchiveBundleViewItem): string {
