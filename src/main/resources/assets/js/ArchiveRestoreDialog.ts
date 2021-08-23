@@ -31,8 +31,7 @@ export class ArchiveRestoreDialog
     }
 
     protected doAction() {
-        const ids: string[] = this.itemsList.getItems().map((item: ContentSummaryAndCompareStatus) => item.getId());
-        new RestoreArchivedRequest(ids)
+        new RestoreArchivedRequest([this.archiveBundle.getId()])
             .sendAndParseWithPolling()
             .then(() => {
                 new DeleteContentRequest()
