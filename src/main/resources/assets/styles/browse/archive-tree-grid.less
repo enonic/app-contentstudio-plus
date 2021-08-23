@@ -7,6 +7,12 @@
       .slick-row {
         display: flex;
 
+        &.non-selectable {
+          .slick-cell-checkboxsel label {
+            display: none;
+          }
+        }
+
         .slick-cell {
           position: static;
 
