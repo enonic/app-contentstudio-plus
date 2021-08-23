@@ -74,6 +74,7 @@ export class ArchiveAppBar extends AppBar {
             this.selectedProjectViewer.setTitle(i18n('text.selectContext'));
             this.addClass('appbar-content');
             this.appendChild(this.selectedProjectViewer);
+            this.getAppIcon().setAppName(i18n('app.archive'));
 
             return rendered;
         });
