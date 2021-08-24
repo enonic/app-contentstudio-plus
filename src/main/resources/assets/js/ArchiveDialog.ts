@@ -3,15 +3,11 @@ import {ConfirmValueDialog} from 'lib-contentstudio/app/remove/ConfirmValueDialo
 import {ArchiveBundleViewItem} from './ArchiveBundleViewItem';
 import {ArchiveBundleViewer} from './ArchiveBundleViewer';
 import {H6El} from 'lib-admin-ui/dom/H6El';
-import {ListBox} from 'lib-admin-ui/ui/selector/list/ListBox';
-import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
-import {ContentSummaryAndCompareStatusFetcher} from 'lib-contentstudio/app/resource/ContentSummaryAndCompareStatusFetcher';
 import {ContentId} from 'lib-contentstudio/app/content/ContentId';
-import {ContentResponse} from 'lib-contentstudio/app/resource/ContentResponse';
-import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
 import {Action} from 'lib-admin-ui/ui/Action';
-import {ArchiveContentDialogViewer} from './ArchiveContentDialogViewer';
 import {GetDescendantsOfContentsRequest} from 'lib-contentstudio/app/resource/GetDescendantsOfContentsRequest';
+import {ArchiveItemsList} from './ArchiveItemsList';
+import {AppHelper} from 'lib-admin-ui/util/AppHelper';
 
 export abstract class ArchiveDialog extends ModalDialog {
 
@@ -56,6 +52,34 @@ export abstract class ArchiveDialog extends ModalDialog {
         this.archiveAction.onExecuted(() => {
             this.confirmValueDialog.setValueToCheck('' + this.itemsList.getItemCount()).open();
         });
+
+        const scrollHandler = AppHelper.debounce(() => {
+            if (this.isScrolledToTheBottom()) {
+                this.itemsList.load();
+            }
+        }, 300);
+
+        this.getBody().onScroll(() => {
+            scrollHandler();
+        });
+
+        this.itemsList.onItemsAdded(() => {
+            if (this.isClosed()) {
+                return;
+            }
+
+            this.resizeHandler(); // to toggle fullscreen mode if needed
+
+            if (this.isScrolledToTheBottom()) {
+                this.itemsList.load();
+            }
+        });
+    }
+
+    private isScrolledToTheBottom() {
+        const dialogBodyEl: HTMLElement = this.getBody().getHTMLElement();
+
+        return dialogBodyEl.scrollHeight - dialogBodyEl.scrollTop - dialogBodyEl.clientHeight < 200;
     }
 
     protected executeAction() {
@@ -70,18 +94,16 @@ export abstract class ArchiveDialog extends ModalDialog {
         this.archiveBundleViewer.setObject(archive);
 
         new GetDescendantsOfContentsRequest(archive.getData().getPath()).sendAndParse().then((ids: ContentId[]) => {
-            ContentSummaryAndCompareStatusFetcher.fetchByIds(ids).then((items: ContentSummaryAndCompareStatus[]) => {
-                this.itemsList.setItems(items);
-                this.archiveAction.setLabel(`${this.getArchiveActionTitle()} (${items.length})`);
-            }).catch(DefaultErrorHandler.handle);
+            this.itemsList.setItemsIds(ids);
+            this.archiveAction.setLabel(`${this.getArchiveActionTitle()} (${ids.length})`);
         });
 
         return this;
     }
 
-    private loadArchivedBundleContents(): Q.Promise<ContentSummaryAndCompareStatus[]> {
-        return ContentSummaryAndCompareStatusFetcher.fetchChildren(new ContentId(this.archiveBundle.getId())).then(
-            (response: ContentResponse<ContentSummaryAndCompareStatus>) => response.getContents());
+    close(): void {
+        super.close();
+        this.itemsList.clearItems();
     }
 
     protected abstract getSubtitle(): string;
@@ -105,24 +127,5 @@ export abstract class ArchiveDialog extends ModalDialog {
 
             return rendered;
         });
-    }
-}
-
-export class ArchiveItemsList extends ListBox<ContentSummaryAndCompareStatus> {
-
-    constructor() {
-        super('archive-items-list');
-    }
-
-    protected createItemView(item: ContentSummaryAndCompareStatus, readOnly: boolean): ArchiveContentDialogViewer {
-        const viewer: ArchiveContentDialogViewer = new ArchiveContentDialogViewer();
-
-        viewer.setObject(item);
-
-        return viewer;
-    }
-
-    protected getItemId(item: ContentSummaryAndCompareStatus): string {
-        return item.getId();
     }
 }
