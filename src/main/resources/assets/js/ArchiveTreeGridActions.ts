@@ -21,10 +21,6 @@ export class ArchiveTreeGridActions
 
     private selectedItems: ArchiveViewItem[] = [];
 
-    private confirmValueDialog?: ConfirmValueDialog;
-
-    private confirmationDialog?: ConfirmationDialog;
-
     constructor() {
         this.restoreAction = this.createRestoreAction();
         this.deleteAction = this.createDeleteAction();
