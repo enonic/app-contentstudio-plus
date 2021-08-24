@@ -27,10 +27,13 @@ export class ArchiveTreeGrid extends TreeGrid<ArchiveViewItem> {
     constructor() {
         super(ArchiveTreeGridHelper.createTreeGridBuilder());
 
-        this.setContextMenu(new TreeGridContextMenu(new ArchiveTreeGridActions()));
+        const archiveTreeGridActions: ArchiveTreeGridActions = new ArchiveTreeGridActions();
+        this.setContextMenu(new TreeGridContextMenu(archiveTreeGridActions));
 
         ArchiveTreeGridRefreshRequiredEvent.on(() => {
+            this.deselectAll();
             this.reload();
+            archiveTreeGridActions.updateActionsEnabledState([]);
         });
     }
 
