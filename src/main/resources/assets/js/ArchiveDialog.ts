@@ -7,7 +7,6 @@ import {ContentId} from 'lib-contentstudio/app/content/ContentId';
 import {Action} from 'lib-admin-ui/ui/Action';
 import {GetDescendantsOfContentsRequest} from 'lib-contentstudio/app/resource/GetDescendantsOfContentsRequest';
 import {ArchiveItemsList} from './ArchiveItemsList';
-import {AppHelper} from 'lib-admin-ui/util/AppHelper';
 
 export abstract class ArchiveDialog extends ModalDialog {
 
@@ -53,33 +52,13 @@ export abstract class ArchiveDialog extends ModalDialog {
             this.confirmValueDialog.setValueToCheck('' + this.itemsList.getItemCount()).open();
         });
 
-        const scrollHandler = AppHelper.debounce(() => {
-            if (this.isScrolledToTheBottom()) {
-                this.itemsList.load();
-            }
-        }, 300);
-
-        this.getBody().onScroll(() => {
-            scrollHandler();
-        });
-
         this.itemsList.onItemsAdded(() => {
             if (this.isClosed()) {
                 return;
             }
 
             this.resizeHandler(); // to toggle fullscreen mode if needed
-
-            if (this.isScrolledToTheBottom()) {
-                this.itemsList.load();
-            }
         });
-    }
-
-    private isScrolledToTheBottom() {
-        const dialogBodyEl: HTMLElement = this.getBody().getHTMLElement();
-
-        return dialogBodyEl.scrollHeight - dialogBodyEl.scrollTop - dialogBodyEl.clientHeight < 200;
     }
 
     protected executeAction() {

@@ -10,15 +10,13 @@ import {Application} from 'lib-admin-ui/app/Application';
 import {NotifyManager} from 'lib-admin-ui/notify/NotifyManager';
 import {ApplicationEvent, ApplicationEventType} from 'lib-admin-ui/application/ApplicationEvent';
 import {UriHelper} from 'lib-admin-ui/util/UriHelper';
-import {Path} from 'lib-admin-ui/rest/Path';
 import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
 import {Project} from 'lib-contentstudio/app/settings/data/project/Project';
 import {ProjectListWithMissingRequest} from 'lib-contentstudio/app/settings/resource/ProjectListWithMissingRequest';
 import {ProjectHelper} from 'lib-contentstudio/app/settings/data/project/ProjectHelper';
 import {ProjectContext} from 'lib-contentstudio/app/project/ProjectContext';
-import {ContentApp} from 'lib-contentstudio/app/ContentApp';
-import {SettingsApp} from 'lib-contentstudio/app/settings/SettingsApp';
 import {ArchiveApp} from './ArchiveApp';
+import {AggregatedServerEventsListener} from 'lib-contentstudio/app/event/AggregatedServerEventsListener';
 
 declare const CONFIG;
 
@@ -121,6 +119,9 @@ async function startApplication() {
     const connectionDetector = startLostConnectionDetector();
 
     initApplicationEventListener();
+
+    new AggregatedServerEventsListener([application]).start();
+
 
     initProjectContext(application)
         .catch((reason: any) => {

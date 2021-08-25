@@ -21,20 +21,31 @@ import {GetPrincipalByKeyRequest} from 'lib-contentstudio/app/resource/GetPrinci
 import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
 import {Principal} from 'lib-admin-ui/security/Principal';
 import {ArchiveTreeGridRefreshRequiredEvent} from './ArchiveTreeGridRefreshRequiredEvent';
+import {ProjectContext} from 'lib-contentstudio/app/project/ProjectContext';
 
 export class ArchiveTreeGrid extends TreeGrid<ArchiveViewItem> {
+
+    private readonly treeGridActions: ArchiveTreeGridActions;
 
     constructor() {
         super(ArchiveTreeGridHelper.createTreeGridBuilder());
 
-        const archiveTreeGridActions: ArchiveTreeGridActions = new ArchiveTreeGridActions();
-        this.setContextMenu(new TreeGridContextMenu(archiveTreeGridActions));
+        this.treeGridActions = new ArchiveTreeGridActions();
+        this.setContextMenu(new TreeGridContextMenu(this.treeGridActions));
 
         ArchiveTreeGridRefreshRequiredEvent.on(() => {
-            this.deselectAll();
-            this.reload();
-            archiveTreeGridActions.updateActionsEnabledState([]);
+            this.refresh();
         });
+
+        ProjectContext.get().onProjectChanged(() => {
+            this.refresh();
+        });
+    }
+
+    refresh() {
+        this.deselectAll();
+        this.reload();
+        this.treeGridActions.updateActionsEnabledState([]);
     }
 
     protected fetchRoot(): Q.Promise<ArchiveViewItem[]> {
