@@ -1,0 +1,25 @@
+.archive-items-list {
+  overflow: auto;
+  position: relative;
+  margin-top: 10px;
+  min-height: 50px;
+
+  &.icon-spinner {
+    &:before {
+      position: absolute;
+      display: none;
+      .animation(rotate360, .5s, 0s, linear);
+      font-size: 32px;
+      left: calc(50% - 24px);
+      top: calc(50% - 24px);
+    }
+  }
+
+  &.loading.icon-spinner {
+    opacity: 0.5;
+
+    &:before {
+      display: block;
+    }
+  }
+}

@@ -4,35 +4,67 @@ import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/Cont
 import {ContentSummaryAndCompareStatusFetcher} from 'lib-contentstudio/app/resource/ContentSummaryAndCompareStatusFetcher';
 import {ContentId} from 'lib-contentstudio/app/content/ContentId';
 import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
+import {Element} from 'lib-admin-ui/dom/Element';
+import {AppHelper} from 'lib-admin-ui/util/AppHelper';
 
 export class ArchiveItemsList extends ListBox<ContentSummaryAndCompareStatus> {
 
     private static LOADING_CLASS: string = 'loading';
 
-    private ids: ContentId[];
+    private idsToLoad: ContentId[];
 
     private loading: boolean;
 
-    constructor() {
+    private scrollableContainer: Element;
+
+    constructor(scrollableContainer?: Element) {
         super('archive-items-list icon-spinner');
+
+        this.scrollableContainer = scrollableContainer || this;
+
+        this.initListeners();
+    }
+
+    private initListeners() {
+        const scrollHandler = AppHelper.debounce(() => {
+            if (this.isScrolledToTheBottom()) {
+                this.load();
+            }
+        }, 300);
+
+        this.scrollableContainer.onScroll(() => {
+            scrollHandler();
+        });
+
+        this.onItemsAdded(() => {
+            if (this.isScrolledToTheBottom()) {
+                this.load();
+            }
+        });
+    }
+
+    private isScrolledToTheBottom() {
+        const scrollableContainerHTML: HTMLElement = this.scrollableContainer.getHTMLElement();
+
+        return scrollableContainerHTML.scrollHeight - scrollableContainerHTML.scrollTop - scrollableContainerHTML.clientHeight < 200;
     }
 
     setItemsIds(ids: ContentId[]) {
-        this.ids = ids;
+        this.idsToLoad = ids;
         this.load();
     }
 
-    load() {
+    private load() {
         const totalLoaded: number = this.getItemCount();
 
-        if (this.loading || totalLoaded >= this.ids.length) {
+        if (this.loading || totalLoaded >= this.idsToLoad.length) {
             return;
         }
 
         this.loading = true;
         this.addClass(ArchiveItemsList.LOADING_CLASS);
 
-        const idsToLoad: ContentId[] = this.ids.slice(totalLoaded, totalLoaded + 10);
+        const idsToLoad: ContentId[] = this.idsToLoad.slice(totalLoaded, totalLoaded + 10);
 
         ContentSummaryAndCompareStatusFetcher.fetchByIds(idsToLoad)
             .then((items: ContentSummaryAndCompareStatus[]) => {
