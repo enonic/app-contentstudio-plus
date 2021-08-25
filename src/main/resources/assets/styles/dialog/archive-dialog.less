@@ -5,36 +5,28 @@
 
   .modal-dialog-wrapper {
     .modal-dialog-body {
+      .dialog-content {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
 
-      .items-title {
-        margin-top: 15px;
-        font-size: 12px;
-        font-weight: bold;
+        .archive-bundle-viewer {
+          flex-shrink: 0;
+        }
+        
+        .items-title {
+          margin-top: 15px;
+          font-size: 12px;
+          font-weight: bold;
+        }
       }
+    }
+  }
 
-      .archive-items-list {
-        position: relative;
-        margin-top: 10px;
-        min-height: 50px;
-
-        &.icon-spinner {
-          &:before {
-            position: fixed;
-            display: none;
-            .animation(rotate360, .5s, 0s, linear);
-            font-size: 48px;
-            left: calc(50% - 24px);
-            top: calc(50% - 24px);
-          }
-        }
-
-        &.loading.icon-spinner {
-          opacity: 0.5;
-
-          &:before {
-            display: block;
-          }
-        }
+  &.fullscreen {
+    .modal-dialog-wrapper {
+      .modal-dialog-body {
+        overflow: visible;
       }
     }
   }
