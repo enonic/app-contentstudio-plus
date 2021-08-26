@@ -49,7 +49,7 @@ export abstract class ArchiveDialog extends ModalDialog {
         super.initListeners();
 
         this.archiveAction.onExecuted(() => {
-            this.confirmValueDialog.setValueToCheck('' + this.itemsList.getItemCount()).open();
+            this.confirmValueDialog.open();
         });
 
         this.itemsList.onItemsAdded(() => {
@@ -74,6 +74,7 @@ export abstract class ArchiveDialog extends ModalDialog {
 
         new GetDescendantsOfContentsRequest(archive.getData().getPath()).sendAndParse().then((ids: ContentId[]) => {
             this.itemsList.setItemsIds(ids);
+            this.confirmValueDialog.setValueToCheck('' + ids.length);
             this.archiveAction.setLabel(`${this.getArchiveActionTitle()} (${ids.length})`);
         });
 
