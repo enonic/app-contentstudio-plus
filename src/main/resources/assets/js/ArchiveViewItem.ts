@@ -38,7 +38,7 @@ export abstract class ArchiveViewItem implements ViewItem {
     }
 
     getId(): string {
-        return this.data.getContentSummary().getId();
+        return this.data.getContentSummary()?.getId();
     }
 
     abstract getDisplayName(): string;

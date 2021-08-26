@@ -93,7 +93,7 @@ export class ArchiveTreeGrid extends TreeGrid<ArchiveViewItem> {
             return this.fetchArchiveBundleChildren(<ArchiveBundleViewItem>parentNode.getData());
         }
 
-        return this.fetchContentChildren((<ArchiveContentViewItem>parentNode.getData()).getData());
+        return this.fetchContentChildren(parentNode);
     }
 
     private fetchArchiveBundleChildren(archiveBundle: ArchiveBundleViewItem): Q.Promise<ArchiveViewItem[]> {
@@ -111,15 +111,37 @@ export class ArchiveTreeGrid extends TreeGrid<ArchiveViewItem> {
             });
     }
 
-    private fetchContentChildren(content: ContentSummaryAndCompareStatus): Q.Promise<ArchiveViewItem[]> {
-        return ContentSummaryAndCompareStatusFetcher.fetchChildren(content.getContentId()).then(
+    private fetchContentChildren(parentNode: TreeNode<ArchiveViewItem>): Q.Promise<ArchiveViewItem[]> {
+        if (parentNode.hasChildren() && this.isEmptyNode(parentNode.getChildren()[parentNode.getChildren().length - 1])) {
+            parentNode.getChildren().pop();
+        }
+
+        const content: ContentSummaryAndCompareStatus = (<ArchiveContentViewItem>parentNode.getData()).getData();
+        const from: number = parentNode.getChildren().length;
+
+        return ContentSummaryAndCompareStatusFetcher.fetchChildren(content.getContentId(), from, 10).then(
             (response: ContentResponse<ContentSummaryAndCompareStatus>) => {
-                return response.getContents().map((c: ContentSummaryAndCompareStatus) => {
+                const total: number = response.getMetadata().getTotalHits();
+                parentNode.setMaxChildren(total);
+
+                const newItems: ArchiveViewItem[] = response.getContents().map((c: ContentSummaryAndCompareStatus) => {
                     return new ArchiveContentViewItemBuilder()
                         .setData(c)
                         .build();
                 });
+
+                if (parentNode.getChildren().length + newItems.length < total) {
+                    newItems.push(new ArchiveContentViewItemBuilder()
+                        .setData(new ContentSummaryAndCompareStatus())
+                        .build());
+                }
+
+                return parentNode.getChildren().map((child: TreeNode<ArchiveViewItem>) => child.getData()).concat(newItems);
             });
+    }
+
+    protected isEmptyNode(node: TreeNode<ArchiveViewItem>): boolean {
+        return !node.getData().getData().getContentSummary();
     }
 
     protected hasChildren(item: ArchiveViewItem): boolean {
