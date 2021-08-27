@@ -16,7 +16,7 @@ export class ArchiveTreeGridHelper {
         return new TreeGridBuilder<ArchiveViewItem>()
             .setColumnConfig(ArchiveTreeGridHelper.createColumnConfig())
             .setPartialLoadEnabled(true)
-            .setLoadBufferSize(20)
+            .setLoadBufferSize(10)
             .prependClasses('archive-tree-grid');
     }
 
