@@ -23,9 +23,14 @@ import {Principal} from 'lib-admin-ui/security/Principal';
 import {ArchiveTreeGridRefreshRequiredEvent} from './ArchiveTreeGridRefreshRequiredEvent';
 import {ProjectContext} from 'lib-contentstudio/app/project/ProjectContext';
 
-export class ArchiveTreeGrid extends TreeGrid<ArchiveViewItem> {
+export class ArchiveTreeGrid
+    extends TreeGrid<ArchiveViewItem> {
 
     private readonly treeGridActions: ArchiveTreeGridActions;
+
+    private rootArchiveContentId: ContentId;
+
+    private usersMap: Map<string, Principal> = new Map<string, Principal>();
 
     constructor() {
         super(ArchiveTreeGridHelper.createTreeGridBuilder());
@@ -49,95 +54,108 @@ export class ArchiveTreeGrid extends TreeGrid<ArchiveViewItem> {
     }
 
     protected fetchRoot(): Q.Promise<ArchiveViewItem[]> {
-        return new GetContentByPathRequest(ContentPath.fromString('/__archive__')).sendAndParse().then((content: Content) => {
-            return new ListContentByIdRequest(content.getContentId()).sendAndParse().then((response: ContentResponse<ContentSummary>) => {
-                return this.fetchPrincipals(response.getContents()).then((usersMap: Map<string, Principal>) => {
-                    return response.getContents().map((archiveBundleContent: ContentSummary) => {
-                        return new ArchiveBundleViewItemBuilder()
-                            .setArchivedBy(usersMap.get(archiveBundleContent.getModifier()))
-                            .setData(ContentSummaryAndCompareStatus.fromContentSummary(archiveBundleContent))
-                            .build();
+        return this.getRootArchiveContentId().then((rootId: ContentId) => {
+            const parentNode: TreeNode<ArchiveViewItem> = this.getRoot().getDefaultRoot();
+            this.removeEmptyNode(parentNode);
+            const from: number = parentNode.getChildren().length;
+
+            return ContentSummaryAndCompareStatusFetcher.fetchChildren(rootId, from, 10)
+                .then((response: ContentResponse<ContentSummaryAndCompareStatus>) => {
+                    const total: number = response.getMetadata().getTotalHits();
+                    parentNode.setMaxChildren(total);
+
+                    return this.fetchPrincipals(response.getContents()).then(() => {
+                        const newItems: ArchiveViewItem[] = response.getContents().map(
+                            (archiveBundleContent: ContentSummaryAndCompareStatus) => {
+                                return new ArchiveBundleViewItemBuilder()
+                                    .setArchivedBy(this.usersMap.get(archiveBundleContent.getContentSummary().getModifier()))
+                                    .setData(archiveBundleContent)
+                                    .build();
+                            });
+
+                        if (parentNode.getChildren().length + newItems.length < total) {
+                            newItems.push(new ArchiveBundleViewItemBuilder()
+                                .setData(new ContentSummaryAndCompareStatus())
+                                .build());
+                        }
+
+                        return parentNode.getChildren().map((child: TreeNode<ArchiveViewItem>) => child.getData()).concat(newItems);
                     });
                 });
-            });
         });
     }
 
-    private fetchPrincipals(bundles: ContentSummary[]): Q.Promise<Map<string, Principal>> {
-        const usersMap: Map<string, Q.Promise<Principal>> = new Map();
+    private getRootArchiveContentId(): Q.Promise<ContentId> {
+        if (this.rootArchiveContentId) {
+            return Q(this.rootArchiveContentId);
+        }
+
+        return new GetContentByPathRequest(ContentPath.fromString('/__archive__'))
+            .sendAndParse()
+            .then((content: Content) => content.getContentId());
+    }
+
+
+    private fetchPrincipals(bundles: ContentSummaryAndCompareStatus[]): Q.Promise<void> {
+        const usersToLoadMap: Map<string, Q.Promise<Principal>> = new Map();
         const promises: Q.Promise<Principal>[] = [];
 
-        bundles.forEach((item: ContentSummary) => {
-            const id: string = item.getModifier();
+        bundles.forEach((item: ContentSummaryAndCompareStatus) => {
+            const id: string = item.getContentSummary().getModifier();
 
-            if (!usersMap.has(id)) {
+            if (!this.usersMap.has(id) && !usersToLoadMap.has(id)) {
                 const requestPromise: Q.Promise<Principal> = new GetPrincipalByKeyRequest(PrincipalKey.fromString(id)).sendAndParse();
-                usersMap.set(id, requestPromise);
+                usersToLoadMap.set(id, requestPromise);
                 promises.push(requestPromise);
             }
         });
 
         return Q.all(promises).then((principals: Principal[]) => {
-            const resultsMap: Map<string, Principal> = new Map();
-
             principals.forEach((principal: Principal) => {
-                resultsMap.set(principal.getKey().toString(), principal);
+                this.usersMap.set(principal.getKey().toString(), principal);
             });
 
-            return resultsMap;
+            return Q(null);
         });
     }
 
     protected fetchChildren(parentNode?: TreeNode<ArchiveViewItem>): Q.Promise<ArchiveViewItem[]> {
-        if (ObjectHelper.iFrameSafeInstanceOf(parentNode.getData(), ArchiveBundleViewItem)) {
-            return this.fetchArchiveBundleChildren(<ArchiveBundleViewItem>parentNode.getData());
-        }
-
-        return this.fetchContentChildren(parentNode);
-    }
-
-    private fetchArchiveBundleChildren(archiveBundle: ArchiveBundleViewItem): Q.Promise<ArchiveViewItem[]> {
-        return ContentSummaryAndCompareStatusFetcher.fetchChildren(new ContentId(archiveBundle.getId())).then(
-            (response: ContentResponse<ContentSummaryAndCompareStatus> ) => {
-                const items: ContentSummaryAndCompareStatus[] = response.getContents();
-
-                return ContentSummaryAndCompareStatusFetcher.updateRenderableContents(items).then(() => {
-                    return items.map((item: ContentSummaryAndCompareStatus) => {
-                        return new ArchiveContentViewItemBuilder()
-                            .setData(item)
-                            .build();
-                    });
-                });
-            });
+        return parentNode.hasParent() ? this.fetchContentChildren(parentNode) : this.fetchRoot();
     }
 
     private fetchContentChildren(parentNode: TreeNode<ArchiveViewItem>): Q.Promise<ArchiveViewItem[]> {
-        if (parentNode.hasChildren() && this.isEmptyNode(parentNode.getChildren()[parentNode.getChildren().length - 1])) {
-            parentNode.getChildren().pop();
-        }
-
+        this.removeEmptyNode(parentNode);
         const content: ContentSummaryAndCompareStatus = (<ArchiveContentViewItem>parentNode.getData()).getData();
         const from: number = parentNode.getChildren().length;
 
         return ContentSummaryAndCompareStatusFetcher.fetchChildren(content.getContentId(), from, 10).then(
             (response: ContentResponse<ContentSummaryAndCompareStatus>) => {
                 const total: number = response.getMetadata().getTotalHits();
+                const contents: ContentSummaryAndCompareStatus[] = response.getContents();
                 parentNode.setMaxChildren(total);
 
-                const newItems: ArchiveViewItem[] = response.getContents().map((c: ContentSummaryAndCompareStatus) => {
+                ContentSummaryAndCompareStatusFetcher.updateRenderableContents(contents);
+
+                const newArchiveViewItems: ArchiveViewItem[] = contents.map((c: ContentSummaryAndCompareStatus) => {
                     return new ArchiveContentViewItemBuilder()
                         .setData(c)
                         .build();
                 });
 
-                if (parentNode.getChildren().length + newItems.length < total) {
-                    newItems.push(new ArchiveContentViewItemBuilder()
+                if (parentNode.getChildren().length + newArchiveViewItems.length < total) {
+                    newArchiveViewItems.push(new ArchiveContentViewItemBuilder()
                         .setData(new ContentSummaryAndCompareStatus())
                         .build());
                 }
 
-                return parentNode.getChildren().map((child: TreeNode<ArchiveViewItem>) => child.getData()).concat(newItems);
+                return parentNode.getChildren().map((child: TreeNode<ArchiveViewItem>) => child.getData()).concat(newArchiveViewItems);
             });
+    }
+
+    private removeEmptyNode(parentNode: TreeNode<ArchiveViewItem>) {
+        if (parentNode.hasChildren() && this.isEmptyNode(parentNode.getChildren()[parentNode.getChildren().length - 1])) {
+            parentNode.getChildren().pop();
+        }
     }
 
     protected isEmptyNode(node: TreeNode<ArchiveViewItem>): boolean {
@@ -145,7 +163,7 @@ export class ArchiveTreeGrid extends TreeGrid<ArchiveViewItem> {
     }
 
     protected hasChildren(item: ArchiveViewItem): boolean {
-       return item.hasChildren();
+        return item.hasChildren();
     }
 
     protected isToBeExpanded(node: TreeNode<ArchiveViewItem>): boolean {
