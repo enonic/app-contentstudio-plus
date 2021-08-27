@@ -21,7 +21,7 @@ export class ArchiveBundleViewer
 
     resolveSubName(item: ArchiveBundleViewItem): string {
         return i18n('field.preview.toolbar.status',
-            item.getArchivedBy()?.getDisplayName() || item.getData().getContentSummary().getModifier());
+            item.getArchivedBy()?.getDisplayName() || item.getData().getContentSummary()?.getModifier());
     }
 
     resolveIconClass(item: ArchiveBundleViewItem): string {

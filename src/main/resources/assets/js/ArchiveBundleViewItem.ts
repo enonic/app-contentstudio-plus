@@ -29,7 +29,7 @@ export class ArchiveBundleViewItem extends ArchiveViewItem {
     }
 
     getArchiveTime(): Date {
-        return this.data.getContentSummary().getCreatedTime();
+        return this.data.getContentSummary()?.getCreatedTime();
     }
 
     getArchivedBy(): Principal {
