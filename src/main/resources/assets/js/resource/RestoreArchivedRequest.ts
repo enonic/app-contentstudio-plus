@@ -1,8 +1,7 @@
-import { HttpMethod } from 'lib-admin-ui/rest/HttpMethod';
-import { ContentId } from 'lib-contentstudio/app/content/ContentId';
-import {ArchiveResourceRequest} from './ArchiveResourceRequest';
+import {HttpMethod} from 'lib-admin-ui/rest/HttpMethod';
+import {TaskArchiveResourceRequest} from './TaskArchiveResourceRequest';
 
-export class RestoreArchivedRequest extends ArchiveResourceRequest {
+export class RestoreArchivedRequest extends TaskArchiveResourceRequest {
 
     private readonly ids: string[];
 

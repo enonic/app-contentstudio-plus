@@ -7,10 +7,15 @@ import {ContentId} from 'lib-contentstudio/app/content/ContentId';
 import {Action} from 'lib-admin-ui/ui/Action';
 import {GetDescendantsOfContentsRequest} from 'lib-contentstudio/app/resource/GetDescendantsOfContentsRequest';
 import {ArchiveItemsList} from './ArchiveItemsList';
+import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
+import {ContentSummaryAndCompareStatusFetcher} from 'lib-contentstudio/app/resource/ContentSummaryAndCompareStatusFetcher';
+import {ArchiveViewItem} from './ArchiveViewItem';
 
 export abstract class ArchiveDialog extends ModalDialog {
 
     protected confirmValueDialog: ConfirmValueDialog;
+
+    protected items: ArchiveViewItem[];
 
     protected archiveBundle: ArchiveBundleViewItem;
 
@@ -68,11 +73,14 @@ export abstract class ArchiveDialog extends ModalDialog {
 
     protected abstract doAction();
 
-    setArchiveBundle(archive: ArchiveBundleViewItem): ArchiveDialog {
-        this.archiveBundle = archive;
-        this.archiveBundleViewer.setObject(archive);
+    setItems(items: ArchiveViewItem[]): ArchiveDialog {
+        this.items = items;
+        // this.archiveBundleViewer.setObject(archive);
 
-        new GetDescendantsOfContentsRequest(archive.getData().getPath()).sendAndParse().then((ids: ContentId[]) => {
+        new GetDescendantsOfContentsRequest()
+            .setContentPaths(items.map((item: ArchiveViewItem) => item.getData().getContentSummary().getPath()))
+            .sendAndParse()
+            .then((ids: ContentId[]) => {
             this.itemsList.setItemsIds(ids);
             this.confirmValueDialog.setValueToCheck('' + ids.length);
             this.archiveAction.setLabel(`${this.getArchiveActionTitle()} (${ids.length})`);

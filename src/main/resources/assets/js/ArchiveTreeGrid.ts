@@ -22,13 +22,13 @@ import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
 import {Principal} from 'lib-admin-ui/security/Principal';
 import {ArchiveTreeGridRefreshRequiredEvent} from './ArchiveTreeGridRefreshRequiredEvent';
 import {ProjectContext} from 'lib-contentstudio/app/project/ProjectContext';
+import {ListArchivedRequest} from './resource/ListArchivedRequest';
+import {ArchivedContainer} from './ArchivedContainer';
 
 export class ArchiveTreeGrid
     extends TreeGrid<ArchiveViewItem> {
 
     private readonly treeGridActions: ArchiveTreeGridActions;
-
-    private rootArchiveContentId: ContentId;
 
     private usersMap: Map<string, Principal> = new Map<string, Principal>();
 
@@ -54,47 +54,19 @@ export class ArchiveTreeGrid
     }
 
     protected fetchRoot(): Q.Promise<ArchiveViewItem[]> {
-        return this.getRootArchiveContentId().then((rootId: ContentId) => {
-            const parentNode: TreeNode<ArchiveViewItem> = this.getRoot().getDefaultRoot();
-            this.removeEmptyNode(parentNode);
-            const from: number = parentNode.getChildren().length;
+        return new ListArchivedRequest().sendAndParse().then((archiveContainers: ArchivedContainer[]) => {
+            const ids: ContentId[] = [];
+            archiveContainers.forEach((archive: ArchivedContainer) => ids.push(...archive.getContentIds()));
 
-            return ContentSummaryAndCompareStatusFetcher.fetchChildren(rootId, from, 10)
-                .then((response: ContentResponse<ContentSummaryAndCompareStatus>) => {
-                    const total: number = response.getMetadata().getTotalHits();
-                    parentNode.setMaxChildren(total);
-
-                    return this.fetchPrincipals(response.getContents()).then(() => {
-                        const newItems: ArchiveViewItem[] = response.getContents().map(
-                            (archiveBundleContent: ContentSummaryAndCompareStatus) => {
-                                return new ArchiveBundleViewItemBuilder()
-                                    .setArchivedBy(this.usersMap.get(archiveBundleContent.getContentSummary().getModifier()))
-                                    .setData(archiveBundleContent)
-                                    .build();
-                            });
-
-                        if (parentNode.getChildren().length + newItems.length < total) {
-                            newItems.push(new ArchiveBundleViewItemBuilder()
-                                .setData(new ContentSummaryAndCompareStatus())
-                                .build());
-                        }
-
-                        return parentNode.getChildren().map((child: TreeNode<ArchiveViewItem>) => child.getData()).concat(newItems);
-                    });
+            return ContentSummaryAndCompareStatusFetcher.fetchByIds(ids).then((contents: ContentSummaryAndCompareStatus[]) => {
+                return contents.map((c: ContentSummaryAndCompareStatus) => {
+                    return new ArchiveContentViewItemBuilder()
+                        .setData(c)
+                        .build();
                 });
+            });
         });
     }
-
-    private getRootArchiveContentId(): Q.Promise<ContentId> {
-        if (this.rootArchiveContentId) {
-            return Q(this.rootArchiveContentId);
-        }
-
-        return new GetContentByPathRequest(ContentPath.fromString('/__archive__'))
-            .sendAndParse()
-            .then((content: Content) => content.getContentId());
-    }
-
 
     private fetchPrincipals(bundles: ContentSummaryAndCompareStatus[]): Q.Promise<void> {
         const usersToLoadMap: Map<string, Q.Promise<Principal>> = new Map();
@@ -134,8 +106,6 @@ export class ArchiveTreeGrid
                 const contents: ContentSummaryAndCompareStatus[] = response.getContents();
                 parentNode.setMaxChildren(total);
 
-                ContentSummaryAndCompareStatusFetcher.updateRenderableContents(contents);
-
                 const newArchiveViewItems: ArchiveViewItem[] = contents.map((c: ContentSummaryAndCompareStatus) => {
                     return new ArchiveContentViewItemBuilder()
                         .setData(c)
@@ -165,13 +135,4 @@ export class ArchiveTreeGrid
     protected hasChildren(item: ArchiveViewItem): boolean {
         return item.hasChildren();
     }
-
-    protected isToBeExpanded(node: TreeNode<ArchiveViewItem>): boolean {
-        return super.isToBeExpanded(node) || ObjectHelper.iFrameSafeInstanceOf(node.getData(), ArchiveBundleViewItem);
-    }
-
-    protected isSelectableNode(node: TreeNode<ArchiveViewItem>): boolean {
-        return ObjectHelper.iFrameSafeInstanceOf(node.getData(), ArchiveBundleViewItem);
-    }
-
 }
