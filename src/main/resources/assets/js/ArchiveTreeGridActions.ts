@@ -30,7 +30,7 @@ export class ArchiveTreeGridActions
         const action: Action = new Action(i18n('action.restore')).setEnabled(false);
 
         action.onExecuted(() => {
-            ArchiveRestoreDialog.getInstance().setArchiveBundle(<ArchiveBundleViewItem>this.selectedItems[0]).open();
+            ArchiveRestoreDialog.getInstance().setItems(this.selectedItems).open();
         });
 
         return action;
@@ -40,7 +40,7 @@ export class ArchiveTreeGridActions
         const action: Action = new Action(i18n('action.delete')).setEnabled(false);
 
         action.onExecuted(() => {
-            ArchiveDeleteDialog.getInstance().setArchiveBundle(<ArchiveBundleViewItem>this.selectedItems[0]).open();
+            ArchiveDeleteDialog.getInstance().setItems(this.selectedItems).open();
         });
 
         return action;
@@ -53,9 +53,7 @@ export class ArchiveTreeGridActions
     updateActionsEnabledState(selectedItems: ArchiveViewItem[]): Q.Promise<void> {
         this.selectedItems = selectedItems;
 
-        const state: boolean =
-            selectedItems.length === 1 &&
-            selectedItems.every((item: ArchiveViewItem) => ObjectHelper.iFrameSafeInstanceOf(item, ArchiveBundleViewItem));
+        const state: boolean = selectedItems.length > 0;
 
         this.restoreAction.setEnabled(state);
         this.deleteAction.setEnabled(state);

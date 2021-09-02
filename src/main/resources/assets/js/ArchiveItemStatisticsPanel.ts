@@ -22,12 +22,7 @@ export class ArchiveItemStatisticsPanel
             return;
         }
 
-        if (ObjectHelper.iFrameSafeInstanceOf(item, ArchiveContentViewItem)) {
-            super.setItem(item);
-            this.previewPanel.setItem((<ArchiveContentViewItem>item).getData());
-        } else {
-            this.clearItem();
-        }
+        this.previewPanel.setItem((<ArchiveContentViewItem>item).getData());
     }
 
     clearItem() {
