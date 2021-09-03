@@ -68,12 +68,15 @@ export class ArchiveAppBar extends AppBar {
     doRender(): Q.Promise<boolean> {
         return super.doRender().then((rendered: boolean) => {
             this.addClass('archive-appbar');
-            this.appendChild(new DivEl('separator').setHtml('/'));
             const iconEl: DivEl = new DivEl('project-selection-icon icon-compare');
-            this.selectedProjectViewer.appendChild(iconEl);
+
             this.selectedProjectViewer.setTitle(i18n('text.selectContext'));
-            this.addClass('appbar-content');
+            this.selectedProjectViewer.appendChild(iconEl);
+
             this.appendChild(this.selectedProjectViewer);
+            this.appendChild(new DivEl('separator').setHtml('/'));
+            this.addClass('appbar-content');
+
             this.getAppIcon().setAppName(i18n('app.archive'));
 
             return rendered;
