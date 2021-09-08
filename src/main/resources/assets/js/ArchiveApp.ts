@@ -7,18 +7,18 @@ export class ArchiveApp
     extends App {
 
     constructor() {
-        super('main');
+        super('plus');
     }
 
     protected createAppContainer(): AppContainer {
         return new ArchiveAppContainer();
     }
 
-    getIconName(): string {
-        return i18n('app.archive');
+    getIconClass(): string {
+        return 'icon-archive';
     }
 
-    generateAppUrl(): string {
-        return 'main';
+    getDisplayName(): string {
+        return i18n('app.archive');
     }
 }
