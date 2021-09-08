@@ -11,6 +11,9 @@ function handleGet() {
         assetsUri: portal.assetUrl({
             path: ''
         }),
+        studioAssetsUri: portal.assetUrl({
+            path: ''
+        }).replace(/\.plus/g, ''),
         faviconsAssetsUri: portal.assetUrl({
             path: ''
         }).replace(/\.plus/g, ''),
