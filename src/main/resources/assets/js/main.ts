@@ -12,7 +12,7 @@ const body = Body.get();
 
 function injectApp() {
     const appWrapper: AppWrapper = <AppWrapper>body.findChildById('AppWrapper');
-    appWrapper.addApp(new ArchiveApp());
+    appWrapper.addApp(new ArchiveApp(), 1);
 }
 
 (async () => {
