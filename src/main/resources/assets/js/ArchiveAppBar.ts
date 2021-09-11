@@ -52,7 +52,6 @@ export class ArchiveAppBar extends AppBar {
             const project: Project = projects.find((p: Project) => p.getName() === currentProjectName);
             this.selectedProjectViewer.setObject(project);
             this.selectedProjectViewer.toggleClass('multi-projects', projects.length > 1);
-            document.title = `${i18n('app.archive')} / ${project.getDisplayName()}`;
         }).catch(DefaultErrorHandler.handle);
     }
 
