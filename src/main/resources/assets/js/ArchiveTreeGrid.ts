@@ -53,19 +53,19 @@ export class ArchiveTreeGrid
         this.treeGridActions.updateActionsEnabledState([]);
     }
 
-    protected fetchRoot(): Q.Promise<ArchiveViewItem[]> {
-        return new ListArchivedRequest().sendAndParse().then((archiveContainers: ArchivedContainer[]) => {
-            const ids: ContentId[] = [];
-            archiveContainers.forEach((archive: ArchivedContainer) => ids.push(...archive.getContentIds()));
+    fetchRoot(): Q.Promise<ArchiveViewItem[]> {
+        const root: TreeNode<ArchiveViewItem> = this.getRoot().getCurrentRoot();
 
-            return ContentSummaryAndCompareStatusFetcher.fetchByIds(ids).then((contents: ContentSummaryAndCompareStatus[]) => {
-                return contents.map((c: ContentSummaryAndCompareStatus) => {
-                    return new ArchiveContentViewItemBuilder()
-                        .setData(c)
-                        .build();
-                });
+        this.removeEmptyNode(root);
+
+        const from: number = root.getChildren().length;
+
+        return ContentSummaryAndCompareStatusFetcher.fetchRoot(from, 10, 'archive').then(
+            (data: ContentResponse<ContentSummaryAndCompareStatus>) => {
+                return data.getContents().map(d =>  new ArchiveContentViewItemBuilder()
+                    .setData(d)
+                    .build());
             });
-        });
     }
 
     private fetchPrincipals(bundles: ContentSummaryAndCompareStatus[]): Q.Promise<void> {
