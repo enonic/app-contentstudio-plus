@@ -7,7 +7,7 @@ import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
 import {ArchiveContentViewItem} from './ArchiveContentViewItem';
 import {Viewer} from 'lib-admin-ui/ui/Viewer';
 import {ArchiveBundleViewItem} from './ArchiveBundleViewItem';
-import {ArchiveBundleViewer} from './ArchiveBundleViewer';
+import {ArchiveItemViewer} from './ArchiveItemViewer';
 import {ArchiveContentViewer} from './ArchiveContentViewer';
 
 export class ArchiveTreeGridHelper {
@@ -44,7 +44,7 @@ export class ArchiveTreeGridHelper {
         }
 
         if (ObjectHelper.iFrameSafeInstanceOf(dataContext.getData(), ArchiveBundleViewItem)) {
-            const viewer: Viewer<ArchiveBundleViewItem> = dataContext.getViewer('displayName') || new ArchiveBundleViewer();
+            const viewer: Viewer<ArchiveBundleViewItem> = dataContext.getViewer('displayName') || new ArchiveItemViewer();
             viewer.setObject(<ArchiveBundleViewItem>dataContext.getData());
             return viewer;
         }
