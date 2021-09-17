@@ -4,7 +4,8 @@ import {DeleteContentRequest} from 'lib-contentstudio/app/resource/DeleteContent
 import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
 import {ArchiveTreeGridRefreshRequiredEvent} from './ArchiveTreeGridRefreshRequiredEvent';
 
-export class ArchiveDeleteDialog extends ArchiveDialog {
+export class ArchiveDeleteDialog
+    extends ArchiveDialog {
 
     private static INSTANCE: ArchiveDeleteDialog;
 
@@ -28,9 +29,10 @@ export class ArchiveDeleteDialog extends ArchiveDialog {
     }
 
     protected doAction() {
-        new DeleteContentRequest()
-            .addContentPath(this.archiveBundle.getData().getPath())
-            .sendAndParseWithPolling()
+        const request = new DeleteContentRequest();
+        this.items.forEach(item => request.addContentPath(item.getData().getPath()));
+
+        request.sendAndParseWithPolling()
             .then(() => {
                 new ArchiveTreeGridRefreshRequiredEvent().fire();
             })
@@ -38,7 +40,7 @@ export class ArchiveDeleteDialog extends ArchiveDialog {
     }
 
     protected getConfirmValueDialogTitle(): string {
-        return  i18n('dialog.confirmDelete');
+        return i18n('dialog.confirmDelete');
     }
 
     protected getConfirmValueDialogSubTitle(): string {

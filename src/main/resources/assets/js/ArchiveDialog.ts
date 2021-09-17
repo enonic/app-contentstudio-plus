@@ -1,25 +1,21 @@
 import {ModalDialog, ModalDialogConfig} from 'lib-admin-ui/ui/dialog/ModalDialog';
 import {ConfirmValueDialog} from 'lib-contentstudio/app/remove/ConfirmValueDialog';
-import {ArchiveBundleViewItem} from './ArchiveBundleViewItem';
-import {ArchiveBundleViewer} from './ArchiveBundleViewer';
 import {H6El} from 'lib-admin-ui/dom/H6El';
 import {ContentId} from 'lib-contentstudio/app/content/ContentId';
 import {Action} from 'lib-admin-ui/ui/Action';
 import {GetDescendantsOfContentsRequest} from 'lib-contentstudio/app/resource/GetDescendantsOfContentsRequest';
 import {ArchiveItemsList} from './ArchiveItemsList';
-import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
-import {ContentSummaryAndCompareStatusFetcher} from 'lib-contentstudio/app/resource/ContentSummaryAndCompareStatusFetcher';
 import {ArchiveViewItem} from './ArchiveViewItem';
+import {ArchiveDialogItemList} from './ArchiveDialogItemList';
 
-export abstract class ArchiveDialog extends ModalDialog {
+export abstract class ArchiveDialog
+    extends ModalDialog {
 
     protected confirmValueDialog: ConfirmValueDialog;
 
     protected items: ArchiveViewItem[];
 
-    protected archiveBundle: ArchiveBundleViewItem;
-
-    protected archiveBundleViewer: ArchiveBundleViewer;
+    protected archiveItemViewers: ArchiveDialogItemList;
 
     protected itemsList: ArchiveItemsList;
 
@@ -38,7 +34,7 @@ export abstract class ArchiveDialog extends ModalDialog {
             .setSubheaderText(this.getConfirmValueDialogSubTitle())
             .setYesCallback(this.executeAction.bind(this));
 
-        this.archiveBundleViewer = new ArchiveBundleViewer();
+        this.archiveItemViewers = new ArchiveDialogItemList();
         this.itemsList = new ArchiveItemsList();
         this.archiveAction = new Action(this.getArchiveActionTitle());
     }
@@ -75,16 +71,19 @@ export abstract class ArchiveDialog extends ModalDialog {
 
     setItems(items: ArchiveViewItem[]): ArchiveDialog {
         this.items = items;
-        // this.archiveBundleViewer.setObject(archive);
+        this.archiveItemViewers.setItems(items.map(item => item.getData() ));
 
         new GetDescendantsOfContentsRequest()
             .setContentPaths(items.map((item: ArchiveViewItem) => item.getData().getContentSummary().getPath()))
+            .setContentRootPath('archive')
             .sendAndParse()
             .then((ids: ContentId[]) => {
-            this.itemsList.setItemsIds(ids);
-            this.confirmValueDialog.setValueToCheck('' + ids.length);
-            this.archiveAction.setLabel(`${this.getArchiveActionTitle()} (${ids.length})`);
-        });
+                this.itemsList.setItemsIds(ids);
+
+                const count = this.items.length + ids.length;
+                this.confirmValueDialog.setValueToCheck('' + count);
+                this.archiveAction.setLabel(`${this.getArchiveActionTitle()} (${count})`);
+            });
 
         return this;
     }
@@ -108,8 +107,8 @@ export abstract class ArchiveDialog extends ModalDialog {
         return super.doRender().then((rendered: boolean) => {
             this.addClass('archive-dialog');
 
-            this.appendChildToHeader( new H6El('sub-title').setHtml(this.getSubtitle()));
-            this.appendChildToContentPanel(this.archiveBundleViewer);
+            this.appendChildToHeader(new H6El('sub-title').setHtml(this.getSubtitle()));
+            this.appendChildToContentPanel(this.archiveItemViewers);
             this.appendChildToContentPanel(new H6El('items-title').setHtml(this.getItemsSubtitle()));
             this.appendChildToContentPanel(this.itemsList);
 
