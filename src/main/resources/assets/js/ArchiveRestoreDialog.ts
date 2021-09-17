@@ -31,15 +31,11 @@ export class ArchiveRestoreDialog
     }
 
     protected doAction() {
-        new RestoreArchivedRequest([this.archiveBundle.getId()])
+        new RestoreArchivedRequest(this.items.map(item => item.getId()))
+            .setContentRootPath('archive')
             .sendAndParseWithPolling()
             .then(() => {
-                new DeleteContentRequest()
-                    .addContentPath(this.archiveBundle.getData().getPath())
-                    .sendAndParseWithPolling()
-                    .then(() => {
-                        new ArchiveTreeGridRefreshRequiredEvent().fire();
-                    });
+                new ArchiveTreeGridRefreshRequiredEvent().fire();
             })
             .catch(DefaultErrorHandler.handle);
     }
