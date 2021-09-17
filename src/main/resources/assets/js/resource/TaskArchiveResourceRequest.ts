@@ -1,9 +1,8 @@
 import * as Q from 'q';
-import {CmsProjectBasedResourceRequest} from 'lib-contentstudio/app/wizard/CmsProjectBasedResourceRequest';
 import {TaskIdJson} from 'lib-admin-ui/task/TaskIdJson';
 import {TaskState} from 'lib-admin-ui/task/TaskState';
 import {TaskId} from 'lib-admin-ui/task/TaskId';
-import {GetTaskInfoRequest} from 'lib-admin-ui/task/GetTaskInfoRequest';
+import {GetTaskInfoRequest} from 'lib-contentstudio/app/resource/GetTaskInfoRequest';
 import {TaskInfo} from 'lib-admin-ui/task/TaskInfo';
 import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
 import {JsonResponse} from 'lib-admin-ui/rest/JsonResponse';
