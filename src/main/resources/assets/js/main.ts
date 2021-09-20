@@ -1,5 +1,5 @@
 // End of Polyfills
-import {i18nInit} from 'lib-admin-ui/util/MessagesInitializer';
+import {i18nAdd} from 'lib-admin-ui/util/MessagesInitializer';
 import {Body} from 'lib-admin-ui/dom/Body';
 import {ArchiveApp} from './ArchiveApp';
 import {AppWrapper} from 'lib-contentstudio/app/AppWrapper';
@@ -16,9 +16,8 @@ function injectApp() {
 }
 
 (async () => {
-    Messages.setMessages({});
     const i18nUrl: string = CONFIG.services.i18nUrl.replace(new RegExp('contentstudio', 'g'), 'contentstudio.plus');
-    await i18nInit(i18nUrl);
+    await i18nAdd(i18nUrl);
 
     const renderListener = () => {
         injectApp();
