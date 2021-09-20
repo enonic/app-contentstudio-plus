@@ -13,7 +13,7 @@ exports.get = function () {
 var getPhrases = function() {
     const locales = admin.getLocales();
     const phrases = {};
-    const bundles = ['i18n/common', 'i18n/phrases', 'i18n/dialogs'];
+    const bundles = ['i18n/phrases'];
 
     for (const bundleIndex in bundles) {
         const bundlePhrases = i18n.getPhrases(locales, [bundles[bundleIndex]]);
