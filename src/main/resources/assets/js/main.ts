@@ -18,6 +18,8 @@ import {ProjectContext} from 'lib-contentstudio/app/project/ProjectContext';
 import {ArchiveApp} from './ArchiveApp';
 import {AggregatedServerEventsListener} from 'lib-contentstudio/app/event/AggregatedServerEventsListener';
 import {ArchiveAppPanel} from './ArchiveAppPanel';
+import {ArchiveAppContainer} from './ArchiveAppContainer';
+import {Store} from 'lib-admin-ui/store/Store';
 
 declare const CONFIG;
 
@@ -37,7 +39,7 @@ function getApplication(): Application {
     );
     application.setPath(Router.getPath());
     application.setWindow(window);
-
+    Store.instance().set('application', application);
     return application;
 }
 
@@ -141,9 +143,13 @@ function getTheme(): string {
 }
 
 async function startContentBrowser(application: Application) {
-    const archiveAppPanel = new ArchiveAppPanel();
-    body.appendChild(archiveAppPanel);
-    archiveAppPanel.handleBrowse();
+    // const archiveAppPanel = new ArchiveAppPanel();
+    // body.appendChild(archiveAppPanel);
+    // archiveAppPanel.handleBrowse();
+
+    const archiveAppContainer = new ArchiveAppContainer();
+    body.appendChild(archiveAppContainer);
+    archiveAppContainer.show();
 }
 
 (async () => {
