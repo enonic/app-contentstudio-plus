@@ -25,7 +25,7 @@ function handleGet() {
         launcherUrl: admin.getLauncherUrl(),
         services: {
             stylesUrl: portal.serviceUrl({service: 'styles'}),
-            i18nUrl: portal.serviceUrl({service: 'i18n'}),
+            i18nUrl: portal.serviceUrl({service: 'i18n'}).replace(/\.plus/g, ''),
             contentServiceUrl: portal.serviceUrl({service: 'content'}),
             adminToolsUrl: portal.serviceUrl({service: 'admintools'}).replace(/\.plus/g, '')
         },
