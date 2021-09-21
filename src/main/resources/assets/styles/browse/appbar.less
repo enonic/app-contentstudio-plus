@@ -1,6 +1,7 @@
 .appbar.archive-appbar {
   justify-content: flex-start;
   align-items: center;
+  background-color: @admin-white;
 
   .separator {
     font-size: 15px;
@@ -9,6 +10,35 @@
 
   .project-viewer {
     width: auto;
+    color: @admin-bg-dark-gray;
+
+    .display-name {
+      color: @admin-bg-dark-gray;
+    }
+
+    .names-and-icon-view .xp-admin-common-wrapper .font-icon-default::before {
+      color: @admin-bg-dark-gray;
+    }
+
+    &:hover {
+      color: darken(@admin-bg-dark-gray, 10%);
+
+      .display-name {
+        color: darken(@admin-bg-dark-gray, 10%);
+      }
+
+      .names-and-icon-view .xp-admin-common-wrapper .font-icon-default::before {
+        color: darken(@admin-bg-dark-gray, 10%);
+      }
+    }
+  }
+
+  .app-name {
+    color: @admin-bg-dark-gray;
+
+    &:hover {
+      color: darken(@admin-bg-dark-gray, 10%);
+    }
   }
 
   .home-button {
