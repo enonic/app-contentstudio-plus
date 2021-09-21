@@ -13,6 +13,7 @@ const assets = path.join(__dirname, '/build/resources/main/assets');
 module.exports = {
     context: path.join(__dirname, '/src/main/resources/assets'),
     entry: {
+        'js/inject': './js/inject.ts',
         'js/main': './js/main.ts',
         'styles/main': './styles/main.less',
         'js/widgets/layers': './js/widgets/layers/main.ts',
