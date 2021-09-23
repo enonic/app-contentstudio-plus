@@ -7,6 +7,7 @@ import {GetDescendantsOfContentsRequest} from 'lib-contentstudio/app/resource/Ge
 import {ArchiveItemsList} from './ArchiveItemsList';
 import {ArchiveViewItem} from './ArchiveViewItem';
 import {ArchiveDialogItemList} from './ArchiveDialogItemList';
+import {ArchiveResourceRequest} from './resource/ArchiveResourceRequest';
 
 export abstract class ArchiveDialog
     extends ModalDialog {
@@ -75,7 +76,7 @@ export abstract class ArchiveDialog
 
         new GetDescendantsOfContentsRequest()
             .setContentPaths(items.map((item: ArchiveViewItem) => item.getData().getContentSummary().getPath()))
-            .setContentRootPath('archive')
+            .setContentRootPath(ArchiveResourceRequest.ARCHIVE_PATH)
             .sendAndParse()
             .then((ids: ContentId[]) => {
                 this.itemsList.setItemsIds(ids);
