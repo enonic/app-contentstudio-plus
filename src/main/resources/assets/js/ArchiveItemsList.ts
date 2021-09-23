@@ -6,6 +6,7 @@ import {ContentId} from 'lib-contentstudio/app/content/ContentId';
 import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
 import {Element} from 'lib-admin-ui/dom/Element';
 import {AppHelper} from 'lib-admin-ui/util/AppHelper';
+import {ArchiveResourceRequest} from './resource/ArchiveResourceRequest';
 
 export class ArchiveItemsList extends ListBox<ContentSummaryAndCompareStatus> {
 
@@ -17,9 +18,12 @@ export class ArchiveItemsList extends ListBox<ContentSummaryAndCompareStatus> {
 
     private scrollableContainer: Element;
 
+    private archiveContentFetcher: ContentSummaryAndCompareStatusFetcher;
+
     constructor(scrollableContainer?: Element) {
         super('archive-items-list icon-spinner');
 
+        this.archiveContentFetcher = new ContentSummaryAndCompareStatusFetcher(ArchiveResourceRequest.ARCHIVE_PATH);
         this.scrollableContainer = scrollableContainer || this;
 
         this.initListeners();
@@ -66,7 +70,7 @@ export class ArchiveItemsList extends ListBox<ContentSummaryAndCompareStatus> {
 
         const idsToLoad: ContentId[] = this.idsToLoad.slice(totalLoaded, totalLoaded + 10);
 
-        ContentSummaryAndCompareStatusFetcher.fetchByIds(idsToLoad)
+        this.archiveContentFetcher.fetchByIds(idsToLoad)
             .then((items: ContentSummaryAndCompareStatus[]) => {
                 this.loading = false;
                 this.addItems(items);

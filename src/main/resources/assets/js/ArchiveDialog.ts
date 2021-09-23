@@ -20,6 +20,8 @@ export abstract class ArchiveDialog
 
     protected itemsList: ArchiveItemsList;
 
+    protected itemsTitleEl: H6El;
+
     protected archiveAction: Action;
 
     protected constructor(config: ModalDialogConfig = <ModalDialogConfig>{}) {
@@ -37,6 +39,7 @@ export abstract class ArchiveDialog
 
         this.archiveItemViewers = new ArchiveDialogItemList();
         this.itemsList = new ArchiveItemsList();
+        this.itemsTitleEl = new H6El('items-title');
         this.archiveAction = new Action(this.getArchiveActionTitle());
     }
 
@@ -80,6 +83,8 @@ export abstract class ArchiveDialog
             .sendAndParse()
             .then((ids: ContentId[]) => {
                 this.itemsList.setItemsIds(ids);
+                this.itemsList.setVisible(ids.length > 0);
+                this.itemsTitleEl.setVisible(ids.length > 0);
 
                 const count = this.items.length + ids.length;
                 this.confirmValueDialog.setValueToCheck('' + count);
@@ -110,7 +115,7 @@ export abstract class ArchiveDialog
 
             this.appendChildToHeader(new H6El('sub-title').setHtml(this.getSubtitle()));
             this.appendChildToContentPanel(this.archiveItemViewers);
-            this.appendChildToContentPanel(new H6El('items-title').setHtml(this.getItemsSubtitle()));
+            this.appendChildToContentPanel(this.itemsTitleEl.setHtml(this.getItemsSubtitle()));
             this.appendChildToContentPanel(this.itemsList);
 
             return rendered;

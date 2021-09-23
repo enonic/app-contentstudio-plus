@@ -23,10 +23,13 @@ export class ArchiveTreeGrid
 
     private usersMap: Map<string, Principal> = new Map<string, Principal>();
 
+    private archiveContentFetcher: ContentSummaryAndCompareStatusFetcher;
+
     constructor() {
         super(ArchiveTreeGridHelper.createTreeGridBuilder());
 
         this.treeGridActions = new ArchiveTreeGridActions();
+        this.archiveContentFetcher = new ContentSummaryAndCompareStatusFetcher(ArchiveResourceRequest.ARCHIVE_PATH);
         this.setContextMenu(new TreeGridContextMenu(this.treeGridActions));
 
         ArchiveTreeGridRefreshRequiredEvent.on(() => {
@@ -51,7 +54,7 @@ export class ArchiveTreeGrid
 
         const from: number = root.getChildren().length;
 
-        return ContentSummaryAndCompareStatusFetcher.fetchRoot(from, 10, ArchiveResourceRequest.ARCHIVE_PATH).then(
+        return this.archiveContentFetcher.fetchRoot(from, 10).then(
             (data: ContentResponse<ContentSummaryAndCompareStatus>) => {
                 return data.getContents().map(d =>  new ArchiveContentViewItemBuilder()
                     .setData(d)
@@ -91,7 +94,7 @@ export class ArchiveTreeGrid
         const content: ContentSummaryAndCompareStatus = (<ArchiveContentViewItem>parentNode.getData()).getData();
         const from: number = parentNode.getChildren().length;
 
-        return ContentSummaryAndCompareStatusFetcher.fetchChildren(content.getContentId(), from, 10, ArchiveResourceRequest.ARCHIVE_PATH)
+        return this.archiveContentFetcher.fetchChildren(content.getContentId(), from, 10)
             .then((response: ContentResponse<ContentSummaryAndCompareStatus>) => {
                 const total: number = response.getMetadata().getTotalHits();
                 const contents: ContentSummaryAndCompareStatus[] = response.getContents();
