@@ -3,7 +3,7 @@ import {CmsProjectBasedResourceRequest} from 'lib-contentstudio/app/wizard/CmsPr
 export abstract class ArchiveResourceRequest<PARSED_TYPE>
     extends CmsProjectBasedResourceRequest<PARSED_TYPE> {
 
-    static ARCHIVE_PATH: string = 'archive'
+    static ARCHIVE_PATH: string = 'archive';
 
     protected constructor() {
         super();
