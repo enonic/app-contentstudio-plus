@@ -3,6 +3,7 @@ import {i18n} from 'lib-admin-ui/util/Messages';
 import {DeleteContentRequest} from 'lib-contentstudio/app/resource/DeleteContentRequest';
 import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
 import {ArchiveTreeGridRefreshRequiredEvent} from './ArchiveTreeGridRefreshRequiredEvent';
+import {ArchiveResourceRequest} from './resource/ArchiveResourceRequest';
 
 export class ArchiveDeleteDialog
     extends ArchiveDialog {
@@ -29,7 +30,9 @@ export class ArchiveDeleteDialog
     }
 
     protected doAction() {
-        const request = new DeleteContentRequest();
+        const request: DeleteContentRequest = new DeleteContentRequest();
+        request.setContentRootPath(ArchiveResourceRequest.ARCHIVE_PATH);
+
         this.items.forEach(item => request.addContentPath(item.getData().getPath()));
 
         request.sendAndParseWithPolling()

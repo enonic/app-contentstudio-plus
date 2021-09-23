@@ -3,27 +3,18 @@ import {TreeGrid} from 'lib-admin-ui/ui/treegrid/TreeGrid';
 import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import {ContentSummaryAndCompareStatusFetcher} from 'lib-contentstudio/app/resource/ContentSummaryAndCompareStatusFetcher';
 import {ArchiveTreeGridHelper} from './ArchiveTreeGridHelper';
-import {ContentId} from 'lib-contentstudio/app/content/ContentId';
 import {TreeGridContextMenu} from 'lib-admin-ui/ui/treegrid/TreeGridContextMenu';
 import {ArchiveTreeGridActions} from './ArchiveTreeGridActions';
 import {ArchiveViewItem} from './ArchiveViewItem';
 import {TreeNode} from 'lib-admin-ui/ui/treegrid/TreeNode';
-import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
-import {ArchiveBundleViewItem, ArchiveBundleViewItemBuilder} from './ArchiveBundleViewItem';
 import {ArchiveContentViewItem, ArchiveContentViewItemBuilder} from './ArchiveContentViewItem';
 import {ContentResponse} from 'lib-contentstudio/app/resource/ContentResponse';
-import {GetContentByPathRequest} from 'lib-contentstudio/app/resource/GetContentByPathRequest';
-import {ContentPath} from 'lib-contentstudio/app/content/ContentPath';
-import {ListContentByIdRequest} from 'lib-contentstudio/app/resource/ListContentByIdRequest';
-import {Content} from 'lib-contentstudio/app/content/Content';
-import {ContentSummary} from 'lib-contentstudio/app/content/ContentSummary';
 import {GetPrincipalByKeyRequest} from 'lib-contentstudio/app/resource/GetPrincipalByKeyRequest';
 import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
 import {Principal} from 'lib-admin-ui/security/Principal';
 import {ArchiveTreeGridRefreshRequiredEvent} from './ArchiveTreeGridRefreshRequiredEvent';
 import {ProjectContext} from 'lib-contentstudio/app/project/ProjectContext';
-import {ListArchivedRequest} from './resource/ListArchivedRequest';
-import {ArchivedContainer} from './ArchivedContainer';
+import {ArchiveResourceRequest} from './resource/ArchiveResourceRequest';
 
 export class ArchiveTreeGrid
     extends TreeGrid<ArchiveViewItem> {
@@ -60,7 +51,7 @@ export class ArchiveTreeGrid
 
         const from: number = root.getChildren().length;
 
-        return ContentSummaryAndCompareStatusFetcher.fetchRoot(from, 10, 'archive').then(
+        return ContentSummaryAndCompareStatusFetcher.fetchRoot(from, 10, ArchiveResourceRequest.ARCHIVE_PATH).then(
             (data: ContentResponse<ContentSummaryAndCompareStatus>) => {
                 return data.getContents().map(d =>  new ArchiveContentViewItemBuilder()
                     .setData(d)
@@ -100,8 +91,8 @@ export class ArchiveTreeGrid
         const content: ContentSummaryAndCompareStatus = (<ArchiveContentViewItem>parentNode.getData()).getData();
         const from: number = parentNode.getChildren().length;
 
-        return ContentSummaryAndCompareStatusFetcher.fetchChildren(content.getContentId(), from, 10).then(
-            (response: ContentResponse<ContentSummaryAndCompareStatus>) => {
+        return ContentSummaryAndCompareStatusFetcher.fetchChildren(content.getContentId(), from, 10, ArchiveResourceRequest.ARCHIVE_PATH)
+            .then((response: ContentResponse<ContentSummaryAndCompareStatus>) => {
                 const total: number = response.getMetadata().getTotalHits();
                 const contents: ContentSummaryAndCompareStatus[] = response.getContents();
                 parentNode.setMaxChildren(total);

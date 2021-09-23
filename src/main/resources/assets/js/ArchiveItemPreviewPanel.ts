@@ -5,6 +5,7 @@ import {ArchiveItemPreviewToolbar} from './ArchiveItemPreviewToolbar';
 import {ContentSummaryAndCompareStatusFetcher} from 'lib-contentstudio/app/resource/ContentSummaryAndCompareStatusFetcher';
 import {IsRenderableRequest} from 'lib-contentstudio/app/resource/IsRenderableRequest';
 import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
+import {ArchiveResourceRequest} from './resource/ArchiveResourceRequest';
 
 export class ArchiveItemPreviewPanel
     extends ContentItemPreviewPanel {
@@ -19,7 +20,9 @@ export class ArchiveItemPreviewPanel
         if (this.renderableItems.has(item.getId())) {
             super.setItem(item, force);
         } else {
-            new IsRenderableRequest(item.getContentId()).sendAndParse().then((isRenderable: boolean) => {
+            new IsRenderableRequest(item.getContentId())
+                .setContentRootPath(ArchiveResourceRequest.ARCHIVE_PATH)
+                .sendAndParse().then((isRenderable: boolean) => {
                 item.setRenderable(isRenderable);
                 this.renderableItems.set(item.getId(), isRenderable);
                 super.setItem(item);
