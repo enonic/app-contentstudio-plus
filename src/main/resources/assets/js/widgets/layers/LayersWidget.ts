@@ -38,8 +38,8 @@ export class LayersWidget
         });
     }
 
-    private  fetchContent(): Q.Promise<ContentSummaryAndCompareStatus> {
-        return ContentSummaryAndCompareStatusFetcher.fetch(new ContentId(this.contentId));
+    private fetchContent(): Q.Promise<ContentSummaryAndCompareStatus> {
+        return new ContentSummaryAndCompareStatusFetcher().fetch(new ContentId(this.contentId));
     }
 
     doRender(): Q.Promise<boolean> {
