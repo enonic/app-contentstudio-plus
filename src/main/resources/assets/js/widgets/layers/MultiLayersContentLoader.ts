@@ -49,7 +49,7 @@ export class MultiLayersContentLoader {
             .sendAndParse()
             .then((result: ContentsExistResult) => {
                 if (!!result.getContentsExistMap()[id]) {
-                    return ContentSummaryAndCompareStatusFetcher.fetch(this.item.getContentId(), project.getName())
+                    return new ContentSummaryAndCompareStatusFetcher().fetch(this.item.getContentId(), project.getName())
                         .then((item: ContentSummaryAndCompareStatus) => {
                             return new LayerContent(item, project);
                         });
