@@ -5,6 +5,7 @@ import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
 import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import {ArchiveTreeGridRefreshRequiredEvent} from './ArchiveTreeGridRefreshRequiredEvent';
 import {DeleteContentRequest} from 'lib-contentstudio/app/resource/DeleteContentRequest';
+import {ArchiveResourceRequest} from './resource/ArchiveResourceRequest';
 
 export class ArchiveRestoreDialog
     extends ArchiveDialog {
@@ -32,7 +33,6 @@ export class ArchiveRestoreDialog
 
     protected doAction() {
         new RestoreArchivedRequest(this.items.map(item => item.getId()))
-            .setContentRootPath('archive')
             .sendAndParseWithPolling()
             .then(() => {
                 new ArchiveTreeGridRefreshRequiredEvent().fire();
