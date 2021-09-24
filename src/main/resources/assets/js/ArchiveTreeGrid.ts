@@ -32,12 +32,26 @@ export class ArchiveTreeGrid
         this.archiveContentFetcher = new ContentSummaryAndCompareStatusFetcher(ArchiveResourceRequest.ARCHIVE_PATH);
         this.setContextMenu(new TreeGridContextMenu(this.treeGridActions));
 
+        this.initListeners();
+    }
+
+    protected initListeners() {
         ArchiveTreeGridRefreshRequiredEvent.on(() => {
             this.refresh();
         });
 
         ProjectContext.get().onProjectChanged(() => {
             this.refresh();
+        });
+
+        let isFirstTimeShown: boolean = true;
+
+        this.onShown(() => {
+            if (!isFirstTimeShown) {
+                this.reload();
+            }
+
+            isFirstTimeShown = false;
         });
     }
 
