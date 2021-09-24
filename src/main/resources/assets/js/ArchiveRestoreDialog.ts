@@ -2,10 +2,8 @@ import {ArchiveDialog} from './ArchiveDialog';
 import {i18n} from 'lib-admin-ui/util/Messages';
 import {RestoreArchivedRequest} from './resource/RestoreArchivedRequest';
 import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
-import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import {ArchiveTreeGridRefreshRequiredEvent} from './ArchiveTreeGridRefreshRequiredEvent';
-import {DeleteContentRequest} from 'lib-contentstudio/app/resource/DeleteContentRequest';
-import {ArchiveResourceRequest} from './resource/ArchiveResourceRequest';
+import {ContentTreeGridRefreshRequiredEvent} from 'lib-contentstudio/app/browse/ContentTreeGridRefreshRequiredEvent';
 
 export class ArchiveRestoreDialog
     extends ArchiveDialog {
@@ -36,6 +34,7 @@ export class ArchiveRestoreDialog
             .sendAndParseWithPolling()
             .then(() => {
                 new ArchiveTreeGridRefreshRequiredEvent().fire();
+                new ContentTreeGridRefreshRequiredEvent().fire();
             })
             .catch(DefaultErrorHandler.handle);
     }
