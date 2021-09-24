@@ -2,4 +2,10 @@ import {ContentSummaryAndCompareStatusViewer} from 'lib-contentstudio/app/conten
 
 export class ArchiveItemViewer
     extends ContentSummaryAndCompareStatusViewer {
+
+    constructor() {
+        super();
+
+        this.addClass('archive-item-viewer');
+    }
 }
