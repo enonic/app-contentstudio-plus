@@ -3,6 +3,7 @@ import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
 import {ArchiveItemPreviewPanel} from './ArchiveItemPreviewPanel';
 import {ArchiveViewItem} from './ArchiveViewItem';
 import {ArchiveContentViewItem} from './ArchiveContentViewItem';
+import {ArchiveResourceRequest} from './resource/ArchiveResourceRequest';
 
 export class ArchiveItemStatisticsPanel
     extends ItemStatisticsPanel {
@@ -12,7 +13,7 @@ export class ArchiveItemStatisticsPanel
     constructor() {
         super('content-item-statistics-panel');
 
-        this.previewPanel = new ArchiveItemPreviewPanel();
+        this.previewPanel = new ArchiveItemPreviewPanel(ArchiveResourceRequest.ARCHIVE_PATH);
         this.previewPanel.setDoOffset(false);
         this.appendChild(this.previewPanel);
     }
