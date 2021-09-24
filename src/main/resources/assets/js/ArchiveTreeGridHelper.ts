@@ -9,6 +9,8 @@ import {Viewer} from 'lib-admin-ui/ui/Viewer';
 import {ArchiveBundleViewItem} from './ArchiveBundleViewItem';
 import {ArchiveItemViewer} from './ArchiveItemViewer';
 import {ArchiveContentViewer} from './ArchiveContentViewer';
+import {i18n} from 'lib-admin-ui/util/Messages';
+import {SpanEl} from 'lib-admin-ui/dom/SpanEl';
 
 export class ArchiveTreeGridHelper {
 
@@ -27,11 +29,21 @@ export class ArchiveTreeGridHelper {
             field: 'displayName',
             formatter: ArchiveTreeGridHelper.nameFormatter,
             style: {cssClass: 'name', minWidth: 130}
+        }, {
+            name: 'CompareStatus',
+            id: 'compareStatus',
+            field: 'compareStatus',
+            formatter: ArchiveTreeGridHelper.statusFormatter,
+            style: {cssClass: 'status', minWidth: 75, maxWidth: 75}
         }];
     }
 
-    public static nameFormatter({}: any, {}: any, {}: any, {}: any, dataContext: TreeNode<ArchiveViewItem>) {
+    public static nameFormatter({}: any, {}: any, {}: any, {}: any, dataContext: TreeNode<ArchiveViewItem>): string {
         return ArchiveTreeGridHelper.getViewerForArchiveItem(dataContext).toString();
+    }
+
+    public static statusFormatter(): string {
+        return SpanEl.fromText(i18n('status.archived')).toString();
     }
 
     private static getViewerForArchiveItem(dataContext: TreeNode<ArchiveViewItem>): Viewer<any> {
