@@ -12,6 +12,6 @@ export class ArchiveContentDialogViewer extends ContentSummaryAndCompareStatusVi
     }
 
     resolveSubName(object: ContentSummaryAndCompareStatus): string {
-        return new ContentPath(object.getPath().getElements().slice(2)).toString();
+        return object.getPath().toString();
     }
 }
