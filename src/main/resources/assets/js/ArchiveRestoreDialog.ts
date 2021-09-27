@@ -4,6 +4,7 @@ import {RestoreArchivedRequest} from './resource/RestoreArchivedRequest';
 import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
 import {ArchiveTreeGridRefreshRequiredEvent} from './ArchiveTreeGridRefreshRequiredEvent';
 import {ContentTreeGridRefreshRequiredEvent} from 'lib-contentstudio/app/browse/ContentTreeGridRefreshRequiredEvent';
+import {NotifyManager} from 'lib-admin-ui/notify/NotifyManager';
 
 export class ArchiveRestoreDialog
     extends ArchiveDialog {
@@ -35,6 +36,11 @@ export class ArchiveRestoreDialog
             .then(() => {
                 new ArchiveTreeGridRefreshRequiredEvent().fire();
                 new ContentTreeGridRefreshRequiredEvent().fire();
+
+                const total: number = this.items.length;
+                const successMessage: string =
+                    total > 1 ? i18n('notify.restored.success.multiple', total) : i18n('notify.restored.success.single');
+                NotifyManager.get().showSuccess(successMessage);
             })
             .catch(DefaultErrorHandler.handle);
     }
