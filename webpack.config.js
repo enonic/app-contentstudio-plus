@@ -44,11 +44,17 @@ module.exports = {
             },
             {
                 test: /\.(eot|woff|woff2|ttf)$|icomoon-studio-plus.svg/,
-                use: 'file-loader?name=fonts/[name].[ext]'
+                type: 'asset/resource',
+                generator: {
+                    filename: 'fonts/[base]'
+                },
             },
             {
-                test: /^\.(svg|png|jpg|gif)$/,
-                use: 'file-loader?name=img/[name].[ext]'
+                test: /\.(svg|png|jpg|gif)$/,
+                type: 'asset/resource',
+                generator: {
+                    filename: 'images/[base]'
+                },
             }
         ]
     },
