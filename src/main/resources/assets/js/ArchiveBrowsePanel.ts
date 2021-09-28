@@ -25,6 +25,10 @@ export class ArchiveBrowsePanel extends BrowsePanel {
         return new ArchiveBrowseItemPanel();
     }
 
+    protected getFirstPanelSize(): number {
+        return 62;
+    }
+
     doRender(): Q.Promise<boolean> {
         return super.doRender().then((rendered: boolean) => {
             this.addClass('archive-browse-panel');
