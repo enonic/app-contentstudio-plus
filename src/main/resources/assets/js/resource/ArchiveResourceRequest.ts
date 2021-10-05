@@ -1,4 +1,5 @@
 import {CmsProjectBasedResourceRequest} from 'lib-contentstudio/app/wizard/CmsProjectBasedResourceRequest';
+import {ContentResourceRequest} from 'lib-contentstudio/app/resource/ContentResourceRequest';
 
 export abstract class ArchiveResourceRequest<PARSED_TYPE>
     extends CmsProjectBasedResourceRequest<PARSED_TYPE> {
@@ -8,7 +9,7 @@ export abstract class ArchiveResourceRequest<PARSED_TYPE>
     protected constructor() {
         super();
 
-        this.addRequestPathElements('content', ArchiveResourceRequest.ARCHIVE_PATH);
+        this.addRequestPathElements(ContentResourceRequest.CONTENT_PATH, ArchiveResourceRequest.ARCHIVE_PATH);
         this.setContentRootPath(ArchiveResourceRequest.ARCHIVE_PATH);
     }
 }

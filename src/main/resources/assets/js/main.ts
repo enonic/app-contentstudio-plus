@@ -123,9 +123,6 @@ async function startApplication() {
 
     initApplicationEventListener();
 
-    new AggregatedServerEventsListener([application]).start();
-
-
     initProjectContext(application)
         .catch((reason: any) => {
             DefaultErrorHandler.handle(reason);
