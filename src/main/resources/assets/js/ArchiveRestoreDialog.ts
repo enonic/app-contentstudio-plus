@@ -2,8 +2,6 @@ import {ArchiveDialog} from './ArchiveDialog';
 import {i18n} from 'lib-admin-ui/util/Messages';
 import {RestoreArchivedRequest} from './resource/RestoreArchivedRequest';
 import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
-import {ArchiveTreeGridRefreshRequiredEvent} from './ArchiveTreeGridRefreshRequiredEvent';
-import {ContentTreeGridRefreshRequiredEvent} from 'lib-contentstudio/app/browse/ContentTreeGridRefreshRequiredEvent';
 import {NotifyManager} from 'lib-admin-ui/notify/NotifyManager';
 
 export class ArchiveRestoreDialog
@@ -34,9 +32,6 @@ export class ArchiveRestoreDialog
         new RestoreArchivedRequest(this.items.map(item => item.getId()))
             .sendAndParseWithPolling()
             .then(() => {
-                new ArchiveTreeGridRefreshRequiredEvent().fire();
-                new ContentTreeGridRefreshRequiredEvent().fire();
-
                 const total: number = this.items.length;
                 const successMessage: string =
                     total > 1 ? i18n('notify.restored.success.multiple', total) : i18n('notify.restored.success.single');
