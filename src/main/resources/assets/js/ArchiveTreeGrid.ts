@@ -12,9 +12,10 @@ import {ContentResponse} from 'lib-contentstudio/app/resource/ContentResponse';
 import {GetPrincipalByKeyRequest} from 'lib-contentstudio/app/resource/GetPrincipalByKeyRequest';
 import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
 import {Principal} from 'lib-admin-ui/security/Principal';
-import {ArchiveTreeGridRefreshRequiredEvent} from './ArchiveTreeGridRefreshRequiredEvent';
 import {ProjectContext} from 'lib-contentstudio/app/project/ProjectContext';
 import {ArchiveResourceRequest} from './resource/ArchiveResourceRequest';
+import {ArchiveServerEvent} from 'lib-contentstudio/app/event/ArchiveServerEvent';
+import {ContentServerEventsHandler} from 'lib-contentstudio/app/event/ContentServerEventsHandler';
 
 export class ArchiveTreeGrid
     extends TreeGrid<ArchiveViewItem> {
@@ -36,22 +37,25 @@ export class ArchiveTreeGrid
     }
 
     protected initListeners() {
-        ArchiveTreeGridRefreshRequiredEvent.on(() => {
+        ArchiveServerEvent.on(() => {
             this.refresh();
+        });
+
+        let isRefreshTriggered: boolean = false;
+
+        ContentServerEventsHandler.getInstance().onContentArchived(() => {
+            if (!isRefreshTriggered) {
+                isRefreshTriggered = true;
+
+                this.whenShown(() => {
+                    this.refresh();
+                    isRefreshTriggered = false;
+                })
+            }
         });
 
         ProjectContext.get().onProjectChanged(() => {
             this.refresh();
-        });
-
-        let isFirstTimeShown: boolean = true;
-
-        this.onShown(() => {
-            if (!isFirstTimeShown) {
-                this.reload();
-            }
-
-            isFirstTimeShown = false;
         });
     }
 
@@ -70,7 +74,7 @@ export class ArchiveTreeGrid
 
         return this.archiveContentFetcher.fetchRoot(from, 10).then(
             (data: ContentResponse<ContentSummaryAndCompareStatus>) => {
-                return data.getContents().map(d =>  new ArchiveContentViewItemBuilder()
+                return data.getContents().map(d => new ArchiveContentViewItemBuilder()
                     .setData(d)
                     .build());
             });

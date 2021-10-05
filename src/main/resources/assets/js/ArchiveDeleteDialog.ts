@@ -2,7 +2,6 @@ import {ArchiveDialog} from './ArchiveDialog';
 import {i18n} from 'lib-admin-ui/util/Messages';
 import {DeleteContentRequest} from 'lib-contentstudio/app/resource/DeleteContentRequest';
 import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
-import {ArchiveTreeGridRefreshRequiredEvent} from './ArchiveTreeGridRefreshRequiredEvent';
 import {ArchiveResourceRequest} from './resource/ArchiveResourceRequest';
 
 export class ArchiveDeleteDialog
@@ -35,11 +34,7 @@ export class ArchiveDeleteDialog
 
         this.items.forEach(item => request.addContentPath(item.getData().getPath()));
 
-        request.sendAndParseWithPolling()
-            .then(() => {
-                new ArchiveTreeGridRefreshRequiredEvent().fire();
-            })
-            .catch(DefaultErrorHandler.handle);
+        request.sendAndParseWithPolling().catch(DefaultErrorHandler.handle);
     }
 
     protected getConfirmValueDialogTitle(): string {
