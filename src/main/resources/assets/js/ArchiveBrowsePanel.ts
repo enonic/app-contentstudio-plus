@@ -5,7 +5,8 @@ import {ArchiveTreeGrid} from './ArchiveTreeGrid';
 import {ArchiveBrowseItemPanel} from './ArchiveBrowseItemPanel';
 import * as Q from 'q';
 
-export class ArchiveBrowsePanel extends BrowsePanel {
+export class ArchiveBrowsePanel
+    extends BrowsePanel {
 
     protected initElements(): void {
         super.initElements();
