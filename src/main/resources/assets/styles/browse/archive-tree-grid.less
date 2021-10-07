@@ -1,4 +1,19 @@
 .archive-tree-grid {
+  &._0-240,
+  &._240-360,
+  &._360-540,
+  &._540-720 {
+    .slick-cell.modified {
+      display: none;
+    }
+  }
+
+  &._0-240,
+  &._240-360 {
+    .slick-cell.status {
+      display: none;
+    }
+  }
 
   .slick-viewport {
     > .grid-canvas {
@@ -25,14 +40,15 @@
               .@{_COMMON_PREFIX}wrapper {
                 flex-shrink: 0;
 
-                &:before {
+                &::before {
                   display: none;
                 }
               }
             }
           }
 
-          &.status, &.modified {
+          &.status,
+          &.modified {
             flex-shrink: 0;
           }
 
@@ -60,17 +76,4 @@
       }
     }
   }
-
-  &._0-240, &._240-360, &._360-540, &._540-720 {
-    .slick-cell.modified {
-      display: none;
-    }
-  }
-
-  &._0-240, &._240-360 {
-    .slick-cell.status {
-      display: none;
-    }
-  }
-
 }

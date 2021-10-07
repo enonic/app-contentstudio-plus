@@ -53,6 +53,17 @@ export class ArchiveRestoreDialog
         return i18n('dialog.confirmRestore.subtitle');
     }
 
+    protected isConfirmDialogRequired(): boolean {
+        return this.items.length > 1;
+    }
+
+    doRender(): Q.Promise<boolean> {
+        return super.doRender().then((rendered: boolean) => {
+            this.confirmValueDialog.addClass('confirm-restore');
+            return rendered;
+        });
+    }
+
     static getInstance(): ArchiveRestoreDialog {
         if (!ArchiveRestoreDialog.INSTANCE) {
             ArchiveRestoreDialog.INSTANCE = new ArchiveRestoreDialog();

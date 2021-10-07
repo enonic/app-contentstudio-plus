@@ -54,7 +54,11 @@ export abstract class ArchiveDialog
         super.initListeners();
 
         this.archiveAction.onExecuted(() => {
-            this.confirmValueDialog.open();
+            if (this.isConfirmDialogRequired()) {
+                this.confirmValueDialog.open();
+            } else {
+                this.executeAction();
+            }
         });
 
         this.itemsList.onItemsAdded(() => {
@@ -64,6 +68,10 @@ export abstract class ArchiveDialog
 
             this.resizeHandler(); // to toggle fullscreen mode if needed
         });
+    }
+
+    protected isConfirmDialogRequired(): boolean {
+        return true;
     }
 
     protected executeAction() {
