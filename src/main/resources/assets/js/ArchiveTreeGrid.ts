@@ -50,7 +50,7 @@ export class ArchiveTreeGrid
                 this.whenShown(() => {
                     this.refresh();
                     isRefreshTriggered = false;
-                })
+                });
             }
         });
 
