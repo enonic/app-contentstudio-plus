@@ -5,10 +5,11 @@
   min-height: 50px;
 
   &.icon-spinner {
-    &:before {
+    &::before {
       position: absolute;
       display: none;
-      .animation(rotate360, .5s, 0s, linear);
+      .animation(rotate360, 0.5s, 0s, linear);
+
       font-size: 32px;
       left: calc(50% - 24px);
       top: calc(50% - 24px);
