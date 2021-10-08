@@ -24,6 +24,8 @@ export abstract class ArchiveDialog
 
     protected archiveAction: Action;
 
+    protected totalToProcess: number;
+
     protected constructor(config: ModalDialogConfig = <ModalDialogConfig>{}) {
         super(config);
     }
@@ -94,9 +96,9 @@ export abstract class ArchiveDialog
                 this.itemsList.setVisible(ids.length > 0);
                 this.itemsTitleEl.setVisible(ids.length > 0);
 
-                const count = this.items.length + ids.length;
-                this.confirmValueDialog.setValueToCheck('' + count);
-                this.archiveAction.setLabel(`${this.getArchiveActionTitle()} (${count})`);
+                this.totalToProcess = this.items.length + ids.length;
+                this.confirmValueDialog.setValueToCheck('' + this.totalToProcess);
+                this.archiveAction.setLabel(`${this.getArchiveActionTitle()} (${this.totalToProcess})`);
             });
 
         return this;

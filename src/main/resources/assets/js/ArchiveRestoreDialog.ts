@@ -32,9 +32,10 @@ export class ArchiveRestoreDialog
         new RestoreArchivedRequest(this.items.map(item => item.getId()))
             .sendAndParseWithPolling()
             .then(() => {
-                const total: number = this.items.length;
                 const successMessage: string =
-                    total > 1 ? i18n('notify.restored.success.multiple', total) : i18n('notify.restored.success.single');
+                    this.totalToProcess > 1 ?
+                    i18n('notify.restored.success.multiple', this.totalToProcess) :
+                    i18n('notify.restored.success.single');
                 NotifyManager.get().showSuccess(successMessage);
             })
             .catch(DefaultErrorHandler.handle);
