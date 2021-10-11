@@ -98,7 +98,7 @@ export abstract class ArchiveDialog
 
                 this.totalToProcess = this.items.length + ids.length;
                 this.confirmValueDialog.setValueToCheck('' + this.totalToProcess);
-                this.archiveAction.setLabel(`${this.getArchiveActionTitle()} (${this.totalToProcess})`);
+                this.archiveAction.setLabel(this.getArchiveActionTitle() + (this.totalToProcess > 1 ? ` (${this.totalToProcess})` : ''));
             });
 
         return this;
