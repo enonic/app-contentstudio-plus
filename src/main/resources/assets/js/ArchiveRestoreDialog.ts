@@ -35,7 +35,7 @@ export class ArchiveRestoreDialog
                 const successMessage: string =
                     this.totalToProcess > 1 ?
                     i18n('notify.restored.success.multiple', this.totalToProcess) :
-                    i18n('notify.restored.success.single');
+                    i18n('notify.restored.success.single', this.items[0].getDisplayName() );
                 NotifyManager.get().showSuccess(successMessage);
             })
             .catch(DefaultErrorHandler.handle);
@@ -50,7 +50,7 @@ export class ArchiveRestoreDialog
     }
 
     protected isConfirmDialogRequired(): boolean {
-        return this.items.length > 1;
+        return this.items.length + this.itemsList.getItemCount() > 1;
     }
 
     doRender(): Q.Promise<boolean> {
