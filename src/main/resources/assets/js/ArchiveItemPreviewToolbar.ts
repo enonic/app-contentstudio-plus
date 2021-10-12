@@ -8,19 +8,19 @@ import {DivEl} from 'lib-admin-ui/dom/DivEl';
 export class ArchiveItemPreviewToolbar
     extends ContentStatusToolbar {
 
-    private readonly whenArchived: SpanEl;
+    private readonly archivedDate: SpanEl;
 
     private readonly originalPathEl: SpanEl;
 
     constructor() {
         super('archive-status-toolbar');
 
-        this.whenArchived = new SpanEl('when');
-        this.whenArchived.insertAfterEl(this.status);
+        this.archivedDate = new SpanEl('archived-date');
+        this.archivedDate.insertAfterEl(this.status);
 
         const originalPathWrapper = new DivEl('original-path');
-        this.originalPathEl = new SpanEl('part2');
-        originalPathWrapper.appendChildren(new SpanEl('part1').setHtml(i18n('preview.path.part1')), this.originalPathEl);
+        this.originalPathEl = new SpanEl('original-path-value');
+        originalPathWrapper.appendChildren(new SpanEl().setHtml(i18n('preview.originalPath')), this.originalPathEl);
 
         this.insertChild(originalPathWrapper, 1);
     }
@@ -30,7 +30,7 @@ export class ArchiveItemPreviewToolbar
 
         if (item) {
             this.status.setHtml(i18n('status.archived'));
-            this.whenArchived.setHtml(DateTimeFormatter.createHtmlNoTimestamp(item.getContentSummary().getModifiedTime()));
+            this.archivedDate.setHtml(DateTimeFormatter.createHtmlNoTimestamp(item.getContentSummary().getModifiedTime()));
             this.originalPathEl.setHtml(item.getPath().toString());
         }
     }
@@ -38,7 +38,7 @@ export class ArchiveItemPreviewToolbar
     clearItem(): void {
         super.clearItem();
 
-        this.whenArchived.setHtml('');
+        this.archivedDate.setHtml('');
     }
 
     protected foldOrExpand(): void {
