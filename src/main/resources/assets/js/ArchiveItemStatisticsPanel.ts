@@ -13,7 +13,7 @@ export class ArchiveItemStatisticsPanel
     constructor() {
         super('content-item-statistics-panel');
 
-        this.previewPanel = new ArchiveItemPreviewPanel(ArchiveResourceRequest.ARCHIVE_PATH);
+        this.previewPanel = new ArchiveItemPreviewPanel();
         this.previewPanel.setDoOffset(false);
         this.appendChild(this.previewPanel);
     }

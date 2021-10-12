@@ -1,7 +1,41 @@
 .archive-item-preview-panel {
-  .item-preview-toolbar {
-    .when {
-      margin-left: 5px;
+  .item-preview-toolbar.archive-status-toolbar {
+    background-color: #e1c4ce !important;
+    height: 80px;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+
+    .content-status-wrapper {
+      padding-left: 0px;
+      font-size: 14px;
+      line-height: 18px;
+
+      .when {
+        margin-left: 5px;
+      }
+
+      .author {
+        color: @admin-black;
+      }
     }
+
+    .original-path {
+      margin: 5px 10px 0 10px;
+      line-height: 18px;
+      color: @admin-font-gray2;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+
+      .part2 {
+        margin-left: 5px;
+      }
+    }
+  }
+
+  .no-preview-message {
+    background-color: #53585f;
   }
 }

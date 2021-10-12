@@ -2,15 +2,19 @@ import {ContentItemPreviewPanel} from 'lib-contentstudio/app/view/ContentItemPre
 import {ContentItemPreviewToolbar} from 'lib-contentstudio/app/view/ContentItemPreviewToolbar';
 import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import {ArchiveItemPreviewToolbar} from './ArchiveItemPreviewToolbar';
-import {ContentSummaryAndCompareStatusFetcher} from 'lib-contentstudio/app/resource/ContentSummaryAndCompareStatusFetcher';
 import {IsRenderableRequest} from 'lib-contentstudio/app/resource/IsRenderableRequest';
 import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
 import {ArchiveResourceRequest} from './resource/ArchiveResourceRequest';
+import {ContentPath} from 'lib-contentstudio/app/content/ContentPath';
 
 export class ArchiveItemPreviewPanel
     extends ContentItemPreviewPanel {
 
     private renderableItems: Map<string, boolean> = new Map<string, boolean>();
+
+    constructor() {
+        super(ContentPath.ARCHIVE_ROOT);
+    }
 
     createToolbar(): ContentItemPreviewToolbar {
         return <any>new ArchiveItemPreviewToolbar();
