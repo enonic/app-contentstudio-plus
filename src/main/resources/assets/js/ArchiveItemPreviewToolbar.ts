@@ -4,6 +4,7 @@ import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/Cont
 import {ContentStatusToolbar} from 'lib-contentstudio/app/ContentStatusToolbar';
 import {i18n} from 'lib-admin-ui/util/Messages';
 import {DivEl} from 'lib-admin-ui/dom/DivEl';
+import {ContentSummary} from 'lib-contentstudio/app/content/ContentSummary';
 
 export class ArchiveItemPreviewToolbar
     extends ContentStatusToolbar {
@@ -29,9 +30,10 @@ export class ArchiveItemPreviewToolbar
         super.setItem(item);
 
         if (item) {
+            const summary: ContentSummary = item.getContentSummary();
             this.status.setHtml(i18n('status.archived'));
-            this.archivedDate.setHtml(DateTimeFormatter.createHtmlNoTimestamp(item.getContentSummary().getModifiedTime()));
-            this.originalPathEl.setHtml(item.getPath().toString());
+            this.archivedDate.setHtml(DateTimeFormatter.createHtmlNoTimestamp(summary.getModifiedTime()));
+            this.originalPathEl.setHtml(`${summary.getOriginalParentPath()}/${summary.getOriginalName()}`.replace('//','/'));
         }
     }
 
