@@ -9,6 +9,11 @@ import {ArchiveContentViewItem} from './ArchiveContentViewItem';
 import {PrincipalKey} from 'lib-admin-ui/security/PrincipalKey';
 import {Principal} from 'lib-admin-ui/security/Principal';
 import {GetPrincipalByKeyRequest} from 'lib-contentstudio/app/resource/GetPrincipalByKeyRequest';
+import {GetContentVersionsRequest} from 'lib-contentstudio/app/resource/GetContentVersionsRequest';
+import {ContentVersions} from 'lib-contentstudio/app/ContentVersions';
+import {ContentVersion} from 'lib-contentstudio/app/ContentVersion';
+import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
+import {ContentVersionPublishInfo} from 'lib-contentstudio/app/ContentVersionPublishInfo';
 
 
 export class ArchiveItemPreviewToolbar
@@ -42,21 +47,26 @@ export class ArchiveItemPreviewToolbar
 
     private updatedArchivedBlock(summary: ContentSummary) {
         const status: string = i18n('status.archived');
-        const when: string = DateTimeFormatter.createHtmlNoTimestamp(summary.getModifiedTime());
         const modifier: string = summary.getModifier();
 
-        this.getPrincipalDisplayName(modifier).then((displayName: string) => {
+        const versionsPromise: Q.Promise<ContentVersions> = new GetContentVersionsRequest(summary.getContentId()).sendAndParse();
+        const principalPromise: Q.Promise<Principal> = new GetPrincipalByKeyRequest(PrincipalKey.fromString(modifier)).sendAndParse();
+
+        Q.all([versionsPromise, principalPromise]).spread((versions: ContentVersions, principal: Principal) => {
+            const when: string = this.getArchivedDate(versions);
+            const displayName: string = i18n('field.preview.toolbar.status', principal.getDisplayName());
             this.archivedEl.setHtml(`${status} ${when} ${displayName}`);
-        });
+        }).catch(DefaultErrorHandler.handle);
     }
 
-    private getPrincipalDisplayName(modifier: string): Q.Promise<string> {
-        return new GetPrincipalByKeyRequest(PrincipalKey.fromString(modifier)).sendAndParse()
-            .then((user: Principal) => {
-                return i18n('field.preview.toolbar.status', user.getDisplayName());
-            }).catch(() => {
-                return modifier;
-            });
+    private getArchivedDate(versions: ContentVersions): string {
+        const publishInfo: ContentVersionPublishInfo = versions.getActiveVersion().getPublishInfo();
+
+        if (publishInfo?.isArchived()) {
+            return DateTimeFormatter.createHtmlNoTimestamp(publishInfo.getTimestamp());
+        }
+
+        return DateTimeFormatter.createHtmlNoTimestamp(versions.getActiveVersion().getModified());
     }
 
     private updateOriginalPathBlock(item: ArchiveContentViewItem) {
