@@ -31,22 +31,9 @@
     background-color: @admin-dark-gray;
   }
 
-  &.image-preview, &.svg-preview {
-    .wrapper {
-      iframe, .no-preview-message {
-        display: none;
-      }
-    }
-
-    img {
-      margin: auto;
-      max-width: 100%;
-      max-height: 100%;
-    }
-  }
-
   &.media-preview {
-    img, .no-preview-message {
+    img,
+    .no-preview-message {
       display: none;
     }
 
@@ -57,7 +44,8 @@
   }
 
   &.no-preview {
-    img, iframe {
+    img,
+    iframe {
       display: none;
     }
 
@@ -70,6 +58,22 @@
       align-items: center;
       font-size: 21px;
       color: lightgray;
+    }
+  }
+
+  &.image-preview,
+  &.svg-preview {
+    .wrapper {
+      iframe,
+      .no-preview-message {
+        display: none;
+      }
+    }
+
+    img {
+      margin: auto;
+      max-width: 100%;
+      max-height: 100%;
     }
   }
 }
