@@ -23,7 +23,7 @@ export class ArchiveItemStatisticsPanel
             return;
         }
 
-        this.previewPanel.setItem((<ArchiveContentViewItem>item).getData());
+        this.previewPanel.setItem(<ArchiveContentViewItem>item);
     }
 
     clearItem() {

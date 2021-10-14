@@ -6,8 +6,6 @@ import {ArchiveViewItem} from './ArchiveViewItem';
 import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
 import {ArchiveContentViewItem} from './ArchiveContentViewItem';
 import {Viewer} from 'lib-admin-ui/ui/Viewer';
-import {ArchiveBundleViewItem} from './ArchiveBundleViewItem';
-import {ArchiveItemViewer} from './ArchiveItemViewer';
 import {ArchiveContentViewer} from './ArchiveContentViewer';
 import {i18n} from 'lib-admin-ui/util/Messages';
 import {SpanEl} from 'lib-admin-ui/dom/SpanEl';
@@ -52,12 +50,6 @@ export class ArchiveTreeGridHelper {
                                                                    new ArchiveContentViewer();
             viewer.setObject((<ArchiveContentViewItem>dataContext.getData()).getData());
 
-            return viewer;
-        }
-
-        if (ObjectHelper.iFrameSafeInstanceOf(dataContext.getData(), ArchiveBundleViewItem)) {
-            const viewer: Viewer<ArchiveBundleViewItem> = dataContext.getViewer('displayName') || new ArchiveItemViewer();
-            viewer.setObject(<ArchiveBundleViewItem>dataContext.getData());
             return viewer;
         }
 
