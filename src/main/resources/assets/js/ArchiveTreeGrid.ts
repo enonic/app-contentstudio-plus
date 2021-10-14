@@ -16,6 +16,7 @@ import {ProjectContext} from 'lib-contentstudio/app/project/ProjectContext';
 import {ArchiveResourceRequest} from './resource/ArchiveResourceRequest';
 import {ArchiveServerEvent} from 'lib-contentstudio/app/event/ArchiveServerEvent';
 import {ContentServerEventsHandler} from 'lib-contentstudio/app/event/ContentServerEventsHandler';
+import { ContentPath } from 'lib-contentstudio/app/content/ContentPath';
 
 export class ArchiveTreeGrid
     extends TreeGrid<ArchiveViewItem> {
@@ -74,10 +75,24 @@ export class ArchiveTreeGrid
 
         return this.archiveContentFetcher.fetchRoot(from, 10).then(
             (data: ContentResponse<ContentSummaryAndCompareStatus>) => {
-                return data.getContents().map(d => new ArchiveContentViewItemBuilder()
+                return data.getContents().map((d: ContentSummaryAndCompareStatus) => new ArchiveContentViewItemBuilder()
+                    .setOriginalParentPath(this.getOriginalParentPathForRootItem(d))
                     .setData(d)
                     .build());
             });
+    }
+
+    private getOriginalParentPathForRootItem(item: ContentSummaryAndCompareStatus): string {
+        const originalParentPath: string = item.getContentSummary().getOriginalParentPath();
+        const originalName: string = item.getContentSummary().getOriginalName();
+
+        if (!originalParentPath || !originalName) {
+            item.getPath().toString();
+        }
+
+        const separator: string = originalParentPath.endsWith(ContentPath.NODE_PATH_DIVIDER) ? '' : ContentPath.NODE_PATH_DIVIDER;
+
+        return `${originalParentPath}${separator}${originalName}`;
     }
 
     private fetchPrincipals(bundles: ContentSummaryAndCompareStatus[]): Q.Promise<void> {
@@ -118,8 +133,9 @@ export class ArchiveTreeGrid
                 const contents: ContentSummaryAndCompareStatus[] = response.getContents();
                 parentNode.setMaxChildren(total);
 
-                const newArchiveViewItems: ArchiveViewItem[] = contents.map((c: ContentSummaryAndCompareStatus) => {
+                const newArchiveViewItems: ArchiveContentViewItem[] = contents.map((c: ContentSummaryAndCompareStatus) => {
                     return new ArchiveContentViewItemBuilder()
+                        .setOriginalParentPath((<ArchiveContentViewItem>parentNode.getData()).getOriginalParentPath())
                         .setData(c)
                         .build();
                 });
