@@ -130,7 +130,7 @@ export class ArchiveItemPreviewPanel
     }
 
     private setMode(value: string) {
-        if (value != 'media-preview') {
+        if (value !== 'media-preview') {
             this.frame.setSrc('about:blank');
         }
         this.removeClass('image-preview svg-preview media-preview no-preview');
