@@ -15,37 +15,20 @@ import {MediaAllowsPreviewRequest} from 'lib-contentstudio/app/resource/MediaAll
 import {UrlHelper} from 'lib-contentstudio/app/util/UrlHelper';
 import {ImageUrlResolver} from 'lib-contentstudio/app/util/ImageUrlResolver';
 import {ContentTypeName} from 'lib-admin-ui/schema/content/ContentTypeName';
+import {ContentItemPreviewPanel} from 'lib-contentstudio/app/view/ContentItemPreviewPanel';
+import {ViewItem} from 'lib-admin-ui/app/view/ViewItem';
+import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 
 
 export class ArchiveItemPreviewPanel
-    extends ItemPreviewPanel<ArchiveContentViewItem> {
+    extends ContentItemPreviewPanel {
+
+    protected item: ArchiveContentViewItem;
 
     private renderableItems: Map<string, boolean> = new Map<string, boolean>();
-    private image: ImgEl;
-    private item: ArchiveContentViewItem;
-    private previewMessage: DivEl;
-    private debouncedSetItem: (item: ArchiveContentViewItem) => void;
 
     constructor() {
-        super();
-
-        this.initElements();
-    }
-
-    private initElements() {
-        this.debouncedSetItem = AppHelper.runOnceAndDebounce(this.doSetItem.bind(this), 300);
-        this.image = new ImgEl();
-
-        const previewText = new SpanEl();
-        previewText.setHtml(i18n('field.preview.notAvailable'));
-        this.previewMessage = new DivEl('no-preview-message');
-        this.previewMessage.appendChild(previewText);
-    }
-
-    private initListeners() {
-        this.image.onLoaded((   ) => {
-            this.mask.hide();
-        });
+        super(ContentPath.ARCHIVE_ROOT);
     }
 
     createToolbar(): ArchiveItemPreviewToolbar {
@@ -67,100 +50,18 @@ export class ArchiveItemPreviewPanel
         }
     }
 
-    private doSetItem(item: ArchiveContentViewItem) {
-        if (item && !item.equals(this.item)) {
-            const contentSummary: ContentSummary = item.getData().getContentSummary();
-
-            if (this.isMediaForPreview(contentSummary)) {
-                this.setMediaPreviewMode(contentSummary);
-            } else if (contentSummary.getType().isImage() || contentSummary.getType().isVectorMedia()) {
-                this.setImagePreviewMode(contentSummary);
-            } else {
-                this.setMode('no-preview');
-            }
-        }
-
-        this.toolbar.setItem(item);
-        this.item = item;
+    protected viewItemToContent(item: ArchiveContentViewItem): ContentSummaryAndCompareStatus {
+        return item.getData();
     }
 
-    private isMediaForPreview(content: ContentSummary) {
-        const type: ContentTypeName = content.getType();
-
-        return type.isAudioMedia() ||
-               type.isDocumentMedia() ||
-               type.isTextMedia() ||
-               type.isVideoMedia();
-    }
-
-    private setMediaPreviewMode(contentSummary: ContentSummary) {
-        new MediaAllowsPreviewRequest(contentSummary.getContentId()).setContentRootPath(ContentPath.ARCHIVE_ROOT).sendAndParse().then(
-            (allows: boolean) => {
-                if (allows) {
-                    this.setMode('media-preview');
-                    this.frame.setSrc(this.getMediaUrl(contentSummary));
-                } else {
-                    this.setMode('no-preview');
-                }
-            }).catch(DefaultErrorHandler.handle);
-    }
-
-    private getMediaUrl(contentSummary: ContentSummary): string {
-        return UrlHelper.getCmsRestUri(
-            `${UrlHelper.getCMSPath(ContentPath.ARCHIVE_ROOT)}/content/media/${contentSummary.getId()}?download=false#view=fit`);
-    }
-
-    private setImagePreviewMode(contentSummary: ContentSummary) {
-        const imgUrlResolver: ImageUrlResolver = new ImageUrlResolver(ContentPath.ARCHIVE_ROOT)
-            .setContentId(contentSummary.getContentId())
-            .setTimestamp(contentSummary.getModifiedTime());
-
-        if (!contentSummary.getType().isVectorMedia()) {
-            imgUrlResolver.setSize(this.addImageSizeToUrl());
-            this.setMode('image-preview');
-        } else {
-            this.setMode('svg-preview');
-        }
-
-        this.image.setSrc(imgUrlResolver.resolveForPreview());
-
-        if (!this.image.isLoaded()) {
-            this.showMask();
-        }
-    }
-
-    private setMode(value: string) {
-        if (value !== 'media-preview') {
-            this.frame.setSrc('about:blank');
-        }
-        this.removeClass('image-preview svg-preview media-preview no-preview');
-        this.addClass(value);
-    }
-
-    private showMask() {
-        if (this.isVisible()) {
-            this.mask.show();
-        }
-    }
-
-    private addImageSizeToUrl(): number {
-        const imgWidth = this.getEl().getWidth();
-        const imgHeight = this.getEl().getHeight() - this.toolbar.getEl().getHeight();
-        const imgSize = Math.max(imgWidth, imgHeight);
-
-        return imgSize;
-    }
-
-    clearItem() {
-        (<ArchiveItemPreviewToolbar>this.toolbar).clearItem();
+    protected isNonBinaryItemRenderable(item: ContentSummaryAndCompareStatus): boolean {
+        return false;
     }
 
     doRender(): Q.Promise<boolean> {
         return super.doRender().then((rendered: boolean) => {
             this.addClass('archive-item-preview-panel');
 
-            this.wrapper.appendChild(this.image);
-            this.wrapper.appendChild(this.previewMessage);
             return rendered;
         });
     }
