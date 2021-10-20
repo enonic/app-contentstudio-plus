@@ -4,19 +4,7 @@ import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
 import {ArchiveResourceRequest} from './resource/ArchiveResourceRequest';
 import {ContentPath} from 'lib-contentstudio/app/content/ContentPath';
 import {ArchiveContentViewItem} from './ArchiveContentViewItem';
-import {ItemPreviewPanel} from 'lib-admin-ui/app/view/ItemPreviewPanel';
-import {ImgEl} from 'lib-admin-ui/dom/ImgEl';
-import {DivEl} from 'lib-admin-ui/dom/DivEl';
-import {AppHelper} from 'lib-admin-ui/util/AppHelper';
-import {i18n} from 'lib-admin-ui/util/Messages';
-import {SpanEl} from 'lib-admin-ui/dom/SpanEl';
-import {ContentSummary} from 'lib-contentstudio/app/content/ContentSummary';
-import {MediaAllowsPreviewRequest} from 'lib-contentstudio/app/resource/MediaAllowsPreviewRequest';
-import {UrlHelper} from 'lib-contentstudio/app/util/UrlHelper';
-import {ImageUrlResolver} from 'lib-contentstudio/app/util/ImageUrlResolver';
-import {ContentTypeName} from 'lib-admin-ui/schema/content/ContentTypeName';
 import {ContentItemPreviewPanel} from 'lib-contentstudio/app/view/ContentItemPreviewPanel';
-import {ViewItem} from 'lib-admin-ui/app/view/ViewItem';
 import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 
 
