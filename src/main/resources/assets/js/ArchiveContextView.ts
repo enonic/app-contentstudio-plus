@@ -43,7 +43,9 @@ export class ArchiveContextView
         this.archiveItem = item;
 
         if (item) {
-            this.contentWidgetItemView.getViewer().getNamesAndIconView().getNamesView().setSubName(item.getOriginalFullPath());
+            this.contentWidgetItemView.getViewer().whenRendered(() => {
+                this.contentWidgetItemView.getViewer().getNamesAndIconView().getNamesView().setSubName(item.getOriginalFullPath());
+            });
         }
     }
 }
