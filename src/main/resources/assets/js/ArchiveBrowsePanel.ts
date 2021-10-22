@@ -4,16 +4,13 @@ import {Toolbar} from 'lib-admin-ui/ui/toolbar/Toolbar';
 import {ArchiveTreeGrid} from './ArchiveTreeGrid';
 import {ArchiveBrowseItemPanel} from './ArchiveBrowseItemPanel';
 import * as Q from 'q';
-import {Button} from 'lib-admin-ui/ui/button/Button';
 import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
-import {ToggleContextPanelEvent} from 'lib-contentstudio/app/view/context/ToggleContextPanelEvent';
 import {SplitPanel} from 'lib-admin-ui/ui/panel/SplitPanel';
 import {ContextSplitPanel} from 'lib-contentstudio/app/view/context/ContextSplitPanel';
-import {ContextPanel} from 'lib-contentstudio/app/view/context/ContextPanel';
-import {ActiveContextPanelManager} from 'lib-contentstudio/app/view/context/ActiveContextPanelManager';
 import {DockedContextPanel} from 'lib-contentstudio/app/view/context/DockedContextPanel';
 import {ArchiveContextView} from './ArchiveContextView';
 import {ArchiveContentViewItem} from './ArchiveContentViewItem';
+import {NonMobileContextPanelToggleButton} from 'lib-contentstudio/app/view/context/button/NonMobileContextPanelToggleButton';
 
 export class ArchiveBrowsePanel
     extends BrowsePanel {
@@ -22,21 +19,25 @@ export class ArchiveBrowsePanel
 
     private contextView: ArchiveContextView;
 
+    private contextSplitPanel: ContextSplitPanel;
+
     protected initElements(): void {
         super.initElements();
 
         this.browseToolbar.addActions(this.getBrowseActions().getAllActions());
-        this.addContextPanelButton();
+        this.browseToolbar.appendChild(new NonMobileContextPanelToggleButton());
     }
 
-    private addContextPanelButton() {
-        const button: Button = new Button();
-        button.addClass('toggle-button icon-list');
-        this.browseToolbar.appendChild(button);
+    protected initListeners(): void {
+        super.initListeners();
 
-        button.onClicked(() => {
-            new ToggleContextPanelEvent().fire();
-            button.toggleClass('expanded', !button.hasClass('expanded'));
+        this.contextSplitPanel.onMobileModeChanged((isMobile: boolean) => {
+            if (isMobile) {
+                this.gridAndItemsSplitPanel.hideSecondPanel();
+            } else {
+                this.gridAndItemsSplitPanel.showFirstPanel();
+                this.gridAndItemsSplitPanel.showSecondPanel();
+            }
         });
     }
 
@@ -45,11 +46,15 @@ export class ArchiveBrowsePanel
 
         const item: ArchiveContentViewItem = <ArchiveContentViewItem>this.treeGrid.getLastSelectedOrHighlightedItem();
         const summary: ContentSummaryAndCompareStatus = item?.getData();
-        const contextPanel: ContextPanel = ActiveContextPanelManager.getActiveContextPanel();
 
-        if (contextPanel) {
-            contextPanel.setItem(summary);
-            this.contextView.setArchiveItem(item);
+        this.contextView.setItem(summary);
+        this.contextView.setArchiveItem(item);
+
+        if (this.treeGrid.hasHighlightedNode()) {
+            if (this.contextSplitPanel.isMobileMode()) {
+                this.gridAndItemsSplitPanel.hideFirstPanel();
+                this.gridAndItemsSplitPanel.showSecondPanel();
+            }
         }
     }
 
@@ -76,12 +81,22 @@ export class ArchiveBrowsePanel
     protected createBrowseWithItemsPanel(): SplitPanel {
         this.contextView = new ArchiveContextView();
 
-        const contextSplitPanel: ContextSplitPanel = ContextSplitPanel.create(this.getBrowseItemPanel(),
+        this.contextSplitPanel = ContextSplitPanel.create(this.getBrowseItemPanel(),
             new DockedContextPanel(this.contextView))
             .setActions(this.getBrowseActions().getAllActions())
             .setContextView(this.contextView)
             .build();
 
-        return contextSplitPanel;
+        this.contextSplitPanel.onFoldClicked(() => {
+            this.gridAndItemsSplitPanel.showFirstPanel();
+            this.gridAndItemsSplitPanel.showFirstPanel();
+            this.gridAndItemsSplitPanel.hideSecondPanel();
+        });
+
+        return this.contextSplitPanel;
+    }
+
+    protected togglePreviewPanelDependingOnScreenSize(): void {
+        //
     }
 }
