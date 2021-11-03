@@ -11,7 +11,7 @@ import {GetPrincipalByKeyRequest} from 'lib-contentstudio/app/resource/GetPrinci
 import {GetContentVersionsRequest} from 'lib-contentstudio/app/resource/GetContentVersionsRequest';
 import {ContentVersions} from 'lib-contentstudio/app/ContentVersions';
 import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
-import {ArchiveHelper} from './ArchiveHelper';
+import {DateTimeFormatter} from 'lib-admin-ui/ui/treegrid/DateTimeFormatter';
 
 
 export class ArchiveItemPreviewToolbar
@@ -51,7 +51,7 @@ export class ArchiveItemPreviewToolbar
         const principalPromise: Q.Promise<Principal> = new GetPrincipalByKeyRequest(PrincipalKey.fromString(modifier)).sendAndParse();
 
         Q.all([versionsPromise, principalPromise]).spread((versions: ContentVersions, principal: Principal) => {
-            const when: string = ArchiveHelper.getArchivedDate(versions);
+            const when: string = DateTimeFormatter.createHtml(summary.getArchivedTime());
             const displayName: string = i18n('field.preview.toolbar.status', principal.getDisplayName());
             this.archivedEl.setHtml(`${status} ${when} ${displayName}`);
         }).catch(DefaultErrorHandler.handle);
