@@ -16,7 +16,7 @@ export class ArchivePropertiesWidgetItemView
 
         new GetContentVersionsRequest(this.content.getContentId()).sendAndParse().then((versions: ContentVersions) => {
             const archived: string = i18n('status.archived');
-            const archivedDate: string = DateTimeFormatter.createHtml(this.content.getArchivedTime());;
+            const archivedDate: string = DateTimeFormatter.createHtml(this.content.getArchivedTime());
             this.insertKeyValue(archived, archivedDate, this.getIndexToInsertArchived());
         }).catch(DefaultErrorHandler.handle);
     }
