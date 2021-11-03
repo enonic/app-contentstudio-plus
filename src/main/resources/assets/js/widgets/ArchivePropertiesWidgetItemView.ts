@@ -4,8 +4,9 @@ import {i18n} from 'lib-admin-ui/util/Messages';
 import {GetContentVersionsRequest} from 'lib-contentstudio/app/resource/GetContentVersionsRequest';
 import {ContentVersions} from 'lib-contentstudio/app/ContentVersions';
 import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
-import {ArchiveHelper} from '../ArchiveHelper';
 import {Element} from 'lib-admin-ui/dom/Element';
+import {DateTimeFormatter} from 'lib-admin-ui/ui/treegrid/DateTimeFormatter';
+
 
 export class ArchivePropertiesWidgetItemView
     extends PropertiesWidgetItemView {
@@ -15,7 +16,7 @@ export class ArchivePropertiesWidgetItemView
 
         new GetContentVersionsRequest(this.content.getContentId()).sendAndParse().then((versions: ContentVersions) => {
             const archived: string = i18n('status.archived');
-            const archivedDate: string = ArchiveHelper.getArchivedDate(versions);
+            const archivedDate: string = DateTimeFormatter.createHtml(this.content.getArchivedTime());;
             this.insertKeyValue(archived, archivedDate, this.getIndexToInsertArchived());
         }).catch(DefaultErrorHandler.handle);
     }
