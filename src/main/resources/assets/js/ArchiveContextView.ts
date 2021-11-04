@@ -48,4 +48,12 @@ export class ArchiveContextView
             });
         }
     }
+
+    doRender(): Q.Promise<boolean> {
+        return super.doRender().then((rendered: boolean) => {
+            this.addClass('archive-context-view');
+
+            return rendered;
+        });
+    }
 }
