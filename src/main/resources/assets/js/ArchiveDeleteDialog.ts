@@ -34,7 +34,7 @@ export class ArchiveDeleteDialog
 
         this.items.forEach(item => request.addContentPath(item.getData().getPath()));
 
-        request.sendAndParseWithPolling().catch(DefaultErrorHandler.handle);
+        request.sendAndParse().catch(DefaultErrorHandler.handle);
     }
 
     protected getConfirmValueDialogTitle(): string {
