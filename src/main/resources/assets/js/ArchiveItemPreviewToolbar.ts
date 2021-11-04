@@ -45,14 +45,16 @@ export class ArchiveItemPreviewToolbar
 
     private updatedArchivedBlock(summary: ContentSummary) {
         const status: string = i18n('status.archived');
-        const modifier: string = summary.getModifier();
+        const archivedBy: PrincipalKey = summary.getArchivedBy();
 
         const versionsPromise: Q.Promise<ContentVersions> = new GetContentVersionsRequest(summary.getContentId()).sendAndParse();
-        const principalPromise: Q.Promise<Principal> = new GetPrincipalByKeyRequest(PrincipalKey.fromString(modifier)).sendAndParse();
+        const principalPromise: Q.Promise<Principal> = archivedBy != null ? new GetPrincipalByKeyRequest(archivedBy).sendAndParse() : Q(
+            null);
 
         Q.all([versionsPromise, principalPromise]).spread((versions: ContentVersions, principal: Principal) => {
             const when: string = DateTimeFormatter.createHtml(summary.getArchivedTime());
-            const displayName: string = i18n('field.preview.toolbar.status', principal.getDisplayName());
+            const displayName: string = i18n('field.preview.toolbar.status',
+                !!principal ? principal.getDisplayName() : PrincipalKey.ofAnonymous().getId());
             this.archivedEl.setHtml(`${status} ${when} ${displayName}`);
         }).catch(DefaultErrorHandler.handle);
     }
