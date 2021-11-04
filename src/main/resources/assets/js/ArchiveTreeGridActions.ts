@@ -21,7 +21,7 @@ export class ArchiveTreeGridActions
     }
 
     private createRestoreAction(): Action {
-        const action: Action = new Action(i18n('action.restore')).setEnabled(false);
+        const action: Action = new Action(i18n('action.restoreMore')).setEnabled(false);
 
         action.onExecuted(() => {
             ArchiveRestoreDialog.getInstance().setItems(this.selectedItems).open();
@@ -31,7 +31,7 @@ export class ArchiveTreeGridActions
     }
 
     private createDeleteAction(): Action {
-        const action: Action = new Action(i18n('action.delete')).setEnabled(false);
+        const action: Action = new Action(i18n('action.deleteMore')).setEnabled(false);
 
         action.onExecuted(() => {
             ArchiveDeleteDialog.getInstance().setItems(this.selectedItems).open();
