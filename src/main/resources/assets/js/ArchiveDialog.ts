@@ -73,7 +73,7 @@ export abstract class ArchiveDialog
     }
 
     protected isConfirmDialogRequired(): boolean {
-        return true;
+        return this.items.length + this.itemsList.getItemCount() > 1;
     }
 
     protected executeAction() {
