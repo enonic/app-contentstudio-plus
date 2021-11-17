@@ -50,6 +50,9 @@ jobs:
             ${{ runner.os }}-gradle-
       - run: ./gradlew build -Pcom.enonic.xp.app.production=true
       - uses: actions/upload-artifact@v2
+        with:
+          name: contentstudio.plus
+          path: build/libs/contentstudio.plus.jar
 
 
       - uses: codecov/codecov-action@v2.1.0
