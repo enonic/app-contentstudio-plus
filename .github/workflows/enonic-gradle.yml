@@ -48,12 +48,8 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-      - name: Build with Gradle
-          run: ./gradlew build -Pcom.enonic.xp.app.production=true
-                 - uses: actions/upload-artifact@v2
-                 with:
-                   name: contentstudio
-                   path: modules/app/build/libs/contentstudio.jar
+      - run: ./gradlew build -Pcom.enonic.xp.app.production=true
+      - uses: actions/upload-artifact@v2
 
       - uses: codecov/codecov-action@v2.1.0
 
