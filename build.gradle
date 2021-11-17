@@ -11,6 +11,21 @@ apply from: "$rootDir/gradle/lib-admin.gradle"
 apply from: "$rootDir/gradle/lib-contentstudio.gradle"
 apply from: "$rootDir/gradle/node.gradle"
 
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'com.enonic.defaults'
+    apply plugin: 'com.enonic.xp.base'
+    apply from: "$rootDir/gradle/env.gradle"
+    apply from: "$rootDir/gradle/node.gradle"
+    apply from: "$rootDir/gradle/lib-admin.gradle"
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        xp.enonicRepo('dev')
+    }
+}
+
 configurations {
     devResources {
         attributes {
