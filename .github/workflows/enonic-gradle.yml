@@ -145,7 +145,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-
+      - uses: actions/download-artifact@v2
+        with:
+          name: contentstudio.plus
+          path: build/libs
 
       - name: Run Selenium Tests
         run: ./gradlew :testing:${{ matrix.suite }}

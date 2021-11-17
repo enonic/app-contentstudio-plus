@@ -106,7 +106,7 @@ task deployContentStudioPlus( type: DefaultTask ) {
 }
 
 
-task startServer( dependsOn: [unpackDistro, copyConfig, deployContentStudio,deployContentStudioPlus] ) {
+task startServer( dependsOn: [unpackDistro, copyConfig, deployContentStudio] ) {
     doLast {
         xpServer.installDir = file( distroDir )
         xpServer.start()
