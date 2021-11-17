@@ -45,6 +45,7 @@ describe('archive.content.spec:  tests for archiving content', function () {
             assert.equal(message, expectedMessage, "Expected notification message should appear");
             //5. Navigate to 'Archive Browse Panel' and check the archived content:
             await studioUtils.openArchivePanel();
+            await studioUtils.saveScreenshot("folder_in_archive");
             await archiveBrowsePanel.waitForContentDisplayed(FOLDER1.displayName);
         });
 
