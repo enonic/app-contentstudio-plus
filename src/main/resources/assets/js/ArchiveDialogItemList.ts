@@ -6,6 +6,9 @@ import {ListBox} from 'lib-admin-ui/ui/selector/list/ListBox';
 export class ArchiveDialogItemList
     extends ListBox<ContentSummaryAndCompareStatus> {
 
+    constructor() {
+        super('archive-dialog-item-list');
+    }
     createItemView(item: ContentSummaryAndCompareStatus): ArchiveItemViewer {
         const viewer = new ArchiveItemViewer();
         viewer.setObject(item);
