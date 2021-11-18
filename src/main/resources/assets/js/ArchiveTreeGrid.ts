@@ -15,6 +15,7 @@ import {ArchiveServerEvent} from 'lib-contentstudio/app/event/ArchiveServerEvent
 import {ContentServerEventsHandler} from 'lib-contentstudio/app/event/ContentServerEventsHandler';
 import {ContentPath} from 'lib-contentstudio/app/content/ContentPath';
 import {ContentId} from 'lib-contentstudio/app/content/ContentId';
+import {AppHelper} from 'lib-admin-ui/util/AppHelper';
 
 export class ArchiveTreeGrid
     extends TreeGrid<ArchiveViewItem> {
@@ -34,9 +35,11 @@ export class ArchiveTreeGrid
     }
 
     protected initListeners() {
-        ArchiveServerEvent.on(() => {
+        const debouncedRefresh = AppHelper.debounce(() => {
             this.refresh();
-        });
+        }, 200);
+
+        ArchiveServerEvent.on(debouncedRefresh);
 
         let isRefreshTriggered: boolean = false;
 
