@@ -21,12 +21,9 @@ export class LayersWidget
 
         this.layersWidgetItemView = new LayersWidgetItemView();
 
-        this.initProjectContext().then(() => {
-            this.fetchContent().then((content: ContentSummaryAndCompareStatus) => {
-                return this.layersWidgetItemView.setContentAndUpdateView(content);
-            }).catch(DefaultErrorHandler.handle);
-        });
-
+        this.fetchContent().then((content: ContentSummaryAndCompareStatus) => {
+            return this.layersWidgetItemView.setContentAndUpdateView(content);
+        }).catch(DefaultErrorHandler.handle);
     }
 
     private initProjectContext(): Q.Promise<void> {
