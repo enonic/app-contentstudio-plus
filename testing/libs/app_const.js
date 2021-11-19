@@ -11,6 +11,9 @@ module.exports = Object.freeze({
     itemIsArchived(name) {
         return `Item \"${name}\" is archived`
     },
+    itemIsRestored(name) {
+        return `Item \"${name}\" is restored`
+    },
 
     itemSavedNotificationMessage: function (name) {
         return `Item \"${name}\" is saved.`

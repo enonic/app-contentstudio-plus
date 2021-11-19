@@ -6,7 +6,7 @@ const lib = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
 const XPATH = {
     container: `//div[contains(@id,'ArchiveRestoreDialog')]`,
-    restoreButton: `//button[contains(@id,'DialogButton') and child::span[contains(.,'Restore']]`,
+    restoreButton: `//button[contains(@id,'DialogButton') and child::span[contains(.,'Restore')]]`,
     itemListToRestore: "//ul[contains(@id,'ArchiveDialogItemList')]",
     childListToRestore:"//ul[contains(@id,'ArchiveItemsList')]",
     header: `//div[contains(@id,'DefaultModalDialogHeader')]`,
