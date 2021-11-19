@@ -83,7 +83,6 @@ export class ArchiveBrowsePanel
 
         this.contextSplitPanel = ContextSplitPanel.create(this.getBrowseItemPanel(),
             new DockedContextPanel(this.contextView))
-            .setActions(this.getBrowseActions().getAllActions())
             .setContextView(this.contextView)
             .build();
 
