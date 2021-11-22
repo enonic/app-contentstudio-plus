@@ -113,13 +113,13 @@ class ArchiveBrowsePanel extends BaseBrowsePanel {
     }
 
 
-    async waitForItemByDisplayNamePresent(displayName) {
+    async waitForContentByDisplayNamePresent(displayName) {
         try {
             let selector = this.treeGrid + lib.itemByDisplayName(displayName);
             return await this.waitForElementDisplayed(selector, appConst.longTimeout);
         } catch (err) {
             console.log("item is not displayed:" + displayName);
-            this.saveScreenshot('err_find_' + displayName);
+            await this.saveScreenshot('err_find_' + displayName);
             throw new Error('Settings: item was not found ! ' + displayName + "  " + err);
         }
     }
