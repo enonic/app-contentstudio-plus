@@ -3,6 +3,14 @@
     margin-top: 15px;
   }
 
+  &.is-processing {
+    .dialog-content {
+      > *:not(.progress-bar) {
+        display: none;
+      }
+    }
+  }
+
   .modal-dialog-wrapper {
     .modal-dialog-body {
       .dialog-content {
@@ -28,14 +36,6 @@
     .modal-dialog-wrapper {
       .modal-dialog-body {
         overflow: visible;
-      }
-    }
-  }
-
-  &.is-processing {
-    .dialog-content {
-      > *:not(.progress-bar) {
-        display: none;
       }
     }
   }
