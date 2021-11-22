@@ -47,4 +47,8 @@ export class TaskArchiveResourceRequest extends ArchiveResourceRequest<TaskId> {
             return deferred.promise;
         });
     }
+
+    protected parseResponse(response: JsonResponse<TaskIdJson>): TaskId {
+        return TaskId.fromJson(response.getResult());
+    }
 }

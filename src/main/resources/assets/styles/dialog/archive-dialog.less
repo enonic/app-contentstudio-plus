@@ -31,4 +31,12 @@
       }
     }
   }
+
+  &.is-processing {
+    .dialog-content {
+      > *:not(.progress-bar) {
+        display: none;
+      }
+    }
+  }
 }
