@@ -16,39 +16,41 @@ export class ArchiveItemsList extends ListBox<ContentSummaryAndCompareStatus> {
 
     private loading: boolean;
 
-    private scrollableContainer: Element;
-
     private archiveContentFetcher: ContentSummaryAndCompareStatusFetcher;
 
-    constructor(scrollableContainer?: Element) {
+    constructor() {
         super('archive-items-list icon-spinner');
 
         this.archiveContentFetcher = new ContentSummaryAndCompareStatusFetcher(ArchiveResourceRequest.ARCHIVE_PATH);
-        this.scrollableContainer = scrollableContainer || this;
 
         this.initListeners();
     }
 
     private initListeners() {
-        const scrollHandler = AppHelper.debounce(() => {
-            if (this.isScrolledToTheBottom()) {
-                this.load();
-            }
-        }, 300);
+        this.whenRendered(() => {
+            const scrollableParent: Element = this.getParentElement().getParentElement();
 
-        this.scrollableContainer.onScroll(() => {
-            scrollHandler();
+            const scrollHandler = AppHelper.debounce(() => {
+                if (this.isScrolledToTheBottom(scrollableParent)) {
+                    this.load();
+                }
+            }, 300);
+
+            scrollableParent.onScroll(() => {
+                scrollHandler();
+            });
+
+            this.onItemsAdded(() => {
+                if (this.isScrolledToTheBottom(scrollableParent)) {
+                    this.load();
+                }
+            });
         });
 
-        this.onItemsAdded(() => {
-            if (this.isScrolledToTheBottom()) {
-                this.load();
-            }
-        });
     }
 
-    private isScrolledToTheBottom() {
-        const scrollableContainerHTML: HTMLElement = this.scrollableContainer.getHTMLElement();
+    private isScrolledToTheBottom(scrollableParent: Element) {
+        const scrollableContainerHTML: HTMLElement = scrollableParent.getHTMLElement();
 
         return scrollableContainerHTML.scrollHeight - scrollableContainerHTML.scrollTop - scrollableContainerHTML.clientHeight < 200;
     }
