@@ -5,6 +5,7 @@ import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
 import {NotifyManager} from 'lib-admin-ui/notify/NotifyManager';
 import {ProgressBarManager} from 'lib-contentstudio/app/dialog/ProgressBarManager';
 import {TaskId} from 'lib-admin-ui/task/TaskId';
+import {TaskState} from 'lib-admin-ui/task/TaskState';
 
 export class ArchiveRestoreDialog
     extends ArchiveDialog {
@@ -32,13 +33,20 @@ export class ArchiveRestoreDialog
     protected initListeners(): void {
         super.initListeners();
 
-        this.progressManager.onProgressComplete(() => {
-            const successMessage: string =
-                this.totalToProcess > 1 ?
-                i18n('notify.restored.success.multiple', this.totalToProcess) :
-                i18n('notify.restored.success.single', this.items[0].getDisplayName());
-            NotifyManager.get().showSuccess(successMessage);
+        this.progressManager.onProgressComplete((task: TaskState) => {
+            if (task === TaskState.FINISHED) {
+                const successMessage: string =
+                    this.totalToProcess > 1 ?
+                    i18n('notify.restored.success.multiple', this.totalToProcess) :
+                    i18n('notify.restored.success.single', this.items[0].getDisplayName());
+                NotifyManager.get().showSuccess(successMessage);
+            } else {
+                NotifyManager.get().showError(i18n('notify.restore.failed'));
+            }
+
         });
+
+        this.progressManager.setSuppressNotifications(true);
     }
 
     protected getSubtitle(): string {
