@@ -101,10 +101,11 @@ describe('archive.content.spec: tests for archiving content', function () {
             //3. Click on 'Restore' button in the modal dialog:
             await archiveRestoreDialog.clickOnRestoreButton();
             //4. Verify that the content is not displayed in Archive Browse Panel:
-            await archiveBrowsePanel.waitForContentNotDisplayed(FOLDER2.displayName);
             let message = await contentBrowsePanel.waitForNotificationMessage();
+            await studioUtils.saveScreenshot("folder_to_restore_notification");
             let expectedMessage = appConst.itemIsRestored(FOLDER2.displayName);
             assert.equal(message, expectedMessage, "Expected notification message should appear");
+            await archiveBrowsePanel.waitForContentNotDisplayed(FOLDER2.displayName);
             //5. Verify the content is present in Content Browse Panel
             await studioUtils.switchToContentMode();
             await studioUtils.saveScreenshot("folder_is_restored");
