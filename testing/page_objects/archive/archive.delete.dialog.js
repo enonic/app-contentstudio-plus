@@ -6,24 +6,24 @@ const lib = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
 const XPATH = {
     container: `//div[contains(@id,'ArchiveDeleteDialog')]`,
+    deleteNowButton: `//button[contains(@id,'DialogButton') and child::span[contains(.,'Delete Now')]]`,
+    childListToDelete: "//ul[contains(@id,'ArchiveItemsList')]",
     header: `//div[contains(@id,'DefaultModalDialogHeader')]`,
-    contentTypeByName: name => {
-        return `//div[@class='content-types-content']//li[contains(@class,'content-types-list-item') and descendant::h6[contains(@class,'main-name') and contains(.,'${name}')]]`;
-    },
+    dialogItemList: "//ul[contains(@id,'ArchiveDialogItemList')]",
 };
 
 class ArchiveDeleteDialog extends Page {
 
-    get header() {
-        return XPATH.container + XPATH.header;
+    get title() {
+        return XPATH.container + XPATH.header + "//h2[@class='title']";
+    }
+
+    get deleteNowButton() {
+        return XPATH.container + XPATH.deleteNowButton;
     }
 
     get cancelButton() {
         return XPATH.container + lib.CANCEL_BUTTON_DIALOG;
-    }
-
-    get deleteNowButton() {
-        return XPATH.container + lib.CANCEL_BUTTON_TOP;
     }
 
     get cancelButtonTop() {
@@ -31,18 +31,25 @@ class ArchiveDeleteDialog extends Page {
     }
 
     clickOnCancelButtonTop() {
-        return this.clickOnElement(this.cancelButtonTop).catch(err => {
-            this.saveScreenshot('err_cancel_archive_delete_dlg');
-            throw new Error('Error when clicking on Cancel button top ' + err);
-        })
+        return this.clickOnElement(this.cancelButtonTop);
+    }
+
+    getItemsToDeleteDisplayName() {
+        let locator = XPATH.container + XPATH.dialogItemList + lib.H6_DISPLAY_NAME;
+        return this.getTextInElements(locator);
+    }
+
+    async clickOnCancelButton() {
+        await this.waitForElementDisplayed(this.cancelButton, appConst.mediumTimeout);
+        return await this.clickOnElement(this.cancelButton);
     }
 
     async waitForOpened() {
         try {
-            await this.waitForElementDisplayed(this.cancelButton, appConst.mediumTimeout)
+            await this.waitForElementDisplayed(this.deleteNowButton, appConst.mediumTimeout)
         } catch (err) {
-            await this.saveScreenshot(appConst.generateRandomName('err_archive_delete'));
-            throw new Error('Archive Delete Dialog was not loaded! ' + err);
+            await this.saveScreenshot(appConst.generateRandomName('err_restore_dlg'));
+            throw new Error('Restore from Archive dialog was not loaded! ' + err);
         }
     }
 
@@ -50,48 +57,22 @@ class ArchiveDeleteDialog extends Page {
         try {
             await this.waitForElementNotDisplayed(XPATH.container, appConst.mediumTimeout)
         } catch (error) {
-            await this.saveScreenshot(appConst.generateRandomName('err_new_content_close'));
-            throw new Error('Archive Delete Dialog was not closed');
+            await this.saveScreenshot(appConst.generateRandomName('err_delete_dlg_close'));
+            throw new Error('Delete from Archive dialog was not closed ' + err);
         }
     }
 
-    waitForMostPopularBlockDisplayed() {
-        let locator = XPATH.container + XPATH.mostPopularBlock;
-        return this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+    getTitleInHeader() {
+        return this.getText(this.title);
     }
 
-    getHeaderText() {
-        return this.getText(this.header);
+    async clickOnDeleteNowButton() {
+        await this.waitForDeleteNowButtonDisplayed();
+        return await this.clickOnElement(this.deleteNowButton);
     }
 
-    //type Search Text In Hidden Input
-    async typeSearchText(text) {
-        try {
-            await this.getBrowser().keys(text)
-            return await this.pause(200);
-        } catch (err) {
-            throw new Error("New Content Dialog- error when typing the text in search input! " + err);
-        }
-    }
-
-    async clickOnContentType(contentTypeName) {
-        let typeSelector = XPATH.contentTypeByName(contentTypeName);
-        await this.waitForElementDisplayed(typeSelector, appConst.mediumTimeout);
-        let elems = await this.getDisplayedElements(typeSelector);
-        await elems[0].click();
-        return await this.pause(500);
-    }
-
-    waitForUploaderButtonDisplayed() {
-        return this.waitForElementDisplayed(XPATH.uploaderButton, appConst.shortTimeout).catch(error => {
-            this.saveScreenshot('uploader_button_not_visible');
-            return false;
-        });
-    }
-
-    async getItems() {
-        let locator = XPATH.typesList + lib.H6_DISPLAY_NAME;
-        return this.getTextInElements(locator);
+    waitForDeleteNowButtonDisplayed() {
+        return this.waitForElementDisplayed(this.deleteNowButton, appConst.mediumTimeout);
     }
 }
 

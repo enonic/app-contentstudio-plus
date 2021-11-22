@@ -12,6 +12,7 @@ const DeleteContentDialog = require('../page_objects/delete.content.dialog');
 const ArchiveBrowsePanel = require('../page_objects/archive/archive.browse.panel');
 const ConfirmValueDialog = require('../page_objects/confirm.content.delete.dialog');
 const ArchiveRestoreDialog = require('../page_objects/archive/archive.restore.dialog');
+const ArchiveDeleteDialog = require('../page_objects/archive/archive.delete.dialog');
 
 describe('archive.content.spec: tests for archiving content', function () {
     this.timeout(appConst.SUITE_TIMEOUT);
@@ -19,6 +20,8 @@ describe('archive.content.spec: tests for archiving content', function () {
 
     let FOLDER1;
     let FOLDER2;
+    const ARCHIVE_DELETE_TITLE = "Delete from Archive";
+    const ARCHIVE_RESTORE_TITLE = "Restore from Archive";
 
     it(`Precondition: new folder should be added`,
         async () => {
@@ -85,13 +88,15 @@ describe('archive.content.spec: tests for archiving content', function () {
             let contentBrowsePanel = new ContentBrowsePanel();
             let archiveRestoreDialog = new ArchiveRestoreDialog();
             let archiveBrowsePanel = new ArchiveBrowsePanel();
-            //1. Navigate to 'Archive Browse Panel' and check the archived folder:
+            //1. Navigate to 'Archive Browse Panel':
             await studioUtils.openArchivePanel();
             //2. Do 'rightClick' on the folder and Click on 'Restore...' menu item in the Context menu
             await archiveBrowsePanel.rightClickOnItemByDisplayName(FOLDER2.displayName);
             await studioUtils.saveScreenshot("context-menu-restore");
             await archiveBrowsePanel.clickOnMenuItem(appConst.GRID_CONTEXT_MENU.RESTORE);
             await archiveRestoreDialog.waitForOpened();
+            let actualTitle = await archiveRestoreDialog.getTitleInHeader();
+            assert.equal(actualTitle, ARCHIVE_RESTORE_TITLE, "Expected title should be displayed in the dialog");
             await studioUtils.saveScreenshot("folder_to_restore1");
             //3. Click on 'Restore' button in the modal dialog:
             await archiveRestoreDialog.clickOnRestoreButton();
@@ -104,6 +109,52 @@ describe('archive.content.spec: tests for archiving content', function () {
             await studioUtils.switchToContentMode();
             await studioUtils.saveScreenshot("folder_is_restored");
             await studioUtils.findContentAndClickCheckBox(FOLDER2.displayName);
+        });
+
+    it(`GIVEN existing archived folder is selected  WHEN 'Delete Archive Dialog' button has been opened THEN expected title and items should be displayed on the dialog`,
+        async () => {
+            let archiveDeleteDialog = new ArchiveDeleteDialog();
+            let archiveBrowsePanel = new ArchiveBrowsePanel();
+            //1. Navigate to 'Archive Browse Panel' :
+            await studioUtils.openArchivePanel();
+            await archiveBrowsePanel.clickCheckboxAndSelectRowByDisplayName(FOLDER1.displayName);
+            //2. Do 'rightClick' on the folder and Click on 'Restore...' menu item in the Context menu
+            await archiveBrowsePanel.rightClickOnItemByDisplayName(FOLDER1.displayName);
+            await studioUtils.saveScreenshot("context-menu-delete");
+            await archiveBrowsePanel.clickOnMenuItem(appConst.GRID_CONTEXT_MENU.DELETE);
+            await archiveDeleteDialog.waitForOpened();
+            await studioUtils.saveScreenshot("delete_archive_dialog");
+            //3. 'Delete now' button and expected title should be displayed in the dialog:
+            await archiveDeleteDialog.waitForDeleteNowButtonDisplayed();
+            let title = await archiveDeleteDialog.getTitleInHeader();
+            assert.equal(title, ARCHIVE_DELETE_TITLE, "Expected title should be present in the dialog");
+            let actualItems = await archiveDeleteDialog.getItemsToDeleteDisplayName();
+            assert.equal(actualItems[0], FOLDER1.displayName, "Expected item to delete should be displayed");
+        });
+
+    //Verifies https://github.com/enonic/app-contentstudio-plus/issues/300
+    //Notification message should appear after deleting content from Archive #300
+    it(`GIVEN existing archived folder is selected AND 'Delete...' context menu item has been clicked WHEN 'Delete now' button has been pressed in the modal dialog THEN the folder should be removed from Archive`,
+        async () => {
+            let contentBrowsePanel = new ContentBrowsePanel();
+            let archiveDeleteDialog = new ArchiveDeleteDialog();
+            let archiveBrowsePanel = new ArchiveBrowsePanel();
+            //1. Navigate to 'Archive Browse Panel' and check the archived folder:
+            await studioUtils.openArchivePanel();
+            //2. Do 'rightClick' on the folder and Click on 'Restore...' menu item in the Context menu
+            await archiveBrowsePanel.rightClickOnItemByDisplayName(FOLDER1.displayName);
+            await studioUtils.saveScreenshot("context-menu-delete");
+            await archiveBrowsePanel.clickOnMenuItem(appConst.GRID_CONTEXT_MENU.DELETE);
+            await archiveDeleteDialog.waitForOpened();
+            await studioUtils.saveScreenshot("folder_to_delete");
+            //3. Click on 'Delete Now' button in the modal dialog:
+            await archiveDeleteDialog.clickOnDeleteNowButton();
+            //4. Verify that the content is not displayed in Archive Browse Panel:
+            await archiveBrowsePanel.waitForContentNotDisplayed(FOLDER1.displayName);
+            //TODO uncomment when issue#300 will be fixed
+            //let message = await contentBrowsePanel.waitForNotificationMessage();
+            //let expectedMessage = appConst.itemIsRestored(FOLDER2.displayName);
+            //assert.equal(message, expectedMessage, "Expected notification message should appear");
         });
 
 
