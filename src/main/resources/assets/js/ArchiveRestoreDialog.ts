@@ -12,7 +12,7 @@ export class ArchiveRestoreDialog
 
     private static INSTANCE: ArchiveRestoreDialog;
 
-    progressManager: ProgressBarManager;
+    private progressManager: ProgressBarManager;
 
     constructor() {
         super({
