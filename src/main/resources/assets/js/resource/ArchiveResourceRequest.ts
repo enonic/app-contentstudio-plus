@@ -4,7 +4,7 @@ import {ContentResourceRequest} from 'lib-contentstudio/app/resource/ContentReso
 export abstract class ArchiveResourceRequest<PARSED_TYPE>
     extends CmsProjectBasedResourceRequest<PARSED_TYPE> {
 
-    static ARCHIVE_PATH: string = 'archive';
+    static ARCHIVE_PATH = 'archive';
 
     protected constructor() {
         super();

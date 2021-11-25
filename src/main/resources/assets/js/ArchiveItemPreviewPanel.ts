@@ -38,19 +38,19 @@ export class ArchiveItemPreviewPanel
         }
     }
 
-    protected viewItemToContent(item: ArchiveContentViewItem): ContentSummaryAndCompareStatus {
-        return item.getData();
-    }
-
-    protected isNonBinaryItemRenderable(item: ContentSummaryAndCompareStatus): boolean {
-        return false;
-    }
-
     doRender(): Q.Promise<boolean> {
         return super.doRender().then((rendered: boolean) => {
             this.addClass('archive-item-preview-panel');
 
             return rendered;
         });
+    }
+
+    protected viewItemToContent(item: ArchiveContentViewItem): ContentSummaryAndCompareStatus {
+        return item.getData();
+    }
+
+    protected isNonBinaryItemRenderable(item: ContentSummaryAndCompareStatus): boolean {
+        return false;
     }
 }

@@ -7,7 +7,7 @@ import {LayerContentViewRelation} from './LayerContentViewRelation';
 
 export class LayerContentView extends LiEl {
 
-    static VIEW_CLASS: string = 'layers-item-view';
+    static VIEW_CLASS = 'layers-item-view';
 
     private readonly item: LayerContent;
 
@@ -21,11 +21,6 @@ export class LayerContentView extends LiEl {
         this.item = layerContent;
 
         this.initElements();
-    }
-
-    private initElements() {
-        this.relationBlock = new LayerContentViewRelation(`${LayerContentView.VIEW_CLASS}-relation`);
-        this.dataBlock = new LayerContentViewDataBlock(this.item, `${LayerContentView.VIEW_CLASS}-data`);
     }
 
     doRender(): Q.Promise<boolean> {
@@ -51,5 +46,10 @@ export class LayerContentView extends LiEl {
 
     getDataBlock(): DivEl {
         return this.dataBlock;
+    }
+
+    private initElements(): void {
+        this.relationBlock = new LayerContentViewRelation(`${LayerContentView.VIEW_CLASS}-relation`);
+        this.dataBlock = new LayerContentViewDataBlock(this.item, `${LayerContentView.VIEW_CLASS}-data`);
     }
 }

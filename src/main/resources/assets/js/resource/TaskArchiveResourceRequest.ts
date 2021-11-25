@@ -14,16 +14,16 @@ export class TaskArchiveResourceRequest extends ArchiveResourceRequest<TaskId> {
         return this.send().then((response: JsonResponse<TaskIdJson>) => {
             const deferred = Q.defer<string>();
             const taskId: TaskId = TaskId.fromJson(response.getResult());
-            const poll = (interval: number = 500) => {
+            const poll = (interval = 500): void => {
                 setTimeout(() => {
                     new GetTaskInfoRequest(taskId).sendAndParse().then((task: TaskInfo) => {
-                        let state = task.getState();
+                        const state = task.getState();
                         if (!task) {
                             deferred.reject('Task expired');
                             return; // task probably expired, stop polling
                         }
 
-                        let progress = task.getProgress();
+                        const progress = task.getProgress();
 
                         switch (state) {
                         case TaskState.FINISHED:

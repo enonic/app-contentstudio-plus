@@ -7,11 +7,11 @@ import {ProjectContext} from 'lib-contentstudio/app/project/ProjectContext';
 
 export class LayerContentViewDataBlock extends DivEl {
 
-    private static CURRENT_CLASS: string = 'layer-current';
+    private static CURRENT_CLASS = 'layer-current';
 
-    private static INHERITED_CLASS: string = 'item-inherited';
+    private static INHERITED_CLASS = 'item-inherited';
 
-    private static READONLY_CLASS: string = 'readonly';
+    private static READONLY_CLASS = 'readonly';
 
     private readonly layerContent: LayerContent;
 
@@ -27,12 +27,6 @@ export class LayerContentViewDataBlock extends DivEl {
         this.layerContent = layerContent;
 
         this.initElements(cls);
-    }
-
-    private initElements(parentCls: string) {
-        this.header = new LayerContentViewHeader(this.layerContent, `${parentCls}-header`);
-        this.body = new LayerContentViewBody(this.layerContent, `${parentCls}-body`);
-        this.footer = new LayerContentViewFooter(this.layerContent, `${parentCls}-footer`);
     }
 
     doRender(): Q.Promise<boolean> {
@@ -59,5 +53,11 @@ export class LayerContentViewDataBlock extends DivEl {
 
             return rendered;
         });
+    }
+
+    private initElements(parentCls: string): void {
+        this.header = new LayerContentViewHeader(this.layerContent, `${parentCls}-header`);
+        this.body = new LayerContentViewBody(this.layerContent, `${parentCls}-body`);
+        this.footer = new LayerContentViewFooter(this.layerContent, `${parentCls}-footer`);
     }
 }

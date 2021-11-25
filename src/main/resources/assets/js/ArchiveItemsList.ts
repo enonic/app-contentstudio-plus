@@ -10,7 +10,7 @@ import {ArchiveResourceRequest} from './resource/ArchiveResourceRequest';
 
 export class ArchiveItemsList extends ListBox<ContentSummaryAndCompareStatus> {
 
-    private static LOADING_CLASS: string = 'loading';
+    private static LOADING_CLASS = 'loading';
 
     private idsToLoad: ContentId[];
 
@@ -26,7 +26,24 @@ export class ArchiveItemsList extends ListBox<ContentSummaryAndCompareStatus> {
         this.initListeners();
     }
 
-    private initListeners() {
+    setItemsIds(ids: ContentId[]): void {
+        this.idsToLoad = ids;
+        this.load();
+    }
+
+    protected createItemView(item: ContentSummaryAndCompareStatus, readOnly: boolean): ArchiveContentDialogViewer {
+        const viewer: ArchiveContentDialogViewer = new ArchiveContentDialogViewer();
+
+        viewer.setObject(item);
+
+        return viewer;
+    }
+
+    protected getItemId(item: ContentSummaryAndCompareStatus): string {
+        return item.getId();
+    }
+
+    private initListeners(): void {
         this.whenRendered(() => {
             const scrollableParent: Element = this.getParentElement().getParentElement();
 
@@ -49,18 +66,13 @@ export class ArchiveItemsList extends ListBox<ContentSummaryAndCompareStatus> {
 
     }
 
-    private isScrolledToTheBottom(scrollableParent: Element) {
+    private isScrolledToTheBottom(scrollableParent: Element): boolean {
         const scrollableContainerHTML: HTMLElement = scrollableParent.getHTMLElement();
 
         return scrollableContainerHTML.scrollHeight - scrollableContainerHTML.scrollTop - scrollableContainerHTML.clientHeight < 200;
     }
 
-    setItemsIds(ids: ContentId[]) {
-        this.idsToLoad = ids;
-        this.load();
-    }
-
-    private load() {
+    private load(): void {
         const totalLoaded: number = this.getItemCount();
 
         if (this.loading || totalLoaded >= this.idsToLoad.length) {
@@ -83,17 +95,5 @@ export class ArchiveItemsList extends ListBox<ContentSummaryAndCompareStatus> {
                 this.loading = false; // not using finally because need to set loading to false before setting items
                 this.removeClass(ArchiveItemsList.LOADING_CLASS);
             });
-    }
-
-    protected createItemView(item: ContentSummaryAndCompareStatus, readOnly: boolean): ArchiveContentDialogViewer {
-        const viewer: ArchiveContentDialogViewer = new ArchiveContentDialogViewer();
-
-        viewer.setObject(item);
-
-        return viewer;
-    }
-
-    protected getItemId(item: ContentSummaryAndCompareStatus): string {
-        return item.getId();
     }
 }

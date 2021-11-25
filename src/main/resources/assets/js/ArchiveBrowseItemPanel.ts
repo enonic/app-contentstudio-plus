@@ -1,5 +1,5 @@
 import {BrowseItemPanel} from 'lib-admin-ui/app/browse/BrowseItemPanel';
-import { ContentBrowseItemPanel } from 'lib-contentstudio/app/browse/ContentBrowseItemPanel';
+import {ContentBrowseItemPanel} from 'lib-contentstudio/app/browse/ContentBrowseItemPanel';
 import {ArchiveItemStatisticsPanel} from './ArchiveItemStatisticsPanel';
 
 export class ArchiveBrowseItemPanel

@@ -16,15 +16,8 @@ export class LayersContentTreeDialog extends ModalDialog {
 
     private constructor() {
         super({
-            class: 'layers-content-tree-dialog'
+            class: 'layers-content-tree-dialog',
         });
-    }
-
-    protected initElements(): void {
-        super.initElements();
-
-        this.subTitle = new H6El('sub-title');
-        this.layersContentTreeList = new LayersContentTreeList();
     }
 
     static get(): LayersContentTreeDialog {
@@ -55,5 +48,12 @@ export class LayersContentTreeDialog extends ModalDialog {
 
             return rendered;
         });
+    }
+
+    protected initElements(): void {
+        super.initElements();
+
+        this.subTitle = new H6El('sub-title');
+        this.layersContentTreeList = new LayersContentTreeList();
     }
 }

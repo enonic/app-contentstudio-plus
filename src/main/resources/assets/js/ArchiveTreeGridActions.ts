@@ -20,6 +20,21 @@ export class ArchiveTreeGridActions
         this.deleteAction = this.createDeleteAction();
     }
 
+    getAllActions(): Action[] {
+        return [this.restoreAction, this.deleteAction];
+    }
+
+    updateActionsEnabledState(selectedItems: ArchiveViewItem[]): Q.Promise<void> {
+        this.selectedItems = selectedItems;
+
+        const state: boolean = selectedItems.length > 0;
+
+        this.restoreAction.setEnabled(state);
+        this.deleteAction.setEnabled(state);
+
+        return Q();
+    }
+
     private createRestoreAction(): Action {
         const action: Action = new Action(i18n('action.restoreMore')).setEnabled(false);
 
@@ -39,20 +54,4 @@ export class ArchiveTreeGridActions
 
         return action;
     }
-
-    getAllActions(): Action[] {
-        return [this.restoreAction, this.deleteAction];
-    }
-
-    updateActionsEnabledState(selectedItems: ArchiveViewItem[]): Q.Promise<void> {
-        this.selectedItems = selectedItems;
-
-        const state: boolean = selectedItems.length > 0;
-
-        this.restoreAction.setEnabled(state);
-        this.deleteAction.setEnabled(state);
-
-        return Q(null);
-    }
-
 }

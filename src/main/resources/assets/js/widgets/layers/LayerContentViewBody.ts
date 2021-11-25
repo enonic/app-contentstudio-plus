@@ -19,15 +19,6 @@ export class LayerContentViewBody extends DivEl {
         this.initElements();
     }
 
-    private initElements() {
-        if (this.layerContent.hasItem()) {
-            this.itemViewer = new LangBasedContentSummaryViewer(this.layerContent.getProject());
-            this.itemViewer.setObject(this.layerContent.getItem());
-        } else {
-            this.notAvailableBlock = new DivEl('not-available-info').setHtml(i18n('dialog.layers.notAvailable'));
-        }
-    }
-
     doRender(): Q.Promise<boolean> {
         return super.doRender().then((rendered) => {
             if (this.layerContent.hasItem()) {
@@ -38,5 +29,14 @@ export class LayerContentViewBody extends DivEl {
 
             return rendered;
         });
+    }
+
+    private initElements(): void {
+        if (this.layerContent.hasItem()) {
+            this.itemViewer = new LangBasedContentSummaryViewer(this.layerContent.getProject());
+            this.itemViewer.setObject(this.layerContent.getItem());
+        } else {
+            this.notAvailableBlock = new DivEl('not-available-info').setHtml(i18n('dialog.layers.notAvailable'));
+        }
     }
 }

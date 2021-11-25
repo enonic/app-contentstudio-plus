@@ -30,6 +30,45 @@ export abstract class ArchiveDialog
         super(config);
     }
 
+    setItems(items: ArchiveViewItem[]): ArchiveDialog {
+        this.items = items;
+        this.archiveItemViewers.setItems(items.map(item => item.getData()));
+
+        void new GetDescendantsOfContentsRequest()
+            .setContentPaths(items.map((item: ArchiveViewItem) => item.getData().getContentSummary().getPath()))
+            .setContentRootPath(ArchiveResourceRequest.ARCHIVE_PATH)
+            .sendAndParse()
+            .then((ids: ContentId[]) => {
+                this.itemsList.setItemsIds(ids);
+                this.itemsList.setVisible(ids.length > 0);
+                this.itemsTitleEl.setVisible(ids.length > 0);
+
+                this.totalToProcess = this.items.length + ids.length;
+                this.confirmValueDialog.setValueToCheck(`${this.totalToProcess}`);
+                this.archiveAction.setLabel(this.getArchiveActionTitle() + (this.totalToProcess > 1 ? ` (${this.totalToProcess})` : ''));
+            });
+
+        return this;
+    }
+
+    close(): void {
+        super.close();
+        this.itemsList.clearItems();
+    }
+
+    doRender(): Q.Promise<boolean> {
+        return super.doRender().then((rendered: boolean) => {
+            this.addClass('archive-dialog');
+
+            this.appendChildToHeader(new H6El('sub-title').setHtml(this.getSubtitle()));
+            this.appendChildToContentPanel(this.archiveItemViewers);
+            this.appendChildToContentPanel(this.itemsTitleEl.setHtml(this.getItemsSubtitle()));
+            this.appendChildToContentPanel(this.itemsList);
+
+            return rendered;
+        });
+    }
+
     protected initElements(): void {
         super.initElements();
 
@@ -77,38 +116,12 @@ export abstract class ArchiveDialog
         return this.items.length + this.itemsList.getItemCount() > 1;
     }
 
-    protected executeAction() {
+    protected executeAction(): void {
         this.doAction();
         this.close();
     }
 
     protected abstract doAction();
-
-    setItems(items: ArchiveViewItem[]): ArchiveDialog {
-        this.items = items;
-        this.archiveItemViewers.setItems(items.map(item => item.getData() ));
-
-        new GetDescendantsOfContentsRequest()
-            .setContentPaths(items.map((item: ArchiveViewItem) => item.getData().getContentSummary().getPath()))
-            .setContentRootPath(ArchiveResourceRequest.ARCHIVE_PATH)
-            .sendAndParse()
-            .then((ids: ContentId[]) => {
-                this.itemsList.setItemsIds(ids);
-                this.itemsList.setVisible(ids.length > 0);
-                this.itemsTitleEl.setVisible(ids.length > 0);
-
-                this.totalToProcess = this.items.length + ids.length;
-                this.confirmValueDialog.setValueToCheck('' + this.totalToProcess);
-                this.archiveAction.setLabel(this.getArchiveActionTitle() + (this.totalToProcess > 1 ? ` (${this.totalToProcess})` : ''));
-            });
-
-        return this;
-    }
-
-    close(): void {
-        super.close();
-        this.itemsList.clearItems();
-    }
 
     protected abstract getSubtitle(): string;
 
@@ -119,17 +132,4 @@ export abstract class ArchiveDialog
     protected abstract getConfirmValueDialogTitle(): string;
 
     protected abstract getConfirmValueDialogSubTitle(): string;
-
-    doRender(): Q.Promise<boolean> {
-        return super.doRender().then((rendered: boolean) => {
-            this.addClass('archive-dialog');
-
-            this.appendChildToHeader(new H6El('sub-title').setHtml(this.getSubtitle()));
-            this.appendChildToContentPanel(this.archiveItemViewers);
-            this.appendChildToContentPanel(this.itemsTitleEl.setHtml(this.getItemsSubtitle()));
-            this.appendChildToContentPanel(this.itemsList);
-
-            return rendered;
-        });
-    }
 }

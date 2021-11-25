@@ -6,9 +6,9 @@ import {OnOffButton} from 'lib-contentstudio/app/issue/view/OnOffButton';
 export class Widget
     extends DivEl {
 
-    private readonly loadMask: LoadMask;
     protected readonly contentId: string;
     protected readonly repository: string;
+    private readonly loadMask: LoadMask;
     private readonly button: OnOffButton;
 
     constructor(config: WidgetConfig, cls?: string) {

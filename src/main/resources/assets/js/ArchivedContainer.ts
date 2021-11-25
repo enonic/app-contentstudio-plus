@@ -18,7 +18,7 @@ export class ArchivedContainer {
         this.archiveTime = new Date(Date.parse(json.archiveTime));
     }
 
-    static fromJson(json: ArchivedContainerJson) {
+    static fromJson(json: ArchivedContainerJson): ArchivedContainer {
         return new ArchivedContainer(json);
     }
 
