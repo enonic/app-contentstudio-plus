@@ -1,18 +1,13 @@
-import {ArchiveDialog} from './ArchiveDialog';
 import {i18n} from 'lib-admin-ui/util/Messages';
 import {RestoreArchivedRequest} from './resource/RestoreArchivedRequest';
 import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
-import {NotifyManager} from 'lib-admin-ui/notify/NotifyManager';
-import {ProgressBarManager} from 'lib-contentstudio/app/dialog/ProgressBarManager';
 import {TaskId} from 'lib-admin-ui/task/TaskId';
-import {TaskState} from 'lib-admin-ui/task/TaskState';
+import {ArchiveProgressDialog} from './ArchiveProgressDialog';
 
 export class ArchiveRestoreDialog
-    extends ArchiveDialog {
+    extends ArchiveProgressDialog {
 
     private static INSTANCE: ArchiveRestoreDialog;
-
-    private progressManager: ProgressBarManager;
 
     constructor() {
         super({
@@ -21,32 +16,20 @@ export class ArchiveRestoreDialog
         });
     }
 
-    protected initElements(): void {
-        super.initElements();
-
-        this.progressManager = new ProgressBarManager({
-            managingElement: <any>this,
-            processingLabel: i18n('field.progress.restoring')
-        });
+    protected getProcessingLabelText(): string {
+        return i18n('field.progress.restoring');
     }
 
-    protected initListeners(): void {
-        super.initListeners();
+    protected getSuccessTextForMultiple(): string {
+        return i18n('notify.restored.success.multiple', this.totalToProcess);
+    }
 
-        this.progressManager.onProgressComplete((task: TaskState) => {
-            if (task === TaskState.FINISHED) {
-                const successMessage: string =
-                    this.totalToProcess > 1 ?
-                    i18n('notify.restored.success.multiple', this.totalToProcess) :
-                    i18n('notify.restored.success.single', this.items[0].getDisplayName());
-                NotifyManager.get().showSuccess(successMessage);
-            } else {
-                NotifyManager.get().showError(i18n('notify.restore.failed'));
-            }
+    protected getSuccessTextForSingle(): string {
+        return i18n('notify.restored.success.single', this.items[0].getDisplayName());
+    }
 
-        });
-
-        this.progressManager.setSuppressNotifications(true);
+    protected getFailText(): string {
+        return i18n('notify.restore.failed');
     }
 
     protected getSubtitle(): string {
@@ -59,10 +42,6 @@ export class ArchiveRestoreDialog
 
     protected getArchiveActionTitle(): string {
         return i18n('action.restore');
-    }
-
-    protected executeAction() {
-        this.doAction();
     }
 
     protected doAction() {
