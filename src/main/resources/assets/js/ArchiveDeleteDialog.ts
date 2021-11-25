@@ -3,9 +3,11 @@ import {i18n} from 'lib-admin-ui/util/Messages';
 import {DeleteContentRequest} from 'lib-contentstudio/app/resource/DeleteContentRequest';
 import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
 import {ArchiveResourceRequest} from './resource/ArchiveResourceRequest';
+import {ArchiveProgressDialog} from './ArchiveProgressDialog';
+import {TaskId} from 'lib-admin-ui/task/TaskId';
 
 export class ArchiveDeleteDialog
-    extends ArchiveDialog {
+    extends ArchiveProgressDialog {
 
     private static INSTANCE: ArchiveDeleteDialog;
 
@@ -34,7 +36,9 @@ export class ArchiveDeleteDialog
 
         this.items.forEach(item => request.addContentPath(item.getData().getPath()));
 
-        request.sendAndParse().catch(DefaultErrorHandler.handle);
+        request.sendAndParse().then((taskId: TaskId) => {
+            this.progressManager.pollTask(taskId);
+        }).catch(DefaultErrorHandler.handle);
     }
 
     protected getConfirmValueDialogTitle(): string {
@@ -51,6 +55,22 @@ export class ArchiveDeleteDialog
         }
 
         return ArchiveDeleteDialog.INSTANCE;
+    }
+
+    protected getProcessingLabelText(): string {
+        return i18n('field.progress.deleting');
+    }
+
+    protected getSuccessTextForMultiple(): string {
+        return i18n('notify.deleted.success.multiple', this.totalToProcess);
+    }
+
+    protected getSuccessTextForSingle(): string {
+        return i18n('notify.deleted.success.single', this.items[0].getDisplayName());
+    }
+
+    protected getFailText(): string {
+        return i18n('notify.delete.failed');
     }
 
 }

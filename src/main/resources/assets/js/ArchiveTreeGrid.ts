@@ -39,7 +39,9 @@ export class ArchiveTreeGrid
             this.refresh();
         }, 200);
 
-        ArchiveServerEvent.on(debouncedRefresh);
+        ArchiveServerEvent.on((event: ArchiveServerEvent) => {
+            debouncedRefresh();
+        });
 
         let isRefreshTriggered: boolean = false;
 
