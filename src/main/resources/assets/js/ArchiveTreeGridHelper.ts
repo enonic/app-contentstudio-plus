@@ -26,17 +26,17 @@ export class ArchiveTreeGridHelper {
             id: 'displayName',
             field: 'displayName',
             formatter: ArchiveTreeGridHelper.nameFormatter,
-            style: {cssClass: 'name', minWidth: 130}
+            style: {cssClass: 'name', minWidth: 130},
         }, {
             name: 'CompareStatus',
             id: 'compareStatus',
             field: 'compareStatus',
             formatter: ArchiveTreeGridHelper.statusFormatter,
-            style: {cssClass: 'status', minWidth: 75, maxWidth: 75}
+            style: {cssClass: 'status', minWidth: 75, maxWidth: 75},
         }];
     }
 
-    public static nameFormatter({}: any, {}: any, {}: any, {}: any, dataContext: TreeNode<ArchiveViewItem>): string {
+    public static nameFormatter(_a: any, _b: any, _c: any, _d: any, dataContext: TreeNode<ArchiveViewItem>): string {
         return ArchiveTreeGridHelper.getViewerForArchiveItem(dataContext).toString();
     }
 

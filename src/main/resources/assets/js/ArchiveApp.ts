@@ -11,15 +11,15 @@ export class ArchiveApp
         super(DescriptorKey.fromString(`${CONFIG.appId}.plus:main`));
     }
 
-    protected createAppContainer(): AppContainer {
-        return new ArchiveAppContainer();
-    }
-
     getIconClass(): string {
         return 'icon-archive';
     }
 
     getDisplayName(): string {
         return i18n('app.archive');
+    }
+
+    protected createAppContainer(): AppContainer {
+        return new ArchiveAppContainer();
     }
 }

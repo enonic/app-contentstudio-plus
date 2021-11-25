@@ -15,13 +15,7 @@ export class ShowAllContentLayersButton extends ActionButton {
         this.initListeners();
     }
 
-    private initListeners() {
-        this.getAction().onExecuted(() => {
-            LayersContentTreeDialog.get().setItems(this.items).open();
-        });
-    }
-
-    setItems(items: LayerContent[]) {
+    setItems(items: LayerContent[]): void {
         this.items = items;
 
         const total: number = items.filter((layerContent: LayerContent) => layerContent.hasItem()).length;
@@ -34,6 +28,12 @@ export class ShowAllContentLayersButton extends ActionButton {
             this.addClass('show-all-button');
 
             return rendered;
+        });
+    }
+
+    private initListeners(): void {
+        this.getAction().onExecuted(() => {
+            LayersContentTreeDialog.get().setItems(this.items).open();
         });
     }
 }

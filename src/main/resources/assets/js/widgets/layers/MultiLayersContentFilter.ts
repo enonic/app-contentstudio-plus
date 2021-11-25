@@ -17,7 +17,7 @@ export class MultiLayersContentFilter {
     }
 
     private hasNonEmptyParent(item: LayerContent): boolean {
-        let hasParentWithItem: boolean = false;
+        let hasParentWithItem = false;
         let parent: LayerContent = this.findParent(item);
 
         while (parent && !hasParentWithItem) {
@@ -40,7 +40,7 @@ export class MultiLayersContentFilter {
             return true;
         }
 
-        return this.findChildren(item).some((child: LayerContent) => this.hasNonEmptyDescendant(child) );
+        return this.findChildren(item).some((child: LayerContent) => this.hasNonEmptyDescendant(child));
     }
 
     private findChildren(item: LayerContent): LayerContent[] {

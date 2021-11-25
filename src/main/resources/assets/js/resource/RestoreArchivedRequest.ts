@@ -1,8 +1,11 @@
 import {HttpMethod} from 'lib-admin-ui/rest/HttpMethod';
 import {TaskArchiveResourceRequest} from './TaskArchiveResourceRequest';
 
-export class RestoreArchivedRequest extends TaskArchiveResourceRequest {
+type Params = {
+    contentIds: string[];
+};
 
+export class RestoreArchivedRequest extends TaskArchiveResourceRequest {
     private readonly ids: string[];
 
     constructor(ids: string[]) {
@@ -13,9 +16,9 @@ export class RestoreArchivedRequest extends TaskArchiveResourceRequest {
         this.addRequestPathElements('restore');
     }
 
-    getParams(): Object {
+    getParams(): Params {
         return {
-            contentIds: this.ids
+            contentIds: this.ids,
         };
     }
 }

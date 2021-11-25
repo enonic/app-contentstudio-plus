@@ -8,7 +8,7 @@ import {LayerContentViewRelation} from './LayerContentViewRelation';
 
 export class LayersView extends ListBox<LayerContent> {
 
-    private static EXPANDED_CLASS: string = `${LayerContentView.VIEW_CLASS}-expanded`;
+    private static EXPANDED_CLASS = `${LayerContentView.VIEW_CLASS}-expanded`;
 
     private activeItemView: LayerContentView;
 
@@ -62,19 +62,19 @@ export class LayersView extends ListBox<LayerContent> {
     }
 
     private countDescendants(projectName: string, items: LayerContent[]): number {
-        let total: number = 0;
+        let total = 0;
 
         const children: LayerContent[] = items.filter((item: LayerContent) => item.getProject().getParent() === projectName);
 
         children.forEach((child: LayerContent) => {
-            total++;
+            total += 1;
             total += this.countDescendants(child.getProjectName(), items);
         });
 
         return total;
     }
 
-    private appendMoreBlockToLastItem(more: number) {
+    private appendMoreBlockToLastItem(more: number): void {
         const relationBlock: LayerContentViewRelation = new LayerContentViewRelation(`${LayerContentView.VIEW_CLASS}-relation`);
         this.appendChild(relationBlock);
         this.getItemViews().pop().addClass('has-children');
@@ -93,16 +93,16 @@ export class LayersView extends ListBox<LayerContent> {
         while (layerContent) {
             result.unshift(layerContent);
             projectName = layerContent.getProject().getParent();
-            layerContent = !!projectName ? items.find((item: LayerContent) => item.getProjectName() === projectName) : null;
+            layerContent = projectName ? items.find((item: LayerContent) => item.getProjectName() === projectName) : null;
         }
 
         return result;
     }
 
-    private hideInheritedItems() {
+    private hideInheritedItems(): void {
         const reversedItemViews: LayerContentView[] = <LayerContentView[]>this.getItemViews().reverse();
 
-        let parentIndex: number = -1;
+        let parentIndex = -1;
         reversedItemViews.find((item: LayerContentView, index: number) => {
             parentIndex = index;
             return (index !== 0 && item.hasItem() && !item.getItem().isDataInherited()) || index === reversedItemViews.length -1;
@@ -119,7 +119,7 @@ export class LayersView extends ListBox<LayerContent> {
         }
     }
 
-    private hideItemsBetween(itemIndex: number, parentIndex: number) {
+    private hideItemsBetween(itemIndex: number, parentIndex: number): void {
         const reversedItemViews: LayerContentView[] = <LayerContentView[]>this.getItemViews().reverse();
         const currentItem: LayerContentView = reversedItemViews[itemIndex];
         currentItem.addClass('has-hidden-parents');

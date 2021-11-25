@@ -71,7 +71,7 @@ configurations.all {
 
 node {
     download = true
-    version = '14.15.0'
+    version = '16.0.0'
 }
 
 task copyDevResources {
@@ -87,7 +87,7 @@ task copyDevResources {
 npmInstall.dependsOn copyDevResources
 
 task lint( type: NpmTask, dependsOn: npmInstall ) {
-    args = [ 'run', 'lint' ]
+    args = [ 'run', 'lint:quiet' ]
     inputs.files fileTree( dir: 'modules', include: '**/src/main/**.*' )
     outputs.dir file('gradle')
     outputs.upToDateWhen { false }

@@ -17,7 +17,7 @@ export class MultiLayersContentLoader {
         return this.loadSameContentInOtherProjects().then((layerContents: LayerContent[]) => this.filter(layerContents));
     }
 
-    setItem(item: ContentSummaryAndCompareStatus) {
+    setItem(item: ContentSummaryAndCompareStatus): void {
         this.item = item;
     }
 
@@ -48,7 +48,7 @@ export class MultiLayersContentLoader {
             .setRequestProject(project)
             .sendAndParse()
             .then((result: ContentsExistResult) => {
-                if (!!result.getContentsExistMap()[id]) {
+                if (result.getContentsExistMap()[id]) {
                     return new ContentSummaryAndCompareStatusFetcher().fetch(this.item.getContentId(), project.getName())
                         .then((item: ContentSummaryAndCompareStatus) => {
                             return new LayerContent(item, project);

@@ -4,7 +4,7 @@ export class LayersContentTreeListHelper {
 
     private layerContents: LayerContent[];
 
-    setItems(items: LayerContent[]) {
+    setItems(items: LayerContent[]): void {
         this.layerContents = items;
     }
 
@@ -25,7 +25,7 @@ export class LayersContentTreeListHelper {
         let parent: LayerContent = this.findParent(item);
 
         while (parent) {
-            level++;
+            level += 1;
             parent = this.findParent(parent);
         }
 
@@ -51,7 +51,7 @@ export class LayersContentTreeListHelper {
     }
 
     private getRootItems(): LayerContent[] {
-        return this.layerContents.filter((item: LayerContent) => this.calcLevel(item) === 0 );
+        return this.layerContents.filter((item: LayerContent) => this.calcLevel(item) === 0);
     }
 
 }

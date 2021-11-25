@@ -31,7 +31,7 @@ export class LangBasedContentSummaryViewer extends ContentSummaryAndCompareStatu
         }
 
         const language: string = this.project.getLanguage();
-        return !!language ? new Flag(language) : null;
+        return language ? new Flag(language) : null;
     }
 
 

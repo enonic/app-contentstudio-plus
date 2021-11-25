@@ -43,7 +43,25 @@ export class ArchiveItemPreviewToolbar
         }
     }
 
-    private updatedArchivedBlock(summary: ContentSummary) {
+    clearItem(): void {
+        this.setItem(null);
+
+        this.archivedEl.setHtml('');
+    }
+
+    doRender(): Q.Promise<boolean> {
+        return super.doRender().then((rendered: boolean) => {
+            this.insertChild(this.archivedEl, 1);
+
+            return rendered;
+        });
+    }
+
+    protected foldOrExpand(): void {
+        return;
+    }
+
+    private updatedArchivedBlock(summary: ContentSummary): void {
         const status: string = i18n('status.archived');
         const archivedBy: PrincipalKey = summary.getArchivedBy();
 
@@ -54,30 +72,12 @@ export class ArchiveItemPreviewToolbar
         Q.all([versionsPromise, principalPromise]).spread((versions: ContentVersions, principal: Principal) => {
             const when: string = DateTimeFormatter.createHtml(summary.getArchivedTime());
             const displayName: string = i18n('field.preview.toolbar.status',
-                !!principal ? principal.getDisplayName() : PrincipalKey.ofAnonymous().getId());
+                principal ? principal.getDisplayName() : PrincipalKey.ofAnonymous().getId());
             this.archivedEl.setHtml(`${status} ${when} ${displayName}`);
         }).catch(DefaultErrorHandler.handle);
     }
 
-    private updateOriginalPathBlock(item: ArchiveContentViewItem) {
+    private updateOriginalPathBlock(item: ArchiveContentViewItem): void {
         this.originalPathEl.setHtml(item.getOriginalFullPath());
-    }
-
-    clearItem(): void {
-        this.setItem(null);
-
-        this.archivedEl.setHtml('');
-    }
-
-    protected foldOrExpand(): void {
-        return;
-    }
-
-    doRender(): Q.Promise<boolean> {
-        return super.doRender().then((rendered: boolean) => {
-            this.insertChild(this.archivedEl, 1);
-
-            return rendered;
-        });
     }
 }

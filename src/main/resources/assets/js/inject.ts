@@ -9,16 +9,16 @@ declare const CONFIG;
 
 const body = Body.get();
 
-function injectApp() {
+function injectApp(): void {
     const appWrapper: AppWrapper = <AppWrapper>body.findChildById('AppWrapper');
     appWrapper.addApp(new ArchiveApp(), 1);
 }
 
-(async () => {
+void (async () => {
     const i18nUrl: string = CONFIG.services.i18nUrl.replace(new RegExp('contentstudio', 'g'), 'contentstudio.plus');
     await i18nAdd(i18nUrl);
 
-    const renderListener = () => {
+    const renderListener = (): void => {
         injectApp();
         body.unRendered(renderListener);
     };

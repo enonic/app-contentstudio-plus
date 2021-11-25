@@ -18,7 +18,7 @@ export class ArchiveItemStatisticsPanel
         this.appendChild(this.previewPanel);
     }
 
-    setItem(item: ArchiveViewItem) {
+    setItem(item: ArchiveViewItem): void {
         if (ObjectHelper.equals(this.getItem(), item)) {
             return;
         }
@@ -26,7 +26,7 @@ export class ArchiveItemStatisticsPanel
         this.previewPanel.setItem(<ArchiveContentViewItem>item);
     }
 
-    clearItem() {
+    clearItem(): void {
         super.clearItem();
 
         this.previewPanel.clearItem();

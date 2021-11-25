@@ -25,9 +25,11 @@ declare const CONFIG;
 
 // Dynamically import and execute all input types, since they are used
 // on-demand, when parsing XML schemas and has not real usage in app
-declare var require: { context: (directory: string, useSubdirectories: boolean, filter: RegExp) => void };
-const importAll = r => r.keys().forEach(r);
-importAll(require.context('lib-contentstudio/app/inputtype', true, /^(?!\.[\/\\](ui)).*(\.js)$/));
+declare let require: { context: (directory: string, useSubdirectories: boolean, filter: RegExp) => void };
+
+// eslint-disable-next-line @typescript-eslint/no-unsafe-return
+const importAll = (r): void => r.keys().forEach(r);
+importAll(require.context('lib-contentstudio/app/inputtype', true, /^(?!\.[\\](ui)).*(\.js)$/));
 
 const body = Body.get();
 
@@ -35,7 +37,7 @@ function getApplication(): Application {
     const application = new Application(
         'content-studio-plus',
         i18n('app.name'),
-        i18n('app.abbr')
+        i18n('app.abbr'),
     );
     application.setPath(Router.getPath());
     application.setWindow(window);
@@ -66,7 +68,7 @@ function startLostConnectionDetector(): ConnectionDetector {
     return connectionDetector;
 }
 
-function initApplicationEventListener() {
+function initApplicationEventListener(): void {
 
     let messageId;
     let appStatusCheckInterval;
@@ -104,20 +106,20 @@ function initProjectContext(application: Application): Q.Promise<void> {
 
             if (currentProject) {
                 ProjectContext.get().setProject(currentProject);
-                return Q(null);
+                return Q();
             }
         }
 
         if (ProjectHelper.isAvailable(projects[0])) {
             ProjectContext.get().setProject(projects[0]);
-            return Q(null);
+            return Q();
         }
 
-        return Q(null);
+        return Q();
     });
 }
 
-async function startApplication() {
+function startApplication(): void {
     const application: Application = getApplication();
     const connectionDetector = startLostConnectionDetector();
 
@@ -136,10 +138,11 @@ async function startApplication() {
 }
 
 function getTheme(): string {
-    return CONFIG.theme ? (`theme-${CONFIG.theme}` || '') : '';
+    const theme: string = CONFIG.theme;
+    return theme ? (`theme-${theme}` || '') : '';
 }
 
-async function startContentBrowser(application: Application) {
+function startContentBrowser(application: Application): void {
     // const archiveAppPanel = new ArchiveAppPanel();
     // body.appendChild(archiveAppPanel);
     // archiveAppPanel.handleBrowse();
@@ -149,12 +152,12 @@ async function startContentBrowser(application: Application) {
     archiveAppContainer.show();
 }
 
-(async () => {
+void (async () => {
     await i18nInit(CONFIG.services.i18nUrl);
     const i18nUrl: string = CONFIG.services.i18nUrl.replace(new RegExp('contentstudio', 'g'), 'contentstudio.plus');
     await i18nAdd(i18nUrl);
 
-    const renderListener = () => {
+    const renderListener = (): void => {
         startApplication();
         body.unRendered(renderListener);
     };

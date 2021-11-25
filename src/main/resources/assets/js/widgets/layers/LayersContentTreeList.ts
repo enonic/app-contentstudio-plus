@@ -18,15 +18,15 @@ export class LayersContentTreeList
         this.helper = new LayersContentTreeListHelper();
     }
 
+    setItems(items: LayerContent[], silent?: boolean): void {
+        this.helper.setItems(items);
+        super.setItems(this.helper.sort(), silent);
+    }
+
     protected getItemId(item: LayerContent): string {
         const projectName: string = item.getProject().getName();
         const contentId: string = item.hasItem() ? item.getItemId() : '';
         return `${projectName}:${contentId}`;
-    }
-
-    setItems(items: LayerContent[], silent?: boolean): void {
-        this.helper.setItems(items);
-        super.setItems(this.helper.sort(), silent);
     }
 
     protected createItemView(item: LayerContent, readOnly: boolean): LayerContentViewDataBlock {

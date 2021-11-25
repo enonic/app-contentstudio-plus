@@ -19,7 +19,19 @@ export class LayerContentViewHeader extends DivEl {
         this.initElements();
     }
 
-    private initElements() {
+    doRender(): Q.Promise<boolean> {
+        return super.doRender().then((rendered) => {
+            this.appendChild(this.layerNameBlock);
+
+            if (this.itemStatusBlock) {
+                this.appendChild(this.itemStatusBlock);
+            }
+
+            return rendered;
+        });
+    }
+
+    private initElements(): void {
         this.layerNameBlock = new DivEl('layer-details');
         const layerName: DivEl = new DivEl('layer-name');
         layerName.setHtml(ProjectHelper.isAvailable(this.layerContent.getProject())
@@ -38,17 +50,5 @@ export class LayerContentViewHeader extends DivEl {
             this.itemStatusBlock.setHtml(CompareStatusFormatter.formatStatusText(this.layerContent.getItem().getCompareStatus()));
             this.itemStatusBlock.addClass(CompareStatusFormatter.formatStatusClass(this.layerContent.getItem().getCompareStatus()));
         }
-    }
-
-    doRender(): Q.Promise<boolean> {
-        return super.doRender().then((rendered) => {
-            this.appendChild(this.layerNameBlock);
-
-            if (this.itemStatusBlock) {
-                this.appendChild(this.itemStatusBlock);
-            }
-
-            return rendered;
-        });
     }
 }
