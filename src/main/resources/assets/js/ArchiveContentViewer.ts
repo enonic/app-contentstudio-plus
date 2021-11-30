@@ -8,7 +8,12 @@ export class ArchiveContentViewer extends ContentSummaryAndCompareStatusViewer {
 
         this.setIsRelativePath(true);
     }
+
     resolveSubName(object: ContentSummaryAndCompareStatus): string {
         return super.resolveSubName(object);
+    }
+
+    resolveWorkflowState(): string {
+        return '';
     }
 }
