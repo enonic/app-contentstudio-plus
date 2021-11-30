@@ -15,7 +15,8 @@ import {ArchiveServerEvent} from 'lib-contentstudio/app/event/ArchiveServerEvent
 import {ContentServerEventsHandler} from 'lib-contentstudio/app/event/ContentServerEventsHandler';
 import {ContentPath} from 'lib-contentstudio/app/content/ContentPath';
 import {ContentId} from 'lib-contentstudio/app/content/ContentId';
-import {AppHelper} from 'lib-admin-ui/util/AppHelper';
+import {NodeServerChangeType} from 'lib-admin-ui/event/NodeServerChange';
+import {ContentServerChangeItem} from 'lib-contentstudio/app/event/ContentServerChangeItem';
 
 export class ArchiveTreeGrid
     extends TreeGrid<ArchiveViewItem> {
@@ -35,12 +36,22 @@ export class ArchiveTreeGrid
     }
 
     protected initListeners() {
-        const debouncedRefresh = AppHelper.debounce(() => {
-            this.refresh();
-        }, 200);
-
         ArchiveServerEvent.on((event: ArchiveServerEvent) => {
-            debouncedRefresh();
+            const type: NodeServerChangeType = event.getNodeChange().getChangeType();
+
+            if (type === NodeServerChangeType.MOVE || type === NodeServerChangeType.DELETE) {
+                const itemsToRemove: ContentServerChangeItem[] = this.extractTopMostContentItems(event);
+                const allEventItemsIds: string[] =
+                    event.getNodeChange().getChangeItems().map((item: ContentServerChangeItem) => item.getContentId().toString());
+
+                this.deselectNodes(allEventItemsIds); // required because treegrid lacks delete for multiple ids
+
+                itemsToRemove.forEach((item: ContentServerChangeItem) => {
+                    const id: string = item.getContentId().toString();
+                    this.collapseNodeByDataId(id); // required because treegrid lacks delete for multiple ids
+                    this.deleteNodeByDataId(id);
+                });
+            }
         });
 
         let isRefreshTriggered: boolean = false;
@@ -59,6 +70,31 @@ export class ArchiveTreeGrid
         ProjectContext.get().onProjectChanged(() => {
             this.refresh();
         });
+    }
+
+    private extractTopMostContentItems(event: ArchiveServerEvent): ContentServerChangeItem[] {
+        const itemsToDelete: ContentServerChangeItem[] = [];
+
+        event.getNodeChange().getChangeItems().forEach((eventItem: ContentServerChangeItem) => {
+            const contains: boolean = itemsToDelete.some((itemToDelete: ContentServerChangeItem, index: number) => {
+                if (eventItem.getPath().isDescendantOf(itemToDelete.getPath())) {
+                    return true;
+                }
+
+                if (itemToDelete.getPath().isDescendantOf(eventItem.getPath())) {
+                    itemsToDelete[index] = eventItem;
+                    return true;
+                }
+
+                return false;
+            });
+
+            if (!contains) {
+                itemsToDelete.push(eventItem);
+            }
+        });
+
+        return itemsToDelete;
     }
 
     refresh() {
