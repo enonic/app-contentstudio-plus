@@ -37,7 +37,8 @@ export abstract class ArchiveDialog
         this.confirmValueDialog
             .setHeaderText(this.getConfirmValueDialogTitle())
             .setSubheaderText(this.getConfirmValueDialogSubTitle())
-            .setYesCallback(this.executeAction.bind(this));
+            .setYesCallback(() => this.executeAction())
+            .setNoCallback(() => this.close());
 
         this.archiveItemViewers = new ArchiveDialogItemList();
         this.itemsList = new ArchiveItemsList();
