@@ -524,6 +524,10 @@ class Page {
     dismissAlert() {
         return this.getBrowser().dismissAlert();
     }
+
+    setWindowSize(width, height) {
+        return this.getBrowser().setWindowSize(width, height)
+    }
 }
 
 module.exports = Page;

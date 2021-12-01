@@ -152,10 +152,10 @@ describe('archive.content.spec: tests for archiving content', function () {
             await archiveDeleteDialog.clickOnDeleteNowButton();
             //4. Verify that the content is not displayed in Archive Browse Panel:
             await archiveBrowsePanel.waitForContentNotDisplayed(FOLDER1.displayName);
-            //TODO uncomment when issue#300 will be fixed
-            //let message = await contentBrowsePanel.waitForNotificationMessage();
-            //let expectedMessage = appConst.itemIsRestored(FOLDER2.displayName);
-            //assert.equal(message, expectedMessage, "Expected notification message should appear");
+            //5. Verify the notification message
+            let message = await contentBrowsePanel.waitForNotificationMessage();
+            let expectedMessage = appConst.itemIsRestored(FOLDER2.displayName);
+            assert.equal(message, expectedMessage, "Expected notification message should appear");
         });
 
 
