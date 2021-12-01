@@ -3,6 +3,7 @@ import {RestoreArchivedRequest} from './resource/RestoreArchivedRequest';
 import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
 import {TaskId} from 'lib-admin-ui/task/TaskId';
 import {ArchiveProgressDialog} from './ArchiveProgressDialog';
+import {ArchiveViewItem} from './ArchiveViewItem';
 
 export class ArchiveRestoreDialog
     extends ArchiveProgressDialog {
@@ -45,9 +46,34 @@ export class ArchiveRestoreDialog
     }
 
     protected doAction() {
-        new RestoreArchivedRequest(this.items.map(item => item.getId())).sendAndParse().then((taskId: TaskId) => {
+        new RestoreArchivedRequest(this.getItemsToRestore()).sendAndParse().then((taskId: TaskId) => {
             this.progressManager.pollTask(taskId);
         }).catch(DefaultErrorHandler.handle);
+    }
+
+    private getItemsToRestore(): string[] {
+        const itemsToDelete: ArchiveViewItem[] = [];
+
+        this.items.forEach((item: ArchiveViewItem) => {
+            const contains: boolean = itemsToDelete.some((itemToDelete: ArchiveViewItem, index: number) => {
+                if (item.getData().getPath().isDescendantOf(itemToDelete.getData().getPath())) {
+                    return true;
+                }
+
+                if (itemToDelete.getData().getPath().isDescendantOf(item.getData().getPath())) {
+                    itemsToDelete[index] = item;
+                    return true;
+                }
+
+                return false;
+            });
+
+            if (!contains) {
+                itemsToDelete.push(item);
+            }
+        });
+
+        return itemsToDelete.map((item) => item.getId());
     }
 
     protected getConfirmValueDialogTitle(): string {
