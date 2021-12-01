@@ -18,8 +18,6 @@ export class ArchiveStatusWidgetItemView
     public setContentAndUpdateView(item: ContentSummaryAndCompareStatus): Q.Promise<any> {
         this.content = item;
         return this.layout();
-
-        return Q<any>(null);
     }
 
     public layout(): Q.Promise<any> {

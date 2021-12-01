@@ -3,20 +3,26 @@ import * as Q from 'q';
 import {WidgetView} from 'lib-contentstudio/app/view/context/WidgetView';
 import {WidgetItemView} from 'lib-contentstudio/app/view/context/WidgetItemView';
 import {AttachmentsWidgetItemView} from 'lib-contentstudio/app/view/context/widget/details/AttachmentsWidgetItemView';
-import {ContentWidgetItemView} from 'lib-contentstudio/app/view/context/widget/details/ContentWidgetItemView';
 import {ContentPath} from 'lib-contentstudio/app/content/ContentPath';
 import {ArchiveStatusWidgetItemView} from './widgets/ArchiveStatusWidgetItemView';
 import {ArchiveContentViewItem} from './ArchiveContentViewItem';
 import {ArchivePropertiesWidgetItemView} from './widgets/ArchivePropertiesWidgetItemView';
+import {ArchiveWidgetItemView} from './widgets/ArchiveWidgetItemView';
 
 export class ArchiveContextView
     extends ContextView {
 
     private archiveItem: ArchiveContentViewItem;
 
-    private contentWidgetItemView: ContentWidgetItemView;
+    private archiveWidgetItemView: ArchiveWidgetItemView;
 
     private propertiesWidgetItemView: ArchivePropertiesWidgetItemView;
+
+    constructor() {
+        super();
+
+        this.addClass('archive-context-view');
+    }
 
     getCustomWidgetViewsAndUpdateDropdown(): Q.Promise<void> {
         this.widgetsSelectionRow.updateWidgetsDropdown(this.widgetViews);
@@ -28,11 +34,11 @@ export class ArchiveContextView
     }
 
     protected getDetailsWidgetItemViews(): WidgetItemView[] {
-        this.contentWidgetItemView = new ContentWidgetItemView();
+        this.archiveWidgetItemView = new ArchiveWidgetItemView();
         this.propertiesWidgetItemView = new ArchivePropertiesWidgetItemView();
 
         return [
-            this.contentWidgetItemView,
+            this.archiveWidgetItemView,
             new ArchiveStatusWidgetItemView(),
             this.propertiesWidgetItemView,
             new AttachmentsWidgetItemView().setContentRootPath(ContentPath.ARCHIVE_ROOT)
@@ -43,17 +49,9 @@ export class ArchiveContextView
         this.archiveItem = item;
 
         if (item) {
-            this.contentWidgetItemView.getViewer().whenRendered(() => {
-                this.contentWidgetItemView.getViewer().getNamesAndIconView().getNamesView().setSubName(item.getOriginalFullPath());
+            this.archiveWidgetItemView.whenRendered(() => {
+                this.archiveWidgetItemView.setSubName(item.getOriginalFullPath());
             });
         }
-    }
-
-    doRender(): Q.Promise<boolean> {
-        return super.doRender().then((rendered: boolean) => {
-            this.addClass('archive-context-view');
-
-            return rendered;
-        });
     }
 }

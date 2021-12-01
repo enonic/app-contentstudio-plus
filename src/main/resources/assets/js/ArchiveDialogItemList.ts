@@ -1,5 +1,5 @@
 import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
-import {ArchiveItemViewer} from './ArchiveItemViewer';
+import {ArchiveContentViewer} from './ArchiveContentViewer';
 import {ListBox} from 'lib-admin-ui/ui/selector/list/ListBox';
 
 
@@ -9,8 +9,9 @@ export class ArchiveDialogItemList
     constructor() {
         super('archive-dialog-item-list');
     }
-    createItemView(item: ContentSummaryAndCompareStatus): ArchiveItemViewer {
-        const viewer = new ArchiveItemViewer();
+
+    createItemView(item: ContentSummaryAndCompareStatus): ArchiveContentViewer {
+        const viewer = new ArchiveContentViewer();
         viewer.setObject(item);
 
         return viewer;
