@@ -1,6 +1,5 @@
 import {ContentSummaryAndCompareStatusViewer} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatusViewer';
 import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
-import {ContentPath} from 'lib-contentstudio/app/content/ContentPath';
 
 export class ArchiveContentDialogViewer extends ContentSummaryAndCompareStatusViewer {
 
@@ -13,5 +12,9 @@ export class ArchiveContentDialogViewer extends ContentSummaryAndCompareStatusVi
 
     resolveSubName(object: ContentSummaryAndCompareStatus): string {
         return object.getPath().toString();
+    }
+
+    resolveWorkflowState(_object: ContentSummaryAndCompareStatus): string {
+        return '';
     }
 }
