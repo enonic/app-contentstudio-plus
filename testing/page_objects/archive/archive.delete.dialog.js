@@ -39,6 +39,11 @@ class ArchiveDeleteDialog extends Page {
         return this.getTextInElements(locator);
     }
 
+    getChildItemsToDeleteDisplayName() {
+        let locator = XPATH.container + XPATH.childListToDelete + lib.H6_DISPLAY_NAME;
+        return this.getTextInElements(locator);
+    }
+
     async clickOnCancelButton() {
         await this.waitForElementDisplayed(this.cancelButton, appConst.mediumTimeout);
         return await this.clickOnElement(this.cancelButton);
@@ -73,6 +78,11 @@ class ArchiveDeleteDialog extends Page {
 
     waitForDeleteNowButtonDisplayed() {
         return this.waitForElementDisplayed(this.deleteNowButton, appConst.mediumTimeout);
+    }
+
+    getChildItemsToDeletePath() {
+        let locator = XPATH.container + XPATH.childListToDelete + lib.P_SUB_NAME;
+        return this.getTextInElements(locator);
     }
 }
 

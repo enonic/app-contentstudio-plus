@@ -45,7 +45,7 @@ const XPATH = {
         return lib.itemByName(name) +
                `/ancestor::div[contains(@class,'slick-cell')]/span[contains(@class,'collapse') or contains(@class,'expand')]`;
     },
-}
+};
 
 class ArchiveBrowsePanel extends BaseBrowsePanel {
 
@@ -54,7 +54,7 @@ class ArchiveBrowsePanel extends BaseBrowsePanel {
     }
 
     get restoreButton() {
-        return XPATH.settingsAppContainer + `/*[contains(@id, 'ActionButton') and child::span[text()='Restore...']]`;
+        return XPATH.container + XPATH.toolbar + `/*[contains(@id, 'ActionButton') and child::span[text()='Restore...']]`;
     }
 
     get treeGrid() {
@@ -77,6 +77,36 @@ class ArchiveBrowsePanel extends BaseBrowsePanel {
         return XPATH.archiveTreeGrid + lib.H6_DISPLAY_NAME;
     }
 
+    waitForRestoreButtonEnabled() {
+        return this.waitForElementEnabled(this.restoreButton, appConst.mediumTimeout);
+    }
+
+    async clickOnRestoreButton() {
+        try {
+            await this.waitForRestoreButtonEnabled();
+            await this.clickOnElement(this.restoreButton);
+            return await this.pause(1100);
+        } catch (err) {
+            this.saveScreenshot('err_click_on_expander');
+            throw new Error('error when click on expander-icon ' + err);
+        }
+    }
+
+    async clickOnDeleteButton() {
+        await this.waitForDeleteButtonEnabled();
+        await this.clickOnElement(this.deleteButton);
+        return await this.pause(500);
+    }
+
+    async waitForDeleteButtonEnabled() {
+        await this.waitForDeleteButtonDisplayed();
+        return await this.waitForElementEnabled(this.deleteButton, appConst.mediumTimeout)
+    }
+
+    waitForDeleteButtonDisplayed() {
+        return this.waitForElementDisplayed(this.deleteButton, appConst.mediumTimeout);
+    }
+
     async clickOnExpanderIcon(name) {
         try {
             let expanderIcon = XPATH.itemsTreeGrid + XPATH.expanderIconByName(name);
@@ -95,7 +125,7 @@ class ArchiveBrowsePanel extends BaseBrowsePanel {
             return await this.waitForElementDisplayed(this.treeGrid + lib.itemByName(contentName), timeout);
         } catch (err) {
             console.log("item is not displayed:" + contentName);
-            awthis.saveScreenshot('err_find_' + contentName);
+            await this.saveScreenshot('err_find_' + contentName);
             throw new Error('content is not displayed ! ' + contentName + "  " + err);
         }
     }

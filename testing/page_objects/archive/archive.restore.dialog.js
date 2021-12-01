@@ -72,6 +72,16 @@ class ArchiveRestoreDialog extends Page {
     waitForRestoreButtonDisplayed() {
         return this.waitForElementDisplayed(this.restoreButton, appConst.mediumTimeout);
     }
+
+    getItemsToRestorePath() {
+        let locator = XPATH.container + XPATH.itemListToRestore + lib.P_SUB_NAME;
+        return this.getTextInElements(locator);
+    }
+
+    getChildItemsToRestorePath() {
+        let locator = XPATH.container + XPATH.childListToRestore + lib.P_SUB_NAME;
+        return this.getTextInElements(locator);
+    }
 }
 
 module.exports = ArchiveRestoreDialog;
