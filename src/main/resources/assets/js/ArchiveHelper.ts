@@ -9,14 +9,14 @@ export abstract class ArchiveHelper {
     public static filterTopMostItems(items: ItemWithPath[]): ItemWithPath[]  {
         const result: ItemWithPath[] = [];
 
-        items.forEach((item: ItemWithPath) => {
-            const contains: boolean = result.some((itemToDelete: ItemWithPath, index: number) => {
-                if (item.getPath().isDescendantOf(itemToDelete.getPath())) {
+        items.forEach((thisItem: ItemWithPath) => {
+            const contains: boolean = result.some((otherItem: ItemWithPath, index: number) => {
+                if (thisItem.getPath().isDescendantOf(otherItem.getPath())) {
                     return true;
                 }
 
-                if (itemToDelete.getPath().isDescendantOf(item.getPath())) {
-                    result[index] = item;
+                if (otherItem.getPath().isDescendantOf(thisItem.getPath())) {
+                    result[index] = thisItem;
                     return true;
                 }
 
@@ -24,7 +24,7 @@ export abstract class ArchiveHelper {
             });
 
             if (!contains) {
-                result.push(item);
+                result.push(thisItem);
             }
         });
 
