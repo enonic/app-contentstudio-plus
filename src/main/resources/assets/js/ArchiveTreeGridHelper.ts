@@ -9,6 +9,11 @@ import {Viewer} from 'lib-admin-ui/ui/Viewer';
 import {ArchiveContentViewer} from './ArchiveContentViewer';
 import {i18n} from 'lib-admin-ui/util/Messages';
 import {SpanEl} from 'lib-admin-ui/dom/SpanEl';
+import {ContentPath} from 'lib-contentstudio/app/content/ContentPath';
+
+interface ItemWithPath {
+    getPath(): ContentPath;
+}
 
 export class ArchiveTreeGridHelper {
 

@@ -2,6 +2,7 @@ import {Equitable} from 'lib-admin-ui/Equitable';
 import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
 import {ViewItem} from 'lib-admin-ui/app/view/ViewItem';
 import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
+import { ContentPath } from 'lib-contentstudio/app/content/ContentPath';
 
 export abstract class ArchiveViewItem implements ViewItem {
 
@@ -51,6 +52,10 @@ export abstract class ArchiveViewItem implements ViewItem {
 
     getData(): ContentSummaryAndCompareStatus {
         return this.data;
+    }
+
+    getPath(): ContentPath {
+        return this.data?.getPath();
     }
 }
 

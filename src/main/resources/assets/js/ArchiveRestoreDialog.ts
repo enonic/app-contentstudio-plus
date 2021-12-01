@@ -4,6 +4,7 @@ import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
 import {TaskId} from 'lib-admin-ui/task/TaskId';
 import {ArchiveProgressDialog} from './ArchiveProgressDialog';
 import {ArchiveViewItem} from './ArchiveViewItem';
+import {ArchiveHelper} from './ArchiveHelper';
 
 export class ArchiveRestoreDialog
     extends ArchiveProgressDialog {
@@ -52,28 +53,7 @@ export class ArchiveRestoreDialog
     }
 
     private getItemsToRestore(): string[] {
-        const itemsToDelete: ArchiveViewItem[] = [];
-
-        this.items.forEach((item: ArchiveViewItem) => {
-            const contains: boolean = itemsToDelete.some((itemToDelete: ArchiveViewItem, index: number) => {
-                if (item.getData().getPath().isDescendantOf(itemToDelete.getData().getPath())) {
-                    return true;
-                }
-
-                if (itemToDelete.getData().getPath().isDescendantOf(item.getData().getPath())) {
-                    itemsToDelete[index] = item;
-                    return true;
-                }
-
-                return false;
-            });
-
-            if (!contains) {
-                itemsToDelete.push(item);
-            }
-        });
-
-        return itemsToDelete.map((item) => item.getId());
+        return (<ArchiveViewItem[]>ArchiveHelper.filterTopMostItems(this.items)).map((item: ArchiveViewItem) => item.getId());
     }
 
     protected getConfirmValueDialogTitle(): string {
