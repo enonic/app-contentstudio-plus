@@ -2,9 +2,11 @@ import {ArchiveDialog} from './ArchiveDialog';
 import {NotifyManager} from 'lib-admin-ui/notify/NotifyManager';
 import {ProgressBarManager} from 'lib-contentstudio/app/dialog/ProgressBarManager';
 import {TaskState} from 'lib-admin-ui/task/TaskState';
+import {ManagedActionExecutor} from 'lib-admin-ui/managedaction/ManagedActionExecutor';
 
 export abstract class ArchiveProgressDialog
-    extends ArchiveDialog {
+    extends ArchiveDialog
+    implements ManagedActionExecutor {
 
     progressManager: ProgressBarManager;
 
@@ -12,7 +14,7 @@ export abstract class ArchiveProgressDialog
         super.initElements();
 
         this.progressManager = new ProgressBarManager({
-            managingElement: <any>this,
+            managingElement: this,
             processingLabel: this.getProcessingLabelText()
         });
     }
@@ -43,4 +45,8 @@ export abstract class ArchiveProgressDialog
     protected abstract getSuccessTextForSingle(): string;
 
     protected abstract getFailText(): string;
+
+    isExecuting(): boolean {
+        return this.progressManager.isActive();
+    }
 }

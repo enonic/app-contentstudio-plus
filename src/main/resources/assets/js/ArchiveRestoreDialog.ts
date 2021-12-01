@@ -3,6 +3,8 @@ import {RestoreArchivedRequest} from './resource/RestoreArchivedRequest';
 import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
 import {TaskId} from 'lib-admin-ui/task/TaskId';
 import {ArchiveProgressDialog} from './ArchiveProgressDialog';
+import {ArchiveViewItem} from './ArchiveViewItem';
+import {ArchiveHelper} from './ArchiveHelper';
 
 export class ArchiveRestoreDialog
     extends ArchiveProgressDialog {
@@ -45,9 +47,13 @@ export class ArchiveRestoreDialog
     }
 
     protected doAction() {
-        new RestoreArchivedRequest(this.items.map(item => item.getId())).sendAndParse().then((taskId: TaskId) => {
+        new RestoreArchivedRequest(this.getItemsToRestore()).sendAndParse().then((taskId: TaskId) => {
             this.progressManager.pollTask(taskId);
         }).catch(DefaultErrorHandler.handle);
+    }
+
+    private getItemsToRestore(): string[] {
+        return (<ArchiveViewItem[]>ArchiveHelper.filterTopMostItems(this.items)).map((item: ArchiveViewItem) => item.getId());
     }
 
     protected getConfirmValueDialogTitle(): string {

@@ -17,6 +17,7 @@ import {ContentPath} from 'lib-contentstudio/app/content/ContentPath';
 import {ContentId} from 'lib-contentstudio/app/content/ContentId';
 import {NodeServerChangeType} from 'lib-admin-ui/event/NodeServerChange';
 import {ContentServerChangeItem} from 'lib-contentstudio/app/event/ContentServerChangeItem';
+import {ArchiveHelper} from './ArchiveHelper';
 
 export class ArchiveTreeGrid
     extends TreeGrid<ArchiveViewItem> {
@@ -73,28 +74,7 @@ export class ArchiveTreeGrid
     }
 
     private extractTopMostContentItems(event: ArchiveServerEvent): ContentServerChangeItem[] {
-        const itemsToDelete: ContentServerChangeItem[] = [];
-
-        event.getNodeChange().getChangeItems().forEach((eventItem: ContentServerChangeItem) => {
-            const contains: boolean = itemsToDelete.some((itemToDelete: ContentServerChangeItem, index: number) => {
-                if (eventItem.getPath().isDescendantOf(itemToDelete.getPath())) {
-                    return true;
-                }
-
-                if (itemToDelete.getPath().isDescendantOf(eventItem.getPath())) {
-                    itemsToDelete[index] = eventItem;
-                    return true;
-                }
-
-                return false;
-            });
-
-            if (!contains) {
-                itemsToDelete.push(eventItem);
-            }
-        });
-
-        return itemsToDelete;
+        return <ContentServerChangeItem[]>ArchiveHelper.filterTopMostItems(event.getNodeChange().getChangeItems());
     }
 
     refresh() {
