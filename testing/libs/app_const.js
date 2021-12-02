@@ -15,6 +15,10 @@ module.exports = Object.freeze({
         return `Item \"${name}\" is restored`
     },
 
+    itemIsDeleted(name) {
+        return `Item \"${name}\" is deleted`
+    },
+
     itemSavedNotificationMessage: function (name) {
         return `Item \"${name}\" is saved.`
     },

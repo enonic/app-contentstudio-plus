@@ -154,7 +154,7 @@ describe('archive.content.spec: tests for archiving content', function () {
             await archiveBrowsePanel.waitForContentNotDisplayed(FOLDER1.displayName);
             //5. Verify the notification message
             let message = await contentBrowsePanel.waitForNotificationMessage();
-            let expectedMessage = appConst.itemIsRestored(FOLDER2.displayName);
+            let expectedMessage = appConst.itemIsDeleted(FOLDER1.displayName);
             assert.equal(message, expectedMessage, "Expected notification message should appear");
         });
 
