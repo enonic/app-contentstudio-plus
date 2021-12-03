@@ -3,7 +3,6 @@ import {i18nAdd} from 'lib-admin-ui/util/MessagesInitializer';
 import {Body} from 'lib-admin-ui/dom/Body';
 import {ArchiveApp} from './ArchiveApp';
 import {AppWrapper} from 'lib-contentstudio/app/AppWrapper';
-import {Messages} from 'lib-admin-ui/util/Messages';
 
 declare const CONFIG;
 

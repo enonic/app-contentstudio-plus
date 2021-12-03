@@ -22,3 +22,13 @@ exports.post = function () {
         };
     }
 };
+
+exports.get = function () {
+    return {
+        status: 200,
+        contentType: "application/json",
+        body: {
+            hasValidLicense: licenseManager.isCurrentLicenseValid()
+        }
+    };
+}
