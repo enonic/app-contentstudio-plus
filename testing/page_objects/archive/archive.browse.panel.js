@@ -8,7 +8,6 @@ const BaseBrowsePanel = require('../../page_objects/base.browse.panel');
 
 const XPATH = {
     container: "//div[contains(@id,'ArchiveBrowsePanel')]",
-    settingsAppContainer: "//div[contains(@id,'SettingsAppContainer')]",
     toolbar: "//div[contains(@id,'Toolbar')]",
     archiveTreeGrid: `//div[contains(@id,'ArchiveTreeGrid')]`,
     treeGridToolbar: `//div[contains(@id,'TreeGridToolbar')]`,
@@ -179,7 +178,7 @@ class ArchiveBrowsePanel extends BaseBrowsePanel {
         let checkBox = XPATH.checkboxByName(name);
         await this.waitForElementDisplayed(checkBox, appConst.mediumTimeout);
         await this.clickOnElement(checkBox);
-        return await this.pause(300);
+        return await this.pause(500);
     }
 
     async clickOnCheckboxAndSelectRowByName(name) {
