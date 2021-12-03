@@ -359,7 +359,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
     }
 
     waitForContentNotDisplayed(contentName) {
-        return this.waitForElementNotDisplayed(XPATH.treeGrid + lib.itemByName(contentName), appConst.mediumTimeout).catch(err => {
+        return this.waitForElementNotDisplayed(XPATH.treeGrid + lib.itemByName(contentName), appConst.longTimeout).catch(err => {
             throw new Error("Content is still displayed :" + err);
         });
     }
