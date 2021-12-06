@@ -53,8 +53,8 @@ class ArchiveRestoreDialog extends Page {
 
     async waitForClosed() {
         try {
-            await this.waitForElementNotDisplayed(XPATH.container, appConst.mediumTimeout)
-        } catch (error) {
+            await this.waitForElementNotDisplayed(XPATH.container, appConst.longTimeout);
+        } catch (err) {
             await this.saveScreenshot(appConst.generateRandomName('err_restore_dlg_close'));
             throw new Error('Restore from Archive dialog was not closed ' + err);
         }
