@@ -8,13 +8,7 @@ export abstract class LicenseRequest<T>
         super();
     }
 
-    protected generateUrl(): string {
-        // that makes it work from both studio and studio.plus context
-        const idToReplace: string = CONFIG.appId.replace('.plus', '');
-        return CONFIG.services.i18nUrl.replace(new RegExp(`${idToReplace}/`, 'g'), `${idToReplace}.plus/`).replace('i18n', 'license');
-    }
-
     getRequestPath(): Path {
-        return <any>this.generateUrl();
+        return <any>CONFIG.services.licenseUrl;
     }
 }

@@ -13,7 +13,6 @@ declare const CS_PLUS_LAYERS_CONFIG: WidgetConfig;
         if (existingWidget) {
             existingWidget.remove();
         }
-        //const containerEl = Element.fromHtmlElement((container as HTMLElement), true);
 
         const widgetContainerEl = Element.fromHtmlElement((widgetContainer as HTMLElement), true);
 
