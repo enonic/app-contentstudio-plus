@@ -19,6 +19,8 @@ describe('archive.muiltiselect.restore.spec: tests for restore several items', f
 
     let FOLDER1;
     let FOLDER2;
+    const FOLDER_DISPLAY_NAME = appConst.TEST_FOLDER_WITH_IMAGES_2;
+    const FOLDER_NAME = appConst.TEST_FOLDER_WITH_IMAGES_NAME_2;
 
     it(`Precondition: new folders should be added`,
         async () => {
@@ -111,7 +113,7 @@ describe('archive.muiltiselect.restore.spec: tests for restore several items', f
             await archiveRestoreDialog.waitForClosed();
         });
 
-    it(`GIVEN 2 folders are selected in Archive AND Confirm Value dialog has been opened WHEN the restoring has been confirmed THEN both folders should not be present in Archive`,
+    it(`GIVEN 2 folders are selected in Archive AND 'Confirm Value' dialog has been opened WHEN the restoring has been confirmed THEN both folders should not be present in Archive`,
         async () => {
             let archiveRestoreDialog = new ArchiveRestoreDialog();
             let archiveBrowsePanel = new ArchiveBrowsePanel();
@@ -135,6 +137,45 @@ describe('archive.muiltiselect.restore.spec: tests for restore several items', f
             await archiveBrowsePanel.waitForContentNotDisplayed(FOLDER1.displayName);
             await archiveBrowsePanel.waitForContentNotDisplayed(FOLDER2.displayName);
         });
+
+    // Verify https://github.com/enonic/app-contentstudio-plus/issues/346
+    //Error after restoring filtered content #346
+    it(`GIVEN existing archived folder with children items is filtered WHEN the folder has been restored THEN 'Hide Selection' circle gets not visible`,
+        async () => {
+            let contentBrowsePanel = new ContentBrowsePanel();
+            let deleteContentDialog = new DeleteContentDialog();
+            let archiveBrowsePanel = new ArchiveBrowsePanel();
+            let confirmValueDialog = new ConfirmValueDialog();
+            let archiveRestoreDialog = new ArchiveRestoreDialog();
+            //1. Select a folder
+            await studioUtils.findContentAndClickCheckBox(FOLDER_DISPLAY_NAME);
+            //2. Archive this folder with children:
+            await contentBrowsePanel.clickOnArchiveButton();
+            await deleteContentDialog.waitForDialogOpened();
+            await deleteContentDialog.clickOnArchiveButton();
+            await confirmValueDialog.waitForDialogOpened();
+            await confirmValueDialog.typeNumberOrName(11);
+            await confirmValueDialog.clickOnConfirmButton();
+            //3. Navigate to 'Archive Browse Panel' and select the archived content:
+            await studioUtils.openArchivePanel();
+            await studioUtils.saveScreenshot("folder_in_archive1_2");
+            await archiveBrowsePanel.clickOnCheckboxAndSelectRowByName(FOLDER_NAME);
+            //4. Click on 'Show Selection' circle:
+            await archiveBrowsePanel.clickOnSelectionToggler();
+            //5. Open 'Restore from Archive' dialog:
+            await archiveBrowsePanel.clickOnRestoreButton();
+            await archiveRestoreDialog.waitForOpened();
+            await archiveRestoreDialog.clickOnRestoreButton();
+            //5. Confirm the value:
+            await confirmValueDialog.typeNumberOrName(11);
+            await confirmValueDialog.clickOnConfirmButton();
+            await archiveRestoreDialog.waitForClosed();
+            //7. Verify that selection controller(circle) gets not visible in the toolbar:
+            await studioUtils.saveScreenshot("archive_selection_controller_not_visible_2");
+            //TODO uncomment it after the bug will be fixed.
+            //await archiveBrowsePanel.waitForSelectionTogglerNotVisible();
+        });
+
 
     beforeEach(() => studioUtils.navigateToContentStudioApp());
     afterEach(() => studioUtils.doCloseAllWindowTabsAndSwitchToHome());
