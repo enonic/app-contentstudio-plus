@@ -49,9 +49,10 @@ describe('archive.context.panel.spec: tests for archive context panel', function
             await studioUtils.saveScreenshot("archive_context_panel");
             //3. Verify the properties widget
             let actualOwner = await archivedContentPropertiesWidget.getOwner();
+            assert.equal(actualOwner, "su", "Expected owner should be displayed");
             //4. Verify the status widget
             let actualStatus = await archivedContentStatusWidget.getStatus();
-            assert.equal(actualStatus, "Archived", "Expected status status should be displayed");
+            assert.equal(actualStatus, "Archived", "Expected status should be displayed");
         });
 
     it(`GIVEN archived content has been selected WHEN widget dropdown handle has been clicked THEN 2 expected options should be in WidgetSelector dropdown`,
