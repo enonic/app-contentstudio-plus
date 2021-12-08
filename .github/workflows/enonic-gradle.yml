@@ -7,9 +7,9 @@ jobs:
     runs-on: ubuntu-latest
 
     outputs:
-      publish: ${{ github.ref == 'refs/heads/master' && steps.publish_vars.outputs.repo != '' }}
+      publish: ${{ steps.publish_vars.outputs.repo != '' && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/1.')) }}
       repo: ${{ steps.publish_vars.outputs.repo }}
-      release: ${{ github.ref == 'refs/heads/master' && steps.publish_vars.outputs.release == 'true' }}
+      release: ${{ steps.publish_vars.outputs.release == 'true' && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/1.')) }}
       tag_name: ${{ steps.publish_vars.outputs.tag_name }}
       prerelease: ${{ steps.publish_vars.outputs.prerelease }}
       nextSnapshot: ${{ steps.publish_vars.outputs.nextSnapshot }}
