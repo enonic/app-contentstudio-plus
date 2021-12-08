@@ -106,7 +106,7 @@ jobs:
                   SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
                   SLACK_CHANNEL: notif-build-tests
                   SLACK_USERNAME: GitHub Actions
-                  SLACK_TITLE: GitHub Action Failure in Content Studio app ${{ matrix.suite }}
+                  SLACK_TITLE: GitHub Action Failure in Content Studio+ app ${{ matrix.suite }}
                   SLACK_MESSAGE: ${{job.container.id}}
                   SLACK_ICON: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
                   SLACK_COLOR: ${{ job.status }}

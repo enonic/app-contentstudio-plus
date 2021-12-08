@@ -86,7 +86,7 @@ jobs:
                 with:
                     tag_name: ${{ steps.publish_vars.outputs.tag_name }}
                     body_path: changelog.md
-                    release_name: Enonic Content Studio ${{ steps.publish_vars.outputs.version }}
+                    release_name: Enonic Content Studio+ ${{ steps.publish_vars.outputs.version }}
                     prerelease: ${{ steps.publish_vars.outputs.prerelease == 'true' }}
 
 
