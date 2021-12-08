@@ -96,7 +96,7 @@ jobs:
               with:
                   path: './gradle.properties'
                   property: 'version'
-                  value: ${{ needs.publish_vars.outputs.nextSnapshot }}
+                  value: ${{ steps.publish_vars.outputs.nextSnapshot }}
 
             - name: Commit and push new version
               if: steps.publish_vars.outputs.release == 'true'
