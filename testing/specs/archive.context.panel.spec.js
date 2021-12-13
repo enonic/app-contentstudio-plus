@@ -120,7 +120,10 @@ describe('archive.context.panel.spec: tests for archive context panel', function
             //5. Verify that new 'Restored' version-item appears in the widget:
             let actualUser = await browseVersionsWidget.getRestoredBy(0);
             assert.equal(actualUser, "by Super User", "Expected user should be displayed in the 'restored by'");
-            //6. Verify the status in the restored content
+            //6. Verify that 'Archived' version item is present in the widget:
+            actualUser = await browseVersionsWidget.getArchivedBy(0);
+            assert.equal(actualUser, "by Super User", "Expected user should be displayed in the 'restored by'");
+            //7. Verify the status in the restored content
             let status = await browseVersionsWidget.getContentStatus();
             //Verify the content's status in the top of Version Widget
             assert.equal(status, appConst.CONTENT_STATUS.NEW, "'New' status should be after the restoring this content");
