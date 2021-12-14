@@ -7,7 +7,7 @@ const XPATH = {
     widget: "//div[contains(@id,'ContentBrowsePanel')]//div[contains(@id,'VersionHistoryView')]",
     versionsList: "//ul[contains(@id,'VersionHistoryList')]",
     versionItem: "//li[contains(@class,'version-list-item') and child::div[contains(@class,'version-viewer')]]",
-    publishActionItems: "//li[contains(@class,'version-list-item')and child::div[contains(@class,'publish-action')]]",
+    publishedItems: "//li[contains(@id,'VersionHistoryListItem')and descendant::h6[contains(.,'Published')]]",
 };
 
 class BrowseVersionsWidget extends BaseVersionsWidget {
@@ -20,8 +20,8 @@ class BrowseVersionsWidget extends BaseVersionsWidget {
         return this.versionsWidget + XPATH.versionsList + XPATH.versionItem;
     }
 
-    get publishActionItems() {
-        return this.versionsWidget + XPATH.versionsList + XPATH.publishActionItems;
+    get publishedItems() {
+        return this.versionsWidget + XPATH.versionsList + XPATH.publishedItems;
     }
 }
 

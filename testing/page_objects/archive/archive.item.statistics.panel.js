@@ -12,7 +12,7 @@ const XPATH = {
     originalPath: "//div[contains(@class,'original-path')]",
 };
 
-class SettingsItemStatisticsPanel extends Page {
+class ArchiveItemStatisticsPanel extends Page {
 
     get archiveStatus() {
         return XPATH.container + XPATH.archiveToolbar + XPATH.archiveStatus;
@@ -48,4 +48,4 @@ class SettingsItemStatisticsPanel extends Page {
     }
 }
 
-module.exports = SettingsItemStatisticsPanel;
+module.exports = ArchiveItemStatisticsPanel;

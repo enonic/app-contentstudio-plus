@@ -8,6 +8,8 @@ const xpath = {
     container: `//div[contains(@id,'ArchiveBrowsePanel')]//div[contains(@id,'WidgetView')]//div[contains(@id,'PropertiesWidgetItemView')]`,
     languageProperty: "//dd[contains(.,'Language:')]/following-sibling::dt[1]",
     ownerProperty: "//dd[contains(.,'Owner:')]/following-sibling::dt[1]",
+    typeProperty: "//dd[contains(.,'Type:')]/following-sibling::dt[1]",
+    applicationProperty: "//dd[contains(.,'Application:')]/following-sibling::dt[1]",
     firstPublishedProperty: "//dd[contains(.,'First Published:')]/following-sibling::dt[1]",
     archivedProperty: "//dd[contains(.,'Archived:')]/following-sibling::dt[1]",
 };
@@ -20,6 +22,14 @@ class ArchivedContentPropertiesWidget extends Page {
 
     get ownerProperty() {
         return xpath.container + xpath.ownerProperty;
+    }
+
+    get typeProperty() {
+        return xpath.container + xpath.typeProperty;
+    }
+
+    get applicationProperty() {
+        return xpath.container + xpath.applicationProperty;
     }
 
     get firstPublishedProperty() {
@@ -72,6 +82,30 @@ class ArchivedContentPropertiesWidget extends Page {
             await this.refresh();
             await this.pause(2000);
             await this.waitForElementDisplayed(this.ownerProperty, appConst.shortTimeout);
+        }
+    }
+
+    async getType() {
+        try {
+            await this.waitForElementDisplayed(this.typeProperty, appConst.shortTimeout);
+            return await this.getText(this.typeProperty);
+        } catch (err) {
+            //Workaround for the issue with empty details panel in Wizard
+            await this.refresh();
+            await this.pause(2000);
+            await this.waitForElementDisplayed(this.typeProperty, appConst.shortTimeout);
+        }
+    }
+
+    async getApplication() {
+        try {
+            await this.waitForElementDisplayed(this.applicationProperty, appConst.shortTimeout);
+            return await this.getText(this.applicationProperty);
+        } catch (err) {
+            //Workaround for the issue with empty details panel in Wizard
+            await this.refresh();
+            await this.pause(2000);
+            await this.waitForElementDisplayed(this.applicationProperty, appConst.shortTimeout);
         }
     }
 }

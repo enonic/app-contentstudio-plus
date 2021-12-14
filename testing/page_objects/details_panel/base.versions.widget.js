@@ -9,6 +9,8 @@ const xpath = {
     versionsList: "//ul[contains(@id,'VersionHistoryList')]",
     versionItemExpanded: "//li[contains(@class,'version-list-item expanded')]",
     versionItem: "//li[contains(@class,'version-list-item') and not(contains(@class,'publish-action'))]",
+    archivedItems: "//li[contains(@id,'VersionHistoryListItem')and descendant::h6[contains(.,'Archived')]]",
+    restoredItems: "//li[contains(@id,'VersionHistoryListItem')and descendant::h6[contains(.,'Restored')]]",
     versionItemByDisplayName: displayName => `${lib.itemByDisplayName(displayName)}`,
 };
 
@@ -18,6 +20,9 @@ class BaseVersionsWidget extends Page {
         return this.versionsWidget + lib.COMPARE_WITH_CURRENT_VERSION;
     }
 
+    get archivedItems() {
+        return this.versionsWidget + xpath.versionsList + xpath.archivedItems;
+    }
     async countVersionItems() {
         let items = await this.findElements(xpath.versionItem);
         return items.length;
@@ -110,9 +115,8 @@ class BaseVersionsWidget extends Page {
 
     async waitForActiveVersionButtonDisplayed() {
         try {
-
             let locator = xpath.versionItemExpanded + "//button[child::span[text()='Active version']]";
-            await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+            return await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
         } catch (err) {
             await this.saveScreenshot("active_version_button");
             throw new Error("Version Widget -  'Active version' button is not displayed " + err);
@@ -128,6 +132,20 @@ class BaseVersionsWidget extends Page {
             await this.saveScreenshot("active_version_button");
             throw new Error("Version Widget -  'Active version' button should not be displayed " + err);
         }
+    }
+
+    async getArchivedBy(index) {
+        let locator = this.versionsWidget + xpath.archivedItems + lib.P_SUB_NAME;
+        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+        let elements = await this.findElements(locator);
+        return await elements[index].getText();
+    }
+
+    async getRestoredBy(index) {
+        let locator = this.versionsWidget + xpath.restoredItems + lib.P_SUB_NAME;
+        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+        let elements = await this.findElements(locator);
+        return await elements[index].getText();
     }
 }
 
