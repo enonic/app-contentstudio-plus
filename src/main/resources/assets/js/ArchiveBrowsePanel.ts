@@ -16,6 +16,14 @@ export class ArchiveBrowsePanel
 
     protected contextView: ArchiveContextView;
 
+    doRender(): Q.Promise<boolean> {
+        return super.doRender().then((rendered: boolean) => {
+            this.addClass('archive-browse-panel');
+
+            return rendered;
+        });
+    }
+
     protected initElements(): void {
         super.initElements();
 
@@ -23,8 +31,8 @@ export class ArchiveBrowsePanel
         this.browseToolbar.appendChild(new NonMobileContextPanelToggleButton());
     }
 
-    protected updateContextView(item: ArchiveContentViewItem) {
-        this.contextView.setItem(item?.getData());
+    protected updateContextView(item: ArchiveContentViewItem): void {
+        void this.contextView.setItem(item?.getData());
         this.contextView.setArchiveItem(item);
     }
 
@@ -34,14 +42,6 @@ export class ArchiveBrowsePanel
 
     protected createBrowseItemPanel(): BrowseItemPanel {
         return new ArchiveBrowseItemPanel();
-    }
-
-    doRender(): Q.Promise<boolean> {
-        return super.doRender().then((rendered: boolean) => {
-            this.addClass('archive-browse-panel');
-
-            return rendered;
-        });
     }
 
     protected togglePreviewPanelDependingOnScreenSize(): void {

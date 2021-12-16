@@ -13,11 +13,6 @@ export class ArchiveWidgetItemView
         this.initViewer();
     }
 
-    private initViewer() {
-        this.viewer = new ArchiveContentViewer();
-        this.appendChild(this.viewer);
-    }
-
     getViewer(): ArchiveContentViewer {
         return this.viewer;
     }
@@ -38,5 +33,10 @@ export class ArchiveWidgetItemView
 
     whenRendered(callback: () => void): void {
         this.viewer.whenRendered(callback);
+    }
+
+    private initViewer(): void {
+        this.viewer = new ArchiveContentViewer();
+        this.appendChild(this.viewer);
     }
 }

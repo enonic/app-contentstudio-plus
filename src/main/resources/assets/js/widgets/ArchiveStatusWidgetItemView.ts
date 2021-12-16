@@ -15,12 +15,12 @@ export class ArchiveStatusWidgetItemView
         super('status-widget-item-view');
     }
 
-    public setContentAndUpdateView(item: ContentSummaryAndCompareStatus): Q.Promise<any> {
+    public setContentAndUpdateView(item: ContentSummaryAndCompareStatus): Q.Promise<void> {
         this.content = item;
         return this.layout();
     }
 
-    public layout(): Q.Promise<any> {
+    public layout(): Q.Promise<void> {
         return super.layout().then(() => {
             if (!this.statusEl) {
                 this.statusEl = new SpanEl();

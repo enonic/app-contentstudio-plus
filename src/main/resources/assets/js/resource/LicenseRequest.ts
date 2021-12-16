@@ -9,6 +9,6 @@ export abstract class LicenseRequest<T>
     }
 
     getRequestPath(): Path {
-        return <any>CONFIG.services.licenseUrl;
+        return Path.fromString(CONFIG.services.licenseUrl);
     }
 }

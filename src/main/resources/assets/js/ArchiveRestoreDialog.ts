@@ -14,7 +14,22 @@ export class ArchiveRestoreDialog
     constructor() {
         super({
             title: i18n('dialog.restore.archive.title'),
-            class: 'archive-restore-dialog'
+            class: 'archive-restore-dialog',
+        });
+    }
+
+    static getInstance(): ArchiveRestoreDialog {
+        if (!ArchiveRestoreDialog.INSTANCE) {
+            ArchiveRestoreDialog.INSTANCE = new ArchiveRestoreDialog();
+        }
+
+        return ArchiveRestoreDialog.INSTANCE;
+    }
+
+    doRender(): Q.Promise<boolean> {
+        return super.doRender().then((rendered: boolean) => {
+            this.confirmValueDialog.addClass('confirm-restore');
+            return rendered;
         });
     }
 
@@ -46,14 +61,10 @@ export class ArchiveRestoreDialog
         return i18n('action.restore');
     }
 
-    protected doAction() {
+    protected doAction(): void {
         new RestoreArchivedRequest(this.getItemsToRestore()).sendAndParse().then((taskId: TaskId) => {
             this.progressManager.pollTask(taskId);
         }).catch(DefaultErrorHandler.handle);
-    }
-
-    private getItemsToRestore(): string[] {
-        return (<ArchiveViewItem[]>ArchiveHelper.filterTopMostItems(this.items)).map((item: ArchiveViewItem) => item.getId());
     }
 
     protected getConfirmValueDialogTitle(): string {
@@ -64,19 +75,8 @@ export class ArchiveRestoreDialog
         return i18n('dialog.confirmRestore.subtitle');
     }
 
-    doRender(): Q.Promise<boolean> {
-        return super.doRender().then((rendered: boolean) => {
-            this.confirmValueDialog.addClass('confirm-restore');
-            return rendered;
-        });
-    }
-
-    static getInstance(): ArchiveRestoreDialog {
-        if (!ArchiveRestoreDialog.INSTANCE) {
-            ArchiveRestoreDialog.INSTANCE = new ArchiveRestoreDialog();
-        }
-
-        return ArchiveRestoreDialog.INSTANCE;
+    private getItemsToRestore(): string[] {
+        return (<ArchiveViewItem[]>ArchiveHelper.filterTopMostItems(this.items)).map((item: ArchiveViewItem) => item.getId());
     }
 
 }

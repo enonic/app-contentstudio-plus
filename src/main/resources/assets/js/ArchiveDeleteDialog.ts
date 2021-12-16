@@ -14,8 +14,16 @@ export class ArchiveDeleteDialog
     constructor() {
         super({
             title: i18n('dialog.delete.archive.title'),
-            class: 'archive-delete-dialog'
+            class: 'archive-delete-dialog',
         });
+    }
+
+    static getInstance(): ArchiveDeleteDialog {
+        if (!ArchiveDeleteDialog.INSTANCE) {
+            ArchiveDeleteDialog.INSTANCE = new ArchiveDeleteDialog();
+        }
+
+        return ArchiveDeleteDialog.INSTANCE;
     }
 
     protected getSubtitle(): string {
@@ -30,7 +38,7 @@ export class ArchiveDeleteDialog
         return i18n('dialog.deleteNow');
     }
 
-    protected doAction() {
+    protected doAction(): void {
         const request: DeleteContentRequest = new DeleteContentRequest();
         request.setContentRootPath(ArchiveResourceRequest.ARCHIVE_PATH);
 
@@ -47,14 +55,6 @@ export class ArchiveDeleteDialog
 
     protected getConfirmValueDialogSubTitle(): string {
         return i18n('dialog.confirmDelete.subtitle');
-    }
-
-    static getInstance(): ArchiveDeleteDialog {
-        if (!ArchiveDeleteDialog.INSTANCE) {
-            ArchiveDeleteDialog.INSTANCE = new ArchiveDeleteDialog();
-        }
-
-        return ArchiveDeleteDialog.INSTANCE;
     }
 
     protected getProcessingLabelText(): string {

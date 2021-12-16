@@ -90,6 +90,7 @@ export class ArchiveItemsList extends ListBox<ContentSummaryAndCompareStatus> {
                 this.addItems(items);
                 this.removeClass(ArchiveItemsList.LOADING_CLASS);
             })
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             .catch((error: any) => {
                 DefaultErrorHandler.handle(error);
                 this.loading = false; // not using finally because need to set loading to false before setting items

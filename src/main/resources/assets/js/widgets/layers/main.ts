@@ -14,11 +14,11 @@ declare const CS_PLUS_LAYERS_CONFIG: WidgetConfig;
             existingWidget.remove();
         }
 
-        const widgetContainerEl = Element.fromHtmlElement((widgetContainer as HTMLElement), true);
+        const widgetContainerEl = Element.fromHtmlElement((widgetContainer), true);
 
         const widget = new LayersWidget(CS_PLUS_LAYERS_CONFIG);
         widgetContainerEl.appendChild(widget);
 
-        widget.render();
+        void widget.render();
     }
 })();

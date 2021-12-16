@@ -36,7 +36,13 @@ export class ArchiveTreeGrid
         this.initListeners();
     }
 
-    protected initListeners() {
+    refresh(): void {
+        this.deselectAll();
+        void this.reload();
+        void this.treeGridActions.updateActionsEnabledState([]);
+    }
+
+    protected initListeners(): void {
         ArchiveServerEvent.on((event: ArchiveServerEvent) => {
             const type: NodeServerChangeType = event.getNodeChange().getChangeType();
 
@@ -55,7 +61,7 @@ export class ArchiveTreeGrid
             }
         });
 
-        let isRefreshTriggered: boolean = false;
+        let isRefreshTriggered = false;
 
         ContentServerEventsHandler.getInstance().onContentArchived(() => {
             if (!isRefreshTriggered) {
@@ -73,18 +79,16 @@ export class ArchiveTreeGrid
         });
     }
 
-    private extractTopMostContentItems(event: ArchiveServerEvent): ContentServerChangeItem[] {
-        return <ContentServerChangeItem[]>ArchiveHelper.filterTopMostItems(event.getNodeChange().getChangeItems());
-    }
-
-    refresh() {
-        this.deselectAll();
-        this.reload();
-        this.treeGridActions.updateActionsEnabledState([]);
-    }
-
     protected fetchChildren(parentNode?: TreeNode<ArchiveViewItem>): Q.Promise<ArchiveViewItem[]> {
         return this.fetchContentChildren(parentNode || this.getRoot().getCurrentRoot());
+    }
+
+    protected isEmptyNode(node: TreeNode<ArchiveViewItem>): boolean {
+        return !node.getData().getData().getContentSummary();
+    }
+
+    protected hasChildren(item: ArchiveViewItem): boolean {
+        return item.hasChildren();
     }
 
     private fetchContentChildren(parentNode: TreeNode<ArchiveViewItem>): Q.Promise<ArchiveViewItem[]> {
@@ -116,7 +120,7 @@ export class ArchiveTreeGrid
             });
     }
 
-    private removeEmptyNode(parentNode: TreeNode<ArchiveViewItem>) {
+    private removeEmptyNode(parentNode: TreeNode<ArchiveViewItem>): void {
         if (parentNode.hasChildren() && this.isEmptyNode(parentNode.getChildren()[parentNode.getChildren().length - 1])) {
             parentNode.getChildren().pop();
         }
@@ -143,11 +147,7 @@ export class ArchiveTreeGrid
         return `${originalParentPath}${separator}${originalName}`;
     }
 
-    protected isEmptyNode(node: TreeNode<ArchiveViewItem>): boolean {
-        return !node.getData().getData().getContentSummary();
-    }
-
-    protected hasChildren(item: ArchiveViewItem): boolean {
-        return item.hasChildren();
+    private extractTopMostContentItems(event: ArchiveServerEvent): ContentServerChangeItem[] {
+        return <ContentServerChangeItem[]>ArchiveHelper.filterTopMostItems(event.getNodeChange().getChangeItems());
     }
 }

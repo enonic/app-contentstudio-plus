@@ -26,7 +26,17 @@ export class ArchiveContextView
 
     getCustomWidgetViewsAndUpdateDropdown(): Q.Promise<void> {
         this.widgetsSelectionRow.updateWidgetsDropdown(this.widgetViews);
-        return Q(null);
+        return Q();
+    }
+
+    setArchiveItem(item: ArchiveContentViewItem): void {
+        this.archiveItem = item;
+
+        if (item) {
+            this.archiveWidgetItemView.whenRendered(() => {
+                this.archiveWidgetItemView.setSubName(item.getOriginalFullPath());
+            });
+        }
     }
 
     protected getInitialWidgets(): WidgetView[] {
@@ -41,17 +51,7 @@ export class ArchiveContextView
             this.archiveWidgetItemView,
             new ArchiveStatusWidgetItemView(),
             this.propertiesWidgetItemView,
-            new AttachmentsWidgetItemView().setContentRootPath(ContentPath.ARCHIVE_ROOT)
+            new AttachmentsWidgetItemView().setContentRootPath(ContentPath.ARCHIVE_ROOT),
         ];
-    }
-
-    setArchiveItem(item: ArchiveContentViewItem) {
-        this.archiveItem = item;
-
-        if (item) {
-            this.archiveWidgetItemView.whenRendered(() => {
-                this.archiveWidgetItemView.setSubName(item.getOriginalFullPath());
-            });
-        }
     }
 }

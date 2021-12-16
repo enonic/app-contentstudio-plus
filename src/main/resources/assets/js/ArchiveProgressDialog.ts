@@ -10,16 +10,18 @@ export abstract class ArchiveProgressDialog
 
     progressManager: ProgressBarManager;
 
+    isExecuting(): boolean {
+        return this.progressManager.isActive();
+    }
+
     protected initElements(): void {
         super.initElements();
 
         this.progressManager = new ProgressBarManager({
             managingElement: this,
-            processingLabel: this.getProcessingLabelText()
+            processingLabel: this.getProcessingLabelText(),
         });
     }
-
-    protected abstract getProcessingLabelText(): string;
 
     protected initListeners(): void {
         super.initListeners();
@@ -36,17 +38,15 @@ export abstract class ArchiveProgressDialog
         this.progressManager.setSuppressNotifications(true);
     }
 
-    protected executeAction() {
+    protected executeAction(): void {
         this.doAction();
     }
+
+    protected abstract getProcessingLabelText(): string;
 
     protected abstract getSuccessTextForMultiple(): string;
 
     protected abstract getSuccessTextForSingle(): string;
 
     protected abstract getFailText(): string;
-
-    isExecuting(): boolean {
-        return this.progressManager.isActive();
-    }
 }

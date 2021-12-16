@@ -16,16 +16,16 @@ export class ArchiveNoLicenseBlock
         this.initElements();
     }
 
-    private initElements(): void {
-        this.textBlock = new SpanEl('text').setHtml(i18n('notify.archive.license.missing'));
-        this.uploaderEl = new ArchiveLicenseUploadEl();
-    }
-
     doRender(): Q.Promise<boolean> {
         return super.doRender().then((rendered: boolean) => {
             this.appendChildren(this.textBlock, this.uploaderEl);
 
             return rendered;
         });
+    }
+
+    private initElements(): void {
+        this.textBlock = new SpanEl('text').setHtml(i18n('notify.archive.license.missing'));
+        this.uploaderEl = new ArchiveLicenseUploadEl();
     }
 }

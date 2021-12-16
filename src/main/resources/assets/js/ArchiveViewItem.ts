@@ -2,7 +2,7 @@ import {Equitable} from 'lib-admin-ui/Equitable';
 import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
 import {ViewItem} from 'lib-admin-ui/app/view/ViewItem';
 import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
-import { ContentPath } from 'lib-contentstudio/app/content/ContentPath';
+import {ContentPath} from 'lib-contentstudio/app/content/ContentPath';
 
 export abstract class ArchiveViewItem implements ViewItem {
 
@@ -42,14 +42,6 @@ export abstract class ArchiveViewItem implements ViewItem {
         return this.data.getContentSummary()?.getId();
     }
 
-    abstract getDisplayName(): string;
-
-    abstract getIconClass();
-
-    abstract getIconUrl();
-
-    abstract hasChildren(): boolean;
-
     getData(): ContentSummaryAndCompareStatus {
         return this.data;
     }
@@ -57,6 +49,14 @@ export abstract class ArchiveViewItem implements ViewItem {
     getPath(): ContentPath {
         return this.data?.getPath();
     }
+
+    abstract getDisplayName(): string;
+
+    abstract getIconClass();
+
+    abstract getIconUrl();
+
+    abstract hasChildren(): boolean;
 }
 
 export abstract class ArchiveViewItemBuilder {

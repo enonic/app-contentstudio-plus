@@ -24,6 +24,22 @@ export class ArchiveLicenseUploadEl
         this.initListeners();
     }
 
+    doRender(): Q.Promise<boolean> {
+        return super.doRender().then((rendered: boolean) => {
+            this.appendChildren(this.label, this.input);
+
+            return rendered;
+        });
+    }
+
+    onUploadFinished(listener: (isValid: boolean) => void): void {
+        this.uploadFinishedListeners.push(listener);
+    }
+
+    unUploadFinished(listener: (isValid: boolean) => void): void {
+        this.uploadFinishedListeners = this.uploadFinishedListeners.filter(curr => curr !== listener);
+    }
+
     private initListeners(): void {
         this.input.getEl().addEventListener('change', () => {
             this.uploadLicense();
@@ -31,7 +47,7 @@ export class ArchiveLicenseUploadEl
     }
 
     private uploadLicense(): void {
-        let isValid: boolean = false;
+        let isValid = false;
 
         new UploadLicenseRequest((<HTMLInputElement>this.input.getHTMLElement()).files[0]).sendAndParse().then(
             (isValidLicense: boolean) => {
@@ -47,23 +63,7 @@ export class ArchiveLicenseUploadEl
         });
     }
 
-    doRender(): Q.Promise<boolean> {
-        return super.doRender().then((rendered: boolean) => {
-            this.appendChildren(this.label, this.input);
-
-            return rendered;
-        });
-    }
-
-    private notifyUploadFinished(isValid: boolean) {
+    private notifyUploadFinished(isValid: boolean): void {
         this.uploadFinishedListeners.forEach(listener => listener(isValid));
-    }
-
-    public onUploadFinished(listener: (isValid: boolean) => void) {
-        this.uploadFinishedListeners.push(listener);
-    }
-
-    public unUploadFinished(listener: (isValid: boolean) => void) {
-        this.uploadFinishedListeners = this.uploadFinishedListeners.filter(curr => curr !== listener);
     }
 }

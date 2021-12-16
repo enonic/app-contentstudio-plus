@@ -11,7 +11,7 @@ export class ArchiveNoLicenseDialog
     constructor() {
         super({
             title: i18n('dialog.archive.license.missing'),
-            class: 'archive-no-license-dialog'
+            class: 'archive-no-license-dialog',
         });
 
         this.licenseUploadEl = new ArchiveLicenseUploadEl();
