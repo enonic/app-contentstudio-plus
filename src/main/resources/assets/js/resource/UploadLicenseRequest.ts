@@ -2,6 +2,8 @@ import {HttpMethod} from 'lib-admin-ui/rest/HttpMethod';
 import {LicenseRequest} from './LicenseRequest';
 import {Response} from 'lib-admin-ui/rest/Response';
 
+interface LicenseParams { license: File }
+
 export class UploadLicenseRequest
     extends LicenseRequest<boolean> {
 
@@ -15,9 +17,9 @@ export class UploadLicenseRequest
         this.file = file;
     }
 
-    getParams(): Object {
+    getParams(): LicenseParams {
         return {
-            license: this.file
+            license: this.file,
         };
     }
 

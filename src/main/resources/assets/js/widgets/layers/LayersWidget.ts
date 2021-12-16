@@ -42,9 +42,8 @@ export class LayersWidget
         const layersWidgetItemView: LayersWidgetItemView = new LayersWidgetItemView();
 
         this.fetchContent().then((content: ContentSummaryAndCompareStatus) => {
-            layersWidgetItemView.setContentAndUpdateView(content);
+            void layersWidgetItemView.setContentAndUpdateView(content);
             this.appendChild(layersWidgetItemView);
-            return Q(null);
         }).catch(DefaultErrorHandler.handle);
     }
 

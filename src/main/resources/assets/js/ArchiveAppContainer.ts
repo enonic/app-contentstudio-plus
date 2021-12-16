@@ -35,7 +35,19 @@ export class ArchiveAppContainer
         }).catch(DefaultErrorHandler.handle);
     }
 
-    private handleValidationCheckResult(isValid: boolean) {
+    protected appendElements(): void {
+        //
+    }
+
+    protected createAppBar(application: Application): AppBar {
+        return new ArchiveAppBar(application);
+    }
+
+    protected createAppPanel(): AppPanel {
+        return new ArchiveAppPanel();
+    }
+
+    private handleValidationCheckResult(isValid: boolean): void {
         if (isValid) {
             this.handleValidLicenseLoaded();
         } else {
@@ -63,18 +75,6 @@ export class ArchiveAppContainer
         });
 
         this.show();
-    }
-
-    protected appendElements(): void {
-        //
-    }
-
-    protected createAppBar(application: Application): AppBar {
-        return new ArchiveAppBar(application);
-    }
-
-    protected createAppPanel(): AppPanel {
-        return new ArchiveAppPanel();
     }
 
 }
