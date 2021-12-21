@@ -35,7 +35,7 @@ export class ArchiveDeleteDialog
     }
 
     protected getArchiveActionTitle(): string {
-        return i18n('dialog.deleteNow');
+        return i18n('dialog.delete');
     }
 
     protected doAction(): void {
