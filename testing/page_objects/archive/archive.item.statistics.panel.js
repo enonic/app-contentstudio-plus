@@ -9,7 +9,7 @@ const XPATH = {
     container: "//div[contains(@id,'ArchiveItemStatisticsPanel')]",
     archiveToolbar: "//div[contains(@id,'ArchiveItemPreviewToolbar')]",
     archiveStatus: "//div[@class='archived']",
-    originalPath: "//div[contains(@class,'original-path')]",
+    originalPath: "//span[contains(@class,'original-path-value')]",
 };
 
 class ArchiveItemStatisticsPanel extends Page {
