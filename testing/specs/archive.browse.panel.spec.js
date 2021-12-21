@@ -10,9 +10,11 @@ const studioUtils = require('../libs/studio.utils.js');
 const contentBuilder = require("../libs/content.builder");
 const DeleteContentDialog = require('../page_objects/delete.content.dialog');
 const ArchiveBrowsePanel = require('../page_objects/archive/archive.browse.panel');
+const ArchiveItemStatisticsPanel = require('../page_objects/archive/archive.item.statistics.panel');
 const ConfirmValueDialog = require('../page_objects/confirm.content.delete.dialog');
 const ArchiveRestoreDialog = require('../page_objects/archive/archive.restore.dialog');
 const ArchiveDeleteDialog = require('../page_objects/archive/archive.delete.dialog');
+const ArchiveContentWidgetItemView = require('../page_objects/archive/archive.widget.item.view');
 
 describe('archive.browse.panel.spec: tests for archive browse panel and selection controller', function () {
     this.timeout(appConst.SUITE_TIMEOUT);
@@ -79,6 +81,29 @@ describe('archive.browse.panel.spec: tests for archive browse panel and selectio
             //3. Verify buttons:
             await archiveBrowsePanel.waitForDeleteButtonEnabled();
             await archiveBrowsePanel.waitForRestoreButtonEnabled();
+        });
+
+    //Verify https://github.com/enonic/app-contentstudio-plus/issues/316
+    //Workflow state should not be displayed in Archive #316
+    it("WHEN a folder has been selected THEN expected path and status should be displayed in the Item Statistics panel",
+        async () => {
+            //1. Navigate to 'Archive Browse Panel' and check the archived content:
+            await studioUtils.openArchivePanel();
+            let archiveBrowsePanel = new ArchiveBrowsePanel();
+            let archiveItemStatisticsPanel = new ArchiveItemStatisticsPanel();
+            let contentWidgetItemView = new ArchiveContentWidgetItemView();
+            await archiveBrowsePanel.clickOnCheckboxAndSelectRowByName(FOLDER1.displayName);
+            //2. Verify the path and status of the content:
+            let path = await archiveItemStatisticsPanel.getPath();
+            assert.equal(path, `/${FOLDER1.displayName}`, "Expected path should be displayed in Item Statistics panel");
+            let status = await archiveItemStatisticsPanel.getStatus();
+            assert.isTrue(status.includes("Archived"), "Archived status should be displayed in Item Statistics panel");
+            assert.isTrue(status.includes("by Super User"), "'by Super User' should be displayed in Item Statistics panel");
+            //3. Verify that workflow icon is not displayed:
+            await contentWidgetItemView.waitForWorkflowStateNotDisplayed();
+            //4. Verify the name in the content widget:
+            let actualDisplayName = await contentWidgetItemView.getContentDisplayName();
+            assert.equal(actualDisplayName, FOLDER1.displayName, "Expected content name should be displayed on thr panel");
         });
 
     it(`GIVEN 2 folders are selected AND selection controller has been clicked WHEN both folders have been deleted THEN selection controller(circle) gets not visible`,
