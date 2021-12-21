@@ -19,11 +19,11 @@ export class ArchiveApp
         return i18n('app.archive');
     }
 
-    protected createAppContainer(): AppContainer {
-        return new ArchiveAppContainer();
-    }
-
     getUrlPath(): string {
         return 'archive';
+    }
+
+    protected createAppContainer(): AppContainer {
+        return new ArchiveAppContainer();
     }
 }
