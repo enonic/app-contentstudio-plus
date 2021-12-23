@@ -22,4 +22,8 @@ export class ArchiveApp
     protected createAppContainer(): AppContainer {
         return new ArchiveAppContainer();
     }
+
+    getUrlPath(): string {
+        return 'archive';
+    }
 }
