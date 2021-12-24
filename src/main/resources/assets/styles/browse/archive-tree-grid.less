@@ -35,9 +35,6 @@
             flex-grow: 1;
 
             .viewer {
-              max-width: calc(100% - 36px);
-              overflow: visible;
-
               .@{_COMMON_PREFIX}wrapper {
                 flex-shrink: 0;
               }
@@ -46,6 +43,12 @@
 
           &.status {
             flex-basis: 75px;
+            display: flex;
+            justify-content: center;
+
+            span {
+              .ellipsis();
+            }
           }
 
           &.status,
