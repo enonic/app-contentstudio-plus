@@ -16,10 +16,11 @@ ext {
     unpackDir = "$buildDir/install"
     xpVersion='7.8.0-SNAPSHOT'
     distroDir = "$unpackDir/enonic-xp-generic-$xpVersion"
-    deployDir = "$distroDir/home/deploy"
     appDir = "$projectDir/test-applications"
     seleniumDir = "$projectDir/test-applications/selenium"
     xpHome = "$distroDir/home"
+    deployDir = "$xpHome/deploy"
+    licenseDir = "$xpHome/license"
     configDir = "$xpHome/config"
     xpServer = new ServerInstance()
     contentStudioFile = "$deployDir/contentstudio-${version}.jar"
@@ -39,8 +40,20 @@ task unpackDistro( type: Copy ) {
     into file( unpackDir )
 }
 
+task copyLicense( type: Copy ) {
+    doLast {
+        println "Copy license"
+    }
+    from file (rootProject.projectDir)
+    include 'enonic.platform.subscription.lic'
+    into file( licenseDir )
+    mustRunAfter unpackDistro
+}
+
 task copyConfig( type: Copy ) {
-    println "$appDir${File.separator}common-config"
+    doLast {
+        println "$appDir${File.separator}common-config"
+    }
     from "$appDir${File.separator}common-config"
     include '**.*.cfg'
     include '*.properties'
@@ -49,11 +62,13 @@ task copyConfig( type: Copy ) {
 }
 
 task copyApps( type: Copy ) {
-    println '*********************************************************'
-    println '* task started:copyApps  *'
-    println '*********************************************************'
-    println appDir
-    println deployDir
+    doLast {
+        println '*********************************************************'
+        println '* task started:copyApps  *'
+        println '*********************************************************'
+        println appDir
+        println deployDir
+    }
     from file( appDir )
     include '*.jar'
     into file( deployDir )
@@ -106,7 +121,7 @@ task deployContentStudioPlus( type: DefaultTask ) {
 }
 
 
-task startServer( dependsOn: [unpackDistro, copyConfig, deployContentStudio,deployContentStudioPlus] ) {
+task startServer( dependsOn: [unpackDistro, copyConfig, copyLicense, deployContentStudio, deployContentStudioPlus] ) {
     doLast {
         xpServer.installDir = file( distroDir )
         xpServer.start()
