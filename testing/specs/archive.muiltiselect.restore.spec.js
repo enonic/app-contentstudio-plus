@@ -172,8 +172,7 @@ describe('archive.muiltiselect.restore.spec: tests for restore several items', f
             await archiveRestoreDialog.waitForClosed();
             //7. Verify that selection controller(circle) gets not visible in the toolbar:
             await studioUtils.saveScreenshot("archive_selection_controller_not_visible_2");
-            //TODO uncomment it after the bug will be fixed.
-            //await archiveBrowsePanel.waitForSelectionTogglerNotVisible();
+            await archiveBrowsePanel.waitForSelectionTogglerNotVisible();
         });
 
 
