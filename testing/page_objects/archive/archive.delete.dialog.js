@@ -6,7 +6,7 @@ const lib = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
 const XPATH = {
     container: `//div[contains(@id,'ArchiveDeleteDialog')]`,
-    deleteNowButton: `//button[contains(@id,'DialogButton') and child::span[contains(.,'Delete Now')]]`,
+    deleteButton: `//button[contains(@id,'DialogButton') and child::span[contains(.,'Delete')]]`,
     childListToDelete: "//ul[contains(@id,'ArchiveItemsList')]",
     header: `//div[contains(@id,'DefaultModalDialogHeader')]`,
     dialogItemList: "//ul[contains(@id,'ArchiveDialogItemList')]",
@@ -18,8 +18,8 @@ class ArchiveDeleteDialog extends Page {
         return XPATH.container + XPATH.header + "//h2[@class='title']";
     }
 
-    get deleteNowButton() {
-        return XPATH.container + XPATH.deleteNowButton;
+    get deleteButton() {
+        return XPATH.container + XPATH.deleteButton;
     }
 
     get cancelButton() {
@@ -51,7 +51,7 @@ class ArchiveDeleteDialog extends Page {
 
     async waitForOpened() {
         try {
-            await this.waitForElementDisplayed(this.deleteNowButton, appConst.mediumTimeout)
+            await this.waitForElementDisplayed(this.deleteButton, appConst.mediumTimeout)
         } catch (err) {
             await this.saveScreenshot(appConst.generateRandomName('err_restore_dlg'));
             throw new Error('Restore from Archive dialog was not loaded! ' + err);
@@ -71,13 +71,13 @@ class ArchiveDeleteDialog extends Page {
         return this.getText(this.title);
     }
 
-    async clickOnDeleteNowButton() {
-        await this.waitForDeleteNowButtonDisplayed();
-        return await this.clickOnElement(this.deleteNowButton);
+    async clickOnDeleteButton() {
+        await this.waitForDeleteButtonDisplayed();
+        return await this.clickOnElement(this.deleteButton);
     }
 
-    waitForDeleteNowButtonDisplayed() {
-        return this.waitForElementDisplayed(this.deleteNowButton, appConst.mediumTimeout);
+    waitForDeleteButtonDisplayed() {
+        return this.waitForElementDisplayed(this.deleteButton, appConst.mediumTimeout);
     }
 
     getChildItemsToDeletePath() {

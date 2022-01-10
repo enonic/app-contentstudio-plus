@@ -125,8 +125,8 @@ describe('archive.content.spec: tests for archiving content', function () {
             await archiveBrowsePanel.clickOnMenuItem(appConst.GRID_CONTEXT_MENU.DELETE);
             await archiveDeleteDialog.waitForOpened();
             await studioUtils.saveScreenshot("delete_archive_dialog");
-            //3. 'Delete now' button and expected title should be displayed in the dialog:
-            await archiveDeleteDialog.waitForDeleteNowButtonDisplayed();
+            //3. 'Delete' button and expected title should be displayed in the dialog:
+            await archiveDeleteDialog.waitForDeleteButtonDisplayed();
             let title = await archiveDeleteDialog.getTitleInHeader();
             assert.equal(title, ARCHIVE_DELETE_TITLE, "Expected title should be present in the dialog");
             let actualItems = await archiveDeleteDialog.getItemsToDeleteDisplayName();
@@ -135,7 +135,7 @@ describe('archive.content.spec: tests for archiving content', function () {
 
     //Verifies https://github.com/enonic/app-contentstudio-plus/issues/300
     //Notification message should appear after deleting content from Archive #300
-    it(`GIVEN existing archived folder is selected AND 'Delete...' context menu item has been clicked WHEN 'Delete now' button has been pressed in the modal dialog THEN the folder should be removed from Archive`,
+    it(`GIVEN existing archived folder is selected AND 'Delete...' context menu item has been clicked WHEN 'Delete' button has been pressed in the modal dialog THEN the folder should be removed from Archive`,
         async () => {
             let contentBrowsePanel = new ContentBrowsePanel();
             let archiveDeleteDialog = new ArchiveDeleteDialog();
@@ -148,8 +148,8 @@ describe('archive.content.spec: tests for archiving content', function () {
             await archiveBrowsePanel.clickOnMenuItem(appConst.GRID_CONTEXT_MENU.DELETE);
             await archiveDeleteDialog.waitForOpened();
             await studioUtils.saveScreenshot("folder_to_delete");
-            //3. Click on 'Delete Now' button in the modal dialog:
-            await archiveDeleteDialog.clickOnDeleteNowButton();
+            //3. Click on 'Delete' button in the modal dialog:
+            await archiveDeleteDialog.clickOnDeleteButton();
             //4. Verify that the content is not displayed in Archive Browse Panel:
             await archiveBrowsePanel.waitForContentNotDisplayed(FOLDER1.displayName);
             //5. Verify the notification message
