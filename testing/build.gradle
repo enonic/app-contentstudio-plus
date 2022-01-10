@@ -14,7 +14,7 @@ configurations {
 
 ext {
     unpackDir = "$buildDir/install"
-    xpVersion='7.8.0-SNAPSHOT'
+    xpVersion='7.9.0-SNAPSHOT'
     distroDir = "$unpackDir/enonic-xp-generic-$xpVersion"
     appDir = "$projectDir/test-applications"
     seleniumDir = "$projectDir/test-applications/selenium"
