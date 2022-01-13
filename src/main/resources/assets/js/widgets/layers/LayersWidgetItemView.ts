@@ -10,6 +10,12 @@ import {LayersContentTreeDialog} from './dialog/LayersContentTreeDialog';
 import {ProjectCreatedEvent} from 'lib-contentstudio/app/settings/event/ProjectCreatedEvent';
 import {ProjectUpdatedEvent} from 'lib-contentstudio/app/settings/event/ProjectUpdatedEvent';
 import {ProjectDeletedEvent} from 'lib-contentstudio/app/settings/event/ProjectDeletedEvent';
+import {Store} from 'lib-admin-ui/store/Store';
+import {ContentServerEventsHandler} from 'lib-contentstudio/app/event/ContentServerEventsHandler';
+import {ContentServerChangeItem} from 'lib-contentstudio/app/event/ContentServerChangeItem';
+import {ContentId} from 'lib-contentstudio/app/content/ContentId';
+
+export const LAYERS_WIDGET_ITEM_VIEW = 'LayersWidgetItemView';
 
 export class LayersWidgetItemView
     extends DivEl {
@@ -20,9 +26,11 @@ export class LayersWidgetItemView
 
     private readonly loader: MultiLayersContentLoader;
 
-    private items: LayerContent[] = [];
+    private layerContentItems: LayerContent[] = [];
 
-    constructor() {
+    private item: ContentSummaryAndCompareStatus;
+
+    private constructor() {
         super('layers-widget-item-view');
 
         this.layersView = new LayersView();
@@ -36,26 +44,72 @@ export class LayersWidgetItemView
 
     private initListeners(): void {
         this.showAllButton.getAction().onExecuted(() => {
-            LayersContentTreeDialog.get().setItems(this.items).open();
+            LayersContentTreeDialog.get().setItems(this.layerContentItems).open();
         });
 
-        const updateHandler: () => void = () => {
+        this.listenProjectEvents();
+        this.listenContentEvents();
+    }
+
+    private listenProjectEvents(): void {
+        const projectUpdateHandler: () => void = () => {
             if (this.isVisible()) {
                 this.reload();
-            } else {
-                // widget item is already detached from DOM and is not relevant
-                ProjectCreatedEvent.un(updateHandler);
-                ProjectUpdatedEvent.un(updateHandler);
-                ProjectDeletedEvent.un(updateHandler);
             }
         };
 
-        ProjectCreatedEvent.on(updateHandler);
-        ProjectUpdatedEvent.on(updateHandler);
-        ProjectDeletedEvent.on(updateHandler);
+        ProjectCreatedEvent.on(projectUpdateHandler);
+        ProjectUpdatedEvent.on(projectUpdateHandler);
+        ProjectDeletedEvent.on(projectUpdateHandler);
+    }
+
+    private listenContentEvents(): void {
+        const serverEventsHandler: ContentServerEventsHandler = ContentServerEventsHandler.getInstance();
+
+        const contentDeletedHandler: (items: ContentServerChangeItem[]) => void = (items: ContentServerChangeItem[]) => {
+            if (!this.isVisible()) {
+                return;
+            }
+
+            const id: string = this.item.getContentId().toString();
+
+            if (items.some((deletedOrArchivedItem: ContentServerChangeItem) => deletedOrArchivedItem.getContentId().toString() === id)) {
+                if (LayersContentTreeDialog.get().isOpen()) {
+                    LayersContentTreeDialog.get().close();
+                }
+            }
+        };
+
+        const updateHandler: (items: ContentSummaryAndCompareStatus[]) => void = (items: ContentSummaryAndCompareStatus[]) => {
+            if (!this.isVisible()) {
+                return;
+            }
+
+            const id: string = this.item.getContentId().toString();
+
+            if (items.some((item: ContentSummaryAndCompareStatus) => item.getId() === id)) {
+                this.reload();
+            }
+        };
+
+        serverEventsHandler.onContentDeleted(contentDeletedHandler);
+        serverEventsHandler.onContentUpdated(updateHandler);
+    }
+
+    static get(): LayersWidgetItemView {
+        let instance: LayersWidgetItemView = Store.instance().get(LAYERS_WIDGET_ITEM_VIEW);
+
+        if (instance == null) {
+            instance = new LayersWidgetItemView();
+            Store.instance().set(LAYERS_WIDGET_ITEM_VIEW, instance);
+        }
+
+        return instance;
     }
 
     setContentAndUpdateView(item: ContentSummaryAndCompareStatus): Q.Promise<any> {
+        this.item = item;
+
         this.showAllButton.hide();
         this.loader.setItem(item);
 
@@ -64,7 +118,7 @@ export class LayersWidgetItemView
 
     reload(): Q.Promise<any> {
         return this.loader.load().then((items: LayerContent[]) => {
-            this.items = items;
+            this.layerContentItems = items;
             this.layersView.setItems(items);
             this.showAllButton.updateLabelAndVisibility(items);
 
