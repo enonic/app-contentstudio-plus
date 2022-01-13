@@ -5,10 +5,11 @@ import {ProjectContext} from 'lib-contentstudio/app/project/ProjectContext';
 import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import {LayerContent} from '../LayerContent';
 import {LayersContentTreeList} from '../LayersContentTreeList';
+import {Store} from 'lib-admin-ui/store/Store';
+
+export const LAYERS_CONTENT_TREE_DIALOG_KEY = 'LayersContentTreeDialog';
 
 export class LayersContentTreeDialog extends ModalDialog {
-
-    private static INSTANCE: LayersContentTreeDialog;
 
     private layersContentTreeList: LayersContentTreeList;
 
@@ -16,16 +17,19 @@ export class LayersContentTreeDialog extends ModalDialog {
 
     private constructor() {
         super({
-            class: 'layers-content-tree-dialog',
+            class: 'layers-content-tree-dialog'
         });
     }
 
     static get(): LayersContentTreeDialog {
-        if (!LayersContentTreeDialog.INSTANCE) {
-            LayersContentTreeDialog.INSTANCE = new LayersContentTreeDialog();
+        let instance: LayersContentTreeDialog = Store.instance().get(LAYERS_CONTENT_TREE_DIALOG_KEY);
+
+        if (instance == null) {
+            instance = new LayersContentTreeDialog();
+            Store.instance().set(LAYERS_CONTENT_TREE_DIALOG_KEY, instance);
         }
 
-        return LayersContentTreeDialog.INSTANCE;
+        return instance;
     }
 
     setItems(items: LayerContent[]): LayersContentTreeDialog {

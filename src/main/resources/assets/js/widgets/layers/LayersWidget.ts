@@ -39,7 +39,7 @@ export class LayersWidget
     }
 
     private renderLayers(): void {
-        const layersWidgetItemView: LayersWidgetItemView = new LayersWidgetItemView();
+        const layersWidgetItemView: LayersWidgetItemView = LayersWidgetItemView.get();
 
         this.fetchContent().then((content: ContentSummaryAndCompareStatus) => {
             void layersWidgetItemView.setContentAndUpdateView(content);
