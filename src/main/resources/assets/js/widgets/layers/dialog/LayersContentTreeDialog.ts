@@ -16,9 +16,7 @@ export class LayersContentTreeDialog extends ModalDialog {
     private subTitle: H6El;
 
     private constructor() {
-        super({
-            class: 'layers-content-tree-dialog'
-        });
+        super({class: 'layers-content-tree-dialog'});
     }
 
     static get(): LayersContentTreeDialog {
