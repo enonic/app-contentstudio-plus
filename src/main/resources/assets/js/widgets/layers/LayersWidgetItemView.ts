@@ -13,7 +13,6 @@ import {ProjectDeletedEvent} from 'lib-contentstudio/app/settings/event/ProjectD
 import {Store} from 'lib-admin-ui/store/Store';
 import {ContentServerEventsHandler} from 'lib-contentstudio/app/event/ContentServerEventsHandler';
 import {ContentServerChangeItem} from 'lib-contentstudio/app/event/ContentServerChangeItem';
-import {ContentId} from 'lib-contentstudio/app/content/ContentId';
 
 export const LAYERS_WIDGET_ITEM_VIEW = 'LayersWidgetItemView';
 
@@ -42,6 +41,48 @@ export class LayersWidgetItemView
         this.initListeners();
     }
 
+    static get(): LayersWidgetItemView {
+        let instance: LayersWidgetItemView = Store.instance().get(LAYERS_WIDGET_ITEM_VIEW);
+
+        if (instance == null) {
+            instance = new LayersWidgetItemView();
+            Store.instance().set(LAYERS_WIDGET_ITEM_VIEW, instance);
+        }
+
+        return instance;
+    }
+
+    setContentAndUpdateView(item: ContentSummaryAndCompareStatus): Q.Promise<any> {
+        this.item = item;
+
+        this.showAllButton.hide();
+        this.loader.setItem(item);
+
+        return this.reload();
+    }
+
+    reload(): Q.Promise<any> {
+        return this.loader.load().then((items: LayerContent[]) => {
+            this.layerContentItems = items;
+            this.layersView.setItems(items);
+            this.showAllButton.updateLabelAndVisibility(items);
+
+            if (LayersContentTreeDialog.get().isOpen()) {
+                LayersContentTreeDialog.get().setItems(items);
+            }
+
+            return Q(null);
+        });
+    }
+
+    doRender(): Q.Promise<boolean> {
+        return super.doRender().then((rendered: boolean) => {
+            this.appendChild(this.layersView);
+            this.appendChild(this.showAllButton);
+            return rendered;
+        });
+    }
+
     private initListeners(): void {
         this.showAllButton.getAction().onExecuted(() => {
             LayersContentTreeDialog.get().setItems(this.layerContentItems).open();
@@ -54,7 +95,7 @@ export class LayersWidgetItemView
     private listenProjectEvents(): void {
         const projectUpdateHandler: () => void = () => {
             if (this.isVisible()) {
-                this.reload();
+                this.reload().catch(DefaultErrorHandler.handle);
             }
         };
 
@@ -88,51 +129,11 @@ export class LayersWidgetItemView
             const id: string = this.item.getContentId().toString();
 
             if (items.some((item: ContentSummaryAndCompareStatus) => item.getId() === id)) {
-                this.reload();
+                this.reload().catch(DefaultErrorHandler.handle);
             }
         };
 
         serverEventsHandler.onContentDeleted(contentDeletedHandler);
         serverEventsHandler.onContentUpdated(updateHandler);
-    }
-
-    static get(): LayersWidgetItemView {
-        let instance: LayersWidgetItemView = Store.instance().get(LAYERS_WIDGET_ITEM_VIEW);
-
-        if (instance == null) {
-            instance = new LayersWidgetItemView();
-            Store.instance().set(LAYERS_WIDGET_ITEM_VIEW, instance);
-        }
-
-        return instance;
-    }
-
-    setContentAndUpdateView(item: ContentSummaryAndCompareStatus): Q.Promise<any> {
-        this.item = item;
-
-        this.showAllButton.hide();
-        this.loader.setItem(item);
-
-        return this.reload();
-    }
-
-    reload(): Q.Promise<any> {
-        return this.loader.load().then((items: LayerContent[]) => {
-            this.layerContentItems = items;
-            this.layersView.setItems(items);
-            this.showAllButton.updateLabelAndVisibility(items);
-
-            if (LayersContentTreeDialog.get().isOpen()) {
-                LayersContentTreeDialog.get().setItems(items);
-            }
-        }).catch(DefaultErrorHandler.handle);
-    }
-
-    doRender(): Q.Promise<boolean> {
-        return super.doRender().then((rendered: boolean) => {
-            this.appendChild(this.layersView);
-            this.appendChild(this.showAllButton);
-            return rendered;
-        });
     }
 }
