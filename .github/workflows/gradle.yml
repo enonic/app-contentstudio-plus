@@ -20,7 +20,7 @@ jobs:
             -   uses: actions/checkout@v2
 
             -   name: Get publishing variables
-                run: java --version
+                run: java -version
 
             -   name: Get publishing variables
                 id: publish_vars
