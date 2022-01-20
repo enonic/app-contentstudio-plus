@@ -14,8 +14,6 @@ import {Store} from 'lib-admin-ui/store/Store';
 import {ContentServerEventsHandler} from 'lib-contentstudio/app/event/ContentServerEventsHandler';
 import {ContentServerChangeItem} from 'lib-contentstudio/app/event/ContentServerChangeItem';
 
-export const LAYERS_WIDGET_ITEM_VIEW = 'LayersWidgetItemView';
-
 export class LayersWidgetItemView
     extends DivEl {
 
@@ -42,11 +40,11 @@ export class LayersWidgetItemView
     }
 
     static get(): LayersWidgetItemView {
-        let instance: LayersWidgetItemView = Store.instance().get(LAYERS_WIDGET_ITEM_VIEW);
+        let instance: LayersWidgetItemView = Store.instance().get(LayersWidgetItemView.name);
 
         if (instance == null) {
             instance = new LayersWidgetItemView();
-            Store.instance().set(LAYERS_WIDGET_ITEM_VIEW, instance);
+            Store.instance().set(LayersWidgetItemView.name, instance);
         }
 
         return instance;
@@ -88,11 +86,11 @@ export class LayersWidgetItemView
             LayersContentTreeDialog.get().setItems(this.layerContentItems).open();
         });
 
-        this.listenProjectEvents();
-        this.listenContentEvents();
+        this.initProjectEventListeners();
+        this.initContentEventListeners();
     }
 
-    private listenProjectEvents(): void {
+    private initProjectEventListeners(): void {
         const projectUpdateHandler: () => void = () => {
             if (this.isVisible()) {
                 this.reload().catch(DefaultErrorHandler.handle);
@@ -104,7 +102,7 @@ export class LayersWidgetItemView
         ProjectDeletedEvent.on(projectUpdateHandler);
     }
 
-    private listenContentEvents(): void {
+    private initContentEventListeners(): void {
         const serverEventsHandler: ContentServerEventsHandler = ContentServerEventsHandler.getInstance();
 
         const contentDeletedHandler: (items: ContentServerChangeItem[]) => void = (items: ContentServerChangeItem[]) => {

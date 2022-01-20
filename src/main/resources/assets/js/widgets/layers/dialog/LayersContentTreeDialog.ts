@@ -7,8 +7,6 @@ import {LayerContent} from '../LayerContent';
 import {LayersContentTreeList} from '../LayersContentTreeList';
 import {Store} from 'lib-admin-ui/store/Store';
 
-export const LAYERS_CONTENT_TREE_DIALOG_KEY = 'LayersContentTreeDialog';
-
 export class LayersContentTreeDialog extends ModalDialog {
 
     private layersContentTreeList: LayersContentTreeList;
@@ -20,11 +18,11 @@ export class LayersContentTreeDialog extends ModalDialog {
     }
 
     static get(): LayersContentTreeDialog {
-        let instance: LayersContentTreeDialog = Store.instance().get(LAYERS_CONTENT_TREE_DIALOG_KEY);
+        let instance: LayersContentTreeDialog = Store.instance().get(LayersContentTreeDialog.name);
 
         if (instance == null) {
             instance = new LayersContentTreeDialog();
-            Store.instance().set(LAYERS_CONTENT_TREE_DIALOG_KEY, instance);
+            Store.instance().set(LayersContentTreeDialog.name, instance);
         }
 
         return instance;
