@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "jquery": "^3.6.0",
-    "jquery-ui": "^1.13.0",
+    "jquery-ui": "^1.13.1",
     "lib-admin-ui": "file:./.xp/dev/lib-admin-ui",
     "lib-contentstudio": "file:./.xp/dev/lib-contentstudio",
     "normalize-url": "^7.0.2",
