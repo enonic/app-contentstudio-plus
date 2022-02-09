@@ -53,7 +53,6 @@ dependencies {
     include "com.enonic.xp:lib-admin:${xpVersion}"
     include "com.enonic.lib:lib-admin-ui:${libAdminUiVersion}"
     include "com.enonic.lib:lib-contentstudio:${libContentStudioVersion}"
-    include "com.enonic.lib:lib-thymeleaf:2.0.1"
     include "com.enonic.lib:lib-mustache:${libMustacheVersion}"
     devResources "com.enonic.lib:lib-admin-ui:${libAdminUiVersion}"
     devResources "com.enonic.lib:lib-contentstudio:${libContentStudioVersion}"

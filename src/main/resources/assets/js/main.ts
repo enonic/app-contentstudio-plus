@@ -15,13 +15,9 @@ import {Project} from 'lib-contentstudio/app/settings/data/project/Project';
 import {ProjectListWithMissingRequest} from 'lib-contentstudio/app/settings/resource/ProjectListWithMissingRequest';
 import {ProjectHelper} from 'lib-contentstudio/app/settings/data/project/ProjectHelper';
 import {ProjectContext} from 'lib-contentstudio/app/project/ProjectContext';
-import {ArchiveApp} from './ArchiveApp';
-import {AggregatedServerEventsListener} from 'lib-contentstudio/app/event/AggregatedServerEventsListener';
-import {ArchiveAppPanel} from './ArchiveAppPanel';
 import {ArchiveAppContainer} from './ArchiveAppContainer';
 import {Store} from 'lib-admin-ui/store/Store';
-
-declare const CONFIG;
+import {CONFIG} from 'lib-admin-ui/util/Config';
 
 // Dynamically import and execute all input types, since they are used
 // on-demand, when parsing XML schemas and has not real usage in app
@@ -80,7 +76,7 @@ function initApplicationEventListener(): void {
                 return;
             }
             appStatusCheckInterval = setInterval(() => {
-                if (!messageId && CONFIG.appId === event.getApplicationKey().toString()) {
+                if (!messageId && CONFIG.getString('appId') === event.getApplicationKey().toString()) {
                     NotifyManager.get().hide(messageId);
                     messageId = showError(i18n('notify.application.notAvailable'), false);
                 }
@@ -137,25 +133,24 @@ function startApplication(): void {
     application.setLoaded(true);
 }
 
-function getTheme(): string {
-    const theme: string = CONFIG.theme;
-    return theme ? (`theme-${theme}` || '') : '';
-}
-
 function startContentBrowser(application: Application): void {
-    // const archiveAppPanel = new ArchiveAppPanel();
-    // body.appendChild(archiveAppPanel);
-    // archiveAppPanel.handleBrowse();
-
     const archiveAppContainer = new ArchiveAppContainer();
     body.appendChild(archiveAppContainer);
     archiveAppContainer.show();
 }
 
 void (async () => {
-    await i18nInit(CONFIG.services.i18nUrl);
-    const i18nUrl: string = CONFIG.services.i18nUrl.replace(new RegExp('contentstudio', 'g'), 'contentstudio.plus');
-    await i18nAdd(i18nUrl);
+    if (!document.currentScript) {
+        throw 'Legacy browsers are not supported';
+    }
+    const configServiceUrl = document.currentScript.getAttribute('data-config-service-url');
+    if (!configServiceUrl) {
+        throw 'Missing \'data-config-service-url\' attribute';
+    }
+
+    await CONFIG.init(configServiceUrl);
+    await i18nInit(CONFIG.getString('services.i18nUrlStudio'));
+    await i18nAdd(CONFIG.getString('services.i18nUrl'));
 
     const renderListener = (): void => {
         startApplication();

@@ -7,24 +7,16 @@ export class Widget
     extends DivEl {
 
     protected readonly contentId: string;
-    protected readonly repository: string;
     private readonly loadMask: LoadMask;
     private readonly button: OnOffButton;
 
-    constructor(config: WidgetConfig, cls?: string) {
+    constructor(contentId: string, cls?: string) {
         super(AppHelper.getCommonWidgetClass() + (' ' + cls || ''));
 
         this.loadMask = new LoadMask(this);
-        this.contentId = config.contentId;
-        this.repository = config.repository;
+        this.contentId = contentId;
 
         this.button = new OnOffButton({off: false, offLabel: 'Turn On', onLabel: 'Turn Off'});
         this.appendChild(this.button);
     }
 }
-
-export type WidgetConfig = {
-    contentId: string,
-    repository: string,
-    i18nUrl: string
-};
