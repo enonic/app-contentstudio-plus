@@ -1,6 +1,6 @@
 const portalLib = require('/lib/xp/portal');
-const thymeleaf = require('/lib/thymeleaf');
 const portal = require('/lib/xp/portal');
+const mustache = require('/lib/mustache');
 
 function handleGet(req) {
     return renderWidgetView(req);
@@ -16,13 +16,15 @@ function renderWidgetView(req) {
     const view = resolve('layers.html');
     const params = {
         contentId: contentId,
-        repository: req.params.repository,
-        i18nUrl: portal.serviceUrl({service: 'i18n'}),
+        assetsUri: portal.assetUrl({
+            path: ''
+        }),
+        configServiceUrl: portal.serviceUrl({service: 'config'})
     };
 
     return {
         contentType: 'text/html',
-        body: thymeleaf.render(view, params)
+        body: mustache.render(view, params)
     };
 }
 

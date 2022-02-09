@@ -1,36 +1,30 @@
-var admin = require('/lib/xp/admin');
-var mustache = require('/lib/mustache');
-var portal = require('/lib/xp/portal');
+/*global app*/
+
+const admin = require('/lib/xp/admin');
+const mustache = require('/lib/mustache');
+const portal = require('/lib/xp/portal');
+const i18n = require('/lib/xp/i18n');
 
 function handleGet() {
-    var view = resolve('./main.html');
+    const view = resolve('./main.html');
+    const locales = admin.getLocales();
 
-    var params = {
-        adminUrl: admin.getBaseUri(),
-        adminAssetsUri: admin.getAssetsUri(),
+    const params = {
+        appName: i18n.localize({
+            key: 'app.archive',
+            bundles: ['i18n/phrases'],
+            locale: locales
+        }),
+        appId: app.name,
         assetsUri: portal.assetUrl({
             path: ''
         }),
         studioAssetsUri: portal.assetUrl({
-            path: ''
-        }).replace(/\.plus/g, ''),
-        faviconsAssetsUri: portal.assetUrl({
-            path: ''
-        }).replace(/\.plus/g, ''),
-        appName: 'Archive',
-        appId: app.name,
-        appVersion: app.version,
-        locale: admin.getLocale(),
-        launcherPath: admin.getLauncherPath(),
-        launcherUrl: admin.getLauncherUrl(),
-        services: {
-            stylesUrl: portal.serviceUrl({service: 'styles'}),
-            i18nUrl: portal.serviceUrl({service: 'i18n'}).replace(/\.plus/g, ''),
-            contentServiceUrl: portal.serviceUrl({service: 'content'}),
-            adminToolsUrl: portal.serviceUrl({service: 'admintools'}).replace(/\.plus/g, ''),
-            licenseUrl: portal.serviceUrl({service: 'license'}).replace(/\.plus/g, '')
-        },
-        mainUrl: portal.pageUrl({})
+            path: '',
+            application: 'com.enonic.app.contentstudio'
+        }),
+        configServiceUrl: portal.serviceUrl({service: 'config'}),
+        launcherPath: admin.getLauncherPath()
     };
 
     return {

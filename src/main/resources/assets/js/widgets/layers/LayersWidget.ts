@@ -1,4 +1,4 @@
-import {Widget, WidgetConfig} from '../Widget';
+import {Widget} from '../Widget';
 import {AppHelper} from '../../util/AppHelper';
 import {LayersWidgetItemView} from './LayersWidgetItemView';
 import {ContentSummaryAndCompareStatusFetcher} from 'lib-contentstudio/app/resource/ContentSummaryAndCompareStatusFetcher';
@@ -14,8 +14,8 @@ import {i18n} from 'lib-admin-ui/util/Messages';
 export class LayersWidget
     extends Widget {
 
-    constructor(config: WidgetConfig) {
-        super(config, AppHelper.getLayersWidgetClass());
+    constructor(contentId: string) {
+        super(contentId, AppHelper.getLayersWidgetClass());
 
         this.hasLicenseValid().then((isValid: boolean) => {
             if (isValid) {
