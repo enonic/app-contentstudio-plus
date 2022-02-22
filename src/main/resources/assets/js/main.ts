@@ -47,7 +47,7 @@ function startLostConnectionDetector(): ConnectionDetector {
     const connectionDetector: ConnectionDetector =
         ConnectionDetector.get()
             .setAuthenticated(true)
-            .setSessionExpireRedirectUrl(UriHelper.getToolUri(''))
+            .setSessionExpireRedirectUrl(CONFIG.getString('toolUri'))
             .setNotificationMessage(i18n('notify.connection.loss'));
 
     connectionDetector.onReadonlyStatusChanged((readonly: boolean) => {
