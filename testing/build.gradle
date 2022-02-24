@@ -10,6 +10,7 @@ group = 'com.enonic.app.contentstudio.js_testing'
 
 configurations {
     distro
+    deploy
 }
 
 ext {
@@ -25,12 +26,12 @@ ext {
     xpServer = new ServerInstance()
     contentStudioFile = "$deployDir/contentstudio-${version}.jar"
     contentStudioPlusFile = "$deployDir/contentstudio.plus-${version}.jar"
-    contentStudioAppUrl = "https://repo.enonic.com/dev/com/enonic/app/contentstudio/${libContentStudioVersion}/contentstudio-${libContentStudioVersion}.jar"
     contentStudioPlusAppUrl = project.hasProperty('contentStudioPlusAppUrl') ? contentStudioPlusAppUrl : "file:///$projectDir/../build/libs/contentstudio.plus.jar"
 }
 
 dependencies {
     distro "com.enonic.xp:enonic-xp-generic:$xpVersion@zip"
+    deploy "com.enonic.app:contentstudio:$libContentStudioVersion@jar"
 }
 
 task unpackDistro( type: Copy ) {
@@ -76,25 +77,11 @@ task copyApps( type: Copy ) {
 }
 
 
-task deployContentStudio( type: DefaultTask ) {
-    outputs.files( contentStudioFile )
-    doLast {
-        println 'Retrieving Content Studio App from:'
-        println contentStudioAppUrl
-        println 'Deploying to:'
-        println contentStudioFile
-
-        def f = new File( contentStudioFile )
-        if ( !f.exists() )
-        {
-            new URL( contentStudioAppUrl ).withInputStream { i -> f.withOutputStream { it << i } }
-            println 'Content Studio App is downloaded.'
-        }
-        else
-        {
-            println 'Content Studio App already exists.'
-        }
+task deployContentStudio( type: Copy ) {
+    from {
+        configurations.deploy
     }
+    into file( deployDir )
     mustRunAfter unpackDistro
 }
 
