@@ -7,15 +7,6 @@ import {ArchiveAppContainer} from './ArchiveAppContainer';
 const injectApp = (widgetElem: Element): void => {
     const archiveAppContainer: ArchiveAppContainer = new ArchiveAppContainer();
     widgetElem.appendChild(archiveAppContainer);
-    archiveAppContainer.show();
-
-    widgetElem.onShown(() => {
-        archiveAppContainer.show(); // need to toggle key bindings
-    });
-
-    widgetElem.onHidden(() => {
-        archiveAppContainer.hide(); // need to toggle key bindings
-    });
 };
 
 const init = async (configServiceUrl: string, i18nServiceUrl: string): Promise<void> => {
