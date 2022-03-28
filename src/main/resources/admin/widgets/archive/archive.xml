@@ -1,0 +1,7 @@
+<widget xmlns="urn:enonic:xp:model:1.0">
+  <display-name>Archive</display-name>
+  <description>Archive tool</description>
+  <interfaces>
+    <interface>contentstudio.sidebar</interface>
+  </interfaces>
+</widget>
