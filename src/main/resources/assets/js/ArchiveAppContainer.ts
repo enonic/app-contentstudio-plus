@@ -20,7 +20,6 @@ export class ArchiveAppContainer
         super('archive-app-container');
 
         this.onShown(() => {
-            history.pushState(null, null, `main#/${ProjectContext.get().getProject().getName()}/${ArchiveResourceRequest.ARCHIVE_PATH}`);
             Body.get().addClass('archive');
         });
 
