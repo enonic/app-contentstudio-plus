@@ -7,6 +7,9 @@ function handleGet() {
         assetsUri: portal.assetUrl({
             path: 'js/archive.js'
         }),
+        stylesUri: portal.assetUrl({
+            path: 'styles/main.css'
+        }),
         configServiceUrl: portal.serviceUrl({service: 'config'}),
         i18nServiceUrl: portal.serviceUrl({service: 'i18n'})
     };
