@@ -18,6 +18,7 @@ const ArchivedContentVersionsWidget = require('../page_objects/archive/archived.
 const ContentBrowseDetailsPanel = require('../page_objects/browsepanel/detailspanel/browse.details.panel');
 const BrowseVersionsWidget = require('../page_objects/browsepanel/detailspanel/browse.versions.widget');
 const ArchiveRestoreDialog = require('../page_objects/archive/archive.restore.dialog');
+const CompareContentVersionsDialog = require('../page_objects/details_panel/compare.content.versions.dialog');
 
 describe('archive.context.panel.spec: tests for archive context panel', function () {
     this.timeout(appConst.SUITE_TIMEOUT);
@@ -58,8 +59,7 @@ describe('archive.context.panel.spec: tests for archive context panel', function
             assert.equal(actualType, "folder", "Expected type should be displayed");
             let actualApplication = await archivedContentPropertiesWidget.getApplication();
             assert.equal(actualApplication, "base", "Expected application should be displayed");
-
-            //4. Verify the status widget
+            //4. Verify the status in the widget
             let actualStatus = await archivedContentStatusWidget.getStatus();
             assert.equal(actualStatus, "Archived", "Expected status should be displayed");
         });
@@ -69,14 +69,63 @@ describe('archive.context.panel.spec: tests for archive context panel', function
             let archiveBrowseContextPanel = new ArchiveBrowseContextPanel();
             let archiveBrowsePanel = new ArchiveBrowsePanel();
             await studioUtils.openArchivePanel();
+            //1. Select a folder:
             await archiveBrowsePanel.clickCheckboxAndSelectRowByDisplayName(FOLDER1.displayName);
-            //3. Click on Widget Selector dropdown handler:
+            //2. Click on Widget Selector dropdown handler:
             await archiveBrowseContextPanel.clickOnWidgetSelectorDropdownHandle();
-            //4. Verify that two options are present in the selector:
+            //3. Verify that two options are present in the selector:
             let actualOptions = await archiveBrowseContextPanel.getWidgetSelectorDropdownOptions();
             assert.isTrue(actualOptions.includes('Details'));
             assert.isTrue(actualOptions.includes('Version history'));
             assert.equal(actualOptions.length, 2, "Two options should be in the selector");
+        });
+
+    it(`GIVEN archived content has been selected WHEN Comparing Versions Dialog has been opened THEN Revert menu buttons should be hidden`,
+        async () => {
+            let archiveBrowseContextPanel = new ArchiveBrowseContextPanel();
+            let archiveBrowsePanel = new ArchiveBrowsePanel();
+            let archivedContentVersionsWidget = new ArchivedContentVersionsWidget();
+            let compareContentVersionsDialog = new CompareContentVersionsDialog();
+            await studioUtils.openArchivePanel();
+            //1. Select the archived content
+            await archiveBrowsePanel.clickCheckboxAndSelectRowByDisplayName(FOLDER1.displayName);
+            //2. Open Versions Widget:
+            await archiveBrowseContextPanel.openVersionHistory();
+            //3. Open 'Compare Versions' modal dialog:
+            await archivedContentVersionsWidget.clickOnCompareWithCurrentVersionButton(1);
+            await compareContentVersionsDialog.waitForDialogOpened();
+            await studioUtils.saveScreenshot("compare_versions_dialog");
+            //4. Verify that 'Left Revert' menu button is not displayed:
+            await compareContentVersionsDialog.waitForLeftRevertMenuButtonNotDisplayed();
+            //5. Verify that 'Right Revert' menu button is not displayed:
+            await compareContentVersionsDialog.waitForRightRevertMenuButtonNotDisplayed();
+        });
+
+    //Verify - Archive app - error after clicking on a version item in Compare Versions modal dialog #445
+    //https://github.com/enonic/app-contentstudio-plus/issues/445
+    it(`GIVEN Comparing Versions Dialog has been opened WHEN left versions selector has been expanded AND previous option has been clicked THEN Versions are identical should be displayed in the dialog`,
+        async () => {
+            let archiveBrowseContextPanel = new ArchiveBrowseContextPanel();
+            let archiveBrowsePanel = new ArchiveBrowsePanel();
+            let archivedContentVersionsWidget = new ArchivedContentVersionsWidget();
+            let compareContentVersionsDialog = new CompareContentVersionsDialog();
+            await studioUtils.openArchivePanel();
+            //1. Select the archived content
+            await archiveBrowsePanel.clickCheckboxAndSelectRowByDisplayName(FOLDER1.displayName);
+            //2. Open Versions Widget:
+            await archiveBrowseContextPanel.openVersionHistory();
+            //3. Open 'Compare Versions' modal dialog:
+            await archivedContentVersionsWidget.clickOnCompareWithCurrentVersionButton(1);
+            await compareContentVersionsDialog.waitForDialogOpened();
+            //4. Click on the dropdown handle and expand the left menu:
+            await compareContentVersionsDialog.clickOnLeftSelectorDropdownHandle();
+            await studioUtils.saveScreenshot("compare_versions_dialog_left_expanded");
+            //5. click on the 'Previous version' option in the expanded options:
+            await compareContentVersionsDialog.clickOnOptionInLeftVersionsSelector("Previous version");
+            await studioUtils.saveScreenshot("compare_versions_dialog_left_previous_version");
+            //6. Verify that 'Versions are identical' message gets visible in the content panel:
+            let message = await compareContentVersionsDialog.waitForContentPanelIsEmpty();
+            assert.equal(message, "Versions are identical", "Expected message should be displayed in the dialog");
         });
 
     it(`GIVEN archived content has been selected WHEN 'Versions widget' has been opened THEN expected Archived version item should be displayed in the widget`,

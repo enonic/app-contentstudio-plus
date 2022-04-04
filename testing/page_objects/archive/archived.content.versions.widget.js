@@ -29,7 +29,7 @@ class ArchivedContentVersionsWidget extends BaseVersionsWidget {
 
     async getStatusInArchivedItem(index) {
         let locator = XPATH.widget + XPATH.archivedItems + lib.H6_DISPLAY_NAME;
-        this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
         let elements = await this.findElements(locator);
         return await elements[index].getText();
     }
