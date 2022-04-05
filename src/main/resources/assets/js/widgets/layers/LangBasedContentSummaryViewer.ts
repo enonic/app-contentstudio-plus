@@ -1,4 +1,4 @@
-import {Flag} from 'lib-admin-ui/locale/Flag';
+import {Flag} from 'lib-contentstudio/locale/Flag';
 import {Project} from 'lib-contentstudio/app/settings/data/project/Project';
 import {ContentSummaryAndCompareStatusViewer} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatusViewer';
 import {ProjectIconUrlResolver} from 'lib-contentstudio/app/project/ProjectIconUrlResolver';
