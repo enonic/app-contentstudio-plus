@@ -10,7 +10,6 @@ const studioUtils = require('../libs/studio.utils.js');
 const contentBuilder = require("../libs/content.builder");
 const DeleteContentDialog = require('../page_objects/delete.content.dialog');
 const ArchiveBrowsePanel = require('../page_objects/archive/archive.browse.panel');
-const ConfirmValueDialog = require('../page_objects/confirm.content.delete.dialog');
 const ArchiveRestoreDialog = require('../page_objects/archive/archive.restore.dialog');
 const ArchiveDeleteDialog = require('../page_objects/archive/archive.delete.dialog');
 
@@ -157,7 +156,6 @@ describe('archive.content.spec: tests for archiving content', function () {
             let expectedMessage = appConst.itemIsDeleted(FOLDER1.displayName);
             assert.equal(message, expectedMessage, "Expected notification message should appear");
         });
-
 
     beforeEach(() => studioUtils.navigateToContentStudioApp());
     afterEach(() => studioUtils.doCloseAllWindowTabsAndSwitchToHome());
