@@ -15,7 +15,7 @@ function renderWidgetView(req) {
 
     const view = resolve('layers.html');
     const params = {
-        contentId: contentId,
+        contentId: contentId || '',
         assetsUri: portal.assetUrl({
             path: ''
         }),
