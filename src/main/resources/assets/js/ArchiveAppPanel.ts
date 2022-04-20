@@ -7,6 +7,8 @@ export class ArchiveAppPanel
 
     constructor() {
         super('archive-app-panel content-app-panel');
+
+        this.setDoOffset(false);
     }
 
     protected createBrowsePanel(): BrowsePanel {
