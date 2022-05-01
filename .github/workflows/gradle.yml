@@ -90,7 +90,7 @@ jobs:
                     restore-keys: |
                         ${{ runner.os }}-gradle-
 
-            - uses: actions/download-artifact@v2
+            - uses: actions/download-artifact@v3
               with:
                   name: contentstudio.plus
                   path: build/libs
