@@ -1,16 +1,13 @@
 import * as Q from 'q';
 import {TreeGrid} from 'lib-admin-ui/ui/treegrid/TreeGrid';
 import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
-import {ContentSummaryAndCompareStatusFetcher} from 'lib-contentstudio/app/resource/ContentSummaryAndCompareStatusFetcher';
 import {ArchiveTreeGridHelper} from './ArchiveTreeGridHelper';
 import {TreeGridContextMenu} from 'lib-admin-ui/ui/treegrid/TreeGridContextMenu';
 import {ArchiveTreeGridActions} from './ArchiveTreeGridActions';
 import {ArchiveViewItem} from './ArchiveViewItem';
 import {TreeNode} from 'lib-admin-ui/ui/treegrid/TreeNode';
 import {ArchiveContentViewItem, ArchiveContentViewItemBuilder} from './ArchiveContentViewItem';
-import {ContentResponse} from 'lib-contentstudio/app/resource/ContentResponse';
 import {ProjectContext} from 'lib-contentstudio/app/project/ProjectContext';
-import {ArchiveResourceRequest} from './resource/ArchiveResourceRequest';
 import {ArchiveServerEvent} from 'lib-contentstudio/app/event/ArchiveServerEvent';
 import {ContentServerEventsHandler} from 'lib-contentstudio/app/event/ContentServerEventsHandler';
 import {ContentPath} from 'lib-contentstudio/app/content/ContentPath';
@@ -18,22 +15,46 @@ import {ContentId} from 'lib-contentstudio/app/content/ContentId';
 import {NodeServerChangeType} from 'lib-admin-ui/event/NodeServerChange';
 import {ContentServerChangeItem} from 'lib-contentstudio/app/event/ContentServerChangeItem';
 import {ArchiveHelper} from './ArchiveHelper';
+import {ContentQuery} from 'lib-contentstudio/app/content/ContentQuery';
+import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
+import {ArchiveContentFetcher} from './ArchiveContentFetcher';
+import {FetchResponse} from './FetchResponse';
 
 export class ArchiveTreeGrid
     extends TreeGrid<ArchiveViewItem> {
 
     private readonly treeGridActions: ArchiveTreeGridActions;
 
-    private archiveContentFetcher: ContentSummaryAndCompareStatusFetcher;
+    private archiveContentFetcher: ArchiveContentFetcher;
+
+    private filterQuery?: ContentQuery;
 
     constructor() {
         super(ArchiveTreeGridHelper.createTreeGridBuilder());
 
         this.treeGridActions = new ArchiveTreeGridActions();
-        this.archiveContentFetcher = new ContentSummaryAndCompareStatusFetcher(ArchiveResourceRequest.ARCHIVE_PATH);
+        this.archiveContentFetcher = new ArchiveContentFetcher();
         this.setContextMenu(new TreeGridContextMenu(this.treeGridActions));
 
         this.initListeners();
+    }
+
+    setFilterQuery(query: ContentQuery): void {
+        this.filterQuery = query ? new ContentQuery() : null;
+
+        if (query) {
+            this.filterQuery
+                .setSize(ArchiveContentFetcher.FETCH_SIZE)
+                .setQueryFilters(query.getQueryFilters())
+                .setQueryExpr(query.getQueryExpr())
+                .setContentTypeNames(query.getContentTypes())
+                .setMustBeReferencedById(query.getMustBeReferencedById());
+
+            this.getRoot().setFiltered(true);
+            this.reload().catch(DefaultErrorHandler.handle);
+        } else {
+            this.resetFilter();
+        }
     }
 
     refresh(): void {
@@ -93,37 +114,38 @@ export class ArchiveTreeGrid
 
     private fetchContentChildren(parentNode: TreeNode<ArchiveViewItem>): Q.Promise<ArchiveViewItem[]> {
         this.removeEmptyNode(parentNode);
-        const parentContentId: ContentId =
-            parentNode.hasParent() ? (<ArchiveContentViewItem>parentNode.getData()).getData().getContentId() : null;
-        const from: number = parentNode.getChildren().length;
 
-        return this.archiveContentFetcher.fetchChildren(parentContentId, from, 10)
-            .then((response: ContentResponse<ContentSummaryAndCompareStatus>) => {
-                const total: number = response.getMetadata().getTotalHits();
-                const contents: ContentSummaryAndCompareStatus[] = response.getContents();
-                parentNode.setMaxChildren(total);
-
-                const newArchiveViewItems: ArchiveContentViewItem[] = contents.map((c: ContentSummaryAndCompareStatus) => {
-                    return new ArchiveContentViewItemBuilder()
-                        .setOriginalParentPath(this.getParentPath(parentNode, c))
-                        .setData(c)
-                        .build();
-                });
-
-                if (parentNode.getChildren().length + newArchiveViewItems.length < total) {
-                    newArchiveViewItems.push(new ArchiveContentViewItemBuilder()
-                        .setData(new ContentSummaryAndCompareStatus())
-                        .build());
-                }
-
-                return parentNode.getChildren().map((child: TreeNode<ArchiveViewItem>) => child.getData()).concat(newArchiveViewItems);
-            });
+        return this.fetchItems(parentNode).then((fetchResponse: FetchResponse) => {
+            parentNode.setMaxChildren(fetchResponse.total);
+            return this.getParentNodeChildrenItems(parentNode).concat(this.createNewArchiveItems(parentNode, fetchResponse));
+        });
     }
 
     private removeEmptyNode(parentNode: TreeNode<ArchiveViewItem>): void {
         if (parentNode.hasChildren() && this.isEmptyNode(parentNode.getChildren()[parentNode.getChildren().length - 1])) {
             parentNode.getChildren().pop();
         }
+    }
+
+    private getParentNodeChildrenItems(parentNode: TreeNode<ArchiveViewItem>): ArchiveViewItem[] {
+        return parentNode.getChildren().map((child: TreeNode<ArchiveViewItem>) => child.getData());
+    }
+
+    private createNewArchiveItems(parentNode: TreeNode<ArchiveViewItem>, fetchResponse: FetchResponse): ArchiveContentViewItem[] {
+        const newArchiveViewItems: ArchiveContentViewItem[] = fetchResponse.items.map((c: ContentSummaryAndCompareStatus) => {
+            return new ArchiveContentViewItemBuilder()
+                .setOriginalParentPath(this.getParentPath(parentNode, c))
+                .setData(c)
+                .build();
+        });
+
+        if (parentNode.getChildren().length + newArchiveViewItems.length < fetchResponse.total) {
+            newArchiveViewItems.push(new ArchiveContentViewItemBuilder()
+                .setData(new ContentSummaryAndCompareStatus())
+                .build());
+        }
+
+        return newArchiveViewItems;
     }
 
     private getParentPath(parentNode: TreeNode<ArchiveViewItem>, content: ContentSummaryAndCompareStatus): string {
@@ -139,7 +161,7 @@ export class ArchiveTreeGrid
         const originalName: string = item.getContentSummary().getOriginalName();
 
         if (!originalParentPath || !originalName) {
-            item.getPath().toString();
+            return item.getPath().toString();
         }
 
         const separator: string = originalParentPath.endsWith(ContentPath.NODE_PATH_DIVIDER) ? '' : ContentPath.NODE_PATH_DIVIDER;
@@ -149,5 +171,26 @@ export class ArchiveTreeGrid
 
     private extractTopMostContentItems(event: ArchiveServerEvent): ContentServerChangeItem[] {
         return <ContentServerChangeItem[]>ArchiveHelper.filterTopMostItems(event.getNodeChange().getChangeItems());
+    }
+
+    private fetchItems(parentNode: TreeNode<ArchiveViewItem>): Q.Promise<FetchResponse> {
+        if (this.filterQuery && !parentNode.hasParent()) {
+            return this.fetchByQuery(parentNode);
+        }
+
+        return this.fetchContents(parentNode);
+    }
+
+    private fetchByQuery(parentNode: TreeNode<ArchiveViewItem>): Q.Promise<FetchResponse> {
+        this.filterQuery.setFrom(parentNode.getChildren().length);
+
+        return this.archiveContentFetcher.fetchByQuery(this.filterQuery);
+    }
+
+    private fetchContents(parentNode: TreeNode<ArchiveViewItem>): Q.Promise<FetchResponse> {
+        const from: number = parentNode.getChildren().length;
+        const parentContentId: ContentId = parentNode.hasParent() ? parentNode.getData().getData().getContentId() : null;
+
+        return this.archiveContentFetcher.fetchContents(parentContentId, from);
     }
 }
