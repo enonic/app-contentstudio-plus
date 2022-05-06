@@ -1,5 +1,4 @@
 import {BrowseItemPanel} from 'lib-admin-ui/app/browse/BrowseItemPanel';
-import {Toolbar} from 'lib-admin-ui/ui/toolbar/Toolbar';
 import {ArchiveTreeGrid} from './ArchiveTreeGrid';
 import {ArchiveBrowseItemPanel} from './ArchiveBrowseItemPanel';
 import * as Q from 'q';
@@ -7,12 +6,11 @@ import {ArchiveContextView} from './ArchiveContextView';
 import {ArchiveContentViewItem} from './ArchiveContentViewItem';
 import {NonMobileContextPanelToggleButton} from 'lib-contentstudio/app/view/context/button/NonMobileContextPanelToggleButton';
 import {ResponsiveBrowsePanel} from 'lib-contentstudio/app/browse/ResponsiveBrowsePanel';
-import {ResponsiveToolbar} from 'lib-contentstudio/app/browse/ResponsiveToolbar';
+import {ArchiveFilterPanel} from './ArchiveFilterPanel';
+import {ContentQuery} from 'lib-contentstudio/app/content/ContentQuery';
 
 export class ArchiveBrowsePanel
     extends ResponsiveBrowsePanel {
-
-    protected treeGrid: ArchiveTreeGrid;
 
     protected contextView: ArchiveContextView;
 
@@ -29,6 +27,14 @@ export class ArchiveBrowsePanel
 
         this.browseToolbar.addActions(this.getBrowseActions().getAllActions());
         this.browseToolbar.appendChild(new NonMobileContextPanelToggleButton());
+    }
+
+    protected initListeners(): void {
+        super.initListeners();
+
+        (<ArchiveFilterPanel>this.filterPanel).onSearchEvent((query?: ContentQuery) => {
+            (<ArchiveTreeGrid>this.treeGrid).setFilterQuery(query);
+        });
     }
 
     protected updateContextView(item: ArchiveContentViewItem): void {
@@ -50,5 +56,9 @@ export class ArchiveBrowsePanel
 
     protected createContextView(): ArchiveContextView {
         return new ArchiveContextView();
+    }
+
+    protected createFilterPanel(): ArchiveFilterPanel {
+        return new ArchiveFilterPanel();
     }
 }
