@@ -18,7 +18,7 @@ import {IsAuthenticatedRequest} from 'lib-admin-ui/security/auth/IsAuthenticated
 import {BucketAggregation} from 'lib-admin-ui/aggregation/BucketAggregation';
 import {Bucket} from 'lib-admin-ui/aggregation/Bucket';
 import {ArchiveAggregation} from './ArchiveAggregation';
-import {SearchArchiveQueryCreator} from './SearchArchiveQueryCreator';
+import {ArchiveSearchContentQueryCreator} from './ArchiveSearchContentQueryCreator';
 import {ArchiveAggregationsDisplayNamesResolver} from './ArchiveAggregationsDisplayNamesResolver';
 
 export class ArchiveFilterPanel
@@ -54,6 +54,9 @@ export class ArchiveFilterPanel
 
         this.aggregations.set(ContentAggregation.CONTENT_TYPE,
             new AggregationGroupView(ContentAggregation.CONTENT_TYPE, i18n(`field.${ContentAggregation.CONTENT_TYPE}`)));
+
+        this.aggregations.set(ArchiveAggregation.ARCHIVED,
+            new AggregationGroupView(ArchiveAggregation.ARCHIVED, i18n(`field.${ArchiveAggregation.ARCHIVED}`)));
 
         this.aggregations.set(ArchiveAggregation.ARCHIVER,
             new AggregationGroupView(ArchiveAggregation.ARCHIVER, i18n(`field.${ArchiveAggregation.ARCHIVER}`)));
@@ -128,13 +131,14 @@ export class ArchiveFilterPanel
     }
 
     private buildQuery(): ContentQuery {
-        const queryCreator: SearchArchiveQueryCreator = new SearchArchiveQueryCreator(this.getSearchInputValues());
+        const queryCreator: ArchiveSearchContentQueryCreator = new ArchiveSearchContentQueryCreator(this.getSearchInputValues());
 
         queryCreator.setIsAggregation(true);
         queryCreator.setConstraintItemsIds(this.hasConstraint() ? this.getSelectionItems() : null);
 
         return queryCreator.create(
-            [ContentAggregation.CONTENT_TYPE, ArchiveAggregation.ARCHIVER, ContentAggregation.OWNER, ContentAggregation.LANGUAGE]);
+            [ContentAggregation.CONTENT_TYPE, ArchiveAggregation.ARCHIVED, ArchiveAggregation.ARCHIVER, ContentAggregation.OWNER,
+                ContentAggregation.LANGUAGE]);
     }
 
     private notifySearchEvent(query?: ContentQuery): void {
