@@ -15,6 +15,10 @@ import {Expand} from 'lib-admin-ui/rest/Expand';
 import * as Q from 'q';
 import {AggregationsDisplayNamesResolver} from 'lib-contentstudio/app/browse/filter/AggregationsDisplayNamesResolver';
 import {Aggregation} from 'lib-admin-ui/aggregation/Aggregation';
+import {LoginResult} from 'lib-admin-ui/security/auth/LoginResult';
+import {IsAuthenticatedRequest} from 'lib-admin-ui/security/auth/IsAuthenticatedRequest';
+import {BucketAggregation} from 'lib-admin-ui/aggregation/BucketAggregation';
+import {Bucket} from 'lib-admin-ui/aggregation/Bucket';
 
 export class ArchiveFilterPanel
     extends BrowseFilterPanel<ArchiveViewItem> {
@@ -24,6 +28,8 @@ export class ArchiveFilterPanel
     private aggregationsDisplayNamesResolver: AggregationsDisplayNamesResolver;
 
     private searchEventListeners: { (query?: ContentQuery): void; }[] = [];
+
+    private userInfo: LoginResult;
 
     constructor() {
         super();
@@ -47,6 +53,12 @@ export class ArchiveFilterPanel
 
         this.aggregations.set(ContentAggregation.CONTENT_TYPE,
             new AggregationGroupView(ContentAggregation.CONTENT_TYPE, i18n(`field.${ContentAggregation.CONTENT_TYPE}`)));
+
+        this.aggregations.set(ContentAggregation.OWNER,
+            new AggregationGroupView(ContentAggregation.OWNER, i18n(`field.${ContentAggregation.OWNER}`)));
+
+        this.aggregations.set(ContentAggregation.LANGUAGE,
+            new AggregationGroupView(ContentAggregation.LANGUAGE, i18n(`field.${ContentAggregation.LANGUAGE}`)));
 
         return Array.from(this.aggregations.values());
     }
@@ -72,7 +84,12 @@ export class ArchiveFilterPanel
     }
 
     private initAggregationGroupView(): void {
-        this.searchDataAndHandleResponse(this.buildQuery()).catch(DefaultErrorHandler.handle);
+        new IsAuthenticatedRequest().sendAndParse().then((loginResult: LoginResult) => {
+            this.userInfo = loginResult;
+            this.searchDataAndHandleResponse(this.buildQuery()).catch(DefaultErrorHandler.handle);
+
+            return Q.resolve();
+        }).catch(DefaultErrorHandler.handle);
     }
 
     private searchDataAndHandleResponse(contentQuery: ContentQuery): Q.Promise<void> {
@@ -94,10 +111,16 @@ export class ArchiveFilterPanel
     private processSearchResponse(contentQueryResult: ContentQueryResult<ContentSummary, ContentSummaryJson>): void {
         const aggregations: Aggregation[] = contentQueryResult.getAggregations();
         this.updateAggregations(aggregations);
-        this.aggregationsDisplayNamesResolver.updateContentTypeAggregations(aggregations).then(() => {
+        this.aggregationsDisplayNamesResolver.updateAggregationsDisplayNames(aggregations, this.getCurrentUserKeyAsString()).then(() => {
             this.updateAggregations(aggregations);
+            return Q.resolve();
         }).catch(DefaultErrorHandler.handle);
+        this.toggleAggregationsVisibility(aggregations);
         this.updateHitsCounter(contentQueryResult.getMetadata().getTotalHits());
+    }
+
+    private getCurrentUserKeyAsString(): string {
+        return this.userInfo.getUser().getKey().toString();
     }
 
     private buildQuery(): ContentQuery {
@@ -106,12 +129,19 @@ export class ArchiveFilterPanel
         queryCreator.setIsAggregation(true);
         queryCreator.setConstraintItemsIds(this.hasConstraint() ? this.getSelectionItems() : null);
 
-        return queryCreator.create([ContentAggregation.CONTENT_TYPE]);
+        return queryCreator.create([ContentAggregation.CONTENT_TYPE, ContentAggregation.OWNER, ContentAggregation.LANGUAGE]);
     }
 
     private notifySearchEvent(query?: ContentQuery): void {
         this.searchEventListeners.forEach((listener: { (q?: ContentQuery): void; }) => {
             listener(query);
+        });
+    }
+
+    private toggleAggregationsVisibility(aggregations: Aggregation[]): void {
+        aggregations.forEach((aggregation: BucketAggregation) => {
+            const isAggregationVisible: boolean = aggregation.getBuckets().some((bucket: Bucket) => bucket.docCount > 0);
+            this.aggregations.get(aggregation.getName()).setVisible(isAggregationVisible);
         });
     }
 }
