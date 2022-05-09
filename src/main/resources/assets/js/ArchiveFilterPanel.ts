@@ -8,24 +8,25 @@ import {ContentSummary} from 'lib-contentstudio/app/content/ContentSummary';
 import {ContentSummaryJson} from 'lib-contentstudio/app/content/ContentSummaryJson';
 import {ContentQueryRequest} from 'lib-contentstudio/app/resource/ContentQueryRequest';
 import {ContentQueryResult} from 'lib-contentstudio/app/resource/ContentQueryResult';
-import {SearchContentQueryCreator} from 'lib-contentstudio/app/browse/filter/SearchContentQueryCreator';
 import {ArchiveViewItem} from './ArchiveViewItem';
 import {ArchiveResourceRequest} from './resource/ArchiveResourceRequest';
 import {Expand} from 'lib-admin-ui/rest/Expand';
 import * as Q from 'q';
-import {AggregationsDisplayNamesResolver} from 'lib-contentstudio/app/browse/filter/AggregationsDisplayNamesResolver';
 import {Aggregation} from 'lib-admin-ui/aggregation/Aggregation';
 import {LoginResult} from 'lib-admin-ui/security/auth/LoginResult';
 import {IsAuthenticatedRequest} from 'lib-admin-ui/security/auth/IsAuthenticatedRequest';
 import {BucketAggregation} from 'lib-admin-ui/aggregation/BucketAggregation';
 import {Bucket} from 'lib-admin-ui/aggregation/Bucket';
+import {ArchiveAggregation} from './ArchiveAggregation';
+import {SearchArchiveQueryCreator} from './SearchArchiveQueryCreator';
+import {ArchiveAggregationsDisplayNamesResolver} from './ArchiveAggregationsDisplayNamesResolver';
 
 export class ArchiveFilterPanel
     extends BrowseFilterPanel<ArchiveViewItem> {
 
     private aggregations: Map<string, AggregationGroupView>;
 
-    private aggregationsDisplayNamesResolver: AggregationsDisplayNamesResolver;
+    private aggregationsDisplayNamesResolver: ArchiveAggregationsDisplayNamesResolver;
 
     private searchEventListeners: { (query?: ContentQuery): void; }[] = [];
 
@@ -34,7 +35,7 @@ export class ArchiveFilterPanel
     constructor() {
         super();
 
-        this.aggregationsDisplayNamesResolver = new AggregationsDisplayNamesResolver();
+        this.aggregationsDisplayNamesResolver = new ArchiveAggregationsDisplayNamesResolver();
         this.initAggregationGroupView();
     }
 
@@ -53,6 +54,9 @@ export class ArchiveFilterPanel
 
         this.aggregations.set(ContentAggregation.CONTENT_TYPE,
             new AggregationGroupView(ContentAggregation.CONTENT_TYPE, i18n(`field.${ContentAggregation.CONTENT_TYPE}`)));
+
+        this.aggregations.set(ArchiveAggregation.ARCHIVER,
+            new AggregationGroupView(ArchiveAggregation.ARCHIVER, i18n(`field.${ArchiveAggregation.ARCHIVER}`)));
 
         this.aggregations.set(ContentAggregation.OWNER,
             new AggregationGroupView(ContentAggregation.OWNER, i18n(`field.${ContentAggregation.OWNER}`)));
@@ -124,12 +128,13 @@ export class ArchiveFilterPanel
     }
 
     private buildQuery(): ContentQuery {
-        const queryCreator: SearchContentQueryCreator = new SearchContentQueryCreator(this.getSearchInputValues());
+        const queryCreator: SearchArchiveQueryCreator = new SearchArchiveQueryCreator(this.getSearchInputValues());
 
         queryCreator.setIsAggregation(true);
         queryCreator.setConstraintItemsIds(this.hasConstraint() ? this.getSelectionItems() : null);
 
-        return queryCreator.create([ContentAggregation.CONTENT_TYPE, ContentAggregation.OWNER, ContentAggregation.LANGUAGE]);
+        return queryCreator.create(
+            [ContentAggregation.CONTENT_TYPE, ArchiveAggregation.ARCHIVER, ContentAggregation.OWNER, ContentAggregation.LANGUAGE]);
     }
 
     private notifySearchEvent(query?: ContentQuery): void {
