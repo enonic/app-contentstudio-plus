@@ -20,6 +20,7 @@ import {Bucket} from 'lib-admin-ui/aggregation/Bucket';
 import {ArchiveAggregation} from './ArchiveAggregation';
 import {ArchiveSearchContentQueryCreator} from './ArchiveSearchContentQueryCreator';
 import {ArchiveAggregationsDisplayNamesResolver} from './ArchiveAggregationsDisplayNamesResolver';
+import {FilterableAggregationGroupView} from 'lib-contentstudio/app/browse/filter/FilterableAggregationGroupView';
 
 export class ArchiveFilterPanel
     extends BrowseFilterPanel<ArchiveViewItem> {
@@ -59,10 +60,10 @@ export class ArchiveFilterPanel
             new AggregationGroupView(ArchiveAggregation.ARCHIVED, i18n(`field.${ArchiveAggregation.ARCHIVED}`)));
 
         this.aggregations.set(ArchiveAggregation.ARCHIVER,
-            new AggregationGroupView(ArchiveAggregation.ARCHIVER, i18n(`field.${ArchiveAggregation.ARCHIVER}`)));
+            new FilterableAggregationGroupView(ArchiveAggregation.ARCHIVER, i18n(`field.${ArchiveAggregation.ARCHIVER}`)));
 
         this.aggregations.set(ContentAggregation.OWNER,
-            new AggregationGroupView(ContentAggregation.OWNER, i18n(`field.${ContentAggregation.OWNER}`)));
+            new FilterableAggregationGroupView(ContentAggregation.OWNER, i18n(`field.${ContentAggregation.OWNER}`)));
 
         this.aggregations.set(ContentAggregation.LANGUAGE,
             new AggregationGroupView(ContentAggregation.LANGUAGE, i18n(`field.${ContentAggregation.LANGUAGE}`)));
@@ -93,6 +94,10 @@ export class ArchiveFilterPanel
     private initAggregationGroupView(): void {
         new IsAuthenticatedRequest().sendAndParse().then((loginResult: LoginResult) => {
             this.userInfo = loginResult;
+            (<FilterableAggregationGroupView>this.aggregations.get(ContentAggregation.OWNER)).setIdsToKeepOnToTop(
+                [this.getCurrentUserKeyAsString()]);
+            (<FilterableAggregationGroupView>this.aggregations.get(ArchiveAggregation.ARCHIVER)).setIdsToKeepOnToTop(
+                [this.getCurrentUserKeyAsString()]);
             this.searchDataAndHandleResponse(this.buildQuery()).catch(DefaultErrorHandler.handle);
 
             return Q.resolve();
