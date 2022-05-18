@@ -7,7 +7,7 @@ export class ArchiveSearchContentQueryCreator
     protected appendAggregationsAndFilter(contentAggregations?: string[]): void {
         super.appendAggregationsAndFilter(contentAggregations);
 
-        if (!contentAggregations || contentAggregations.some((a: string) => a === ArchiveAggregation.ARCHIVER)) {
+        if (!contentAggregations || contentAggregations.some((a: string) => a === ArchiveAggregation.ARCHIVED_BY)) {
             this.appendArchiverAggregationQuery();
             this.appendArchiverFilter();
         }
@@ -19,11 +19,11 @@ export class ArchiveSearchContentQueryCreator
     }
 
     private appendArchiverAggregationQuery(): void {
-        this.addTermsAggregation(ArchiveAggregation.ARCHIVER, 'archivedBy');
+        this.addTermsAggregation(ArchiveAggregation.ARCHIVED_BY, 'archivedBy');
     }
 
     private appendArchiverFilter(): void {
-        this.appendPropertyFilter(ArchiveAggregation.ARCHIVER, 'archivedBy');
+        this.appendPropertyFilter(ArchiveAggregation.ARCHIVED_BY, 'archivedBy');
     }
 
     private appendArchivedAggregationQuery(): void {

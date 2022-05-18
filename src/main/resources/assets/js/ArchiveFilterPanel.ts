@@ -59,8 +59,8 @@ export class ArchiveFilterPanel
         this.aggregations.set(ArchiveAggregation.ARCHIVED,
             new AggregationGroupView(ArchiveAggregation.ARCHIVED, i18n(`field.${ArchiveAggregation.ARCHIVED}`)));
 
-        this.aggregations.set(ArchiveAggregation.ARCHIVER,
-            new FilterableAggregationGroupView(ArchiveAggregation.ARCHIVER, i18n(`field.${ArchiveAggregation.ARCHIVER}`)));
+        this.aggregations.set(ArchiveAggregation.ARCHIVED_BY,
+            new FilterableAggregationGroupView(ArchiveAggregation.ARCHIVED_BY, i18n(`field.${ArchiveAggregation.ARCHIVED_BY}`)));
 
         this.aggregations.set(ContentAggregation.OWNER,
             new FilterableAggregationGroupView(ContentAggregation.OWNER, i18n(`field.${ContentAggregation.OWNER}`)));
@@ -96,7 +96,7 @@ export class ArchiveFilterPanel
             this.userInfo = loginResult;
             (<FilterableAggregationGroupView>this.aggregations.get(ContentAggregation.OWNER)).setIdsToKeepOnToTop(
                 [this.getCurrentUserKeyAsString()]);
-            (<FilterableAggregationGroupView>this.aggregations.get(ArchiveAggregation.ARCHIVER)).setIdsToKeepOnToTop(
+            (<FilterableAggregationGroupView>this.aggregations.get(ArchiveAggregation.ARCHIVED_BY)).setIdsToKeepOnToTop(
                 [this.getCurrentUserKeyAsString()]);
             this.searchDataAndHandleResponse(this.buildQuery()).catch(DefaultErrorHandler.handle);
 
@@ -142,7 +142,7 @@ export class ArchiveFilterPanel
         queryCreator.setConstraintItemsIds(this.hasConstraint() ? this.getSelectionItems() : null);
 
         return queryCreator.create(
-            [ContentAggregation.CONTENT_TYPE, ArchiveAggregation.ARCHIVED, ArchiveAggregation.ARCHIVER, ContentAggregation.OWNER,
+            [ContentAggregation.CONTENT_TYPE, ArchiveAggregation.ARCHIVED, ArchiveAggregation.ARCHIVED_BY, ContentAggregation.OWNER,
                 ContentAggregation.LANGUAGE]);
     }
 
