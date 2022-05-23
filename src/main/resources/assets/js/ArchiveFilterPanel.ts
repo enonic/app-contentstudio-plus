@@ -72,7 +72,7 @@ export class ArchiveFilterPanel
         this.aggregations = new Map<string, AggregationGroupView>();
 
         this.aggregations.set(ContentAggregation.CONTENT_TYPE,
-            new AggregationGroupView(ContentAggregation.CONTENT_TYPE, i18n(`field.${ContentAggregation.CONTENT_TYPE}`)));
+            new AggregationGroupView(ContentAggregation.CONTENT_TYPE, i18n(`field.${<string>ContentAggregation.CONTENT_TYPE}`)));
 
         this.aggregations.set(ArchiveAggregation.ARCHIVED,
             new AggregationGroupView(ArchiveAggregation.ARCHIVED, i18n(`field.${ArchiveAggregation.ARCHIVED}`)));
@@ -81,10 +81,10 @@ export class ArchiveFilterPanel
             new FilterableAggregationGroupView(ArchiveAggregation.ARCHIVED_BY, i18n(`field.${ArchiveAggregation.ARCHIVED_BY}`)));
 
         this.aggregations.set(ContentAggregation.OWNER,
-            new FilterableAggregationGroupView(ContentAggregation.OWNER, i18n(`field.${ContentAggregation.OWNER}`)));
+            new FilterableAggregationGroupView(ContentAggregation.OWNER, i18n(`field.${<string>ContentAggregation.OWNER}`)));
 
         this.aggregations.set(ContentAggregation.LANGUAGE,
-            new AggregationGroupView(ContentAggregation.LANGUAGE, i18n(`field.${ContentAggregation.LANGUAGE}`)));
+            new AggregationGroupView(ContentAggregation.LANGUAGE, i18n(`field.${<string>ContentAggregation.LANGUAGE}`)));
 
         return Array.from(this.aggregations.values());
     }
