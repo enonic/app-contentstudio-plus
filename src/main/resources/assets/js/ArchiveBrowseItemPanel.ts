@@ -1,4 +1,4 @@
-import {BrowseItemPanel} from 'lib-admin-ui/app/browse/BrowseItemPanel';
+import {BrowseItemPanel} from '@enonic/lib-admin-ui/app/browse/BrowseItemPanel';
 import {ContentBrowseItemPanel} from 'lib-contentstudio/app/browse/ContentBrowseItemPanel';
 import {ArchiveItemStatisticsPanel} from './ArchiveItemStatisticsPanel';
 

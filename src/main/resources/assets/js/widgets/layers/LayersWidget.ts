@@ -4,12 +4,12 @@ import {LayersWidgetItemView} from './LayersWidgetItemView';
 import {ContentSummaryAndCompareStatusFetcher} from 'lib-contentstudio/app/resource/ContentSummaryAndCompareStatusFetcher';
 import {ContentId} from 'lib-contentstudio/app/content/ContentId';
 import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
-import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
+import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import * as Q from 'q';
 import {HasValidLicenseRequest} from '../../resource/HasValidLicenseRequest';
 import {ArchiveNoLicenseBlock} from '../../ArchiveNoLicenseBlock';
-import {SpanEl} from 'lib-admin-ui/dom/SpanEl';
-import {i18n} from 'lib-admin-ui/util/Messages';
+import {SpanEl} from '@enonic/lib-admin-ui/dom/SpanEl';
+import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 
 export class LayersWidget
     extends Widget {

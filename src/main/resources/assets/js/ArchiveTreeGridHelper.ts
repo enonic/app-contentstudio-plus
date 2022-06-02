@@ -1,14 +1,14 @@
-import {TreeGridBuilder} from 'lib-admin-ui/ui/treegrid/TreeGridBuilder';
-import {GridColumnConfig} from 'lib-admin-ui/ui/grid/GridColumn';
+import {TreeGridBuilder} from '@enonic/lib-admin-ui/ui/treegrid/TreeGridBuilder';
+import {GridColumnConfig} from '@enonic/lib-admin-ui/ui/grid/GridColumn';
 import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
-import {TreeNode} from 'lib-admin-ui/ui/treegrid/TreeNode';
+import {TreeNode} from '@enonic/lib-admin-ui/ui/treegrid/TreeNode';
 import {ArchiveViewItem} from './ArchiveViewItem';
-import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
+import {ObjectHelper} from '@enonic/lib-admin-ui/ObjectHelper';
 import {ArchiveContentViewItem} from './ArchiveContentViewItem';
-import {Viewer} from 'lib-admin-ui/ui/Viewer';
+import {Viewer} from '@enonic/lib-admin-ui/ui/Viewer';
 import {ArchiveContentViewer} from './ArchiveContentViewer';
-import {i18n} from 'lib-admin-ui/util/Messages';
-import {SpanEl} from 'lib-admin-ui/dom/SpanEl';
+import {i18n} from '@enonic/lib-admin-ui/util/Messages';
+import {SpanEl} from '@enonic/lib-admin-ui/dom/SpanEl';
 
 export class ArchiveTreeGridHelper {
 

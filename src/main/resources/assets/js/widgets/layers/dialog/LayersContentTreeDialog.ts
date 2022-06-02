@@ -1,11 +1,11 @@
-import {ModalDialog} from 'lib-admin-ui/ui/dialog/ModalDialog';
-import {H6El} from 'lib-admin-ui/dom/H6El';
+import {ModalDialog} from '@enonic/lib-admin-ui/ui/dialog/ModalDialog';
+import {H6El} from '@enonic/lib-admin-ui/dom/H6El';
 import * as Q from 'q';
 import {ProjectContext} from 'lib-contentstudio/app/project/ProjectContext';
 import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import {LayerContent} from '../LayerContent';
 import {LayersContentTreeList} from '../LayersContentTreeList';
-import {Store} from 'lib-admin-ui/store/Store';
+import {Store} from '@enonic/lib-admin-ui/store/Store';
 
 export class LayersContentTreeDialog extends ModalDialog {
 

@@ -1,8 +1,8 @@
 import {ArchiveDialog} from './ArchiveDialog';
-import {NotifyManager} from 'lib-admin-ui/notify/NotifyManager';
+import {NotifyManager} from '@enonic/lib-admin-ui/notify/NotifyManager';
 import {ProgressBarManager} from 'lib-contentstudio/app/dialog/ProgressBarManager';
-import {TaskState} from 'lib-admin-ui/task/TaskState';
-import {ManagedActionExecutor} from 'lib-admin-ui/managedaction/ManagedActionExecutor';
+import {TaskState} from '@enonic/lib-admin-ui/task/TaskState';
+import {ManagedActionExecutor} from '@enonic/lib-admin-ui/managedaction/ManagedActionExecutor';
 
 export abstract class ArchiveProgressDialog
     extends ArchiveDialog

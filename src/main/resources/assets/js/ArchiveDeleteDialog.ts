@@ -1,10 +1,10 @@
 import {ArchiveDialog} from './ArchiveDialog';
-import {i18n} from 'lib-admin-ui/util/Messages';
+import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {DeleteContentRequest} from 'lib-contentstudio/app/resource/DeleteContentRequest';
-import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
+import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import {ArchiveResourceRequest} from './resource/ArchiveResourceRequest';
 import {ArchiveProgressDialog} from './ArchiveProgressDialog';
-import {TaskId} from 'lib-admin-ui/task/TaskId';
+import {TaskId} from '@enonic/lib-admin-ui/task/TaskId';
 
 export class ArchiveDeleteDialog
     extends ArchiveProgressDialog {

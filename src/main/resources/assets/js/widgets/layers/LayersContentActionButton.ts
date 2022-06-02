@@ -1,8 +1,8 @@
 import {ProjectContext} from 'lib-contentstudio/app/project/ProjectContext';
 import {EditContentEvent} from 'lib-contentstudio/app/event/EditContentEvent';
-import {ActionButton} from 'lib-admin-ui/ui/button/ActionButton';
-import {Action} from 'lib-admin-ui/ui/Action';
-import {i18n} from 'lib-admin-ui/util/Messages';
+import {ActionButton} from '@enonic/lib-admin-ui/ui/button/ActionButton';
+import {Action} from '@enonic/lib-admin-ui/ui/Action';
+import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {LayerContent} from './LayerContent';
 
 export class LayersContentActionButton extends ActionButton {

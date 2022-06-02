@@ -1,6 +1,6 @@
-import {H6El} from 'lib-admin-ui/dom/H6El';
-import {ModalDialog} from 'lib-admin-ui/ui/dialog/ModalDialog';
-import {i18n} from 'lib-admin-ui/util/Messages';
+import {H6El} from '@enonic/lib-admin-ui/dom/H6El';
+import {ModalDialog} from '@enonic/lib-admin-ui/ui/dialog/ModalDialog';
+import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {ArchiveLicenseUploadEl} from './ArchiveLicenseUploadEl';
 
 export class ArchiveNoLicenseDialog

@@ -1,8 +1,8 @@
-import {ListBox} from 'lib-admin-ui/ui/selector/list/ListBox';
+import {ListBox} from '@enonic/lib-admin-ui/ui/selector/list/ListBox';
 import {LayerContentView} from './LayerContentView';
 import {LayerContent} from './LayerContent';
-import {DivEl} from 'lib-admin-ui/dom/DivEl';
-import {i18n} from 'lib-admin-ui/util/Messages';
+import {DivEl} from '@enonic/lib-admin-ui/dom/DivEl';
+import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {ProjectContext} from 'lib-contentstudio/app/project/ProjectContext';
 import {LayerContentViewRelation} from './LayerContentViewRelation';
 

@@ -1,11 +1,11 @@
 import * as Q from 'q';
-import {TaskIdJson} from 'lib-admin-ui/task/TaskIdJson';
-import {TaskState} from 'lib-admin-ui/task/TaskState';
-import {TaskId} from 'lib-admin-ui/task/TaskId';
+import {TaskIdJson} from '@enonic/lib-admin-ui/task/TaskIdJson';
+import {TaskState} from '@enonic/lib-admin-ui/task/TaskState';
+import {TaskId} from '@enonic/lib-admin-ui/task/TaskId';
 import {GetTaskInfoRequest} from 'lib-contentstudio/app/resource/GetTaskInfoRequest';
-import {TaskInfo} from 'lib-admin-ui/task/TaskInfo';
-import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
-import {JsonResponse} from 'lib-admin-ui/rest/JsonResponse';
+import {TaskInfo} from '@enonic/lib-admin-ui/task/TaskInfo';
+import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
+import {JsonResponse} from '@enonic/lib-admin-ui/rest/JsonResponse';
 import {ArchiveResourceRequest} from './ArchiveResourceRequest';
 
 export class TaskArchiveResourceRequest extends ArchiveResourceRequest<TaskId> {

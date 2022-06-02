@@ -1,4 +1,4 @@
-import {Response} from 'lib-admin-ui/rest/Response';
+import {Response} from '@enonic/lib-admin-ui/rest/Response';
 import {LicenseRequest} from './LicenseRequest';
 
 export class HasValidLicenseRequest

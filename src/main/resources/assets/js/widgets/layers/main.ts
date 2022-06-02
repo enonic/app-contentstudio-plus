@@ -1,7 +1,7 @@
-import {Element} from 'lib-admin-ui/dom/Element';
+import {Element} from '@enonic/lib-admin-ui/dom/Element';
 import {LayersWidget} from '../layers/LayersWidget';
 import {AppHelper} from '../../util/AppHelper';
-import {CONFIG} from 'lib-admin-ui/util/Config';
+import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
 
 void (async () => {
     const contentId = document.currentScript.getAttribute('data-content-id');

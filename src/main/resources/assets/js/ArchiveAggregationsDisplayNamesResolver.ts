@@ -1,4 +1,4 @@
-import {Aggregation} from 'lib-admin-ui/aggregation/Aggregation';
+import {Aggregation} from '@enonic/lib-admin-ui/aggregation/Aggregation';
 import {AggregationsDisplayNamesResolver} from 'lib-contentstudio/app/browse/filter/AggregationsDisplayNamesResolver';
 import {ArchiveAggregation} from './ArchiveAggregation';
 

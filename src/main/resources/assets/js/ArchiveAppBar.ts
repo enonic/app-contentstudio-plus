@@ -1,14 +1,14 @@
-import {AppBar} from 'lib-admin-ui/app/bar/AppBar';
-import {Application} from 'lib-admin-ui/app/Application';
-import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
-import {i18n} from 'lib-admin-ui/util/Messages';
+import {AppBar} from '@enonic/lib-admin-ui/app/bar/AppBar';
+import {Application} from '@enonic/lib-admin-ui/app/Application';
+import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
+import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {ProjectViewer} from 'lib-contentstudio/app/settings/wizard/viewer/ProjectViewer';
 import {ProjectContext} from 'lib-contentstudio/app/project/ProjectContext';
 import {ProjectSelectionDialog} from 'lib-contentstudio/app/settings/dialog/ProjectSelectionDialog';
 import {ProjectUpdatedEvent} from 'lib-contentstudio/app/settings/event/ProjectUpdatedEvent';
 import {ProjectListWithMissingRequest} from 'lib-contentstudio/app/settings/resource/ProjectListWithMissingRequest';
 import {Project} from 'lib-contentstudio/app/settings/data/project/Project';
-import {DivEl} from 'lib-admin-ui/dom/DivEl';
+import {DivEl} from '@enonic/lib-admin-ui/dom/DivEl';
 
 export class ArchiveAppBar extends AppBar {
 

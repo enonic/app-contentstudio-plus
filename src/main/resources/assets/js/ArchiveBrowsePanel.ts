@@ -1,4 +1,4 @@
-import {BrowseItemPanel} from 'lib-admin-ui/app/browse/BrowseItemPanel';
+import {BrowseItemPanel} from '@enonic/lib-admin-ui/app/browse/BrowseItemPanel';
 import {ArchiveTreeGrid} from './ArchiveTreeGrid';
 import {ArchiveBrowseItemPanel} from './ArchiveBrowseItemPanel';
 import * as Q from 'q';

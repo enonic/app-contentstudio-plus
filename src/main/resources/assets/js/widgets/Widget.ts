@@ -1,5 +1,5 @@
-import {DivEl} from 'lib-admin-ui/dom/DivEl';
-import {LoadMask} from 'lib-admin-ui/ui/mask/LoadMask';
+import {DivEl} from '@enonic/lib-admin-ui/dom/DivEl';
+import {LoadMask} from '@enonic/lib-admin-ui/ui/mask/LoadMask';
 import {AppHelper} from '../util/AppHelper';
 import {OnOffButton} from 'lib-contentstudio/app/issue/view/OnOffButton';
 
