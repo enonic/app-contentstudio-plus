@@ -15,9 +15,9 @@
     "postinstall": "cd node_modules/lib-contentstudio && npm install"
   },
   "dependencies": {
+    "@enonic/lib-admin-ui": "file:./.xp/dev/lib-admin-ui",
     "jquery": "^3.6.0",
     "jquery-ui": "^1.13.0",
-    "lib-admin-ui": "file:./.xp/dev/lib-admin-ui",
     "lib-contentstudio": "file:./.xp/dev/lib-contentstudio",
     "normalize-url": "^7.0.3",
     "q": "^1.5.1"
@@ -57,7 +57,7 @@
     "extends browserslist-config-enonic"
   ],
   "engines": {
-    "node": ">= 16.0.0",
-    "npm": ">= 7.10.0"
+    "node": ">= 16.15.0",
+    "npm": ">= 8.5.5"
   }
 }
