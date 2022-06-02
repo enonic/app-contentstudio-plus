@@ -1,6 +1,6 @@
-import {HttpMethod} from 'lib-admin-ui/rest/HttpMethod';
+import {HttpMethod} from '@enonic/lib-admin-ui/rest/HttpMethod';
 import {LicenseRequest} from './LicenseRequest';
-import {Response} from 'lib-admin-ui/rest/Response';
+import {Response} from '@enonic/lib-admin-ui/rest/Response';
 
 interface LicenseParams { license: File }
 

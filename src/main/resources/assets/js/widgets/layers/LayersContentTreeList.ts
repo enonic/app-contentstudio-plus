@@ -1,4 +1,4 @@
-import {ListBox} from 'lib-admin-ui/ui/selector/list/ListBox';
+import {ListBox} from '@enonic/lib-admin-ui/ui/selector/list/ListBox';
 import {LayerContent} from './LayerContent';
 import {LayerContentViewDataBlock} from './LayerContentViewDataBlock';
 import {LayerContentView} from './LayerContentView';

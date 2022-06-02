@@ -1,4 +1,4 @@
-import {HttpMethod} from 'lib-admin-ui/rest/HttpMethod';
+import {HttpMethod} from '@enonic/lib-admin-ui/rest/HttpMethod';
 import {TaskArchiveResourceRequest} from './TaskArchiveResourceRequest';
 
 type Params = {

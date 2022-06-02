@@ -1,8 +1,8 @@
 import * as Q from 'q';
-import {SpanEl} from 'lib-admin-ui/dom/SpanEl';
+import {SpanEl} from '@enonic/lib-admin-ui/dom/SpanEl';
 import {WidgetItemView} from 'lib-contentstudio/app/view/context/WidgetItemView';
 import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
-import {i18n} from 'lib-admin-ui/util/Messages';
+import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 
 export class ArchiveStatusWidgetItemView
     extends WidgetItemView {

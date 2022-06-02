@@ -1,4 +1,4 @@
-import {DivEl} from 'lib-admin-ui/dom/DivEl';
+import {DivEl} from '@enonic/lib-admin-ui/dom/DivEl';
 import {LayerContent} from './LayerContent';
 import {LayerContentViewHeader} from './LayerContentViewHeader';
 import {LayerContentViewBody} from './LayerContentViewBody';

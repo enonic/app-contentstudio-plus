@@ -1,5 +1,5 @@
-import {DivEl} from 'lib-admin-ui/dom/DivEl';
-import {ActionButton} from 'lib-admin-ui/ui/button/ActionButton';
+import {DivEl} from '@enonic/lib-admin-ui/dom/DivEl';
+import {ActionButton} from '@enonic/lib-admin-ui/ui/button/ActionButton';
 import {LayerContent} from './LayerContent';
 import {LayersContentActionButton} from './LayersContentActionButton';
 

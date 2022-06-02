@@ -1,7 +1,7 @@
-import {DivEl} from 'lib-admin-ui/dom/DivEl';
+import {DivEl} from '@enonic/lib-admin-ui/dom/DivEl';
 import {ArchiveLicenseUploadEl} from './ArchiveLicenseUploadEl';
-import {SpanEl} from 'lib-admin-ui/dom/SpanEl';
-import {i18n} from 'lib-admin-ui/util/Messages';
+import {SpanEl} from '@enonic/lib-admin-ui/dom/SpanEl';
+import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 
 export class ArchiveNoLicenseBlock
     extends DivEl {

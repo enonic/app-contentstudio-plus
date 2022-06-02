@@ -1,6 +1,6 @@
 import {ArchiveItemPreviewToolbar} from './ArchiveItemPreviewToolbar';
 import {IsRenderableRequest} from 'lib-contentstudio/app/resource/IsRenderableRequest';
-import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
+import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import {ContentPath} from 'lib-contentstudio/app/content/ContentPath';
 import {ArchiveContentViewItem} from './ArchiveContentViewItem';
 import {ContentItemPreviewPanel} from 'lib-contentstudio/app/view/ContentItemPreviewPanel';

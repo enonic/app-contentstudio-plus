@@ -1,8 +1,8 @@
-import {DivEl} from 'lib-admin-ui/dom/DivEl';
-import {Element, NewElementBuilder} from 'lib-admin-ui/dom/Element';
-import {LabelEl} from 'lib-admin-ui/dom/LabelEl';
-import {NotifyManager} from 'lib-admin-ui/notify/NotifyManager';
-import {i18n} from 'lib-admin-ui/util/Messages';
+import {DivEl} from '@enonic/lib-admin-ui/dom/DivEl';
+import {Element, NewElementBuilder} from '@enonic/lib-admin-ui/dom/Element';
+import {LabelEl} from '@enonic/lib-admin-ui/dom/LabelEl';
+import {NotifyManager} from '@enonic/lib-admin-ui/notify/NotifyManager';
+import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {UploadLicenseRequest} from './resource/UploadLicenseRequest';
 
 export class ArchiveLicenseUploadEl

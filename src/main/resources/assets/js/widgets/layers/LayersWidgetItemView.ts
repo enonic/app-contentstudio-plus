@@ -4,13 +4,13 @@ import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/Cont
 import {ShowAllContentLayersButton} from './ShowAllContentLayersButton';
 import {MultiLayersContentLoader} from './MultiLayersContentLoader';
 import {LayerContent} from './LayerContent';
-import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
-import {DivEl} from 'lib-admin-ui/dom/DivEl';
+import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
+import {DivEl} from '@enonic/lib-admin-ui/dom/DivEl';
 import {LayersContentTreeDialog} from './dialog/LayersContentTreeDialog';
 import {ProjectCreatedEvent} from 'lib-contentstudio/app/settings/event/ProjectCreatedEvent';
 import {ProjectUpdatedEvent} from 'lib-contentstudio/app/settings/event/ProjectUpdatedEvent';
 import {ProjectDeletedEvent} from 'lib-contentstudio/app/settings/event/ProjectDeletedEvent';
-import {Store} from 'lib-admin-ui/store/Store';
+import {Store} from '@enonic/lib-admin-ui/store/Store';
 import {ContentServerEventsHandler} from 'lib-contentstudio/app/event/ContentServerEventsHandler';
 import {ContentServerChangeItem} from 'lib-contentstudio/app/event/ContentServerChangeItem';
 

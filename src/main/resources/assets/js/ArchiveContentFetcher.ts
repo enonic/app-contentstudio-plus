@@ -3,7 +3,7 @@ import * as Q from 'q';
 import {ContentQueryRequest} from 'lib-contentstudio/app/resource/ContentQueryRequest';
 import {ContentSummaryJson} from 'lib-contentstudio/app/content/ContentSummaryJson';
 import {ContentSummary} from 'lib-contentstudio/app/content/ContentSummary';
-import {Expand} from 'lib-admin-ui/rest/Expand';
+import {Expand} from '@enonic/lib-admin-ui/rest/Expand';
 import {ContentQueryResult} from 'lib-contentstudio/app/resource/ContentQueryResult';
 import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import {CompareStatus} from 'lib-contentstudio/app/content/CompareStatus';

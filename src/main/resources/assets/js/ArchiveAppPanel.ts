@@ -1,5 +1,5 @@
-import {AppPanel} from 'lib-admin-ui/app/AppPanel';
-import {BrowsePanel} from 'lib-admin-ui/app/browse/BrowsePanel';
+import {AppPanel} from '@enonic/lib-admin-ui/app/AppPanel';
+import {BrowsePanel} from '@enonic/lib-admin-ui/app/browse/BrowsePanel';
 import {ArchiveBrowsePanel} from './ArchiveBrowsePanel';
 
 export class ArchiveAppPanel

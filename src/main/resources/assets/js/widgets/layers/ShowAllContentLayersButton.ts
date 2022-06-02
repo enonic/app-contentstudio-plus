@@ -1,6 +1,6 @@
-import {ActionButton} from 'lib-admin-ui/ui/button/ActionButton';
-import {Action} from 'lib-admin-ui/ui/Action';
-import {i18n} from 'lib-admin-ui/util/Messages';
+import {ActionButton} from '@enonic/lib-admin-ui/ui/button/ActionButton';
+import {Action} from '@enonic/lib-admin-ui/ui/Action';
+import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import * as Q from 'q';
 import {LayerContent} from './LayerContent';
 

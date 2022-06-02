@@ -1,22 +1,22 @@
 import * as Q from 'q';
-import {TreeGrid} from 'lib-admin-ui/ui/treegrid/TreeGrid';
+import {TreeGrid} from '@enonic/lib-admin-ui/ui/treegrid/TreeGrid';
 import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import {ArchiveTreeGridHelper} from './ArchiveTreeGridHelper';
-import {TreeGridContextMenu} from 'lib-admin-ui/ui/treegrid/TreeGridContextMenu';
+import {TreeGridContextMenu} from '@enonic/lib-admin-ui/ui/treegrid/TreeGridContextMenu';
 import {ArchiveTreeGridActions} from './ArchiveTreeGridActions';
 import {ArchiveViewItem} from './ArchiveViewItem';
-import {TreeNode} from 'lib-admin-ui/ui/treegrid/TreeNode';
+import {TreeNode} from '@enonic/lib-admin-ui/ui/treegrid/TreeNode';
 import {ArchiveContentViewItem, ArchiveContentViewItemBuilder} from './ArchiveContentViewItem';
 import {ProjectContext} from 'lib-contentstudio/app/project/ProjectContext';
 import {ArchiveServerEvent} from 'lib-contentstudio/app/event/ArchiveServerEvent';
 import {ContentServerEventsHandler} from 'lib-contentstudio/app/event/ContentServerEventsHandler';
 import {ContentPath} from 'lib-contentstudio/app/content/ContentPath';
 import {ContentId} from 'lib-contentstudio/app/content/ContentId';
-import {NodeServerChangeType} from 'lib-admin-ui/event/NodeServerChange';
+import {NodeServerChangeType} from '@enonic/lib-admin-ui/event/NodeServerChange';
 import {ContentServerChangeItem} from 'lib-contentstudio/app/event/ContentServerChangeItem';
 import {ArchiveHelper} from './ArchiveHelper';
 import {ContentQuery} from 'lib-contentstudio/app/content/ContentQuery';
-import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
+import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import {ArchiveContentFetcher} from './ArchiveContentFetcher';
 import {FetchResponse} from './FetchResponse';
 

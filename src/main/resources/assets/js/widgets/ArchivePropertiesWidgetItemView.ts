@@ -1,11 +1,11 @@
 import {PropertiesWidgetItemView} from 'lib-contentstudio/app/view/context/widget/details/PropertiesWidgetItemView';
-import {Application} from 'lib-admin-ui/application/Application';
-import {i18n} from 'lib-admin-ui/util/Messages';
+import {Application} from '@enonic/lib-admin-ui/application/Application';
+import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {GetContentVersionsRequest} from 'lib-contentstudio/app/resource/GetContentVersionsRequest';
 import {ContentVersions} from 'lib-contentstudio/app/ContentVersions';
-import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
-import {Element} from 'lib-admin-ui/dom/Element';
-import {DateTimeFormatter} from 'lib-admin-ui/ui/treegrid/DateTimeFormatter';
+import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
+import {Element} from '@enonic/lib-admin-ui/dom/Element';
+import {DateTimeFormatter} from '@enonic/lib-admin-ui/ui/treegrid/DateTimeFormatter';
 
 
 export class ArchivePropertiesWidgetItemView

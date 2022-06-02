@@ -1,6 +1,6 @@
-import {Path} from 'lib-admin-ui/rest/Path';
-import {ResourceRequest} from 'lib-admin-ui/rest/ResourceRequest';
-import {CONFIG} from 'lib-admin-ui/util/Config';
+import {Path} from '@enonic/lib-admin-ui/rest/Path';
+import {ResourceRequest} from '@enonic/lib-admin-ui/rest/ResourceRequest';
+import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
 
 export abstract class LicenseRequest<T>
     extends ResourceRequest<T> {

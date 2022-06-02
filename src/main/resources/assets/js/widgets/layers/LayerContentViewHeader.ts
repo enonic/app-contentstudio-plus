@@ -1,4 +1,4 @@
-import {DivEl} from 'lib-admin-ui/dom/DivEl';
+import {DivEl} from '@enonic/lib-admin-ui/dom/DivEl';
 import {CompareStatusFormatter} from 'lib-contentstudio/app/content/CompareStatus';
 import {LayerContent} from './LayerContent';
 import {ProjectHelper} from 'lib-contentstudio/app/settings/data/project/ProjectHelper';

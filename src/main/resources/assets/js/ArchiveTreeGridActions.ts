@@ -1,7 +1,7 @@
 import * as Q from 'q';
-import {TreeGridActions} from 'lib-admin-ui/ui/treegrid/actions/TreeGridActions';
-import {Action} from 'lib-admin-ui/ui/Action';
-import {i18n} from 'lib-admin-ui/util/Messages';
+import {TreeGridActions} from '@enonic/lib-admin-ui/ui/treegrid/actions/TreeGridActions';
+import {Action} from '@enonic/lib-admin-ui/ui/Action';
+import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {ArchiveViewItem} from './ArchiveViewItem';
 import {ArchiveDeleteDialog} from './ArchiveDeleteDialog';
 import {ArchiveRestoreDialog} from './ArchiveRestoreDialog';

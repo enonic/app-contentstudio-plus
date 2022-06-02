@@ -1,23 +1,23 @@
 // End of Polyfills
 import * as Q from 'q';
-import {showError, showWarning} from 'lib-admin-ui/notify/MessageBus';
-import {i18n} from 'lib-admin-ui/util/Messages';
-import {i18nInit, i18nAdd} from 'lib-admin-ui/util/MessagesInitializer';
+import {showError, showWarning} from '@enonic/lib-admin-ui/notify/MessageBus';
+import {i18n} from '@enonic/lib-admin-ui/util/Messages';
+import {i18nInit, i18nAdd} from '@enonic/lib-admin-ui/util/MessagesInitializer';
 import {Router} from 'lib-contentstudio/app/Router';
-import {ConnectionDetector} from 'lib-admin-ui/system/ConnectionDetector';
-import {Body} from 'lib-admin-ui/dom/Body';
-import {Application} from 'lib-admin-ui/app/Application';
-import {NotifyManager} from 'lib-admin-ui/notify/NotifyManager';
-import {ApplicationEvent, ApplicationEventType} from 'lib-admin-ui/application/ApplicationEvent';
-import {UriHelper} from 'lib-admin-ui/util/UriHelper';
-import {DefaultErrorHandler} from 'lib-admin-ui/DefaultErrorHandler';
+import {ConnectionDetector} from '@enonic/lib-admin-ui/system/ConnectionDetector';
+import {Body} from '@enonic/lib-admin-ui/dom/Body';
+import {Application} from '@enonic/lib-admin-ui/app/Application';
+import {NotifyManager} from '@enonic/lib-admin-ui/notify/NotifyManager';
+import {ApplicationEvent, ApplicationEventType} from '@enonic/lib-admin-ui/application/ApplicationEvent';
+import {UriHelper} from '@enonic/lib-admin-ui/util/UriHelper';
+import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import {Project} from 'lib-contentstudio/app/settings/data/project/Project';
 import {ProjectListWithMissingRequest} from 'lib-contentstudio/app/settings/resource/ProjectListWithMissingRequest';
 import {ProjectHelper} from 'lib-contentstudio/app/settings/data/project/ProjectHelper';
 import {ProjectContext} from 'lib-contentstudio/app/project/ProjectContext';
 import {ArchiveAppContainer} from './ArchiveAppContainer';
-import {Store} from 'lib-admin-ui/store/Store';
-import {CONFIG} from 'lib-admin-ui/util/Config';
+import {Store} from '@enonic/lib-admin-ui/store/Store';
+import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
 
 // Dynamically import and execute all input types, since they are used
 // on-demand, when parsing XML schemas and has not real usage in app

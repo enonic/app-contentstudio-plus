@@ -1,5 +1,5 @@
-import {ItemStatisticsPanel} from 'lib-admin-ui/app/view/ItemStatisticsPanel';
-import {ObjectHelper} from 'lib-admin-ui/ObjectHelper';
+import {ItemStatisticsPanel} from '@enonic/lib-admin-ui/app/view/ItemStatisticsPanel';
+import {ObjectHelper} from '@enonic/lib-admin-ui/ObjectHelper';
 import {ArchiveItemPreviewPanel} from './ArchiveItemPreviewPanel';
 import {ArchiveViewItem} from './ArchiveViewItem';
 import {ArchiveContentViewItem} from './ArchiveContentViewItem';
