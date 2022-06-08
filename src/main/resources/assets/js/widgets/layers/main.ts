@@ -2,6 +2,7 @@ import {Element} from '@enonic/lib-admin-ui/dom/Element';
 import {LayersWidget} from '../layers/LayersWidget';
 import {AppHelper} from '../../util/AppHelper';
 import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
+import {i18nInit, i18nAdd} from '@enonic/lib-admin-ui/util/MessagesInitializer';
 
 void (async () => {
     const contentId = document.currentScript.getAttribute('data-content-id');
@@ -11,6 +12,8 @@ void (async () => {
     }
 
     await CONFIG.init(configServiceUrl);
+    await i18nInit(CONFIG.getString('services.i18nUrlStudio'));
+    await i18nAdd(CONFIG.getString('services.i18nUrl'));
 
     const widgetContainer = document.getElementById(AppHelper.getLayersWidgetClass());
 
