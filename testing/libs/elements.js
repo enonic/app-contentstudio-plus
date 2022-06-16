@@ -88,9 +88,9 @@ module.exports = Object.freeze({
     COMPARE_WITH_CURRENT_VERSION: `//button[contains(@id,'ActionButton') and @title='Compare with current version']`,
     LIVE_EDIT_FRAME: "//iframe[contains(@class,'live-edit-frame shown')]",
     APP_MODE_SWITCHER_TOGGLER: "//div[contains(@id,'AppWrapper')]//button[contains(@id,'ToggleIcon')]",
-    SETTINGS_BUTTON: "//button[contains(@id,SidebarButton) and @title='Settings']",
-    ARCHIVE_BUTTON: "//button[contains(@id,SidebarButton) and @title='Archive']",
-    MODE_CONTENT_BUTTON: "//button[contains(@id,SidebarButton) and @title='Home']",
+    SETTINGS_BUTTON: "//button[contains(@id,WidgetButton) and @title='Settings']",
+    ARCHIVE_BUTTON: "//button[contains(@id,WidgetButton) and @title='Archive']",
+    MODE_CONTENT_BUTTON: "//button[contains(@id,WidgetButton) and @title='Content Studio']",
     CKE: {
         insertTableButton: `//a[contains(@class,'cke_button') and contains(@title,'Table')]`,
         insertLinkButton: `//a[contains(@class,'cke_button') and contains(@title,'Link')]`,
