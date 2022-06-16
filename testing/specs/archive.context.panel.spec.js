@@ -166,6 +166,7 @@ describe('archive.context.panel.spec: tests for archive context panel', function
             //4. Select the folder and open Versions History:
             await studioUtils.findAndSelectItem(FOLDER1.displayName);
             await contentBrowseDetailsPanel.openVersionHistory();
+            await studioUtils.saveScreenshot("folder_restored_by");
             //5. Verify that new 'Restored' version-item appears in the widget:
             let actualUser = await browseVersionsWidget.getRestoredBy(0);
             assert.equal(actualUser, "by Super User", "Expected user should be displayed in the 'restored by'");
