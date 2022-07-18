@@ -17,7 +17,7 @@
   "dependencies": {
     "@enonic/lib-admin-ui": "file:./.xp/dev/lib-admin-ui",
     "jquery": "^3.6.0",
-    "jquery-ui": "^1.13.0",
+    "jquery-ui": "^1.13.2",
     "lib-contentstudio": "file:./.xp/dev/lib-contentstudio",
     "normalize-url": "^7.0.3",
     "q": "^1.5.1"
