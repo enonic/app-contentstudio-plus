@@ -45,10 +45,7 @@ app {
 }
 
 dependencies {
-    include "com.enonic.xp:lib-content:${xpVersion}"
-    include "com.enonic.xp:lib-context:${xpVersion}"
     include "com.enonic.xp:lib-portal:${xpVersion}"
-    include "com.enonic.xp:lib-event:${xpVersion}"
     include "com.enonic.xp:lib-i18n:${xpVersion}"
     include "com.enonic.xp:lib-admin:${xpVersion}"
     include "com.enonic.lib:lib-admin-ui:${libAdminUiVersion}"
@@ -70,7 +67,7 @@ configurations.all {
 
 node {
     download = true
-    version = '16.15.0'
+    version = '16.16.0'
 }
 
 task copyDevResources {

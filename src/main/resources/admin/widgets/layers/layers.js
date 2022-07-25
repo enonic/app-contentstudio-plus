@@ -1,4 +1,3 @@
-const portalLib = require('/lib/xp/portal');
 const portal = require('/lib/xp/portal');
 const mustache = require('/lib/mustache');
 
@@ -9,8 +8,8 @@ function handleGet(req) {
 function renderWidgetView(req) {
     let contentId = req.params.contentId;
 
-    if (!contentId && portalLib.getContent()) {
-        contentId = portalLib.getContent()._id;
+    if (!contentId && portal.getContent()) {
+        contentId = portal.getContent()._id;
     }
 
     const view = resolve('layers.html');
