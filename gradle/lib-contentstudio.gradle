@@ -16,8 +16,6 @@ def hasFlushTask()
 if ( hasLibContentStudio() )
 {
     def appContentStudio = gradle.includedBuild( 'app-contentstudio' )
-    def excludedTasks = gradle.startParameter.getExcludedTaskNames().findAll( { it == 'lint' || it == 'test' } )
-    appContentStudio.getLoadedSettings().getStartParameter().setExcludedTaskNames( excludedTasks )
 
     ext {
         libContentStudioBuildTask = appContentStudio.task( ':lib-contentstudio:build' )
