@@ -95,6 +95,16 @@ module.exports = Object.freeze({
         STRONG: "password123=",
         WEAK: "password"
     },
+    VERSIONS_ITEM_HEADER: {
+        PERMISSIONS_UPDATED: 'Permissions updated',
+        CREATED: "Created",
+        EDITED: "Edited",
+        MARKED_AS_READY: "Marked as Ready",
+        SORTED: "Sorted",
+        PUBLISHED: "Published",
+        CHANGED: "Changed",
+        ARCHIVED: "Archived"
+    },
 
     VALIDATION_MESSAGE: {
         TEXT_IS_TOO_LONG: "Text is too long",

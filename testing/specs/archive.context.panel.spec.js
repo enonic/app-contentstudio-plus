@@ -38,7 +38,6 @@ describe('archive.context.panel.spec: tests for archive context panel', function
             let contentBrowsePanel = new ContentBrowsePanel();
             let deleteContentDialog = new DeleteContentDialog();
             let archiveBrowsePanel = new ArchiveBrowsePanel();
-            let confirmValueDialog = new ConfirmValueDialog();
             //1. Select and archive the folder
             await studioUtils.findContentAndClickCheckBox(FOLDER1.displayName);
             await contentBrowsePanel.rightClickOnItemByDisplayName(FOLDER1.displayName);
@@ -54,25 +53,59 @@ describe('archive.context.panel.spec: tests for archive context panel', function
             await studioUtils.saveScreenshot("archive_context_panel");
             //3. Verify the properties widget
             let actualOwner = await archivedContentPropertiesWidget.getOwner();
-            assert.equal(actualOwner, "su", "Expected owner should be displayed");
-            let actualType = await archivedContentPropertiesWidget.getType();
-            assert.equal(actualType, "folder", "Expected type should be displayed");
-            let actualApplication = await archivedContentPropertiesWidget.getApplication();
-            assert.equal(actualApplication, "base", "Expected application should be displayed");
-            //4. Verify the status in the widget
-            let actualStatus = await archivedContentStatusWidget.getStatus();
-            assert.equal(actualStatus, "Archived", "Expected status should be displayed");
+                assert.equal(actualOwner, "su", "Expected owner should be displayed");
+                let actualType = await archivedContentPropertiesWidget.getType();
+                assert.equal(actualType, "folder", "Expected type should be displayed");
+                let actualApplication = await archivedContentPropertiesWidget.getApplication();
+                assert.equal(actualApplication, "base", "Expected application should be displayed");
+                //4. Verify the status in the widget
+                let actualStatus = await archivedContentStatusWidget.getStatus();
+                assert.equal(actualStatus, "Archived", "Expected status should be displayed");
         });
 
-    it(`GIVEN archived content has been selected WHEN widget dropdown handle has been clicked THEN 2 expected options should be in WidgetSelector dropdown`,
-        async () => {
-            let archiveBrowseContextPanel = new ArchiveBrowseContextPanel();
-            let archiveBrowsePanel = new ArchiveBrowsePanel();
-            await studioUtils.openArchivePanel();
-            //1. Select a folder:
-            await archiveBrowsePanel.clickCheckboxAndSelectRowByDisplayName(FOLDER1.displayName);
-            //2. Click on Widget Selector dropdown handler:
-            await archiveBrowseContextPanel.clickOnWidgetSelectorDropdownHandle();
+        it(`GIVEN 'Versions widget' is opened WHEN 'Created' version item has been clicked THEN 'Revert' and 'Active versions' should not be displayed`,
+            async () => {
+                    let archiveBrowseContextPanel = new ArchiveBrowseContextPanel();
+                    let archiveBrowsePanel = new ArchiveBrowsePanel();
+                    let archivedContentVersionsWidget = new ArchivedContentVersionsWidget();
+                    await studioUtils.openArchivePanel();
+                    //1. Select the archived content
+                    await archiveBrowsePanel.clickCheckboxAndSelectRowByDisplayName(FOLDER1.displayName);
+                    //2. Open the versions widget and click on Created version item:
+                    await archiveBrowseContextPanel.openVersionHistory();
+                    await archivedContentVersionsWidget.clickOnVersionItemByHeader(appConst.VERSIONS_ITEM_HEADER.CREATED, 0);
+                    await archivedContentVersionsWidget.pause(1000);
+                    await studioUtils.saveScreenshot("version_item_clicked");
+                    //3. Verify that 'Revert' and 'Active versions' buttons are not displayed in the widget:
+                    let result = await archivedContentVersionsWidget.isRevertButtonDisplayed();
+                    assert.isFalse(result, "'Revert' button should not be displayed in the widget");
+                    result = await archivedContentVersionsWidget.isActiveVersionButtonDisplayed();
+                    assert.isFalse(result, "'Active version' button should not be displayed in the widget");
+                    //4. Verify that 'Compare with current version' buttons is displayed in Created and Edited items only:
+                    let isDisplayed = await archivedContentVersionsWidget.isCompareWithCurrentVersionButtonDisplayed(
+                        appConst.VERSIONS_ITEM_HEADER.CREATED,
+                        0);
+                    assert.isTrue(isDisplayed, "'Compare with current version' button should be displayed in Created-item");
+                    isDisplayed =
+                        await archivedContentVersionsWidget.isCompareWithCurrentVersionButtonDisplayed(appConst.VERSIONS_ITEM_HEADER.EDITED,
+                            0);
+                    assert.isTrue(isDisplayed, "'Compare with current version' button should be displayed in the Edited-item");
+
+                    isDisplayed =
+                        await archivedContentVersionsWidget.isCompareWithCurrentVersionButtonDisplayed(
+                            appConst.VERSIONS_ITEM_HEADER.ARCHIVED, 0);
+                    assert.isFalse(isDisplayed, "'Compare with current version' button should not be displayed in the Archived-item");
+            });
+
+        it(`GIVEN archived content has been selected WHEN widget dropdown handle has been clicked THEN 2 expected options should be in WidgetSelector dropdown`,
+            async () => {
+                    let archiveBrowseContextPanel = new ArchiveBrowseContextPanel();
+                    let archiveBrowsePanel = new ArchiveBrowsePanel();
+                    await studioUtils.openArchivePanel();
+                    //1. Select existing folder:
+                    await archiveBrowsePanel.clickCheckboxAndSelectRowByDisplayName(FOLDER1.displayName);
+                    //2. Click on Widget Selector dropdown handler:
+                    await archiveBrowseContextPanel.clickOnWidgetSelectorDropdownHandle();
             //3. Verify that two options are present in the selector:
             let actualOptions = await archiveBrowseContextPanel.getWidgetSelectorDropdownOptions();
             assert.isTrue(actualOptions.includes('Details'));
@@ -92,8 +125,8 @@ describe('archive.context.panel.spec: tests for archive context panel', function
             //2. Open Versions Widget:
             await archiveBrowseContextPanel.openVersionHistory();
             //3. Open 'Compare Versions' modal dialog:
-            await archivedContentVersionsWidget.clickOnCompareWithCurrentVersionButton(1);
-            await compareContentVersionsDialog.waitForDialogOpened();
+                await archivedContentVersionsWidget.clickOnCompareWithCurrentVersionButtonByHeader(appConst.VERSIONS_ITEM_HEADER.EDITED, 0);
+                await compareContentVersionsDialog.waitForDialogOpened();
             await studioUtils.saveScreenshot("compare_versions_dialog");
             //4. Verify that 'Left Revert' menu button is not displayed:
             await compareContentVersionsDialog.waitForLeftRevertMenuButtonNotDisplayed();
@@ -115,8 +148,8 @@ describe('archive.context.panel.spec: tests for archive context panel', function
             //2. Open Versions Widget:
             await archiveBrowseContextPanel.openVersionHistory();
             //3. Open 'Compare Versions' modal dialog:
-            await archivedContentVersionsWidget.clickOnCompareWithCurrentVersionButton(1);
-            await compareContentVersionsDialog.waitForDialogOpened();
+                await archivedContentVersionsWidget.clickOnCompareWithCurrentVersionButtonByHeader(appConst.VERSIONS_ITEM_HEADER.EDITED, 0);
+                await compareContentVersionsDialog.waitForDialogOpened();
             //4. Click on the dropdown handle and expand the left menu:
             await compareContentVersionsDialog.clickOnLeftSelectorDropdownHandle();
             await studioUtils.saveScreenshot("compare_versions_dialog_left_expanded");
@@ -128,17 +161,17 @@ describe('archive.context.panel.spec: tests for archive context panel', function
             assert.equal(message, "Versions are identical", "Expected message should be displayed in the dialog");
         });
 
-    it(`GIVEN archived content has been selected WHEN 'Versions widget' has been opened THEN expected Archived version item should be displayed in the widget`,
-        async () => {
-            let archiveBrowseContextPanel = new ArchiveBrowseContextPanel();
-            let archiveBrowsePanel = new ArchiveBrowsePanel();
-            let archivedContentVersionsWidget = new ArchivedContentVersionsWidget();
-            await studioUtils.openArchivePanel();
-            //1. Select the archived content
-            await archiveBrowsePanel.clickCheckboxAndSelectRowByDisplayName(FOLDER1.displayName);
-            //2. Open the versions widget:
-            await archiveBrowseContextPanel.openVersionHistory();
-            //3. Verify that 'archived' version item appears in the widget:
+        it(`GIVEN existing archived content has been selected WHEN 'Versions widget' has been opened THEN expected Archived version item should be displayed in the widget`,
+            async () => {
+                    let archiveBrowseContextPanel = new ArchiveBrowseContextPanel();
+                    let archiveBrowsePanel = new ArchiveBrowsePanel();
+                    let archivedContentVersionsWidget = new ArchivedContentVersionsWidget();
+                    await studioUtils.openArchivePanel();
+                    //1. Select the archived content
+                    await archiveBrowsePanel.clickCheckboxAndSelectRowByDisplayName(FOLDER1.displayName);
+                    //2. Open the versions widget:
+                    await archiveBrowseContextPanel.openVersionHistory();
+                    //3. Verify that 'archived' version item appears in the widget:
             let actualStatus = await archivedContentVersionsWidget.getStatusInArchivedItem(0);
             assert.isTrue(actualStatus.includes("Archived"));
             let archivedBy = await archivedContentVersionsWidget.getArchivedBy(0);
