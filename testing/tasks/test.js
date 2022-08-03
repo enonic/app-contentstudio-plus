@@ -7,6 +7,7 @@ const PropertiesReader = require('properties-reader');
 const file = path.join(__dirname, '/../browser.properties');
 const properties = PropertiesReader(file);
 const seleniumVersion = properties.get('selenium.version');
+const driverVersion = properties.get('chromedriver.version');
 
 const mocha = new Mocha({
     reporter: 'mochawesome',
@@ -52,7 +53,7 @@ async function uiTests() {
             baseURL: 'https://github.com/SeleniumHQ/selenium/releases/download',
             drivers: {
                 chrome: {
-                    version: 'latest',
+                    version: driverVersion,
                     arch: process.arch,
                     baseURL: 'https://chromedriver.storage.googleapis.com'
                 },
@@ -64,7 +65,7 @@ async function uiTests() {
             seleniumArgs: [ 'standalone'],
             drivers: {
                 chrome: {
-                    version: 'latest',
+                    version: driverVersion,
                 },
             }
         });
