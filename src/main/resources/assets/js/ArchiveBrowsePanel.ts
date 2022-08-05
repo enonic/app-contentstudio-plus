@@ -37,9 +37,9 @@ export class ArchiveBrowsePanel
         });
     }
 
-    protected updateContextView(item: ArchiveContentViewItem): void {
-        void this.contextView.setItem(item?.getData());
+    protected updateContextView(item: ArchiveContentViewItem): Q.Promise<void> {
         this.contextView.setArchiveItem(item);
+        return this.contextView.setItem(item?.getData());
     }
 
     protected createTreeGrid(): ArchiveTreeGrid {
