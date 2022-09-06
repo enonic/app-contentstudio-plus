@@ -81,24 +81,28 @@ jobs:
                     java-version: 11
                     distribution: 'temurin'
 
-            -   uses: actions/cache@v3
-                with:
-                    path: |
-                        ~/.gradle/caches
-                        ~/.gradle/wrapper
-                    key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-                    restore-keys: |
-                        ${{ runner.os }}-gradle-
+            - uses: actions/cache@v3
+              with:
+                  path: |
+                      ~/.gradle/caches
+                      ~/.gradle/wrapper
+                  key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+                  restore-keys: |
+                      ${{ runner.os }}-gradle-
+            - run: |
+                  set -ex
+                  wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+                  sudo apt install ./google-chrome-stable_current_amd64.deb
 
             - uses: actions/download-artifact@v3
               with:
                   name: contentstudio.plus
                   path: build/libs
 
-            -   name: Save license
-                run: 'echo "$LICENSE" > enonic.platform.subscription.lic'
-                shell: bash
-                env:
+            - name: Save license
+              run: 'echo "$LICENSE" > enonic.platform.subscription.lic'
+              shell: bash
+              env:
                     LICENSE: ${{secrets.ENONIC_LICENSE}}
 
             -   name: Run Selenium Tests
