@@ -19,7 +19,7 @@
     "jquery": "^3.6.1",
     "jquery-ui": "^1.13.2",
     "lib-contentstudio": "file:./.xp/dev/lib-contentstudio",
-    "normalize-url": "^7.1.0",
+    "normalize-url": "^7.2.0",
     "q": "^1.5.1"
   },
   "devDependencies": {
