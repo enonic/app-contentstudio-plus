@@ -10,6 +10,10 @@ export class AppHelper {
         return AppHelper.getWidgetClass('layers');
     }
 
+    static getVariantsWidgetClass(): string {
+        return AppHelper.getWidgetClass('variants');
+    }
+
     private static getWidgetClass(widgetName: string): string {
         return `${AppHelper.getCommonWidgetClass()}-${widgetName}`;
     }
