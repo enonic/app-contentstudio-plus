@@ -6,17 +6,15 @@ import {ContentId} from 'lib-contentstudio/app/content/ContentId';
 import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import * as Q from 'q';
-import {HasValidLicenseRequest} from '../../resource/HasValidLicenseRequest';
 import {ArchiveNoLicenseBlock} from '../../ArchiveNoLicenseBlock';
-import {SpanEl} from '@enonic/lib-admin-ui/dom/SpanEl';
-import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 
 export class LayersWidget
     extends Widget {
 
     constructor(contentId: string) {
-        super(contentId, AppHelper.getLayersWidgetClass());
+        super(AppHelper.getLayersWidgetClass());
 
+        this.setContentId(contentId);
         this.hasLicenseValid().then((isValid: boolean) => {
             if (isValid) {
                 this.renderWidgetContent();
@@ -26,15 +24,11 @@ export class LayersWidget
         }).catch(DefaultErrorHandler.handle);
     }
 
-    private hasLicenseValid(): Q.Promise<boolean> {
-        return new HasValidLicenseRequest().sendAndParse();
-    }
-
     private renderWidgetContent(): void {
         if (this.contentId) {
             this.renderLayers();
         } else {
-            this.renderNoSelectedItem();
+            this.handleNoSelectedItem();
         }
     }
 
@@ -49,10 +43,6 @@ export class LayersWidget
 
     private fetchContent(): Q.Promise<ContentSummaryAndCompareStatus> {
         return new ContentSummaryAndCompareStatusFetcher().fetch(new ContentId(this.contentId));
-    }
-
-    private renderNoSelectedItem(): void {
-        this.appendChild(new SpanEl('error').setHtml(i18n('notify.archive.widget.noselection')));
     }
 
     private renderNoLicense(): void {
