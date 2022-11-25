@@ -1,22 +1,53 @@
 import {DivEl} from '@enonic/lib-admin-ui/dom/DivEl';
 import {LoadMask} from '@enonic/lib-admin-ui/ui/mask/LoadMask';
 import {AppHelper} from '../util/AppHelper';
-import {OnOffButton} from 'lib-contentstudio/app/issue/view/OnOffButton';
+import {SpanEl} from '@enonic/lib-admin-ui/dom/SpanEl';
+import {i18n} from '@enonic/lib-admin-ui/util/Messages';
+import * as Q from 'q';
+import {HasValidLicenseRequest} from '../resource/HasValidLicenseRequest';
+import {Element} from '@enonic/lib-admin-ui/dom/Element';
 
 export class Widget
     extends DivEl {
 
-    protected readonly contentId: string;
-    private readonly loadMask: LoadMask;
-    private readonly button: OnOffButton;
+    protected contentId?: string;
+    protected loadMask: LoadMask;
+    private noItemsBlock?: Element;
 
-    constructor(contentId: string, cls?: string) {
+    constructor(cls?: string) {
         super(AppHelper.getCommonWidgetClass() + (' ' + cls || ''));
 
-        this.loadMask = new LoadMask(this);
-        this.contentId = contentId;
+        this.initElements();
+        this.initListeners();
+    }
 
-        this.button = new OnOffButton({off: false, offLabel: 'Turn On', onLabel: 'Turn Off'});
-        this.appendChild(this.button);
+    setContentId(contentId: string): void {
+        this.contentId = contentId;
+        this.noItemsBlock?.hide();
+    }
+
+    protected initElements(): void {
+        this.loadMask = new LoadMask(this);
+    }
+
+    protected initListeners(): void {
+        //
+    }
+
+    protected handleNoSelectedItem(): void {
+        if (!this.noItemsBlock) {
+            this.noItemsBlock = new SpanEl('error').setHtml(i18n('notify.archive.widget.noselection'));
+            this.appendChild(this.noItemsBlock);
+        }
+
+        this.noItemsBlock.show();
+    }
+
+    protected hasLicenseValid(): Q.Promise<boolean> {
+        return new HasValidLicenseRequest().sendAndParse();
+    }
+
+    cleanUp(): void {
+        //
     }
 }
