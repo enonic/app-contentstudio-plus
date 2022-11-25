@@ -1,0 +1,7 @@
+<widget>
+    <display-name>Variants</display-name>
+    <description>Create variants of a content</description>
+    <interfaces>
+        <interface>contentstudio.contextpanel</interface>
+    </interfaces>
+</widget>
