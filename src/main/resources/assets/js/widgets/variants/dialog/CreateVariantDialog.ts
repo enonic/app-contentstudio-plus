@@ -11,6 +11,9 @@ import {FormView} from '@enonic/lib-admin-ui/form/FormView';
 import {ContentSummary} from 'lib-contentstudio/app/content/ContentSummary';
 import {ValidityChangedEvent} from '@enonic/lib-admin-ui/ValidityChangedEvent';
 import {VariableNameHelper} from './VariableNameHelper';
+import {DuplicateContentRequest} from 'lib-contentstudio/app/resource/DuplicateContentRequest';
+import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
+import {ContentDuplicateParams} from 'lib-contentstudio/app/resource/ContentDuplicateParams';
 
 export class CreateVariantDialog
     extends ModalDialog {
@@ -24,6 +27,8 @@ export class CreateVariantDialog
     private createAction: Action;
 
     private variants: ContentSummary[] = [];
+
+    private originalContent: ContentSummaryAndCompareStatus;
 
     private constructor() {
         super({
@@ -67,10 +72,22 @@ export class CreateVariantDialog
     }
 
     private createVariant(): void {
-        //
+        this.sendCreateVariantRequest();
+        this.close();
+    }
+
+    private sendCreateVariantRequest(): void {
+        const item: ContentDuplicateParams = new ContentDuplicateParams()
+            .setContentId(this.originalContent.getContentId())
+            .setIncludeChildren(false)
+            .setVariant(true)
+            .setName(this.variantNameFormItem.getValue());
+
+        new DuplicateContentRequest([item]).sendAndParse().catch(DefaultErrorHandler.handle);
     }
 
     setContent(content: ContentSummaryAndCompareStatus): CreateVariantDialog {
+        this.originalContent = content;
         this.originalContentBlock.setContent(content);
         return this;
     }
