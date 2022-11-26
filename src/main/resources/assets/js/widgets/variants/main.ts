@@ -19,6 +19,7 @@ void (async () => {
 
     if (widgetContainer) {
         const widgetContainerEl = Element.fromHtmlElement((widgetContainer), true);
+        widgetContainerEl.removeChildren();
 
         const widget: VariantsWidget = VariantsWidget.get();
         widget.setContentId(contentId);
