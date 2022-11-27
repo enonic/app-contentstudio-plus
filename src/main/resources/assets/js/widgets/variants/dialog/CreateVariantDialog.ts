@@ -77,8 +77,7 @@ export class CreateVariantDialog
     }
 
     private sendCreateVariantRequest(): void {
-        const item: ContentDuplicateParams = new ContentDuplicateParams()
-            .setContentId(this.originalContent.getContentId())
+        const item: ContentDuplicateParams = new ContentDuplicateParams(this.originalContent.getContentId())
             .setIncludeChildren(false)
             .setVariant(true)
             .setName(this.variantNameFormItem.getValue());
