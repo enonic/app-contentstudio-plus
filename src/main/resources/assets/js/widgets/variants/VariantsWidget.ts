@@ -18,7 +18,9 @@ export class VariantsWidget
 
     private createVariantsButton?: Button;
 
-    private originalContent?: ContentSummaryAndCompareStatus;
+    private originalContent: ContentSummaryAndCompareStatus;
+
+    private content: ContentSummaryAndCompareStatus;
 
     private variants: ContentSummary[];
 
@@ -46,24 +48,40 @@ export class VariantsWidget
     }
 
     private loadDataAndUpdateWidgetContent(): void {
-        Q.all([this.fetchOriginalContent(), this.fetchVariants()]).then(() => {
+        this.fetchData().then(() => {
             this.displayVariants();
+            return Q.resolve();
         }).catch((e: Error) => {
             DefaultErrorHandler.handle(e);
             this.handleErrorWhileLoadingVariants();
         }).finally(() => this.loadMask.hide());
     }
 
-    private fetchOriginalContent(): Q.Promise<void> {
+    private fetchData(): Q.Promise<void> {
+        return this.fetchContent().then(() => this.fetchVariants());
+    }
+
+    private fetchContent(): Q.Promise<void> {
         return new ContentSummaryAndCompareStatusFetcher().fetch(new ContentId(this.contentId)).then(
             (content: ContentSummaryAndCompareStatus) => {
+                this.content = content;
+
+                if (this.content.isVariant()) {
+                    const id: ContentId = new ContentId(this.content.getContentSummary().getVariantOf());
+                    return new ContentSummaryAndCompareStatusFetcher().fetch(id).then((original: ContentSummaryAndCompareStatus) => {
+                        this.originalContent = original;
+                    });
+                }
+
                 this.originalContent = content;
+                return Q.resolve();
             });
     }
 
     private fetchVariants(): Q.Promise<void> {
-        return new GetContentVariantsRequest(this.contentId).sendAndParse().then((variants: ContentSummary[]) => {
+        return new GetContentVariantsRequest(this.originalContent.getId()).sendAndParse().then((variants: ContentSummary[]) => {
             this.variants = variants;
+            return Q.resolve();
         });
     }
 
