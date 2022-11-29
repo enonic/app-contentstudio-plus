@@ -33,18 +33,16 @@ export class LayersContentTreeListHelper {
     }
 
     findParent(layerContent: LayerContent): LayerContent {
-        const parentName: string = layerContent.getProject().getParent();
-        return this.layerContents.find((item: LayerContent) =>  item.getProjectName() === parentName);
+        return this.layerContents.find((lc: LayerContent) => layerContent.getProject().getParents()?.indexOf(lc.getProjectName()) >= 0);
     }
 
     private unwrapChildren(layerContent: LayerContent): LayerContent[] {
         const result: LayerContent[] = [layerContent];
-        const projectName: string = layerContent.getProjectName();
 
         this.layerContents
-            .filter((item: LayerContent) => item.getProject().getParent() === projectName)
-            .forEach((child: LayerContent) => {
-                result.push(...this.unwrapChildren(child));
+            .filter((lc: LayerContent) => layerContent.getProject().getParents()?.indexOf(lc.getProjectName()) >= 0)
+            .forEach((lc: LayerContent) => {
+                result.push(...this.unwrapChildren(lc));
             });
 
         return result;
