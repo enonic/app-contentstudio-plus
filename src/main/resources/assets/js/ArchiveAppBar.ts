@@ -4,7 +4,7 @@ import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {ProjectViewer} from 'lib-contentstudio/app/settings/wizard/viewer/ProjectViewer';
 import {ProjectContext} from 'lib-contentstudio/app/project/ProjectContext';
-import {ProjectSelectionDialog} from 'lib-contentstudio/app/settings/dialog/ProjectSelectionDialog';
+import {ProjectSelectionDialog} from 'lib-contentstudio/app/dialog/ProjectSelectionDialog';
 import {ProjectUpdatedEvent} from 'lib-contentstudio/app/settings/event/ProjectUpdatedEvent';
 import {ProjectListWithMissingRequest} from 'lib-contentstudio/app/settings/resource/ProjectListWithMissingRequest';
 import {Project} from 'lib-contentstudio/app/settings/data/project/Project';
