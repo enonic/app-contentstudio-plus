@@ -1,0 +1,29 @@
+.variants-actions-menu {
+  height: 32px;
+
+  .action-button {
+    border-right: 1px solid @admin-white;
+    background-color: @admin-button-blue2;
+
+    &:not([disabled]):hover {
+      background-color: @admin-button-blue1;
+    }
+
+    span {
+      font-size: 13px;
+    }
+  }
+
+  .xp-admin-common-dropdown-handle {
+    order: 1;
+    background-color: @admin-button-blue2;
+
+    &:not([disabled]):hover {
+      background-color: @admin-button-blue1;
+    }
+
+    &:before {
+      color: @admin-white;
+    }
+  }
+}

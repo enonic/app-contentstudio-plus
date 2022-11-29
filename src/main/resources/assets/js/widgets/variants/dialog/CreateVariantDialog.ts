@@ -8,7 +8,6 @@ import {VariantNameFormItem} from './VariantNameFormItem';
 import {Fieldset} from '@enonic/lib-admin-ui/ui/form/Fieldset';
 import {Form} from '@enonic/lib-admin-ui/ui/form/Form';
 import {FormView} from '@enonic/lib-admin-ui/form/FormView';
-import {ContentSummary} from 'lib-contentstudio/app/content/ContentSummary';
 import {ValidityChangedEvent} from '@enonic/lib-admin-ui/ValidityChangedEvent';
 import {VariableNameHelper} from './VariableNameHelper';
 import {DuplicateContentRequest} from 'lib-contentstudio/app/resource/DuplicateContentRequest';
@@ -26,7 +25,7 @@ export class CreateVariantDialog
 
     private createAction: Action;
 
-    private variants: ContentSummary[] = [];
+    private variants: ContentSummaryAndCompareStatus[] = [];
 
     private originalContent: ContentSummaryAndCompareStatus;
 
@@ -80,6 +79,7 @@ export class CreateVariantDialog
         const item: ContentDuplicateParams = new ContentDuplicateParams(this.originalContent.getContentId())
             .setIncludeChildren(false)
             .setVariant(true)
+            .setParent(this.originalContent.getPath().toString())
             .setName(this.variantNameFormItem.getValue());
 
         new DuplicateContentRequest([item]).sendAndParse().catch(DefaultErrorHandler.handle);
@@ -91,13 +91,13 @@ export class CreateVariantDialog
         return this;
     }
 
-    setVariants(variants: ContentSummary[]): CreateVariantDialog {
+    setVariants(variants: ContentSummaryAndCompareStatus[]): CreateVariantDialog {
         this.variants = variants || [];
         return this;
     }
 
     private isNameOccupied(name: string): boolean {
-        return this.variants.some((variant: ContentSummary) => {
+        return this.variants.some((variant: ContentSummaryAndCompareStatus) => {
             return variant.getPath().getName() === name;
         });
     }

@@ -1,7 +1,6 @@
 import {Widget} from '../Widget';
 import {AppHelper} from '../../util/AppHelper';
 import * as Q from 'q';
-import {ContentSummary} from 'lib-contentstudio/app/content/ContentSummary';
 import {GetContentVariantsRequest} from './resource/request/GetContentVariantsRequest';
 import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import {Button} from '@enonic/lib-admin-ui/ui/button/Button';
@@ -10,6 +9,7 @@ import {CreateVariantDialog} from './dialog/CreateVariantDialog';
 import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import {ContentSummaryAndCompareStatusFetcher} from 'lib-contentstudio/app/resource/ContentSummaryAndCompareStatusFetcher';
 import {ContentId} from 'lib-contentstudio/app/content/ContentId';
+import {VariantsList} from './ui/list/VariantsList';
 
 export class VariantsWidget
     extends Widget {
@@ -22,7 +22,9 @@ export class VariantsWidget
 
     private content: ContentSummaryAndCompareStatus;
 
-    private variants: ContentSummary[];
+    private variants: ContentSummaryAndCompareStatus[];
+
+    private variantsList: VariantsList;
 
     constructor() {
         super(AppHelper.getVariantsWidgetClass());
@@ -79,10 +81,11 @@ export class VariantsWidget
     }
 
     private fetchVariants(): Q.Promise<void> {
-        return new GetContentVariantsRequest(this.originalContent.getId()).sendAndParse().then((variants: ContentSummary[]) => {
-            this.variants = variants;
-            return Q.resolve();
-        });
+        return new GetContentVariantsRequest(this.originalContent.getId()).fetchWithCompareStatus().then(
+            (variants: ContentSummaryAndCompareStatus[]) => {
+                this.variants = variants;
+                return Q.resolve();
+            });
     }
 
     private displayVariants(): void {
@@ -95,6 +98,13 @@ export class VariantsWidget
 
     private showExistingVariants(): void {
         this.createVariantsButton?.hide();
+
+        if (!this.variantsList) {
+            this.variantsList = new VariantsList();
+            this.appendChild(this.variantsList);
+        }
+
+        this.variantsList.update(this.originalContent, this.variants).setActiveItemById(this.contentId);
     }
 
     private showCreateVariantsButton(): void {
