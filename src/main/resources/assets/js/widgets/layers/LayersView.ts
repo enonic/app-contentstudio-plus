@@ -64,7 +64,7 @@ export class LayersView extends ListBox<LayerContent> {
     private countDescendants(projectName: string, items: LayerContent[]): number {
         let total = 0;
 
-        const children: LayerContent[] = items.filter((item: LayerContent) => item.getProject().getParent() === projectName);
+        const children: LayerContent[] = items.filter((item: LayerContent) => item.getProject().getParents().indexOf(projectName) >= 0);
 
         children.forEach((child: LayerContent) => {
             total += 1;
@@ -87,13 +87,13 @@ export class LayersView extends ListBox<LayerContent> {
     private filterWidgetItems(items: LayerContent[]): LayerContent[] {
         const result: LayerContent[] = [];
 
-        let projectName: string = ProjectContext.get().getProject().getName();
-        let layerContent: LayerContent = items.find((item: LayerContent) => item.getProjectName() === projectName);
+        let projectsNames: string[] = [ProjectContext.get().getProject().getName()];
+        let layerContent: LayerContent = items.find((item: LayerContent) => projectsNames.indexOf(item.getProjectName()) >= 0);
 
         while (layerContent) {
             result.unshift(layerContent);
-            projectName = layerContent.getProject().getParent();
-            layerContent = projectName ? items.find((item: LayerContent) => item.getProjectName() === projectName) : null;
+            projectsNames = layerContent.getProject().getParents();
+            layerContent = projectsNames ? items.find((item: LayerContent) => projectsNames.indexOf(item.getProjectName()) >= 0) : null;
         }
 
         return result;
