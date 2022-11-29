@@ -31,8 +31,8 @@ export class MultiLayersContentFilter {
         return hasParentWithItem;
     }
 
-    private findParent(item: LayerContent): LayerContent {
-        return this.items.find((lc: LayerContent) => lc.getProjectName() === item.getProject().getParent());
+    private findParent(layerContent: LayerContent): LayerContent {
+        return this.items.find((lc: LayerContent) => layerContent.getProject().getParents()?.indexOf(lc.getProjectName()) >= 0);
     }
 
     private hasNonEmptyDescendant(item: LayerContent): boolean {
@@ -44,6 +44,6 @@ export class MultiLayersContentFilter {
     }
 
     private findChildren(item: LayerContent): LayerContent[] {
-        return this.items.filter((lc: LayerContent) => lc.getProject().getParent() === item.getProjectName());
+        return this.items.filter((lc: LayerContent) => item.getProject().getParents()?.indexOf(lc.getProjectName()) >= 0);
     }
 }
