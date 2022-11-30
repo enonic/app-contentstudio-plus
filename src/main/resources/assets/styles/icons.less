@@ -1,10 +1,14 @@
 @font-face {
   font-family: 'icomoon-studio-plus';
   src:
-    url('../fonts/icomoon-studio-plus.woff2') format('woff2'),
-    url('../fonts/icomoon-studio-plus.woff?d2dpl4') format('woff');
+    url('../icons/fonts/icomoon-studio-plus.woff2') format('woff2'),
+    url('../icons/fonts/icomoon-studio-plus.woff?d2dpl4') format('woff');
 }
 
-.icon-plus {
+.icon-new-tab {
   .icon-mixin('icomoon-studio-plus');
+
+  &:before {
+    content: "\ea7f";
+  }
 }
