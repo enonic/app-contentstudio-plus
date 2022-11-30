@@ -14,6 +14,10 @@ export class AppHelper {
         return AppHelper.getWidgetClass('variants');
     }
 
+    static getAdobeWidgetClass(): string {
+        return AppHelper.getWidgetClass('adobe');
+    }
+
     private static getWidgetClass(widgetName: string): string {
         return `${AppHelper.getCommonWidgetClass()}-${widgetName}`;
     }
