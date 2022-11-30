@@ -18,13 +18,16 @@ module.exports = {
         'styles/main': './styles/main.less',
         'js/widgets/layers': './js/widgets/layers/main.ts',
         'js/widgets/variants': './js/widgets/variants/main.ts',
+        'js/widgets/adobe': './js/widgets/adobe/main.ts',
         'styles/widgets/layers': './styles/widgets/layers/main.less',
         'styles/widgets/variants': './styles/widgets/variants/main.less',
+        'styles/widgets/adobe': './styles/widgets/adobe/index.less',
         'styles/license': './styles/license.less'
     },
     output: {
         path: assets,
-        filename: './[name].js'
+        filename: './[name].js',
+        assetModuleFilename: './[file]'
     },
     resolve: {
         extensions: ['.ts', '.js', '.less', '.css']
@@ -46,11 +49,7 @@ module.exports = {
             },
             {
                 test: /\.(eot|woff|woff2|ttf)$|icomoon-studio-plus.svg/,
-                use: 'file-loader?name=fonts/[name].[ext]'
-            },
-            {
-                test: /^\.(svg|png|jpg|gif)$/,
-                use: 'file-loader?name=img/[name].[ext]'
+                use: 'file-loader?name=styles/icons/fonts/[name].[ext]'
             }
         ]
     },

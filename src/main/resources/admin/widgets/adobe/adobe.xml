@@ -1,0 +1,7 @@
+<widget>
+    <display-name>Adobe Target</display-name>
+    <description>Experiment and optimise</description>
+    <interfaces>
+        <interface>contentstudio.contextpanel</interface>
+    </interfaces>
+</widget>
