@@ -177,7 +177,7 @@ export class VariantsWidget
     }
 
     private initCreateVariantsButton(): Button {
-        const button: Button = new Button(i18n('widget.variants.button.create'));
+        const button: Button = new Button(i18n('widget.variants.create.text'));
         button.addClass('variants-widget-button-create');
 
         button.onClicked(() => {
