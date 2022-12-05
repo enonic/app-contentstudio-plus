@@ -4,15 +4,12 @@ import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import {OriginalContentBlock} from './OriginalContentBlock';
 import * as Q from 'q';
-import {VariantNameFormItem} from './VariantNameFormItem';
-import {Fieldset} from '@enonic/lib-admin-ui/ui/form/Fieldset';
-import {Form} from '@enonic/lib-admin-ui/ui/form/Form';
-import {FormView} from '@enonic/lib-admin-ui/form/FormView';
-import {ValidityChangedEvent} from '@enonic/lib-admin-ui/ValidityChangedEvent';
 import {VariableNameHelper} from './VariableNameHelper';
 import {DuplicateContentRequest} from 'lib-contentstudio/app/resource/DuplicateContentRequest';
 import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import {ContentDuplicateParams} from 'lib-contentstudio/app/resource/ContentDuplicateParams';
+import {VariantNameInput} from './VariantNameInput';
+import {ValidityStatus, ValueValidationState} from 'lib-contentstudio/app/inputtype/text/CheckedValueInput';
 
 export class CreateVariantDialog
     extends ModalDialog {
@@ -21,7 +18,7 @@ export class CreateVariantDialog
 
     private originalContentBlock: OriginalContentBlock;
 
-    private variantNameFormItem: VariantNameFormItem;
+    private variantNameInput: VariantNameInput;
 
     private createAction: Action;
 
@@ -32,7 +29,7 @@ export class CreateVariantDialog
     private constructor() {
         super({
             class: 'create-variant-dialog',
-            title: i18n('widget.variants.dialog.create.title'),
+            title: i18n('widget.variants.create.text'),
         });
     }
 
@@ -48,14 +45,8 @@ export class CreateVariantDialog
         super.initElements();
 
         this.originalContentBlock = new OriginalContentBlock();
-        this.variantNameFormItem = new VariantNameFormItem();
-        this.createAction = new Action(i18n('widget.variants.dialog.create.submit'));
-    }
-
-    protected postInitElements(): void {
-        super.postInitElements();
-
-        this.variantNameFormItem.setIsNameOccupiedHandler(this.isNameOccupied.bind(this));
+        this.createAction = new Action(i18n('widget.variants.create.text'));
+        this.variantNameInput = new VariantNameInput();
     }
 
     protected initListeners(): void {
@@ -65,8 +56,12 @@ export class CreateVariantDialog
            this.createVariant();
         });
 
-        this.variantNameFormItem.onValidityChanged((event: ValidityChangedEvent) => {
-            this.createAction.setEnabled(event.isValid());
+        this.variantNameInput.onValueCheckInProgress(() => {
+            this.createAction.setEnabled(false);
+        });
+
+        this.variantNameInput.onStateUpdated((state: ValueValidationState) => {
+            this.createAction.setEnabled(state.getStatus() === ValidityStatus.VALID);
         });
     }
 
@@ -80,7 +75,7 @@ export class CreateVariantDialog
             .setIncludeChildren(false)
             .setVariant(true)
             .setParent(this.originalContent.getPath().toString())
-            .setName(this.variantNameFormItem.getValue());
+            .setName(this.variantNameInput.getValue());
 
         new DuplicateContentRequest([item]).sendAndParse().catch(DefaultErrorHandler.handle);
     }
@@ -93,35 +88,26 @@ export class CreateVariantDialog
 
     setVariants(variants: ContentSummaryAndCompareStatus[]): CreateVariantDialog {
         this.variants = variants || [];
+        this.variantNameInput.setVariants(this.variants);
         return this;
-    }
-
-    private isNameOccupied(name: string): boolean {
-        return this.variants.some((variant: ContentSummaryAndCompareStatus) => {
-            return variant.getPath().getName() === name;
-        });
     }
 
     doRender(): Q.Promise<boolean> {
         return super.doRender().then((rendered: boolean) => {
             this.appendChildToContentPanel(this.originalContentBlock);
-            this.appendChildToContentPanel(this.createFormContainerForNameInput());
+            this.appendChildToContentPanel(this.variantNameInput);
             this.addAction(this.createAction);
             return rendered;
         });
     }
 
-
-    private createFormContainerForNameInput(): Form {
-        const form: Form = new Form(FormView.VALIDATION_CLASS);
-        const fieldSet: Fieldset = new Fieldset();
-        fieldSet.add(this.variantNameFormItem);
-        form.add(fieldSet);
-        return form;
+    open(): void {
+        this.variantNameInput.setValue(new VariableNameHelper(this.variants).getNextAvailableName());
+        super.open();
     }
 
-    open(): void {
-        this.variantNameFormItem.setValue(new VariableNameHelper(this.variants).getNextAvailableName());
-        super.open();
+    close(): void {
+        super.close();
+        this.variantNameInput.reset();
     }
 }
