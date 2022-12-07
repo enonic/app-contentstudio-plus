@@ -94,7 +94,7 @@ class Page {
             if (value == "") {
                 await inputElement.setValue(text);
             }
-            return await inputElement.pause(300);
+            return await this.pause(300);
         } catch (err) {
             throw new Error("Error when set value in input " + err);
         }
@@ -109,7 +109,7 @@ class Page {
         if (value == "") {
             await inputElement.addValue(text);
         }
-        return await inputElement.pause(300);
+        return await this.pause(300);
     }
 
     //Wait for an element for the provided amount of milliseconds to be present within the DOM. Returns true if the selector matches at least one
@@ -134,9 +134,9 @@ class Page {
             let inputElement = await this.findElement(selector);
             await inputElement.waitForDisplayed(1000);
             await inputElement.clearValue();
-            return await inputElement.pause(3000);
+            return await this.pause(2000);
         } catch (err) {
-            throw new Error("Error when clear value in input" + err);
+            throw new Error("Error during clearing the text input" + err);
         }
     }
 
