@@ -20,7 +20,7 @@ export class LayersContentTreeList
 
     setItems(items: LayerContent[], silent?: boolean): void {
         this.helper.setItems(items);
-        super.setItems(this.helper.sort(), silent);
+        super.setItems(this.helper.toFlatTree(), silent);
     }
 
     protected getItemId(item: LayerContent): string {

@@ -1,8 +1,10 @@
 import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import {Project} from 'lib-contentstudio/app/settings/data/project/Project';
 import {ContentId} from 'lib-contentstudio/app/content/ContentId';
+import {Equitable} from '@enonic/lib-admin-ui/Equitable';
+import {ObjectHelper} from '@enonic/lib-admin-ui/ObjectHelper';
 
-export class LayerContent {
+export class LayerContent implements Equitable {
 
     private readonly item: ContentSummaryAndCompareStatus;
 
@@ -35,5 +37,20 @@ export class LayerContent {
 
     hasItem(): boolean {
         return !!this.item;
+    }
+
+    equals(o: Equitable): boolean {
+        if (!ObjectHelper.iFrameSafeInstanceOf(o, LayerContent)) {
+            return false;
+        }
+
+        const other: LayerContent = <LayerContent>o;
+
+        return ObjectHelper.equals(this.project, other.project) && ObjectHelper.equals(this.item, other.item);
+    }
+
+    shallowEquals(other: LayerContent): boolean {
+        return ObjectHelper.anyEquals(this.project?.getName(), other.project?.getName()) &&
+               ObjectHelper.anyEquals(this.item?.getId(), other.item?.getId());
     }
 }

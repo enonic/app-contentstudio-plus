@@ -8,13 +8,29 @@ export class LayersContentTreeListHelper {
         this.layerContents = items;
     }
 
-    sort(): LayerContent[] {
-        const result: LayerContent[] = [];
+    toFlatTree(): LayerContent[] {
+        return this.removeDuplicates(this.flattenLayerContents());
+    }
+
+    private flattenLayerContents(): LayerContent[] {
+        const items: LayerContent[] = [];
 
         const rootItems: LayerContent[] = this.getRootItems();
 
         rootItems.forEach((rootItem: LayerContent) => {
-            result.push(...this.unwrapChildren(rootItem));
+            items.push(...this.unWrapChildren(rootItem));
+        });
+
+        return items;
+    }
+
+    private removeDuplicates(items: LayerContent[]): LayerContent[] {
+        const result: LayerContent[] = [];
+
+        items.forEach((item: LayerContent) => {
+           if (!result.some((resultItem: LayerContent) => resultItem.shallowEquals(item))) {
+               result.push(item);
+           }
         });
 
         return result;
@@ -36,13 +52,13 @@ export class LayersContentTreeListHelper {
         return this.layerContents.find((lc: LayerContent) => layerContent.getProject().getParents()?.indexOf(lc.getProjectName()) >= 0);
     }
 
-    private unwrapChildren(layerContent: LayerContent): LayerContent[] {
+    private unWrapChildren(layerContent: LayerContent): LayerContent[] {
         const result: LayerContent[] = [layerContent];
 
         this.layerContents
-            .filter((lc: LayerContent) => layerContent.getProject().getParents()?.indexOf(lc.getProjectName()) >= 0)
+            .filter((lc: LayerContent) => lc.getProject().getParents()?.indexOf(layerContent.getProjectName()) >= 0)
             .forEach((lc: LayerContent) => {
-                result.push(...this.unwrapChildren(lc));
+                result.push(...this.unWrapChildren(lc));
             });
 
         return result;
