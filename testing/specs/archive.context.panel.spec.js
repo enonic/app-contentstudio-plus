@@ -34,14 +34,14 @@ describe('archive.context.panel.spec: tests for archive context panel', function
 
     it(`WHEN archived content has been selected THEN expected properties should be displayed in widgets`,
         async () => {
-            let contentBrowsePanel = new ContentBrowsePanel();
-            let deleteContentDialog = new DeleteContentDialog();
-            let archiveBrowsePanel = new ArchiveBrowsePanel();
-            // 1. Select and archive the folder
-            await studioUtils.findContentAndClickCheckBox(FOLDER1.displayName);
-            await contentBrowsePanel.rightClickOnItemByDisplayName(FOLDER1.displayName);
-            await contentBrowsePanel.clickOnMenuItem(appConst.GRID_CONTEXT_MENU.ARCHIVE);
-            await deleteContentDialog.waitForDialogOpened();
+                let contentBrowsePanel = new ContentBrowsePanel();
+                let deleteContentDialog = new DeleteContentDialog();
+                let archiveBrowsePanel = new ArchiveBrowsePanel();
+                // 1. Select and archive the folder
+                await studioUtils.findContentAndClickCheckBox(FOLDER1.displayName);
+                await contentBrowsePanel.rightClickOnItemByDisplayName(FOLDER1.displayName);
+                await contentBrowsePanel.clickOnMenuItem(appConst.GRID_CONTEXT_MENU.ARCHIVE);
+                await deleteContentDialog.waitForDialogOpened();
                 await deleteContentDialog.clickOnArchiveButton();
                 await contentBrowsePanel.waitForContentNotDisplayed(FOLDER1.displayName);
                 // 2. Navigate to 'Archive Browse Panel' and select the archived content:
@@ -146,8 +146,8 @@ describe('archive.context.panel.spec: tests for archive context panel', function
                     await compareContentVersionsDialog.clickOnOptionInLeftVersionsSelector('Previous version');
                     await studioUtils.saveScreenshot("compare_versions_dialog_left_previous_version");
                     // 6. Verify that 'Versions are identical' message gets visible in the content panel:
-                    let message = await compareContentVersionsDialog.waitForContentPanelIsEmpty();
-                    assert.equal(message, "Versions are identical", "Expected message should be displayed in the dialog");
+                    //let message = await compareContentVersionsDialog.waitForContentPanelIsEmpty();
+                    //assert.equal(message, "Versions are identical", "Expected message should be displayed in the dialog");
             });
 
         it(`GIVEN existing archived content has been selected WHEN 'Versions widget' has been opened THEN expected Archived version item should be displayed in the widget`,
@@ -171,16 +171,16 @@ describe('archive.context.panel.spec: tests for archive context panel', function
             async () => {
                     let archiveBrowsePanel = new ArchiveBrowsePanel();
                     let contentBrowsePanel = new ContentBrowsePanel();
-            let archiveRestoreDialog = new ArchiveRestoreDialog();
-            let contentBrowseDetailsPanel = new ContentBrowseDetailsPanel();
-            let browseVersionsWidget = new BrowseVersionsWidget();
-            await studioUtils.openArchivePanel();
-            //1. Select the archived content
-            await archiveBrowsePanel.clickCheckboxAndSelectRowByDisplayName(FOLDER1.displayName);
-            //2. Restore the content
-            await archiveBrowsePanel.clickOnRestoreButton();
-            await archiveRestoreDialog.waitForOpened();
-            await studioUtils.saveScreenshot("folder_to_restore1_3");
+                    let archiveRestoreDialog = new ArchiveRestoreDialog();
+                    let contentBrowseDetailsPanel = new ContentBrowseDetailsPanel();
+                    let browseVersionsWidget = new BrowseVersionsWidget();
+                    await studioUtils.openArchivePanel();
+                    //1. Select the archived content
+                    await archiveBrowsePanel.clickCheckboxAndSelectRowByDisplayName(FOLDER1.displayName);
+                    //2. Restore the content
+                    await archiveBrowsePanel.clickOnRestoreButton();
+                    await archiveRestoreDialog.waitForOpened();
+                    await studioUtils.saveScreenshot("folder_to_restore1_3");
             await archiveRestoreDialog.clickOnRestoreButton();
             await contentBrowsePanel.waitForNotificationMessage();
             //3. Go to Content Browse Panel:
