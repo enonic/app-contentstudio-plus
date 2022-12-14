@@ -59,7 +59,8 @@ class UserAccessWidgetItemView extends Page {
             throw new Error('Access widget was not loaded! ' + err);
         });
     }
-};
+}
+
 module.exports = UserAccessWidgetItemView;
 
 

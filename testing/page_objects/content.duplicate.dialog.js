@@ -90,11 +90,11 @@ class ContentDuplicateDialog extends Page {
         try {
             let linkText = await this.getText(this.showDependentItemsLink);
             let startIndex = linkText.indexOf('(');
-            if (startIndex == -1) {
+            if (startIndex === -1) {
                 throw new Error("Content Duplicate Dialog - error when get a number in  `show dependent items` link  ");
             }
             let endIndex = linkText.indexOf(')');
-            if (endIndex == -1) {
+            if (endIndex === -1) {
                 throw new Error("Content Duplicate Dialog - error when get a number in  `show dependent items` link  ");
             }
             return linkText.substring(startIndex + 1, endIndex);

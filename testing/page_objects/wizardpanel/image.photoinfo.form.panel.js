@@ -48,5 +48,5 @@ class ImagePhotoInfoFormPanel extends Page {
     getDateTimeValue() {
         return this.getTextInInput(this.dateTimeInput);
     }
-};
+}
 module.exports = ImagePhotoInfoFormPanel;
