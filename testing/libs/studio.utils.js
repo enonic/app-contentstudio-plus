@@ -13,28 +13,17 @@ const ContentWizardPanel = require('../page_objects/wizardpanel/content.wizard.p
 const webDriverHelper = require("./WebDriverHelper");
 const IssueListDialog = require('../page_objects/issue/issue.list.dialog');
 const CreateTaskDialog = require('../page_objects/issue/create.task.dialog');
-const DeleteContentDialog = require('../page_objects/delete.content.dialog');
 const InsertLinkDialog = require('../page_objects/wizardpanel/insert.link.modal.dialog.cke');
 const ContentPublishDialog = require('../page_objects/content.publish.dialog');
 const BrowseDetailsPanel = require('../page_objects/browsepanel/detailspanel/browse.details.panel');
 const BrowseDependenciesWidget = require('../page_objects/browsepanel/detailspanel/browse.dependencies.widget');
-const BrowseLayersWidget = require('../page_objects/browsepanel/detailspanel/browse.layers.widget');
 const ContentUnpublishDialog = require('../page_objects/content.unpublish.dialog');
 const CreateRequestPublishDialog = require('../page_objects/issue/create.request.publish.dialog');
 const ProjectSelectionDialog = require('../page_objects/project/project.selection.dialog');
-const ProjectWizard = require('../page_objects/project/project.wizard.panel');
-const SettingsBrowsePanel = require('../page_objects/project/settings.browse.panel');
 const ArchiveBrowsePanel = require('../page_objects/archive/archive.browse.panel');
 const UserBrowsePanel = require('../page_objects/users/userbrowse.panel');
-const UserWizard = require('../page_objects/users/user.wizard');
-const NewPrincipalDialog = require('../page_objects/users/new.principal.dialog');
 const PrincipalFilterPanel = require('../page_objects/users/principal.filter.panel');
-const ConfirmationDialog = require('../page_objects/confirmation.dialog');
 const ContentBrowsePanel = require('../page_objects/browsepanel/content.browse.panel');
-const ConfirmValueDialog = require('../page_objects/confirm.content.delete.dialog');
-const DateTimeRange = require('../page_objects/components/datetime.range');
-const WizardDependenciesWidget = require('../page_objects/wizardpanel/details/wizard.dependencies.widget');
-const WizardDetailsPanel = require('../page_objects/wizardpanel/details/wizard.details.panel');
 const fs = require('fs');
 const path = require('path');
 const addContext = require('mochawesome/addContext');
@@ -411,44 +400,7 @@ module.exports = {
         await browsePanel.waitForContentByDisplayNameVisible(displayName);
         return await browsePanel.clickOnRowByDisplayName(displayName);
     },
-    //find the content, select it and 'Delete Now'
-    async doDeleteContent(name) {
-        let browsePanel = new BrowsePanel();
-        let deleteContentDialog = new DeleteContentDialog();
-        await this.findAndSelectItem(name);
-        //Open modal dialog:
-        await browsePanel.clickOnArchiveButton();
-        await deleteContentDialog.waitForDialogOpened();
-        //Click on 'Delete' menu item in the modal dialog:
-        await deleteContentDialog.clickOnDeleteMenuItem();
-        return await deleteContentDialog.waitForDialogClosed();
-    },
-    async doDeleteContentByDisplayName(displayName) {
-        let browsePanel = new BrowsePanel();
-        let deleteContentDialog = new DeleteContentDialog();
-        await this.findAndSelectContentByDisplayName(displayName);
-        //Open modal dialog:
-        await browsePanel.clickOnArchiveButton();
-        await deleteContentDialog.waitForDialogOpened();
-        //Click on 'Delete' menu item in the modal dialog:
-        await deleteContentDialog.clickOnDeleteMenuItem();
-        return await deleteContentDialog.waitForDialogClosed();
-    },
-    async selectContentAndOpenWizard(name) {
-        await this.findAndSelectItem(name);
-        return await this.doClickOnEditAndOpenContent();
-    },
-    async doClickOnEditAndOpenContent() {
-        let browsePanel = new BrowsePanel();
-        let contentWizardPanel = new ContentWizardPanel();
-        await browsePanel.waitForEditButtonEnabled();
-        await browsePanel.clickOnEditButton();
-        //switch to the opened wizard:
-        await this.doSwitchToNewWizard();
-        await contentWizardPanel.waitForOpened();
-        await contentWizardPanel.waitForSpinnerNotVisible(appConst.longTimeout);
-        return await contentWizardPanel.waitForDisplayNameInputFocused();
-    },
+
     async findContentAndClickCheckBox(displayName) {
         let browsePanel = new BrowsePanel();
         await this.typeNameInFilterPanel(displayName);
@@ -468,24 +420,6 @@ module.exports = {
         await this.doSwitchToNewWizard();
         await contentWizardPanel.waitForOpened();
         return await contentWizardPanel.waitForDisplayNameInputFocused();
-    },
-    //Open delete dialog, click on 'Delete' button then type a number to delete
-    async doDeleteNowAndConfirm(numberOfContents) {
-        let browsePanel = new BrowsePanel();
-        let deleteContentDialog = new DeleteContentDialog();
-        let confirmValueDialog = new ConfirmValueDialog();
-        //1. Open Delete Content dialog:
-        await browsePanel.clickOnArchiveButton();
-        await deleteContentDialog.waitForDialogOpened();
-        //2. Click on Delete menu item
-        await deleteContentDialog.clickOnDeleteMenuItem();
-        //3. wait for Confirm dialog is loaded:
-        await confirmValueDialog.waitForDialogOpened();
-        //4. Type required number:
-        await confirmValueDialog.typeNumberOrName(numberOfContents);
-        //Click on Confirm button:
-        await confirmValueDialog.clickOnConfirmButton();
-        return await deleteContentDialog.waitForDialogClosed();
     },
     async typeNameInFilterPanel(name) {
         try {
@@ -515,16 +449,6 @@ module.exports = {
             throw new Error("Error when opening Filter Panel! " + err);
         }
     },
-
-    async openProjectSelectionDialogAndSelectContext(context) {
-        try {
-            let browsePanel = new BrowsePanel();
-            return await browsePanel.selectContext(context);
-        } catch (err) {
-            throw new Error("Error when opening Filter Panel! " + err);
-        }
-    },
-
     async doLogout() {
         let launcherPanel = new LauncherPanel();
         let loginPage = new LoginPage();
@@ -544,19 +468,7 @@ module.exports = {
             throw new Error('error when navigate to Content Studio app ' + err);
         }
     },
-    async navigateToContentStudioWithProjects(userName, password) {
-        try {
-            await this.clickOnContentStudioLink(userName, password);
-            console.log('testUtils:switching to Content Browse panel...');
-            let browsePanel = new BrowsePanel();
-            await webDriverHelper.browser.switchWindow("Content Studio - Enonic XP Admin");
-            return await browsePanel.pause(1500);
-        } catch (err) {
-            console.log('tried to navigate to Content Studio app, but: ' + err);
-            this.saveScreenshot(appConst.generateRandomName("err_navigate_to_studio"));
-            throw new Error('error when navigate to Content Studio app ' + err);
-        }
-    },
+
     async clickOnContentStudioLink(userName, password) {
         let launcherPanel = new LauncherPanel();
         let result = await launcherPanel.waitForPanelDisplayed(2000);
@@ -566,17 +478,6 @@ module.exports = {
         } else {
             console.log("Login Page is opened, type a password and name...");
             return await this.doLoginAndClickOnContentStudio(userName, password);
-        }
-    },
-    async navigateToContentStudioCloseProjectSelectionDialog(userName, password) {
-        try {
-            await this.clickOnContentStudioLink(userName, password);
-            await webDriverHelper.browser.switchWindow("Content Studio - Enonic XP Admin");
-            await webDriverHelper.browser.pause(700);
-            await this.closeProjectSelectionDialog();
-        } catch (err) {
-            this.saveScreenshot(appConst.generateRandomName("err_navigate_to_studio"));
-            throw new Error('error when navigate to Content Studio app ' + err);
         }
     },
     //Clicks on Cancel button and switches to Default project
@@ -622,23 +523,6 @@ module.exports = {
         return await this.doSwitchToContentBrowsePanel();
     },
 
-    async saveAndCloseWizard() {
-        let contentWizardPanel = new ContentWizardPanel();
-        await contentWizardPanel.waitAndClickOnSave();
-        await contentWizardPanel.pause(300);
-        return await this.doCloseWindowTabAndSwitchToBrowsePanel();
-    },
-
-    async switchToContentTabWindow(contentDisplayName) {
-        try {
-            await webDriverHelper.browser.switchWindow(contentDisplayName);
-            let contentWizardPanel = new ContentWizardPanel();
-            return await contentWizardPanel.waitForSpinnerNotVisible();
-        } catch (err) {
-            await webDriverHelper.browser.pause(1500);
-            await webDriverHelper.browser.switchWindow(contentDisplayName);
-        }
-    },
     async doPressBackspace() {
         await webDriverHelper.browser.keys('\uE003');
         return await webDriverHelper.browser.pause(200);
@@ -719,15 +603,6 @@ module.exports = {
             return browseDependenciesWidget.waitForWidgetLoaded();
         })
     },
-    async openLayersWidgetInBrowsePanel() {
-        let browsePanel = new BrowsePanel();
-        let browseDetailsPanel = new BrowseDetailsPanel();
-        let browseLayersWidget = new BrowseLayersWidget();
-        await browsePanel.openDetailsPanel();
-        await browseDetailsPanel.openLayers();
-        await browseLayersWidget.waitForWidgetLoaded();
-        return browseLayersWidget;
-    },
     isStringEmpty(str) {
         return (!str || 0 === str.length);
     },
@@ -756,20 +631,6 @@ module.exports = {
         let atrValue = await element.getAttribute("class");
         return atrValue.includes("sidebar-expanded");
     },
-    async openSettingsPanel() {
-        try {
-            let settingsBrowsePanel = new SettingsBrowsePanel();
-            await this.openContentStudioMenu();
-            await this.waitForElementDisplayed(lib.SETTINGS_BUTTON, appConst.mediumTimeout);
-            await this.clickOnElement(lib.SETTINGS_BUTTON);
-            await webDriverHelper.browser.pause(300);
-            await settingsBrowsePanel.waitForGridLoaded(appConst.mediumTimeout);
-            return settingsBrowsePanel;
-        } catch (err) {
-            await this.saveScreenshot(appConst.generateRandomName("err_open_settings"));
-            throw new Error(err);
-        }
-    },
     async openArchivePanel() {
         try {
             let archiveBrowsePanel = new ArchiveBrowsePanel();
@@ -791,132 +652,13 @@ module.exports = {
     generateRandomName: function (part) {
         return part + Math.round(Math.random() * 1000000);
     },
-    async saveTestProject(name, description, language, principalsToAccess, accessMode) {
-        let projectWizard = new ProjectWizard();
-        let settingsBrowsePanel = new SettingsBrowsePanel();
-        await settingsBrowsePanel.openProjectWizard();
-        await projectWizard.typeDisplayName(name);
-        await projectWizard.typeDescription(description);
-        if (language) {
-            await projectWizard.selectLanguage(language);
-        }
-        if (principalsToAccess) {
-            await projectWizard.addPrincipalsInRolesForm(principalsToAccess);
-        }
-        if (accessMode) {
-            await projectWizard.clickOnAccessModeRadio(accessMode);
-        } else {
-            await projectWizard.clickOnAccessModeRadio("Private");
-        }
-        await projectWizard.pause(400);
-        await projectWizard.waitAndClickOnSave();
-        await projectWizard.waitForNotificationMessage();
-        await projectWizard.waitForSpinnerNotVisible();
-        await projectWizard.pause(700);
-        await settingsBrowsePanel.clickOnCloseIcon(name);
-        await projectWizard.waitForWizardClosed();
-        return await settingsBrowsePanel.pause(500);
-    },
-    navigateToUsersApp: function (userName, password) {
-        let launcherPanel = new LauncherPanel();
-        return launcherPanel.waitForPanelDisplayed(3000).then(result => {
-            if (result) {
-                console.log("Launcher Panel is opened, click on the `Users` link...");
-                return launcherPanel.clickOnUsersLink();
-            } else {
-                console.log("Login Page is opened, type a password and name...");
-                return this.doLoginAndClickOnUsersLink(userName, password);
-            }
-        }).then(() => {
-            return this.doSwitchToUsersApp();
-        }).catch(err => {
-            console.log('tried to navigate to Users app, but: ' + err);
-            throw new Error('error when navigate to Users app ' + err);
-        });
-    },
-    async doLoginAndClickOnUsersLink(userName, password) {
-        let loginPage = new LoginPage();
-        await loginPage.doLogin(userName, password);
-        let launcherPanel = new LauncherPanel();
-        await launcherPanel.clickOnUsersLink();
-        return await loginPage.pause(1000);
-    },
-    doSwitchToUsersApp: function () {
-        console.log('testUtils:switching to users app...');
-        let browsePanel = new UserBrowsePanel();
-        return webDriverHelper.browser.switchWindow("Users - Enonic XP Admin").then(() => {
-            console.log("switched to Users app...");
-            return browsePanel.waitForSpinnerNotVisible();
-        }).then(() => {
-            return browsePanel.waitForUsersGridLoaded(appConst.mediumTimeout);
-        }).catch(err => {
-            throw new Error("Error when switching to Users App " + err);
-        })
-    },
-    async addSystemUser(userData) {
-        let userWizard = new UserWizard();
-        //1. Select System ID Provider folder:
-        await this.clickOnSystemOpenUserWizard();
-        //2. Type the data:
-        await userWizard.typeData(userData);
-        await this.saveScreenshot(appConst.generateRandomName("user"));
-        //3. Save the data and close the wizard:
-        return await this.saveAndCloseUserWizard(userData.displayName);
-    },
-    async selectAndDeleteUserItem(name) {
-        let userBrowsePanel = new UserBrowsePanel();
-        let confirmationDialog = new ConfirmationDialog();
-        await this.findAndSelectUserItem(name);
-        await userBrowsePanel.waitForDeleteButtonEnabled();
-        await userBrowsePanel.clickOnDeleteButton();
-        await confirmationDialog.waitForDialogOpened();
-        await confirmationDialog.clickOnYesButton();
-        return await userBrowsePanel.waitForSpinnerNotVisible();
-    },
+
     async typeNameInUserFilterPanel(name) {
         let browsePanel = new UserBrowsePanel();
         let filterPanel = new PrincipalFilterPanel();
         await browsePanel.clickOnSearchButton();
         await filterPanel.waitForOpened();
         await filterPanel.typeSearchText(name);
-        await browsePanel.pause(300);
-        return await browsePanel.waitForSpinnerNotVisible();
-    },
-    async findAndSelectUserItem(name) {
-        let userBrowsePanel = new UserBrowsePanel();
-        await this.typeNameInUserFilterPanel(name);
-        await userBrowsePanel.pause(400);
-        await userBrowsePanel.waitForRowByNameVisible(name);
-        await userBrowsePanel.clickOnRowByName(name);
-        return await userBrowsePanel.pause(800);
-    },
-    //Click on Save button and close the wizard:
-    async saveAndCloseUserWizard(displayName) {
-        let wizardPanel = new UserWizard();
-        let browsePanel = new UserBrowsePanel();
-        await wizardPanel.waitAndClickOnSave();
-        //await wizardPanel.waitForNotificationMessage();
-        await wizardPanel.pause(2000);
-        //Click on Close icon and close the wizard:
-        return await browsePanel.doClickOnCloseTabAndWaitGrid(displayName);
-    },
-    async clickOnSystemOpenUserWizard() {
-        let browsePanel = new UserBrowsePanel();
-        let userWizard = new UserWizard();
-        let newPrincipalDialog = new NewPrincipalDialog();
-        await browsePanel.clickOnRowByName('system');
-        await browsePanel.waitForNewButtonEnabled();
-        await browsePanel.clickOnNewButton();
-        await newPrincipalDialog.waitForDialogLoaded();
-        await newPrincipalDialog.clickOnItem('User');
-        return await userWizard.waitForOpened();
-    },
-    async typeNameInUsersFilterPanel(name) {
-        let browsePanel = new UserBrowsePanel();
-        let principalFilterPanel = new PrincipalFilterPanel();
-        await browsePanel.clickOnSearchButton();
-        await principalFilterPanel.waitForOpened();
-        await principalFilterPanel.typeSearchText(name);
         await browsePanel.pause(300);
         return await browsePanel.waitForSpinnerNotVisible();
     },
@@ -950,62 +692,9 @@ module.exports = {
             })
         }, {timeout: ms, timeoutMsg: "Timeout exception. Element " + selector + " still not visible in: " + ms});
     },
-    async selectAndDeleteProject(projectName) {
-        let confirmValueDialog = new ConfirmValueDialog();
-        let settingsBrowsePanel = new SettingsBrowsePanel();
-        //1.Select the layer:
-        await settingsBrowsePanel.clickOnRowByDisplayName(projectName);
-        await settingsBrowsePanel.clickOnDeleteButton();
-        //2. Confirm the deleting:
-        await confirmValueDialog.waitForDialogOpened();
-        await confirmValueDialog.typeNumberOrName(projectName);
-        await confirmValueDialog.clickOnConfirmButton();
-        await confirmValueDialog.waitForDialogClosed();
-        return await settingsBrowsePanel.waitForNotificationMessage();
-    },
-    async scheduleContent(contentName, date) {
-        let contentBrowsePanel = new ContentBrowsePanel();
-        let dateTimeRange = new DateTimeRange();
-        await contentBrowsePanel.openPublishMenuSelectItem(appConst.PUBLISH_MENU.PUBLISH);
-        let contentPublishDialog = new ContentPublishDialog();
-        await contentPublishDialog.clickOnAddScheduleIcon();
-        await dateTimeRange.typeOnlineFrom(date, "//div[contains(@id,'ContentPublishDialog')]");
-        await contentPublishDialog.clickOnScheduleButton();
-        return await contentPublishDialog.waitForDialogClosed();
-    },
-    async openWizardDependencyWidget() {
-        let contentWizard = new ContentWizardPanel();
-        let wizardDependenciesWidget = new WizardDependenciesWidget();
-        let wizardDetailsPanel = new WizardDetailsPanel();
-        await contentWizard.openDetailsPanel();
-        await wizardDetailsPanel.openDependencies();
-        await wizardDependenciesWidget.waitForWidgetLoaded();
-        return wizardDependenciesWidget;
-    },
-    async openResourceInDraft(res) {
-        let currentUrl = await webDriverHelper.browser.getUrl();
-        let base = currentUrl.substring(0, currentUrl.indexOf('admin'));
-        let url = base + "admin/site/preview/default/draft/" + res;
-        await this.loadUrl(url);
-        return await webDriverHelper.browser.pause(2000);
-    },
-    async openResourceInMaster(res) {
-        let currentUrl = await webDriverHelper.browser.getUrl();
-        let base = currentUrl.substring(0, currentUrl.indexOf('admin'));
-        let url = base + "admin/site/preview/default/master/" + res;
-        await this.loadUrl(url);
-        return await webDriverHelper.browser.pause(2000);
-    },
+
+
     loadUrl(url) {
         return webDriverHelper.browser.url(url);
     },
-    async getIdOfHtmlAreas() {
-        let selector = lib.FORM_VIEW + lib.TEXT_AREA;
-        let elems = await webDriverHelper.browser.$$(selector);
-        let ids = [];
-        elems.forEach(el => {
-            ids.push(el.getAttribute("id"));
-        });
-        return Promise.all(ids);
-    }
 };

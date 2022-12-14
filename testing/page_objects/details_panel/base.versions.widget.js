@@ -13,7 +13,7 @@ const xpath = {
     restoredItems: "//li[contains(@id,'VersionHistoryListItem')and descendant::h6[contains(.,'Restored')]]",
     versionItemByDisplayName: displayName => `${lib.itemByDisplayName(displayName)}`,
     anyItemByHeader: header => `//li[contains(@class,'version-list-item') and descendant::h6[contains(.,'${header}')]]`,
-    compareWithCurrentVersionButtonLocator: ".//button[@title='Compare with current version']",
+    showChangesButtonLocator: ".//button[@title='Show changes']",
 };
 
 class BaseVersionsWidget extends Page {
@@ -109,11 +109,11 @@ class BaseVersionsWidget extends Page {
         }
     }
 
-    async clickOnCompareWithCurrentVersionButtonByHeader(itemHeader, index) {
+    async clickOnShowChangesButtonByHeader(itemHeader, index) {
         try {
             let itemLocator = this.versionsWidget + xpath.anyItemByHeader(itemHeader);
             let versionItems = await this.findElements(itemLocator);
-            let buttonElements = await versionItems[index].$$(xpath.compareWithCurrentVersionButtonLocator);
+            let buttonElements = await versionItems[index].$$(xpath.showChangesButtonLocator);
             await buttonElements[0].click();
             return await this.pause(200);
         } catch (err) {
@@ -140,10 +140,10 @@ class BaseVersionsWidget extends Page {
         return await elements[index].getText();
     }
 
-    async isCompareWithCurrentVersionButtonDisplayed(itemHeader, index) {
+    async isShowChangesInVersionButtonDisplayed(itemHeader, index) {
         let itemLocator = this.versionsWidget + xpath.anyItemByHeader(itemHeader);
         let elements = await this.findElements(itemLocator);
-        let buttonElements = await elements[index].$$(xpath.compareWithCurrentVersionButtonLocator);
+        let buttonElements = await elements[index].$$(xpath.showChangesButtonLocator);
         return buttonElements.length > 0;
     }
 }

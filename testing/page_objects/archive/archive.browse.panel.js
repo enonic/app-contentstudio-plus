@@ -147,9 +147,9 @@ class ArchiveBrowsePanel extends BaseBrowsePanel {
             let selector = this.treeGrid + lib.itemByDisplayName(displayName);
             return await this.waitForElementDisplayed(selector, appConst.longTimeout);
         } catch (err) {
-            console.log("item is not displayed:" + displayName);
-            await this.saveScreenshot('err_find_' + displayName);
-            throw new Error('Settings: item was not found ! ' + displayName + "  " + err);
+            let screenshot = appConst.generateRandomName('err_find_');
+            await this.saveScreenshot(screenshot);
+            throw new Error('Settings: item was not found ! screenshot ' + screenshot + ' ' + err);
         }
     }
 
@@ -159,18 +159,6 @@ class ArchiveBrowsePanel extends BaseBrowsePanel {
             return await this.waitForElementNotDisplayed(selector, appConst.mediumTimeout);
         } catch (err) {
             throw new Error("The content is still displayed :" + err);
-        }
-    }
-
-    async clickOnRowByDisplayName(displayName) {
-        try {
-            let nameXpath = this.treeGrid + lib.itemByDisplayName(displayName);
-            await this.waitForElementDisplayed(nameXpath, appConst.mediumTimeout);
-            await this.clickOnElement(nameXpath);
-            return await this.pause(300);
-        } catch (err) {
-            this.saveScreenshot('err_find_' + displayName);
-            throw Error('Archive Browse Panel - Row with the displayName ' + displayName + ' was not found' + err)
         }
     }
 

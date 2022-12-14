@@ -72,7 +72,8 @@ class WizardPanel extends Page {
             throw new Error('Error when Delete button has been clicked ' + err);
         });
     }
-};
+}
+
 module.exports = {WizardPanel, XPATH};
 
 

@@ -17,7 +17,6 @@ const xpath = {
     zoomLine: "//div[@class='zoom-line']",
     zoomKnob: "//span[@class='zoom-knob']",
     resetAutofocusButton: "//button[contains(@id,'Button') and child::span[text()='Reset Autofocus']]",
-    resetMaskButton: "//button[contains(@id,'Button') and child::span[text()='Reset Mask']]",
     closeEditModeButton: "//button[contains(@class,'close-button')]",
     buttonApply: "//button/span[text()='Apply']",
     resetMaskButton: "//button[contains(@id,'Button')]/span[text()='Reset Mask']",
