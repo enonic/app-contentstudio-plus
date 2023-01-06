@@ -13,6 +13,7 @@ const xpath = {
     layerDetailsDiv: "//div[contains(@id,'LayerContentViewHeader')]/div[contains(@class,'layer-details')]",
     layerLanguageDiv: "//div[@class='layer-language']",
     layerNameDiv: "//div[@class='layer-name']",
+    openButton: "/following-sibling::div[contains(@id,'LayerContentViewFooter')]/button[child::span[text()='Open']]",
 };
 
 class BaseLayersWidget extends Page {
@@ -57,27 +58,33 @@ class BaseLayersWidget extends Page {
     }
 
     async waitForEditButtonEnabled(layerName) {
-        let locator = this.widgetItemView + xpath.layerViewByName(layerName) +
-                      "/following-sibling::div[contains(@id,'LayerContentViewFooter')]/button[child::span[text()='Edit']]";
-        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
-        return await this.waitForElementEnabled(locator, appConst.mediumTimeout);
-    }
-
-    async waitForEditButtonEnabled(layerName) {
         try {
             let locator = this.widgetItemView + xpath.layerViewByName(layerName) +
                           "/following-sibling::div[contains(@id,'LayerContentViewFooter')]/button[child::span[text()='Edit']]";
             await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
             return await this.waitForElementEnabled(locator, appConst.mediumTimeout);
         } catch (err) {
-            throw new Error("Error getting button in the layer view item: " + err);
+            let screenshot = appConst.generateRandomName('err_edit_btn_widget');
+            await this.saveScreenshot(screenshot);
+            throw new Error("Layer widget - Error 'Edit' button in the layer view item, screenshot: " + screenshot + ' ' + err);
+        }
+    }
+
+    async clickOnWidgetItem(layerName) {
+        try {
+            let locator = this.widgetItemView + xpath.layerViewByName(layerName);
+            await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+            return await this.clickOnElement(locator);
+        } catch (err) {
+            let screenshot = appConst.generateRandomName('widget_item');
+            await this.saveScreenshot(screenshot);
+            throw new Error("Error after clicking on the widget-item, screenshot: " + screenshot + ' ' + err);
         }
     }
 
     async waitForOpenButtonEnabled(layerName) {
         try {
-            let locator = this.widgetItemView + xpath.layerViewByName(layerName) +
-                          "/following-sibling::div[contains(@id,'LayerContentViewFooter')]/button[child::span[text()='Open']]";
+            let locator = this.widgetItemView + xpath.layerViewByName(layerName) + xpath.openButton;
             await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
             return await this.waitForElementEnabled(locator, appConst.mediumTimeout);
         } catch (err) {
@@ -85,6 +92,18 @@ class BaseLayersWidget extends Page {
         }
     }
 
+    async clickOnOpenButton(layerName) {
+        try {
+            let locator = this.widgetItemView + xpath.layerViewByName(layerName) + xpath.openButton;
+            await this.waitForOpenButtonEnabled(layerName);
+            await this.clickOnElement(locator);
+            await this.pause(700);
+        } catch (err) {
+            let screenshot = appConst.generateRandomName('widget_item_open');
+            await this.saveScreenshot(screenshot);
+            throw new Error("Error after clicking on the Open button, screenshot: " + screenshot + ' ' + err);
+        }
+    }
 
     async clickOnLocalizeButton(layerName) {
         let locator = this.widgetItemView + xpath.layerViewByName(layerName) +
@@ -93,9 +112,13 @@ class BaseLayersWidget extends Page {
         return await this.clickOnElement(locator);
     }
 
+    async waitForShowAllButtonDisplayed() {
+        return await this.waitForElementDisplayed(this.showAllButton, appConst.mediumTimeout);
+    }
+
     async clickOnShowAllButton(layerName) {
         let layersContentTreeDialog = new LayersContentTreeDialog();
-        this.waitForElementDisplayed(this.showAllButton, appConst.mediumTimeout);
+        await this.waitForShowAllButtonDisplayed();
         await this.clickOnElement(this.showAllButton);
         await layersContentTreeDialog.waitForDialogLoaded();
         return layersContentTreeDialog;
