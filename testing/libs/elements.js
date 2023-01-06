@@ -32,6 +32,9 @@ module.exports = Object.freeze({
     inputView: "//div[contains(@id,'InputView')]",
     INPUT_VALIDATION_VIEW: "//div[contains(@id,'InputViewValidationViewer')]",
     OCCURRENCE_ERROR_BLOCK: "//div[contains(@id,'InputOccurrenceView')]//div[contains(@class,'error-block')]",
+    radioButtonByLabel: label => {
+        return `//span[contains(@class,'radio-button') and child::label[text()='${label}']]//input`
+    },
     tabBarItemByName: function (name) {
         return `//li[contains(@id,'TabBarItem') and child::a[text()='${name}']] `
     },

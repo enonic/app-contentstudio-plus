@@ -51,8 +51,8 @@ class LayersContentTreeDialog extends Page {
         }
     }
 
-    getTitle() {
-        return this.getText(XPATH.container + XPATH.title);
+    async getTitle() {
+        return await this.getText(XPATH.container + XPATH.title);
     }
 
     async getLayersName() {
@@ -82,6 +82,10 @@ class LayersContentTreeDialog extends Page {
         let buttonLocator = itemLocator + "//button[contains(@id,'LayersContentActionButton')]";
         await this.waitForElementDisplayed(buttonLocator, appConst.mediumTimeout);
         return await this.getText(buttonLocator + "//span");
+    }
+
+    async clickOnLayerItem(layerName) {
+
     }
 }
 module.exports = LayersContentTreeDialog;

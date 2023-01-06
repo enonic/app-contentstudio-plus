@@ -24,11 +24,20 @@ const ArchiveBrowsePanel = require('../page_objects/archive/archive.browse.panel
 const UserBrowsePanel = require('../page_objects/users/userbrowse.panel');
 const PrincipalFilterPanel = require('../page_objects/users/principal.filter.panel');
 const ContentBrowsePanel = require('../page_objects/browsepanel/content.browse.panel');
+const SettingsBrowsePanel = require('../page_objects/project/settings.browse.panel');
+const BrowseLayersWidget = require('../page_objects/browsepanel/detailspanel/browse.layers.widget');
 const fs = require('fs');
 const path = require('path');
 const addContext = require('mochawesome/addContext');
 
 module.exports = {
+    getBrowser() {
+        if (typeof browser !== 'undefined') {
+            return browser;
+        } else {
+            return webDriverHelper.browser;
+        }
+    },
     setTextInCKE: function (id, text) {
         let script = `CKEDITOR.instances['${id}'].setData('${text}')`;
         return webDriverHelper.browser.execute(script).then(() => {
@@ -79,29 +88,6 @@ module.exports = {
     },
     scrollViewPort(viewportElement, step) {
         return webDriverHelper.browser.execute("arguments[0].scrollTop=arguments[1]", viewportElement, step);
-    },
-    async insertUrlLinkInCke(text, url) {
-        let insertLinkDialog = new InsertLinkDialog();
-        await insertLinkDialog.typeText(text);
-        await insertLinkDialog.typeUrl(url);
-        await insertLinkDialog.clickOnInsertButtonAndWaitForClosed();
-        return await webDriverHelper.browser.pause(500);
-    },
-    async insertDownloadLinkInCke(text, contentDisplayName) {
-        let insertLinkDialog = new InsertLinkDialog();
-        await insertLinkDialog.typeText(text);
-        await insertLinkDialog.selectTargetInDownloadTab(contentDisplayName);
-        this.saveScreenshot('download_link_dialog');
-        await insertLinkDialog.clickOnInsertButton();
-        return await insertLinkDialog.pause(700);
-    },
-    async insertEmailLinkInCke(text, email) {
-        let insertLinkDialog = new InsertLinkDialog();
-        await insertLinkDialog.typeText(text);
-        await insertLinkDialog.fillEmailForm(email);
-        this.saveScreenshot('email_link_dialog');
-        await insertLinkDialog.clickOnInsertButton();
-        return await insertLinkDialog.pause(700);
     },
 
     async insertContentLinkInCke(text, contentDisplayName) {
@@ -304,17 +290,6 @@ module.exports = {
         return await contentWizardPanel.waitForOpened();
     },
 
-    async doAddPageTemplate(siteName, template) {
-        let contentWizardPanel = new ContentWizardPanel();
-        await this.doOpenPageTemplateWizard(siteName);
-        await contentWizardPanel.typeData(template);
-        //auto saving should be here:
-        await contentWizardPanel.selectPageDescriptor(template.data.controllerDisplayName);
-        this.saveScreenshot(template.displayName + '_created');
-        await this.doCloseCurrentBrowserTab();
-        await this.doSwitchToContentBrowsePanel();
-        return await contentWizardPanel.pause(2000);
-    },
     //Clicks on Publish button on the toolbar then clicks on Publish button in the dialog
     async doPublish() {
         let browsePanel = new BrowsePanel();
@@ -363,19 +338,6 @@ module.exports = {
         //2. Click on Unpublish button:
         await contentUnpublishDialog.clickOnUnpublishButton();
         return await contentUnpublishDialog.waitForDialogClosed();
-    },
-    async doAddArticleContent(siteName, article) {
-        let contentWizardPanel = new ContentWizardPanel();
-        //1. Select the site
-        await this.findAndSelectItem(siteName);
-        //2. Open article-wizard:
-        await this.openContentWizard(article.contentType);
-        //3.Type the data and save all
-        await contentWizardPanel.typeData(article);
-        await contentWizardPanel.waitAndClickOnSave();
-        await this.doCloseCurrentBrowserTab();
-        await this.doSwitchToContentBrowsePanel();
-        return await webDriverHelper.browser.pause(1000);
     },
     async findAndSelectItem(name) {
         let browsePanel = new BrowsePanel();
@@ -448,15 +410,6 @@ module.exports = {
         } catch (err) {
             throw new Error("Error when opening Filter Panel! " + err);
         }
-    },
-    async doLogout() {
-        let launcherPanel = new LauncherPanel();
-        let loginPage = new LoginPage();
-        let isDisplayed = await launcherPanel.isPanelOpened();
-        if (isDisplayed) {
-            await launcherPanel.clickOnLogoutLink();
-        }
-        return await loginPage.waitForPageLoaded();
     },
     async navigateToContentStudioApp(userName, password) {
         try {
@@ -593,31 +546,32 @@ module.exports = {
             return console.log('screenshot was not saved ' + screenshotsDir + 'utils  ' + err);
         })
     },
-    openDependencyWidgetInBrowsePanel() {
+    async openLayersWidgetInBrowsePanel() {
         let browsePanel = new BrowsePanel();
-        let browseDependenciesWidget = new BrowseDependenciesWidget();
         let browseDetailsPanel = new BrowseDetailsPanel();
-        return browsePanel.openDetailsPanel().then(() => {
-            return browseDetailsPanel.openDependencies();
-        }).then(() => {
-            return browseDependenciesWidget.waitForWidgetLoaded();
-        })
+        let browseLayersWidget = new BrowseLayersWidget();
+        await browsePanel.openDetailsPanel();
+        await browseDetailsPanel.openLayers();
+        await browseLayersWidget.waitForWidgetLoaded();
+        return browseLayersWidget;
+    },
+    async navigateToContentStudioWithProjects(userName, password) {
+        try {
+            await this.clickOnContentStudioLink(userName, password);
+            console.log('testUtils:switching to Content Browse panel...');
+            let browsePanel = new BrowsePanel();
+            await this.getBrowser().switchWindow("Content Studio - Enonic XP Admin");
+            return await browsePanel.pause(1500);
+        } catch (err) {
+            console.log('tried to navigate to Content Studio app, but: ' + err);
+            this.saveScreenshot(appConst.generateRandomName("err_navigate_to_studio"));
+            throw new Error('error when navigate to Content Studio app ' + err);
+        }
     },
     isStringEmpty(str) {
         return (!str || 0 === str.length);
     },
-    sendRequestGetHeaders() {
-        return webDriverHelper.browser.executeAsync(
-            "var callback = arguments[arguments.length - 1];" +
-            "var xhr = new XMLHttpRequest();" +
-            "xhr.open('GET', '', true);" +
-            "xhr.onreadystatechange = function() {" +
-            "  if (xhr.readyState == 4) {" +
-            "    callback(xhr.getAllResponseHeaders());" +
-            "  }" +
-            "};" +
-            "xhr.send();");
-    },
+
     async openContentStudioMenu() {
         let result = await this.isContentStudioMenuOpened();
         if (!result) {
@@ -692,7 +646,50 @@ module.exports = {
             })
         }, {timeout: ms, timeoutMsg: "Timeout exception. Element " + selector + " still not visible in: " + ms});
     },
-
+    async navigateToContentStudioCloseProjectSelectionDialog(userName, password) {
+        try {
+            await this.clickOnContentStudioLink(userName, password);
+            await this.getBrowser().switchWindow("Content Studio - Enonic XP Admin");
+            await this.closeProjectSelectionDialog();
+        } catch (err) {
+            let screenshot = appConst.generateRandomName("err_navigate_to_studio")
+            await this.saveScreenshot(screenshot);
+            throw new Error('Error when navigate to Content Studio app. Screenshot: ' + screenshot + "  " + err);
+        }
+    },
+    async openSettingsPanel() {
+        try {
+            let settingsBrowsePanel = new SettingsBrowsePanel();
+            await this.openContentStudioMenu();
+            await this.waitForElementDisplayed(lib.SETTINGS_BUTTON, appConst.mediumTimeout);
+            await this.clickOnElement(lib.SETTINGS_BUTTON);
+            await this.getBrowser().pause(300);
+            await settingsBrowsePanel.waitForGridLoaded(appConst.mediumTimeout);
+            return settingsBrowsePanel;
+        } catch (err) {
+            await this.saveScreenshot(appConst.generateRandomName("err_open_settings"));
+            throw new Error("Settings Panel was not opened: " + err);
+        }
+    },
+    async openLayersWidgetInBrowsePanel() {
+        let browsePanel = new BrowsePanel();
+        let browseDetailsPanel = new BrowseDetailsPanel();
+        let browseLayersWidget = new BrowseLayersWidget();
+        await browsePanel.openDetailsPanel();
+        await browseDetailsPanel.openLayers();
+        await browseLayersWidget.waitForWidgetLoaded();
+        return browseLayersWidget;
+    },
+    async openProjectSelectionDialogAndSelectContext(context) {
+        try {
+            let browsePanel = new BrowsePanel();
+            return await browsePanel.selectContext(context);
+        } catch (err) {
+            let screenshot = appConst.generateRandomName('err_select_context');
+            await this.saveScreenshot(screenshot);
+            throw new Error('Error during selecting a context, screenshot: ' + screenshot + "  " + err);
+        }
+    },
 
     loadUrl(url) {
         return webDriverHelper.browser.url(url);

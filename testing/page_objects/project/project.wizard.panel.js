@@ -4,7 +4,7 @@ const appConst = require('../../libs/app_const');
 const ComboBox = require('../components/loader.combobox');
 
 const XPATH = {
-    settingsContainer: "//div[contains(@id,'SettingsAppContainer')]",
+    settingsContainer: "//div[contains(@id,'ContentAppBar')]",
     container: `//div[contains(@id,'ProjectWizardPanel')]`,
     displayNameInput: `//input[contains(@name,'displayName')]`,
     tabTitle: "//li[contains(@id,'AppBarTabMenuItem')]",
@@ -16,17 +16,20 @@ const XPATH = {
     selectedReadAccessOption: "//div[contains(@id,'PrincipalSelectedOptionView')]",
     projectAccessControlComboBox: "//div[contains(@id,'ProjectAccessControlComboBox')]",
     projectReadAccessWizardStepForm: "//div[contains(@id,'ProjectReadAccessWizardStepForm')]",
-    accessFormItem: "//div[contains(@id,'ProjectFormItem') and contains(@class,'access')]",
+    accessFormItem: "//div[contains(@id,'ProjectReadAccessFormItem')]",
     localeComboBoxDiv: "//div[contains(@id,'LocaleComboBox')]",
+    projectApplicationsComboboxDiv: "//div[contains(@id, 'ProjectApplicationsComboBox')]",
     languageSelectedOption: "//div[contains(@id,'LocaleSelectedOptionView')]",
     projectAccessSelectorTabMenu: "//div[contains(@id,'ProjectAccessSelector') and contains(@class,'tab-menu access-selector')]",
     parentProjectComboboxDiv: "//div[contains(@id,'ProjectsComboBox')]",
+    selectedAppView: "//div[contains(@id,'ProjectSelectedApplicationViewer')]",
     accessItemByName:
         name => `//div[contains(@id,'PrincipalContainerSelectedOptionView') and descendant::p[contains(@class,'sub-name') and contains(.,'${name}')]]`,
     radioButtonByDescription: descr => XPATH.projectReadAccessWizardStepForm +
                                        `//span[contains(@id,'RadioButton') and descendant::label[contains(.,'${descr}')]]`,
     wizardStepByTitle:
         name => `//ul[contains(@id,'WizardStepNavigator')]//li[contains(@id,'TabBarItem') and @title='${name}']`,
+    aclEntryByName: name => `//div[contains(@id,ProjectAccessControlEntryView) and descendant::h6[contains(@class,'main-name') and contains(.,'${name}')]]`
 };
 
 class ProjectWizardPanel extends Page {
@@ -51,10 +54,14 @@ class ProjectWizardPanel extends Page {
     }
 
     get localeOptionsFilterInput() {
-        return XPATH.projectReadAccessWizardStepForm + XPATH.localeComboBoxDiv + lib.COMBO_BOX_OPTION_FILTER_INPUT;
+        return XPATH.container + XPATH.localeComboBoxDiv + lib.COMBO_BOX_OPTION_FILTER_INPUT;
     }
 
-    get projectsOptionsFilterInput() {
+    get projectApplicationsOptionsFilterInput() {
+        return XPATH.container + XPATH.projectApplicationsComboboxDiv + lib.COMBO_BOX_OPTION_FILTER_INPUT;
+    }
+
+    get parentProjectsOptionsFilterInput() {
         return XPATH.container + XPATH.parentProjectComboboxDiv + lib.COMBO_BOX_OPTION_FILTER_INPUT;
     }
 
@@ -101,7 +108,7 @@ class ProjectWizardPanel extends Page {
         return await this.getText(this.projectIdentifierValidationMessage);
     }
 
-    async getProjectIdentifierValidationMessageNotVisible() {
+    async waitForProjectIdentifierValidationMessageNotVisible() {
         return await this.waitForElementNotDisplayed(this.projectIdentifierValidationMessage, appConst.shortTimeout);
     }
 
@@ -185,8 +192,9 @@ class ProjectWizardPanel extends Page {
             await this.waitForElementDisplayed(selector, appConst.shortTimeout);
             return await this.getText(selector);
         } catch (err) {
-            this.saveScreenshot("err_selected_locale");
-            throw new Error("Selected language was not found " + err);
+            let screenshot = appConst.generateRandomName("err_project_locale");
+            await this.saveScreenshot(screenshot);
+            throw new Error("Selected language was not found, screenshot:  " + screenshot + " " + err);
         }
     }
 
@@ -221,12 +229,12 @@ class ProjectWizardPanel extends Page {
         return this.waitForElementDisplayed(this.rolesComboBox);
     }
 
-    //Adds an user with the default role (Contributor) in Roles step form:
+    //Adds a user with the default role (Contributor) in Roles step form:
     async selectProjectAccessRoles(principalDisplayName) {
         let comboBox = new ComboBox();
         await comboBox.typeTextAndSelectOption(principalDisplayName, XPATH.container + XPATH.projectAccessControlComboBox);
         console.log("Project Wizard, principal is selected: " + principalDisplayName);
-        return await this.pause(400);
+        return await this.pause(1000);
     }
 
     //selects an project(parent) :
@@ -247,6 +255,8 @@ class ProjectWizardPanel extends Page {
         let menuItem = XPATH.container + XPATH.projectAccessControlComboBox + XPATH.accessItemByName(userDisplayName) +
                        lib.tabMenuItem(newRole);
         await this.waitForElementDisplayed(menuItem, appConst.shortTimeout);
+        await this.saveScreenshot(appConst.generateRandomName(newRole));
+        await this.pause(300);
         await this.clickOnElement(menuItem);
         return await this.pause(500);
     }
@@ -254,6 +264,16 @@ class ProjectWizardPanel extends Page {
     async getSelectedProjectAccessItems() {
         let selector = XPATH.container + XPATH.selectedProjectAccessOptions + lib.H6_DISPLAY_NAME;
         let isDisplayed = await this.isElementDisplayed(XPATH.container + XPATH.selectedProjectAccessOptions);
+        if (isDisplayed) {
+            return await this.getTextInElements(selector);
+        } else {
+            return [];
+        }
+    }
+
+    async getSelectedProjectAccessRole(userName) {
+        let selector = XPATH.container + XPATH.aclEntryByName(userName) + XPATH.projectAccessSelectorTabMenu;
+        let isDisplayed = await this.isElementDisplayed(selector);
         if (isDisplayed) {
             return await this.getTextInElements(selector);
         } else {
@@ -275,7 +295,7 @@ class ProjectWizardPanel extends Page {
 
     async selectUserInCustomReadAccess(principalDisplayName) {
         let comboBox = new ComboBox();
-        await comboBox.typeTextAndSelectOption(principalDisplayName, XPATH.projectReadAccessWizardStepForm + XPATH.accessFormItem);
+        await comboBox.typeTextAndSelectOption(principalDisplayName, XPATH.projectReadAccessWizardStepForm);
         console.log("Project Wizard, principal is selected: " + principalDisplayName);
         return await this.pause(300);
     }
@@ -372,17 +392,18 @@ class ProjectWizardPanel extends Page {
     async clickOnWizardStep(title) {
         let stepXpath = XPATH.wizardStepByTitle(title);
         await this.clickOnElement(stepXpath);
-        return await this.pause(900);
+        return await this.pause(700);
     }
 
     async clickOnRemoveLanguage() {
         try {
-            await this.waitForElementDisplayed(this.removeLanguageButton);
+            await this.waitForElementDisplayed(this.removeLanguageButton, appConst.mediumTimeout);
             await this.clickOnElement(this.removeLanguageButton);
             return await this.pause(500);
         } catch (err) {
-            this.saveScreenshot("err_click_on_remove_language_icon");
-            throw new Error('Error when removing the language! ' + err);
+            let screenshot = appConst.generateRandomName("err_project_remove_icon");
+            await this.saveScreenshot(screenshot);
+            throw new Error('Error during clicking on remove language icon, screenshot: ' + screenshot + "  " + err);
         }
     }
 
@@ -391,6 +412,49 @@ class ProjectWizardPanel extends Page {
         await this.getBrowser().waitUntil(async () => {
             return await this.isFocused(this.displayNameInput);
         }, {timeout: appConst.mediumTimeout, timeoutMsg: message});
+    }
+
+    waitForProjectApplicationsOptionsFilterInputDisplayed() {
+        return this.waitForElementDisplayed(this.projectApplicationsOptionsFilterInput, appConst.mediumTimeout);
+    }
+
+    async selectApplication(appName) {
+        try {
+            let comboBox = new ComboBox();
+            await this.waitForProjectApplicationsOptionsFilterInputDisplayed();
+            await comboBox.typeTextAndSelectOption(appName, XPATH.projectApplicationsComboboxDiv);
+            console.log("Project Wizard, application is selected: " + appName);
+            return await this.pause(300);
+        } catch (err) {
+            let screenshot = appConst.generateRandomName("err_project_wizard");
+            await this.saveScreenshot(screenshot);
+            throw new Error("Error during selecting application, screenshot:" + screenshot + "  " + err);
+        }
+    }
+
+    async getSelectedApplication() {
+        try {
+            let locator = XPATH.container + XPATH.selectedAppView + lib.H6_DISPLAY_NAME;
+            await this.waitForElementDisplayed(locator, appConst.shortTimeout);
+            return await this.getText(locator);
+        } catch (err) {
+            let screenshot = appConst.generateRandomName("err_project_locale");
+            await this.saveScreenshot(screenshot);
+            throw new Error("Selected language was not found, screenshot:  " + screenshot + " " + err);
+        }
+    }
+
+    async clickOnRemoveApplicationIcon() {
+        try {
+            let locator = XPATH.container + "//div[contains(@id,'ProjectApplicationSelectedOptionView')]" + lib.REMOVE_ICON
+            await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+            await this.clickOnElement(locator);
+            return await this.pause(500);
+        } catch (err) {
+            let screenshot = appConst.generateRandomName("err_project_remove_icon");
+            await this.saveScreenshot(screenshot);
+            throw new Error('Error during clicking on remove application icon, screenshot: ' + screenshot + "  " + err);
+        }
     }
 }
 
