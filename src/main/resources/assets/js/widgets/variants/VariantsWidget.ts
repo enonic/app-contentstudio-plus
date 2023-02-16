@@ -60,7 +60,7 @@ export class VariantsWidget
     }
 
     private handeContentDuplicated(duplicatedItems: ContentSummaryAndCompareStatus[]): void {
-        if (this.isAnyItemDuplicated(duplicatedItems)) {
+        if (this.isInDOM() && this.isAnyItemDuplicated(duplicatedItems)) {
             this.loadDataAndUpdateWidgetContent();
             NotifyManager.get().showFeedback(i18n('widget.variants.event.create', this.originalContent.getDisplayName()));
         }
@@ -79,7 +79,7 @@ export class VariantsWidget
     }
 
     private handleContentDeleted(items: ContentServerChangeItem[]): void {
-        if (this.isAnyVariantDeleted(items)) {
+        if (this.isInDOM() && this.isAnyVariantDeleted(items)) {
             this.loadDataAndUpdateWidgetContent();
         }
     }
@@ -189,5 +189,9 @@ export class VariantsWidget
 
     private handleErrorWhileLoadingVariants(): void {
         //
+    }
+
+    private isInDOM(): boolean {
+        return this.getHTMLElement().isConnected;
     }
 }

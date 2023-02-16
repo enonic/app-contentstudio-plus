@@ -27,8 +27,13 @@ void (async () => {
 
         void widget.render();
 
-        widgetContainer.addEventListener('remove', () => {
-            widget.cleanUp();
+        widget.whenRendered(() => {
+            const checkPresentInDomInterval = setInterval(() => {
+                if (!widget.getHTMLElement().isConnected) {
+                    clearInterval(checkPresentInDomInterval);
+                    widget.cleanUp();
+                }
+            }, 1000);
         });
     }
 })();
