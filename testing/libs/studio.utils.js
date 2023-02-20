@@ -26,6 +26,7 @@ const PrincipalFilterPanel = require('../page_objects/users/principal.filter.pan
 const ContentBrowsePanel = require('../page_objects/browsepanel/content.browse.panel');
 const SettingsBrowsePanel = require('../page_objects/project/settings.browse.panel');
 const BrowseLayersWidget = require('../page_objects/browsepanel/detailspanel/browse.layers.widget');
+const BrowseVariantsWidget = require('../page_objects/browsepanel/detailspanel/browse.variants.widget');
 const fs = require('fs');
 const path = require('path');
 const addContext = require('mochawesome/addContext');
@@ -554,6 +555,15 @@ module.exports = {
         await browseDetailsPanel.openLayers();
         await browseLayersWidget.waitForWidgetLoaded();
         return browseLayersWidget;
+    },
+    async openVariantsWidget() {
+        let browsePanel = new BrowsePanel();
+        let browseDetailsPanel = new BrowseDetailsPanel();
+        let browseVariantsWidget = new BrowseVariantsWidget();
+        await browsePanel.openDetailsPanel();
+        await browseDetailsPanel.openVariants();
+        await browseVariantsWidget.waitForWidgetLoaded();
+        return browseVariantsWidget;
     },
     async navigateToContentStudioWithProjects(userName, password) {
         try {

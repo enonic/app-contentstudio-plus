@@ -77,6 +77,21 @@ class BaseDetailsPanel extends Page {
         }
     }
 
+    async openVariants() {
+        try {
+            await this.clickOnWidgetSelectorDropdownHandle();
+            let variantsOption = this.widgetSelectorDropdown + lib.itemByDisplayName(appConst.WIDGET_TITLE.VARIANTS);
+            await this.waitForElementDisplayed(variantsOption, appConst.mediumTimeout);
+            let result = await this.getDisplayedElements(variantsOption);
+            await result[0].click();
+            return await this.pause(500);
+        } catch (err) {
+            let screenshot = appConst.generateRandomName('err_variants_widget');
+            await this.saveScreenshot(screenshot);
+            throw new Error(`Error during opening Variants widget, screenshot:${screenshot} ` + err);
+        }
+    }
+
     async openEmulatorWidget() {
         try {
             await this.clickOnWidgetSelectorDropdownHandle();
