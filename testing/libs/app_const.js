@@ -6,17 +6,20 @@ module.exports = Object.freeze({
         return part + Math.round(Math.random() * 1000000);
     },
     itemMarkedAsReadyMessage(name) {
-        return `Item \"${name}\" is marked as ready`
+        return `Item \"${name}\" is marked as ready`;
     },
     itemIsArchived(name) {
-        return `Item \"${name}\" is archived`
+        return `Item \"${name}\" is archived`;
     },
     itemIsRestored(name) {
-        return `Item \"${name}\" is restored`
+        return `Item \"${name}\" is restored`;
     },
 
     itemIsDeleted(name) {
-        return `Item \"${name}\" is deleted`
+        return `Item \"${name}\" is deleted`;
+    },
+    variantCreated(name) {
+        return `A variant for \"${name}\" has been created`;
     },
 
     itemSavedNotificationMessage: function (name) {
@@ -136,7 +139,8 @@ module.exports = Object.freeze({
         VERSION_HISTORY: 'Version history',
         DEPENDENCIES: 'Dependencies',
         LAYERS: 'Layers',
-        EMULATOR: 'Emulator'
+        EMULATOR: 'Emulator',
+        VARIANTS: 'Variants',
     },
     EMULATOR_RESOLUTION: {
         MEDIUM_PHONE: 'Medium Phone',

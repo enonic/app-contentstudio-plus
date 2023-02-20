@@ -63,7 +63,6 @@ describe('layer.localize.button.spec - checks Localize button in browse toolbar 
 
     it("WHEN content, that is inherited from the parent project has been selected THEN 'Localize' button should be enabled in the second layer widget item",
         async () => {
-            let projectSelectionDialog = new ProjectSelectionDialog();
             //1. layer's context should be loaded by default now!
             //2. Select the folder that was inherited from the parent project:
             await studioUtils.findAndSelectItem(FOLDER_NAME);

@@ -78,7 +78,6 @@ describe('layers.content.tree.dialog.spec - tests for Layers Content Tree modal 
 
     it.skip("GIVEN 'Layers Tree' is opened WHEN layer-item has been clicked THEN Edit button gets visible",
         async () => {
-            let contentBrowsePanel = new ContentBrowsePanel();
             await studioUtils.switchToContentMode();
             // 1. Open modal dialog and select the layer's context:
             //await contentBrowsePanel.selectContext(LAYER1_DISPLAY_NAME);
@@ -111,7 +110,7 @@ describe('layers.content.tree.dialog.spec - tests for Layers Content Tree modal 
         async () => {
             let contentBrowsePanel = new ContentBrowsePanel();
             await studioUtils.switchToContentMode();
-            //1. Select the layer's context:
+            // 1. Select the layer's context:
             await studioUtils.openProjectSelectionDialogAndSelectContext(LAYER1_DISPLAY_NAME);
             // 2. Duplicate the folder that is inherited from the parent project:
             await studioUtils.findAndSelectItem(TEST_FOLDER_DISPLAY_NAME);
@@ -134,14 +133,14 @@ describe('layers.content.tree.dialog.spec - tests for Layers Content Tree modal 
         async () => {
             let settingsBrowsePanel = new SettingsBrowsePanel();
             let confirmValueDialog = new ConfirmValueDialog();
-            //1.Delete the first layer:
+            // 1.Delete the first layer:
             await settingsBrowsePanel.clickOnRowByDisplayName(LAYER2_DISPLAY_NAME);
             await settingsBrowsePanel.clickOnDeleteButton();
             await confirmValueDialog.waitForDialogOpened();
             await confirmValueDialog.typeNumberOrName(LAYER2_DISPLAY_NAME);
             await confirmValueDialog.clickOnConfirmButton();
             await settingsBrowsePanel.waitForNotificationMessage();
-            //2.Delete the second layer:
+            // 2.Delete the second layer:
             await settingsBrowsePanel.clickOnRowByDisplayName(LAYER1_DISPLAY_NAME);
             await settingsBrowsePanel.clickOnDeleteButton();
             await confirmValueDialog.waitForDialogOpened();
