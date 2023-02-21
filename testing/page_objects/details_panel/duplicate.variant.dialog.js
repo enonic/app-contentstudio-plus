@@ -29,8 +29,9 @@ class DuplicateVariantDialog extends Page {
         await this.clickOnElement(this.cancelButton);
     }
 
-    waitForClosed() {
-        this.waitForElementNotDisplayed(this.duplicateButton, appConst.mediumTimeout);
+    async waitForClosed() {
+        await this.waitForElementNotDisplayed(this.duplicateButton, appConst.mediumTimeout);
+        return await this.pause(500);
     }
 
     waitForLoaded() {

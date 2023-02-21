@@ -129,6 +129,8 @@ describe('folder.variants.spec - tests for Create Variant modal dialog', functio
             await duplicateVariantDialog.clickOnDuplicateButton();
             // 5. Verify that the dialog is closed:
             await duplicateVariantDialog.waitForClosed();
+            await browseVariantsWidget.pause(1200);
+            await studioUtils.saveScreenshot('variant_duplicated');
             // 6. Verify notification messages
             let varCreated = appConst.variantCreated(FOLDER_NAME);
             let varDuplicated = appConst.itemDuplicated(VARIANT_NAME_1);
