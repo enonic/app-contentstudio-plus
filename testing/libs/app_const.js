@@ -21,6 +21,9 @@ module.exports = Object.freeze({
     variantCreated(name) {
         return `A variant for \"${name}\" has been created`;
     },
+    itemDuplicated(name) {
+        return `Item \"${name}\" is duplicated.`;
+    },
 
     itemSavedNotificationMessage: function (name) {
         return `Item \"${name}\" is saved.`
