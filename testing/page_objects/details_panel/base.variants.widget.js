@@ -24,6 +24,10 @@ class BaseVariantsWidget extends Page {
         return xpath.originalVariantsListItemView + lib.actionButton('Create Variant');
     }
 
+    get variantDuplicateButton() {
+        return "//div[contains(@id,'VariantsListItemViewMenuButton')]" + lib.actionButton('Duplicate');
+    }
+
     get variantListItems() {
         return this.variantsWidget + xpath.variantsListItemView;
     }
@@ -52,28 +56,33 @@ class BaseVariantsWidget extends Page {
         await this.clickOnElement(locator);
     }
 
-    //get all version items with the header then click on required item:
+    // Click on the variant item:
     async clickOnVariantItemByName(name) {
         try {
             await this.waitForElementDisplayed(this.variantListItems, appConst.mediumTimeout);
-            //get all variants items with the name:
-            let locator = lib.itemByName(name);
+            let locator = xpath.variantsListItemView + lib.itemByName(name);
             await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
-            let items = await this.findElements(locator);
-            //click on the item:
-            await items[i].click();
-            return await this.pause(300);
+            return await this.clickOnElement(locator);
         } catch (err) {
             await this.saveScreenshot(appConst.generateRandomName("err_expand_version"));
             throw new Error("Error when clicking on the version item: " + err);
         }
     }
 
-    waitForWidgetLoaded() {
-        return this.waitForElementDisplayed(this.variantsWidget, appConst.mediumTimeout).catch(err => {
-            this.saveScreenshot("err_load_variants_widget");
-            throw new Error('Variants Widget was not loaded in ' + appConst.mediumTimeout + " " + err);
-        });
+    async clickOnDuplicateButton() {
+        await this.waitForElementDisplayed(this.variantDuplicateButton, appConst.mediumTimeout);
+        await this.clickOnElement(this.variantDuplicateButton);
+        return await this.pause(300);
+    }
+
+    async waitForWidgetLoaded() {
+        try {
+            await this.waitForElementDisplayed(this.variantsWidget, appConst.mediumTimeout);
+        } catch (err) {
+            let screenshot = appConst.generateRandomName('err_load_variants_widget');
+            await this.saveScreenshot(screenshot);
+            throw new Error(`Variants Widget was not loaded in ${screenshot} ` + err);
+        }
     }
 
     async clickOnCreateVariantButtonInOriginalItem() {

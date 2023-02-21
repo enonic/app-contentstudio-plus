@@ -9,6 +9,7 @@ const CreateVariantDialog = require('../page_objects/details_panel/create.varian
 const contentBuilder = require("../libs/content.builder");
 const ContentBrowsePanel = require('../page_objects/browsepanel/content.browse.panel');
 const appConst = require('../libs/app_const');
+const DuplicateVariantDialog = require('../page_objects/details_panel/duplicate.variant.dialog');
 
 describe('folder.variants.spec - tests for Create Variant modal dialog', function () {
     this.timeout(appConst.SUITE_TIMEOUT);
@@ -20,11 +21,16 @@ describe('folder.variants.spec - tests for Create Variant modal dialog', functio
     const VARIANT_NAME_1 = appConst.generateRandomName('variant');
     const VARIANT_NAME_2 = appConst.generateRandomName('variant');
 
+
+    it(`Precondition: new folder should be added`,
+        async () => {
+            let folder = contentBuilder.buildFolder(FOLDER_NAME);
+            await studioUtils.doAddFolder(folder);
+        });
+
     it("GIVEN 'create variant dialog' is opened WHEN variant name input has been cleared THEN 'Create Variant' button gets disabled",
         async () => {
             let createVariantDialog = new CreateVariantDialog();
-            let folder = contentBuilder.buildFolder(FOLDER_NAME);
-            await studioUtils.doAddFolder(folder);
             // 1. Select the folder and open Variants widget:
             await studioUtils.findAndSelectItem(FOLDER_NAME);
             let browseVariantsWidget = await studioUtils.openVariantsWidget();
@@ -106,6 +112,45 @@ describe('folder.variants.spec - tests for Create Variant modal dialog', functio
             // 3. Verify that expected variant-content gets visible:
             await studioUtils.saveScreenshot('new_variant_in_grid');
             await contentBrowsePanel.waitForContentDisplayed(VARIANT_NAME_1);
+        });
+
+    it("GIVEN variant has been selected WHEN the variant has been duplicated THEN expected variant content should be displayed",
+        async () => {
+            let contentBrowsePanel = new ContentBrowsePanel();
+            let duplicateVariantDialog = new DuplicateVariantDialog();
+            // 1. Select the folder and open Variants widget:
+            await studioUtils.findAndSelectItem(VARIANT_NAME_1);
+            let browseVariantsWidget = await studioUtils.openVariantsWidget();
+            // 2. Click on 'Duplicate' button in the expanded variant-item
+            await browseVariantsWidget.clickOnDuplicateButton();
+            // 3. Duplicate Variant dialog should be loaded
+            await duplicateVariantDialog.waitForLoaded();
+            // 4. Click on Duplicate button in the dialog:
+            await duplicateVariantDialog.clickOnDuplicateButton();
+            // 5. Verify that the dialog is closed:
+            await duplicateVariantDialog.waitForClosed();
+            // 6. Verify notification messages
+            let varCreated = appConst.variantCreated(FOLDER_NAME);
+            let varDuplicated = appConst.itemDuplicated(VARIANT_NAME_1);
+            let messages = await contentBrowsePanel.waitForNotificationMessages();
+            assert.isTrue(messages.includes(varCreated), 'Variant has been created - this message should appear');
+            assert.isTrue(messages.includes(varDuplicated), 'Item is duplicated - this message should appear');
+        });
+
+    it("GIVEN folder with 2 variants has been filtered WHEN expander icon has been clicked THEN expected duplicated variant with icon should be displayed",
+        async () => {
+            let contentBrowsePanel = new ContentBrowsePanel();
+            // 1. Select the folder and open Variants widget:
+            await studioUtils.findAndSelectItem(FOLDER_NAME);
+            // 2. Expand the folder
+            await contentBrowsePanel.clickOnExpanderIcon(FOLDER_NAME);
+            // 3. Verify that expected duplicated variant-content is present:
+            await studioUtils.saveScreenshot('duplicated_variant_in_grid');
+            let copyName = VARIANT_NAME_1 + '-copy';
+            await contentBrowsePanel.waitForContentDisplayed(copyName);
+            // 4. Verify that both variants have correct icon:
+            await contentBrowsePanel.waitForVariantIconDisplayed(VARIANT_NAME_1);
+            await contentBrowsePanel.waitForVariantIconDisplayed(copyName);
         });
 
 

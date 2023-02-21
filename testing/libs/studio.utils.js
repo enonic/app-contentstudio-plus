@@ -351,7 +351,7 @@ module.exports = {
     async findAndSelectItemByDisplayName(displayName) {
         let browsePanel = new BrowsePanel();
         await this.typeNameInFilterPanel(displayName);
-        await browsePanel.waitForRowByDisplayNameVisible(displayName);
+        await browsePanel.waitForContentByDisplayNameVisible(displayName);
         await browsePanel.pause(300);
         await browsePanel.clickOnRowByDisplayName(displayName);
         return await browsePanel.pause(400);
@@ -471,6 +471,10 @@ module.exports = {
             let homePage = new HomePage();
             return homePage.waitForLoaded(appConst.mediumTimeout);
         });
+    },
+    async doSwitchToPrevTab() {
+        let tabs = await this.getBrowser().getWindowHandles();
+        return await this.getBrowser().switchToWindow(tabs[tabs.length - 2]);
     },
     async doCloseWindowTabAndSwitchToBrowsePanel() {
         await webDriverHelper.browser.closeWindow();
