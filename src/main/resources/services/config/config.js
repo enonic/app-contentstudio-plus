@@ -23,6 +23,7 @@ function handleGet() {
                 app.name,
                 'main'
             ),
+            studioToolUri: admin.getToolUrl('com.enonic.app.contentstudio', 'main')
         }
     };
 }

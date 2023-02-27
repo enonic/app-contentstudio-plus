@@ -1,9 +1,6 @@
 import {PropertiesWidgetItemView} from 'lib-contentstudio/app/view/context/widget/details/PropertiesWidgetItemView';
 import {Application} from '@enonic/lib-admin-ui/application/Application';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
-import {GetContentVersionsRequest} from 'lib-contentstudio/app/resource/GetContentVersionsRequest';
-import {ContentVersions} from 'lib-contentstudio/app/ContentVersions';
-import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import {Element} from '@enonic/lib-admin-ui/dom/Element';
 import {DateTimeFormatter} from '@enonic/lib-admin-ui/ui/treegrid/DateTimeFormatter';
 
@@ -14,11 +11,9 @@ export class ArchivePropertiesWidgetItemView
     protected layoutApplication(application?: Application): void {
         super.layoutApplication(application);
 
-        new GetContentVersionsRequest(this.item.getContentId()).sendAndParse().then((versions: ContentVersions) => {
-            const archived: string = i18n('status.archived');
-            const archivedDate: string = DateTimeFormatter.createHtml(this.item.getContentSummary().getArchivedTime());
-            this.insertKeyValue(archived, archivedDate, this.getIndexToInsertArchived());
-        }).catch(DefaultErrorHandler.handle);
+        const archived: string = i18n('status.archived');
+        const archivedDate: string = DateTimeFormatter.createHtml(this.item.getContentSummary()?.getArchivedTime());
+        this.insertKeyValue(archived, archivedDate, this.getIndexToInsertArchived());
     }
 
     private getIndexToInsertArchived(): number {

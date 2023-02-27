@@ -2,6 +2,8 @@ export class AppHelper {
 
     static APP_PREFIX = 'cs-plus-';
 
+    static STUDIO_URI_PROPERTY_NAME = 'studioToolUri';
+
     static getCommonWidgetClass(): string {
         return `${AppHelper.APP_PREFIX}widget`;
     }

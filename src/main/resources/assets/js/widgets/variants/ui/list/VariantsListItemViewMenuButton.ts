@@ -2,11 +2,13 @@ import {Action} from '@enonic/lib-admin-ui/ui/Action';
 import {MenuButton} from '@enonic/lib-admin-ui/ui/button/MenuButton';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
-import {ContentWindowHelper} from '../../dialog/ContentWindowHelper';
 import * as Q from 'q';
 import {DuplicateVariantDialog} from '../../dialog/DuplicateVariantDialog';
 import {CreateVariantDialog} from '../../dialog/CreateVariantDialog';
 import {GetContentVariantsRequest} from '../../resource/request/GetContentVariantsRequest';
+import {ContentEventsProcessor} from 'lib-contentstudio/app/ContentEventsProcessor';
+import {EditContentEvent} from 'lib-contentstudio/app/event/EditContentEvent';
+import {AppHelper} from '../../../../util/AppHelper';
 
 export class VariantsListItemViewMenuButton
     extends MenuButton {
@@ -45,7 +47,7 @@ export class VariantsListItemViewMenuButton
     }
 
     private handleSecondaryActionExecuted(): void {
-        new ContentWindowHelper(this.item.getId()).openEditWizard();
+        ContentEventsProcessor.handleEdit(new EditContentEvent([this.item]).setUriPropertyName(AppHelper.STUDIO_URI_PROPERTY_NAME));
     }
 
     setItem(item: ContentSummaryAndCompareStatus): VariantsListItemViewMenuButton {
