@@ -1,4 +1,7 @@
 import {ContentDuplicateDialog} from 'lib-contentstudio/app/duplicate/ContentDuplicateDialog';
+import {ContentWizardPanelParams} from 'lib-contentstudio/app/wizard/ContentWizardPanelParams';
+import {ContentSummary} from 'lib-contentstudio/app/content/ContentSummary';
+
 
 export class DuplicateVariantDialog extends ContentDuplicateDialog {
 
@@ -14,5 +17,9 @@ export class DuplicateVariantDialog extends ContentDuplicateDialog {
         }
 
         return DuplicateVariantDialog.INSTANCE;
+    }
+
+    protected getWizardParams(content: ContentSummary): ContentWizardPanelParams {
+        return super.getWizardParams(content).setUriPropertyName('studioToolUri');
     }
 }
