@@ -1,23 +1,38 @@
 /**
- * Created on 05.07.2018.
+ * Created  on 22.02.2023
  */
 const Page = require('../page');
-const lib = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
+const lib = require('../../libs/elements');
 const LoaderComboBox = require('../components/loader.combobox');
+
 const xpath = {
-    container: `//div[contains(@id,'SettingsWizardStepForm')]`,
+    container: `//div[contains(@id,'EditPropertiesDialog')]`,
+    settingsStepFormDiv: "//div[contains(@id,'SettingsWizardStepForm')]",
+    dialogTitle: "//div[contains(@id,'EditDetailsDialogHeader') and child::h2[@class='title']]",
     localeCombobox: `//div[contains(@id,'LocaleComboBox')]`,
     ownerCombobox: `//div[contains(@id,'PrincipalComboBox')]`,
-    applicationsSelectedOptions: "//div[contains(@id,'SiteConfiguratorSelectedOptionView')]",
     selectedOwner: `//div[contains(@class,'selected-options principal-selected-options-view')]`,
-    selectedLocale: `//div[contains(@id,'LocaleSelectedOptionView')]`,
     languageSelectedOption: "//div[contains(@id,'LocaleSelectedOptionView')]",
     ownerSelectedOption: "//div[contains(@id,'PrincipalSelectedOptionView')]",
     removedPrincipal: "//div[contains(@id,'RemovedPrincipalSelectedOptionView')]",
+    scheduleForm: `//div[contains(@id,'ScheduleWizardStepForm')]`,
 };
 
-class SettingsStepForm extends Page {
+class EditSettingDialog extends Page {
+
+    get cancelTopButton() {
+        return xpath.container + lib.CANCEL_BUTTON_TOP;
+    }
+
+    get cancelButton() {
+        return xpath.container + lib.dialogButton('Cancel');
+    }
+
+    get applyButton() {
+        return xpath.container + lib.dialogButton('Apply');
+    }
+
 
     get languageFilterInput() {
         return xpath.container + xpath.localeCombobox + lib.COMBO_BOX_OPTION_FILTER_INPUT;
@@ -35,17 +50,51 @@ class SettingsStepForm extends Page {
         return xpath.container + xpath.ownerSelectedOption + lib.REMOVE_ICON;
     }
 
-    filterOptionsAndSelectLanguage(language) {
-        if (language == null) {
-            return Promise.resolve();
-        } else {
-            return this.typeTextInInput(this.languageFilterInput, language).then(() => {
-                let loaderComboBox = new LoaderComboBox();
-                return loaderComboBox.selectOption(language);
-            }).catch(err => {
-                this.saveScreenshot(appConst.generateRandomName('err_option'));
-                throw new Error('Settings form, language selector :' + err);
-            });
+    async clickOnCancelButton() {
+        await this.waitForElementDisplayed(this.cancelButton, appConst.mediumTimeout);
+        await this.clickOnElement(this.cancelButton);
+        await this.pause(300);
+    }
+
+    waitForApplyButtonDisplayed() {
+        return this.waitForElementDisplayed(this.applyButton, appConst.mediumTimeout);
+    }
+
+    waitForApplyButtonEnabled() {
+        return this.waitForElementEnabled(this.applyButton, appConst.mediumTimeout);
+    }
+
+    waitForApplyButtonDisabled() {
+        return this.waitForElementDisabled(this.applyButton, appConst.mediumTimeout);
+    }
+
+    async waitForLoaded() {
+        await this.waitForElementDisplayed(xpath.settingsStepFormDiv);
+        await this.waitForApplyButtonDisplayed();
+    }
+
+    waitForClosed() {
+        this.waitForElementNotDisplayed(xpath.container, appConst.mediumTimeout);
+    }
+
+    async clickOnApplyButton() {
+        await this.waitForApplyButtonDisplayed();
+        await this.waitForApplyButtonEnabled();
+        await this.clickOnElement(this.applyButton);
+        await this.waitForClosed();
+        return await this.pause(800);
+    }
+
+    async filterOptionsAndSelectLanguage(language) {
+        try {
+            await this.typeTextInInput(this.languageFilterInput, language);
+            await this.pause(300);
+            let loaderComboBox = new LoaderComboBox();
+            await loaderComboBox.selectOption(language);
+            await this.pause(300);
+        } catch (err) {
+            await this.saveScreenshot(appConst.generateRandomName('err_option'));
+            throw new Error('Edit Setting dialog, language selector :' + err);
         }
     }
 
@@ -62,13 +111,18 @@ class SettingsStepForm extends Page {
     }
 
     async getSelectedLanguage() {
-        let selector = xpath.container + xpath.selectedLocale + lib.H6_DISPLAY_NAME;
-        await this.waitForElementDisplayed(selector, appConst.mediumTimeout);
-        return await this.getText(selector);
+        try {
+            let selector = xpath.container + xpath.languageSelectedOption + lib.H6_DISPLAY_NAME;
+            await this.waitForElementDisplayed(selector, appConst.mediumTimeout);
+            return await this.getText(selector);
+        } catch (err) {
+            await this.saveScreenshot(appConst.generateRandomName('err_pr_wizard_language'));
+            throw new Error('Edit Setting dialog, error during getting the selected language. ' + err);
+        }
     }
 
     waitForSelectedLanguageNotDisplayed() {
-        let selector = xpath.container + xpath.selectedLocale + lib.H6_DISPLAY_NAME;
+        let selector = xpath.container + xpath.languageSelectedOption + lib.H6_DISPLAY_NAME;
         return this.waitForElementNotDisplayed(selector, appConst.mediumTimeout);
     }
 
@@ -87,7 +141,7 @@ class SettingsStepForm extends Page {
             await this.clickOnElement(this.removeLanguageButton);
             return await this.pause(500);
         } catch (err) {
-            this.saveScreenshot("err_click_on_remove_language_icon");
+            this.saveScreenshot('err_click_on_remove_language_icon');
             throw new Error('Error when removing the language! ' + err);
         }
     }
@@ -115,6 +169,4 @@ class SettingsStepForm extends Page {
     }
 }
 
-module.exports = SettingsStepForm;
-
-
+module.exports = EditSettingDialog;

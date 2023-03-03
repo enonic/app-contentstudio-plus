@@ -7,11 +7,9 @@ const webDriverHelper = require('../libs/WebDriverHelper');
 const studioUtils = require('../libs/studio.utils.js');
 const projectUtils = require('../libs/project.utils.js');
 const SettingsBrowsePanel = require('../page_objects/project/settings.browse.panel');
-const ProjectSelectionDialog = require('../page_objects/project/project.selection.dialog');
 const contentBuilder = require("../libs/content.builder");
 const ContentBrowsePanel = require('../page_objects/browsepanel/content.browse.panel');
 const ContentWizard = require('../page_objects/wizardpanel/content.wizard.panel');
-const SettingsForm = require('../page_objects/wizardpanel/settings.wizard.step.form');
 const appConst = require('../libs/app_const');
 
 describe('layer.localize.button.spec - checks Localize button in browse toolbar and Layers widget', function () {
@@ -31,7 +29,7 @@ describe('layer.localize.button.spec - checks Localize button in browse toolbar 
             await studioUtils.openSettingsPanel();
             //1.'Default' project should be loaded after closing the 'Select project' dialog, then open wizard for new layer:
             await settingsBrowsePanel.openProjectWizardDialog();
-            let layer = projectUtils.buildLayer("Default", appConst.LANGUAGES.NORSK_NO, appConst.PROJECT_ACCESS_MODE.PUBLIC, null,
+            let layer = projectUtils.buildLayer('Default', appConst.LANGUAGES.NORSK_NO, appConst.PROJECT_ACCESS_MODE.PUBLIC, null,
                 null, LAYER_DISPLAY_NAME);
             await projectUtils.fillFormsWizardAndClickOnCreateButton(layer);
             await settingsBrowsePanel.waitForNotificationMessage();
@@ -63,16 +61,16 @@ describe('layer.localize.button.spec - checks Localize button in browse toolbar 
 
     it("WHEN content, that is inherited from the parent project has been selected THEN 'Localize' button should be enabled in the second layer widget item",
         async () => {
-            //1. layer's context should be loaded by default now!
-            //2. Select the folder that was inherited from the parent project:
+            // 1. layer's context should be loaded by default now!
+            // 2. Select the folder that was inherited from the parent project:
             await studioUtils.findAndSelectItem(FOLDER_NAME);
-            //3. Open Layers widget:
+            // 3. Open Layers widget:
             let browseLayersWidget = await studioUtils.openLayersWidgetInBrowsePanel();
             await studioUtils.saveScreenshot('localize_button_widget_enabled');
-            //4. Verify that two items should be displayed in the widget:
+            // 4. Verify that two items should be displayed in the widget:
             let layersName = await browseLayersWidget.getLayersName();
             assert.equal(layersName.length, 2, 'Two layers should be present in the widget');
-            //5. Verify that 'Localize' button is enabled in the second item:
+            // 5. Verify that 'Localize' button is enabled in the second item:
             await browseLayersWidget.waitForLocalizeButtonEnabled(LAYER_DISPLAY_NAME);
         });
 
@@ -92,21 +90,23 @@ describe('layer.localize.button.spec - checks Localize button in browse toolbar 
             assert.equal(language, "(no)", 'Expected language should be displayed in the layer');
         });
 
-    it("GIVEN content that is inherited from a parent has been selected WHEN Localize button(in widget) has been clicked THEN the content should be loaded in the new wizard tab",
+    it("GIVEN inherited content has been selected WHEN 'Localize' button(in widget) has been clicked THEN the content should be loaded in the new wizard tab",
         async () => {
             let contentWizard = new ContentWizard();
-            let wizardSettingsForm = new SettingsForm();
-            //1. Select the folder in layer and open Layers widget:
+            // 1. Select the folder in layer and open Layers widget:
             await studioUtils.findAndSelectItem(FOLDER_NAME);
             let browseLayersWidget = await studioUtils.openLayersWidgetInBrowsePanel();
-            //2. Click on 'Localize' button:
+            // 2. Click on 'Localize' button:
             await browseLayersWidget.clickOnLocalizeButton(LAYER_DISPLAY_NAME);
             await studioUtils.doSwitchToNextTab();
-            //4. Verify that expected content is loaded in wizard page:
+            // 3. Verify that expected content is loaded in wizard page:
             await contentWizard.waitForOpened();
             let actualDisplayName = await contentWizard.getDisplayName();
             let actualProjectName = await contentWizard.getProjectDisplayName();
-            let actualLanguage = await wizardSettingsForm.getSelectedLanguage();
+            // 4. Open 'Edit Setting' modal dialog:
+            let editSettingsDialog = await studioUtils.openEditSettingDialog();
+            let actualLanguage = await editSettingsDialog.getSelectedLanguage();
+            await editSettingsDialog.clickOnCancelButton();
             assert.equal(actualLanguage, EXPECTED_LANGUAGE_IN_WIZARD, 'Expected language should be displayed in the wizard');
             assert.equal(actualDisplayName, FOLDER_NAME, "Expected folder's displayName should be displayed in the wizard");
             assert.equal(actualProjectName, LAYER_DISPLAY_NAME + "(no)", 'Expected project displayName should be displayed in the wizard');
@@ -117,19 +117,19 @@ describe('layer.localize.button.spec - checks Localize button in browse toolbar 
             let contentBrowsePanel = new ContentBrowsePanel();
             let contentWizardPanel = new ContentWizard();
             // The Context is loaded automatically :
-            //1. Select the folder:
+            // 1. Select the folder:
             await studioUtils.findAndSelectItem(FOLDER_NAME);
             let browseLayersWidget = await studioUtils.openLayersWidgetInBrowsePanel();
-            //2. Click on `Localize` button and open this folder:
+            // 2. Click on `Localize` button and open this folder:
             await contentBrowsePanel.clickOnLocalizeButton();
             await studioUtils.doSwitchToNextTab();
             await contentWizardPanel.waitForOpened();
-            //3. Open Layers widget in the wizard:
+            // 3. Open Layers widget in the wizard:
             let wizardLayersWidget = await contentWizardPanel.openLayersWidget();
             let contentNameAndLanguage = await wizardLayersWidget.getContentNameWithLanguage(LAYER_DISPLAY_NAME);
-            //4. postfix '(?)' should be present in the name of the content because localizing changes are not saved:
+            // 4. postfix '(?)' should be present in the name of the content because localizing changes are not saved:
             assert.equal(contentNameAndLanguage, FOLDER_NAME + '(?)', "postfix '(?)' should be present in the content name");
-            //5. Verify that New status is present in the Layer Content View:
+            // 5. Verify that New status is present in the Layer Content View:
             let actualStatus = await wizardLayersWidget.getContentStatus(LAYER_DISPLAY_NAME);
             assert.equal(actualStatus, 'New', 'Expected content status should be present in the widget item')
         });
@@ -138,23 +138,23 @@ describe('layer.localize.button.spec - checks Localize button in browse toolbar 
         async () => {
             let contentBrowsePanel = new ContentBrowsePanel();
             let contentWizardPanel = new ContentWizard();
-            //1. Select the folder:
+            // 1. Select the folder:
             await studioUtils.findAndSelectItem(FOLDER_NAME);
-            //2. Click on `Localize` button and open it:
+            // 2. Click on `Localize` button and open it:
             await contentBrowsePanel.clickOnLocalizeButton();
             await studioUtils.doSwitchToNextTab();
             await contentWizardPanel.waitForOpened();
-            //3. Open Layers widget in the wizard:
+            // 3. Open Layers widget in the wizard:
             let wizardLayersWidget = await contentWizardPanel.openLayersWidget();
             let layers = await wizardLayersWidget.getLayersName();
-            //4. Verify names of layers:
+            // 4. Verify names of layers:
             assert.equal(layers[0], 'Default', 'Default layer should be present in the widget');
             assert.equal(layers[1], LAYER_DISPLAY_NAME, "layer's layer should be present in the widget");
             let language = await wizardLayersWidget.getLayerLanguage(LAYER_DISPLAY_NAME);
-            //5. Verify Localize button in the widget:
+            // 5. Verify Localize button in the widget:
             await wizardLayersWidget.waitForLocalizeButtonEnabled(LAYER_DISPLAY_NAME);
-            //6. Verify the language in the widget:
-            assert.equal(language, '(no)', "Expected language should be displayed in the layer");
+            // 6. Verify the language in the widget:
+            assert.equal(language, '(no)', 'Expected language should be displayed in the layer');
         });
 
     it("GIVEN content that is inherited from a parent has been opened WHEN 'Save' button has been pressed THEN 'Localize' button should be replaced with 'Edit' button",

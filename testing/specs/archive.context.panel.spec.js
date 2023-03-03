@@ -1,208 +1,228 @@
 /**
- * Created on 07.12.2021
+ * Created on 05.01.2023
  */
 const chai = require('chai');
 const assert = chai.assert;
 const webDriverHelper = require('../libs/WebDriverHelper');
-const appConst = require('../libs/app_const');
-const ContentBrowsePanel = require('../page_objects/browsepanel/content.browse.panel');
 const studioUtils = require('../libs/studio.utils.js');
+const projectUtils = require('../libs/project.utils.js');
+const SettingsBrowsePanel = require('../page_objects/project/settings.browse.panel');
 const contentBuilder = require("../libs/content.builder");
-const DeleteContentDialog = require('../page_objects/delete.content.dialog');
-const ArchiveBrowsePanel = require('../page_objects/archive/archive.browse.panel');
-const ArchivedContentPropertiesWidget = require('../page_objects/archive/archived.content.properties.widget');
-const ArchivedContentStatusWidget = require('../page_objects/archive/archived.content.status.widget');
-const ArchiveBrowseContextPanel = require('../page_objects/archive/archive.browse.context.panel');
-const ArchivedContentVersionsWidget = require('../page_objects/archive/archived.content.versions.widget');
-const ContentBrowseDetailsPanel = require('../page_objects/browsepanel/detailspanel/browse.details.panel');
-const BrowseVersionsWidget = require('../page_objects/browsepanel/detailspanel/browse.versions.widget');
-const ArchiveRestoreDialog = require('../page_objects/archive/archive.restore.dialog');
-const CompareContentVersionsDialog = require('../page_objects/details_panel/compare.content.versions.dialog');
+const ContentBrowsePanel = require('../page_objects/browsepanel/content.browse.panel');
+const ContentWizard = require('../page_objects/wizardpanel/content.wizard.panel');
+const appConst = require('../libs/app_const');
 
-describe('archive.context.panel.spec: tests for archive context panel', function () {
+describe('layer.localize.button.spec - checks Localize button in browse toolbar and Layers widget', function () {
     this.timeout(appConst.SUITE_TIMEOUT);
-    webDriverHelper.setupBrowser();
+    if (typeof browser === 'undefined') {
+        webDriverHelper.setupBrowser();
+    }
+    const LAYER_DISPLAY_NAME = studioUtils.generateRandomName('layer');
+    const FOLDER_NAME = studioUtils.generateRandomName('folder');
+    const FOLDER_2_NAME = studioUtils.generateRandomName('folder');
+    const EXPECTED_LANGUAGE_IN_WIZARD = 'norsk (no)';
 
-    let FOLDER1;
-
-    it(`Precondition: new folder should be added`,
+    it("Precondition 1 - layer(in Default) with 'Norsk(no)' language should be created",
         async () => {
-            let displayName1 = appConst.generateRandomName('folder');
-            FOLDER1 = contentBuilder.buildFolder(displayName1);
-            await studioUtils.doAddFolder(FOLDER1);
+            let settingsBrowsePanel = new SettingsBrowsePanel();
+            await studioUtils.closeProjectSelectionDialog();
+            await studioUtils.openSettingsPanel();
+            // 1.'Default' project should be loaded after closing the 'Select project' dialog, then open wizard for new layer:
+            await settingsBrowsePanel.openProjectWizardDialog();
+            let layer = projectUtils.buildLayer('Default', appConst.LANGUAGES.NORSK_NO, appConst.PROJECT_ACCESS_MODE.PUBLIC, null,
+                null, LAYER_DISPLAY_NAME);
+            await projectUtils.fillFormsWizardAndClickOnCreateButton(layer);
+            await settingsBrowsePanel.waitForNotificationMessage();
         });
 
-    it(`WHEN archived content has been selected THEN expected properties should be displayed in widgets`,
+    it("Precondition 2 - two new folders should be added in 'Default' context",
         async () => {
-                let contentBrowsePanel = new ContentBrowsePanel();
-                let deleteContentDialog = new DeleteContentDialog();
-                let archiveBrowsePanel = new ArchiveBrowsePanel();
-                // 1. Select and archive the folder
-                await studioUtils.findContentAndClickCheckBox(FOLDER1.displayName);
-                await contentBrowsePanel.rightClickOnItemByDisplayName(FOLDER1.displayName);
-                await contentBrowsePanel.clickOnMenuItem(appConst.GRID_CONTEXT_MENU.ARCHIVE);
-                await deleteContentDialog.waitForDialogOpened();
-                await deleteContentDialog.clickOnArchiveButton();
-                await contentBrowsePanel.waitForContentNotDisplayed(FOLDER1.displayName);
-                // 2. Navigate to 'Archive Browse Panel' and select the archived content:
-                await studioUtils.openArchivePanel();
-                let archivedContentPropertiesWidget = new ArchivedContentPropertiesWidget();
-                let archivedContentStatusWidget = new ArchivedContentStatusWidget();
-                await archiveBrowsePanel.clickCheckboxAndSelectRowByDisplayName(FOLDER1.displayName);
-                await studioUtils.saveScreenshot("archive_context_panel");
-                // 3. Verify the properties widget
-                let actualOwner = await archivedContentPropertiesWidget.getOwner();
-                assert.equal(actualOwner, "su", "Expected owner should be displayed");
-                let actualType = await archivedContentPropertiesWidget.getType();
-                assert.equal(actualType, "folder", "Expected type should be displayed");
-                let actualApplication = await archivedContentPropertiesWidget.getApplication();
-                assert.equal(actualApplication, "base", "Expected application should be displayed");
-                // 4. Verify the status in the widget
-                let actualStatus = await archivedContentStatusWidget.getStatus();
-                assert.equal(actualStatus, "Archived", "Expected status should be displayed");
+            // Default project should be loaded automatically when SU is logged in the second time.
+            // 1. folder1 - status is 'work in progress'
+            let folder = contentBuilder.buildFolder(FOLDER_NAME);
+            await studioUtils.doAddFolder(folder);
+            // 2. folder2 - status is 'Ready to Publish'
+            let folder2 = contentBuilder.buildFolder(FOLDER_2_NAME);
+            await studioUtils.doAddReadyFolder(folder2);
         });
 
-        it(`GIVEN 'Versions widget' is opened WHEN 'Created' version item has been clicked THEN 'Revert' and 'Active versions' should not be displayed`,
-            async () => {
-                    let archiveBrowseContextPanel = new ArchiveBrowseContextPanel();
-                    let archiveBrowsePanel = new ArchiveBrowsePanel();
-                    let archivedContentVersionsWidget = new ArchivedContentVersionsWidget();
-                    await studioUtils.openArchivePanel();
-                    // 1. Select the archived content
-                    await archiveBrowsePanel.clickCheckboxAndSelectRowByDisplayName(FOLDER1.displayName);
-                    // 2. Open the versions widget and click on Created version item:
-                    await archiveBrowseContextPanel.openVersionHistory();
-                    await archivedContentVersionsWidget.clickOnVersionItemByHeader(appConst.VERSIONS_ITEM_HEADER.CREATED, 0);
-                    await archivedContentVersionsWidget.pause(1000);
-                    await studioUtils.saveScreenshot("version_item_clicked");
-                    // 3. Verify that 'Revert' and 'Active versions' buttons are not displayed in the widget:
-                    let result = await archivedContentVersionsWidget.isRevertButtonDisplayed();
-                    assert.isFalse(result, "'Revert' button should not be displayed in the widget");
-                    result = await archivedContentVersionsWidget.isActiveVersionButtonDisplayed();
-                    assert.isFalse(result, "'Active version' button should not be displayed in the widget");
-                    // 4. Verify that 'Show changes' buttons is not displayed in Archived items only:
-                    let isDisplayed = await archivedContentVersionsWidget.isShowChangesInVersionButtonDisplayed(
-                        appConst.VERSIONS_ITEM_HEADER.ARCHIVED, 0);
-                    assert.isFalse(isDisplayed, "'Show changes' button should not be displayed in the Archived-item");
-            });
-
-        it(`GIVEN archived content has been selected WHEN widget dropdown handle has been clicked THEN 2 expected options should be in WidgetSelector dropdown`,
-            async () => {
-                    let archiveBrowseContextPanel = new ArchiveBrowseContextPanel();
-                    let archiveBrowsePanel = new ArchiveBrowsePanel();
-                    await studioUtils.openArchivePanel();
-                    // 1. Select existing folder:
-                    await archiveBrowsePanel.clickCheckboxAndSelectRowByDisplayName(FOLDER1.displayName);
-                    // 2. Click on Widget Selector dropdown handler:
-                    await archiveBrowseContextPanel.clickOnWidgetSelectorDropdownHandle();
-                    // 3. Verify that two options are present in the selector:
-                    let actualOptions = await archiveBrowseContextPanel.getWidgetSelectorDropdownOptions();
-                    assert.isTrue(actualOptions.includes('Details'));
-                    assert.isTrue(actualOptions.includes('Version history'));
-                    assert.equal(actualOptions.length, 2, "Two options should be in the selector");
-            });
-
-        it(`GIVEN archived content has been selected WHEN Comparing Versions Dialog has been opened THEN Revert menu buttons should be hidden`,
-            async () => {
-                    let archiveBrowseContextPanel = new ArchiveBrowseContextPanel();
-                    let archiveBrowsePanel = new ArchiveBrowsePanel();
-                    let archivedContentVersionsWidget = new ArchivedContentVersionsWidget();
-                    let compareContentVersionsDialog = new CompareContentVersionsDialog();
-                    await studioUtils.openArchivePanel();
-                    // 1. Select the archived content
-                    await archiveBrowsePanel.clickCheckboxAndSelectRowByDisplayName(FOLDER1.displayName);
-                    // 2. Open Versions Widget:
-                    await archiveBrowseContextPanel.openVersionHistory();
-                    // 3. Open 'Compare Versions' modal dialog:
-                    await archivedContentVersionsWidget.clickOnShowChangesButtonByHeader(appConst.VERSIONS_ITEM_HEADER.EDITED, 0);
-                    await compareContentVersionsDialog.waitForDialogOpened();
-                    await studioUtils.saveScreenshot('compare_versions_dialog');
-                    // 4. Verify that 'Left Revert' menu button is not displayed:
-                    await compareContentVersionsDialog.waitForLeftRevertMenuButtonNotDisplayed();
-                    // 5. Verify that 'Right Revert' menu button is not displayed:
-                    await compareContentVersionsDialog.waitForRightRevertMenuButtonNotDisplayed();
-            });
-
-        // Verify - Archive app - error after clicking on a version item in Compare Versions modal dialog #445
-        // https://github.com/enonic/app-contentstudio-plus/issues/445
-        it(`GIVEN Comparing Versions Dialog has been opened WHEN left versions selector has been expanded AND previous option has been clicked THEN Versions are identical should be displayed in the dialog`,
-            async () => {
-                    let archiveBrowseContextPanel = new ArchiveBrowseContextPanel();
-                    let archiveBrowsePanel = new ArchiveBrowsePanel();
-                    let archivedContentVersionsWidget = new ArchivedContentVersionsWidget();
-                    let compareContentVersionsDialog = new CompareContentVersionsDialog();
-                    await studioUtils.openArchivePanel();
-                    // 1. Select the archived content
-                    await archiveBrowsePanel.clickCheckboxAndSelectRowByDisplayName(FOLDER1.displayName);
-                    // 2. Open Versions Widget:
-                    await archiveBrowseContextPanel.openVersionHistory();
-                    // 3. Open 'Compare Versions' modal dialog:
-                    await archivedContentVersionsWidget.clickOnShowChangesButtonByHeader(appConst.VERSIONS_ITEM_HEADER.EDITED, 0);
-                    await compareContentVersionsDialog.waitForDialogOpened();
-                    // 4. Click on the dropdown handle and expand the left menu:
-                    await compareContentVersionsDialog.clickOnLeftSelectorDropdownHandle();
-                    await studioUtils.saveScreenshot("compare_versions_dialog_left_expanded");
-                    // 5. click on the 'Previous version' option in the expanded options:
-                    await compareContentVersionsDialog.clickOnOptionInLeftVersionsSelector('Previous version');
-                    await studioUtils.saveScreenshot("compare_versions_dialog_left_previous_version");
-                    // 6. Verify that 'Versions are identical' message gets visible in the content panel:
-                    //let message = await compareContentVersionsDialog.waitForContentPanelIsEmpty();
-                    //assert.equal(message, "Versions are identical", "Expected message should be displayed in the dialog");
-            });
-
-        it(`GIVEN existing archived content has been selected WHEN 'Versions widget' has been opened THEN expected Archived version item should be displayed in the widget`,
-            async () => {
-                    let archiveBrowseContextPanel = new ArchiveBrowseContextPanel();
-                    let archiveBrowsePanel = new ArchiveBrowsePanel();
-                    let archivedContentVersionsWidget = new ArchivedContentVersionsWidget();
-                    await studioUtils.openArchivePanel();
-                    //1. Select the archived content
-                    await archiveBrowsePanel.clickCheckboxAndSelectRowByDisplayName(FOLDER1.displayName);
-                    //2. Open the versions widget:
-                    await archiveBrowseContextPanel.openVersionHistory();
-                    //3. Verify that 'archived' version item appears in the widget:
-                    let actualStatus = await archivedContentVersionsWidget.getStatusInArchivedItem(0);
-                    assert.isTrue(actualStatus.includes("Archived"));
-                    let archivedBy = await archivedContentVersionsWidget.getArchivedBy(0);
-                    assert.equal(archivedBy, "by Super User", "Expected user should be displayed");
-            });
-
-        it(`GIVEN restored content has been selected WHEN 'Versions widget' has been opened THEN expected Restored version item should be displayed in the widget`,
-            async () => {
-                    let archiveBrowsePanel = new ArchiveBrowsePanel();
-                    let contentBrowsePanel = new ContentBrowsePanel();
-                    let archiveRestoreDialog = new ArchiveRestoreDialog();
-                    let contentBrowseDetailsPanel = new ContentBrowseDetailsPanel();
-                    let browseVersionsWidget = new BrowseVersionsWidget();
-                    await studioUtils.openArchivePanel();
-                    //1. Select the archived content
-                    await archiveBrowsePanel.clickCheckboxAndSelectRowByDisplayName(FOLDER1.displayName);
-                    //2. Restore the content
-                    await archiveBrowsePanel.clickOnRestoreButton();
-                    await archiveRestoreDialog.waitForOpened();
-                    await studioUtils.saveScreenshot("folder_to_restore1_3");
-            await archiveRestoreDialog.clickOnRestoreButton();
-            await contentBrowsePanel.waitForNotificationMessage();
-            //3. Go to Content Browse Panel:
-            await studioUtils.switchToContentMode();
-            //4. Select the folder and open Versions History:
-            await studioUtils.findAndSelectItem(FOLDER1.displayName);
-            await contentBrowseDetailsPanel.openVersionHistory();
-            await studioUtils.saveScreenshot("folder_restored_by");
-            //5. Verify that new 'Restored' version-item appears in the widget:
-            let actualUser = await browseVersionsWidget.getRestoredBy(0);
-            assert.equal(actualUser, "by Super User", "Expected user should be displayed in the 'restored by'");
-            //6. Verify that 'Archived' version item is present in the widget:
-            actualUser = await browseVersionsWidget.getArchivedBy(0);
-            assert.equal(actualUser, "by Super User", "Expected user should be displayed in the 'restored by'");
-            //7. Verify the status in the restored content
-            let status = await browseVersionsWidget.getContentStatus();
-            //Verify the content's status in the top of Version Widget
-            assert.equal(status, appConst.CONTENT_STATUS.NEW, "'New' status should be after the restoring this content");
+    it("GIVEN layer context is switched WHEN a content that is inherited from a parent has been selected THEN 'Localize' button gets visible and enabled",
+        async () => {
+            let contentBrowsePanel = new ContentBrowsePanel();
+            // 1. Default project is loaded by default, so need to select the layer's context:
+            await studioUtils.openProjectSelectionDialogAndSelectContext(LAYER_DISPLAY_NAME);
+            // Wait for content is inherited from the parent project:
+            await contentBrowsePanel.pause(5000);
+            await studioUtils.findAndSelectItem(FOLDER_NAME);
+            await studioUtils.saveScreenshot('localize_button_browse_panel_enabled');
+            // 2. Verify that Localize button is enabled in the browse toolbar
+            await contentBrowsePanel.waitForLocalizeButtonEnabled();
         });
 
+    it("WHEN content, that is inherited from the parent project has been selected THEN 'Localize' button should be enabled in the second layer widget item",
+        async () => {
+            // 1. layer's context should be loaded by default now!
+            // 2. Select the folder that was inherited from the parent project:
+            await studioUtils.findAndSelectItem(FOLDER_NAME);
+            // 3. Open Layers widget:
+            let browseLayersWidget = await studioUtils.openLayersWidgetInBrowsePanel();
+            await studioUtils.saveScreenshot('localize_button_widget_enabled');
+            // 4. Verify that two items should be displayed in the widget:
+            let layersName = await browseLayersWidget.getLayersName();
+            assert.equal(layersName.length, 2, 'Two layers should be present in the widget');
+            // 5. Verify that 'Localize' button is enabled in the second item:
+            await browseLayersWidget.waitForLocalizeButtonEnabled(LAYER_DISPLAY_NAME);
+        });
 
-    beforeEach(() => studioUtils.navigateToContentStudioApp());
+    it("GIVEN content that is inherited from a parent has been selected WHEN Layers widget has been opened THEN expected layers should be present",
+        async () => {
+            //1. Select the folder in layer and open Layers widget:
+            await studioUtils.findAndSelectItem(FOLDER_NAME);
+            let browseLayersWidget = await studioUtils.openLayersWidgetInBrowsePanel();
+            let layers = await browseLayersWidget.getLayersName();
+            //2. Verify names of layers:
+            assert.equal(layers[0], 'Default', 'Default project should be present in the widget');
+            assert.equal(layers[1], LAYER_DISPLAY_NAME, "layer's display name should be present in the widget");
+            let language = await browseLayersWidget.getLayerLanguage(LAYER_DISPLAY_NAME);
+            //3. Verify 'Localize' button in the widget:
+            await browseLayersWidget.waitForLocalizeButtonEnabled(LAYER_DISPLAY_NAME);
+            //4. Verify the language in the widget:
+            assert.equal(language, "(no)", 'Expected language should be displayed in the layer');
+        });
+
+    it("GIVEN inherited content has been selected WHEN 'Localize' button(in widget) has been clicked THEN the content should be loaded in the new wizard tab",
+        async () => {
+            let contentWizard = new ContentWizard();
+            // 1. Select the folder in layer and open Layers widget:
+            await studioUtils.findAndSelectItem(FOLDER_NAME);
+            let browseLayersWidget = await studioUtils.openLayersWidgetInBrowsePanel();
+            // 2. Click on 'Localize' button:
+            await browseLayersWidget.clickOnLocalizeButton(LAYER_DISPLAY_NAME);
+            await studioUtils.doSwitchToNextTab();
+            // 3. Verify that expected content is loaded in wizard page:
+            await contentWizard.waitForOpened();
+            let actualDisplayName = await contentWizard.getDisplayName();
+            // 4. Verify the project name
+            let actualProjectName = await contentWizard.getProjectDisplayName();
+            let editSettingsDialog = await studioUtils.openEditSettingDialog();
+            // 5. Verify the language in Edit Settings modal dialog:
+            let actualLanguage = await editSettingsDialog.getSelectedLanguage();
+            await editSettingsDialog.clickOnCancelButton();
+            assert.equal(actualLanguage, EXPECTED_LANGUAGE_IN_WIZARD, 'Expected language should be displayed in the wizard');
+            assert.equal(actualDisplayName, FOLDER_NAME, "Expected folder's displayName should be displayed in the wizard");
+            assert.equal(actualProjectName, LAYER_DISPLAY_NAME + '(no)', 'Expected project displayName should be displayed in the wizard');
+        });
+
+    it("GIVEN existing content is opened for localizing WHEN Layers widget has been opened THEN postfix with '?' should be present in the name of folder because localizing changes are not saved",
+        async () => {
+            let contentBrowsePanel = new ContentBrowsePanel();
+            let contentWizardPanel = new ContentWizard();
+            // The Context is loaded automatically :
+            //1. Select the folder:
+            await studioUtils.findAndSelectItem(FOLDER_NAME);
+            let browseLayersWidget = await studioUtils.openLayersWidgetInBrowsePanel();
+            //2. Click on `Localize` button and open this folder:
+            await contentBrowsePanel.clickOnLocalizeButton();
+            await studioUtils.doSwitchToNextTab();
+            await contentWizardPanel.waitForOpened();
+            //3. Open Layers widget in the wizard:
+            let wizardLayersWidget = await contentWizardPanel.openLayersWidget();
+            let contentNameAndLanguage = await wizardLayersWidget.getContentNameWithLanguage(LAYER_DISPLAY_NAME);
+            //4. postfix '(?)' should be present in the name of the content because localizing changes are not saved:
+            assert.equal(contentNameAndLanguage, FOLDER_NAME + '(?)', "postfix '(?)' should be present in the content name");
+            //5. Verify that New status is present in the Layer Content View:
+            let actualStatus = await wizardLayersWidget.getContentStatus(LAYER_DISPLAY_NAME);
+            assert.equal(actualStatus, 'New', 'Expected content status should be present in the widget item')
+        });
+
+    it("GIVEN content that is inherited from a parent has been opened WHEN 'Layers' widget has been opened in the wizard THEN expected layers should be present in the widget",
+        async () => {
+            let contentBrowsePanel = new ContentBrowsePanel();
+            let contentWizardPanel = new ContentWizard();
+            //1. Select the folder:
+            await studioUtils.findAndSelectItem(FOLDER_NAME);
+            //2. Click on `Localize` button and open it:
+            await contentBrowsePanel.clickOnLocalizeButton();
+            await studioUtils.doSwitchToNextTab();
+            await contentWizardPanel.waitForOpened();
+            //3. Open Layers widget in the wizard:
+            let wizardLayersWidget = await contentWizardPanel.openLayersWidget();
+            let layers = await wizardLayersWidget.getLayersName();
+            //4. Verify names of layers:
+            assert.equal(layers[0], 'Default', 'Default layer should be present in the widget');
+            assert.equal(layers[1], LAYER_DISPLAY_NAME, "layer's layer should be present in the widget");
+            let language = await wizardLayersWidget.getLayerLanguage(LAYER_DISPLAY_NAME);
+            //5. Verify Localize button in the widget:
+            await wizardLayersWidget.waitForLocalizeButtonEnabled(LAYER_DISPLAY_NAME);
+            //6. Verify the language in the widget:
+            assert.equal(language, '(no)', "Expected language should be displayed in the layer");
+        });
+
+    it("GIVEN content that is inherited from a parent has been opened WHEN 'Save' button has been pressed THEN 'Localize' button should be replaced with 'Edit' button",
+        async () => {
+            let contentBrowsePanel = new ContentBrowsePanel();
+            let contentWizardPanel = new ContentWizard();
+            // layer's context should be loaded by default now!
+            // 1. Select the folder:
+            await studioUtils.findAndSelectItem(FOLDER_NAME);
+            // 2. Click on `Localize` button and open it:
+            await contentBrowsePanel.clickOnLocalizeButton();
+            await studioUtils.doSwitchToNextTab();
+            await contentWizardPanel.waitForOpened();
+            let localizedMes = await contentWizardPanel.waitForNotificationMessage();
+            // Expected Message: Language was copied from current project
+            assert.equal(localizedMes, appConst.LOCALIZED_MESSAGE_1, 'Expected message should appear after the content has been opened');
+            // 3. Remove the current notification message:
+            await contentWizardPanel.removeNotificationMessage();
+            // 4. Open Layers widget in the wizard:
+            let wizardLayersWidget = await contentWizardPanel.openLayersWidget();
+            // 5. Click on 'Save' button:
+            await contentWizardPanel.waitAndClickOnSave();
+            // 6. Verify the notification message:
+            let actualMessage = await contentWizardPanel.waitForNotificationMessage();
+            // Expected Message: Inherited content was localized:
+            assert.equal(actualMessage, appConst.LOCALIZED_MESSAGE_2, 'Expected message should appear after saving the content');
+            // 7. Verify that 'Edit' button gets visible in the widget:
+            await wizardLayersWidget.waitForEditButtonEnabled(LAYER_DISPLAY_NAME);
+            // 8. Verify that postfix '(?)' is not present in the name in the widget item
+            let result = await wizardLayersWidget.getContentNameWithLanguage(LAYER_DISPLAY_NAME);
+            assert.equal(result, FOLDER_NAME, "postfix '(?)' should not be displayed in the name, because the content is localized");
+        });
+
+    it("GIVEN localized folder has been opened WHEN widget-item for 'Default' project has been clicked THEN 'Open' button button gets visible",
+        async () => {
+            let contentBrowsePanel = new ContentBrowsePanel();
+            let contentWizardPanel = new ContentWizard();
+            // layer's context should be loaded by default now!
+            // 1. Select the folder:
+            await studioUtils.findAndSelectItem(FOLDER_NAME);
+            // 2. Click on `Edit` button and open it:
+            await contentBrowsePanel.clickOnEditButton();
+            await studioUtils.doSwitchToNextTab();
+            await contentWizardPanel.waitForOpened();
+            // 3. Open Layers widget in the wizard:
+            let wizardLayersWidget = await contentWizardPanel.openLayersWidget();
+            // 4. Click on the widget-item
+            await wizardLayersWidget.clickOnWidgetItem('Default');
+            // 5. Verify that Open button gets visible"
+            await wizardLayersWidget.waitForOpenButtonEnabled('Default');
+            // 6. Click on the widget-item for Default project:
+            await wizardLayersWidget.clickOnOpenButton('Default');
+            // 7. Switch to the new opened browser tab and verify the project name:
+            await studioUtils.doSwitchToNextTab();
+            let layerName = await contentWizardPanel.getProjectDisplayName();
+            assert.equal(layerName, 'Default', 'Default layer should be displayed in this wizard page');
+        });
+
+    it('Post conditions: the layer should be deleted',
+        async () => {
+            await studioUtils.openSettingsPanel();
+            await projectUtils.selectAndDeleteProject(LAYER_DISPLAY_NAME);
+        });
+
+    beforeEach(async () => {
+        return await studioUtils.navigateToContentStudioWithProjects();
+    });
     afterEach(() => studioUtils.doCloseAllWindowTabsAndSwitchToHome());
     before(() => {
         return console.log('specification is starting: ' + this.title);

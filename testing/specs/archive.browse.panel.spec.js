@@ -51,20 +51,20 @@ describe('archive.browse.panel.spec: tests for archive browse panel and selectio
             await confirmValueDialog.typeNumberOrName(2);
             await confirmValueDialog.clickOnConfirmButton();
             await contentBrowsePanel.waitForContentNotDisplayed(FOLDER2.displayName);
-            //2. Navigate to 'Archive Browse Panel' and check the archived content:
+            // 2. Navigate to 'Archive Browse Panel' and check the archived content:
             await studioUtils.openArchivePanel();
-            //3. Click on the checkbox:
+            // 3. Click on the checkbox:
             await archiveBrowsePanel.clickCheckboxAndSelectRowByDisplayName(FOLDER1.displayName);
             await studioUtils.saveScreenshot("archive_selection_controller1");
             await archiveBrowsePanel.clickOnSelectionToggler();
-            //4. Verify that just one item are displayed in the filtered grid:
+            // 4. Verify that just one item are displayed in the filtered grid:
             let displayNames = await archiveBrowsePanel.getDisplayNamesInGrid();
             assert.equal(displayNames.length, 1, 'Single item should be present in the filtered grid');
-            //5. Verify that checkboxes are clickable: Unselect one item in the filtered grid:
+            // 5. Verify that checkboxes are clickable: Unselect one item in the filtered grid:
             await archiveBrowsePanel.clickOnCheckbox(FOLDER1.displayName);
-            //6. Verify that the selection toggler(circle in the toolbar) gets not visible :
+            // 6. Verify that the selection toggler(circle in the toolbar) gets not visible :
             await archiveBrowsePanel.waitForSelectionTogglerNotVisible();
-            //7. Verify that Grid returns to the initial state:
+            // 7. Verify that Grid returns to the initial state:
             displayNames = await archiveBrowsePanel.getDisplayNamesInGrid();
             assert.isTrue(displayNames.length > 1, 'Initial state of Grid is restored');
             let result = await archiveBrowsePanel.isSelectionControllerSelected();

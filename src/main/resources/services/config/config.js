@@ -19,10 +19,7 @@ function handleGet() {
                 contentUrl: portal.serviceUrl({service: 'content', application: 'com.enonic.app.contentstudio'}),
                 licenseUrl: portal.serviceUrl({service: 'license', application: 'com.enonic.app.contentstudio'})
             },
-            toolUri: admin.getToolUrl(
-                app.name,
-                'main'
-            ),
+            toolUri: admin.getToolUrl('com.enonic.app.contentstudio', 'main')
         }
     };
 }

@@ -6,12 +6,12 @@ const appConst = require('../../libs/app_const');
 
 const xpath = {
     container: `//div[contains(@id,'ArchiveBrowsePanel')]//div[contains(@id,'WidgetView')]//div[contains(@id,'PropertiesWidgetItemView')]`,
-    languageProperty: "//dd[contains(.,'Language:')]/following-sibling::dt[1]",
-    ownerProperty: "//dd[contains(.,'Owner:')]/following-sibling::dt[1]",
-    typeProperty: "//dd[contains(.,'Type:')]/following-sibling::dt[1]",
-    applicationProperty: "//dd[contains(.,'Application:')]/following-sibling::dt[1]",
-    firstPublishedProperty: "//dd[contains(.,'First Published:')]/following-sibling::dt[1]",
-    archivedProperty: "//dd[contains(.,'Archived:')]/following-sibling::dt[1]",
+    languageProperty: "//dd[contains(.,'Language')]/following-sibling::dt[1]",
+    ownerProperty: "//dd[contains(.,'Owner')]/following-sibling::dt[1]",
+    typeProperty: "//dd[contains(.,'Type')]/following-sibling::dt[1]",
+    applicationProperty: "//dd[contains(.,'Application')]/following-sibling::dt[1]",
+    firstPublishedProperty: "//dd[contains(.,'First Published')]/following-sibling::dt[1]",
+    archivedProperty: "//dd[contains(.,'Archived')]/following-sibling::dt[1]",
 };
 
 class ArchivedContentPropertiesWidget extends Page {
@@ -111,5 +111,3 @@ class ArchivedContentPropertiesWidget extends Page {
 }
 
 module.exports = ArchivedContentPropertiesWidget;
-
-

@@ -3,8 +3,10 @@ import {H6El} from '@enonic/lib-admin-ui/dom/H6El';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import {ContentSummaryAndCompareStatusViewer} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatusViewer';
-import {ContentWindowHelper} from './ContentWindowHelper';
 import * as Q from 'q';
+import {ContentEventsProcessor} from 'lib-contentstudio/app/ContentEventsProcessor';
+import {EditContentEvent} from 'lib-contentstudio/app/event/EditContentEvent';
+import {AppHelper} from '../../../util/AppHelper';
 
 export class OriginalContentBlock extends DivEl {
 
@@ -28,7 +30,8 @@ export class OriginalContentBlock extends DivEl {
     }
 
     private openContentForEdit(): void {
-        new ContentWindowHelper(this.originalContent.getId()).openEditWizard();
+        ContentEventsProcessor.handleEdit(
+          new EditContentEvent([this.originalContent]));
     }
 
     setContent(content: ContentSummaryAndCompareStatus): void {

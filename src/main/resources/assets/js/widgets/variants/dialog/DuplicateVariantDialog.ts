@@ -1,14 +1,9 @@
-import {ContentSummary} from 'lib-contentstudio/app/content/ContentSummary';
 import {ContentDuplicateDialog} from 'lib-contentstudio/app/duplicate/ContentDuplicateDialog';
-import {ContentWindowHelper} from './ContentWindowHelper';
+import {AppHelper} from '../../../util/AppHelper';
 
 export class DuplicateVariantDialog extends ContentDuplicateDialog {
 
     private static INSTANCE: DuplicateVariantDialog;
-
-    private constructor() {
-        super();
-    }
 
     static get(): DuplicateVariantDialog {
         if (!DuplicateVariantDialog.INSTANCE) {
@@ -16,9 +11,5 @@ export class DuplicateVariantDialog extends ContentDuplicateDialog {
         }
 
         return DuplicateVariantDialog.INSTANCE;
-    }
-
-    protected openTabOnDuplicate(content: ContentSummary): void {
-        new ContentWindowHelper(content.getId()).openEditWizard();
     }
 }

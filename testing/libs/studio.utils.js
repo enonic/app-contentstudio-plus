@@ -16,7 +16,7 @@ const CreateTaskDialog = require('../page_objects/issue/create.task.dialog');
 const InsertLinkDialog = require('../page_objects/wizardpanel/insert.link.modal.dialog.cke');
 const ContentPublishDialog = require('../page_objects/content.publish.dialog');
 const BrowseDetailsPanel = require('../page_objects/browsepanel/detailspanel/browse.details.panel');
-const BrowseDependenciesWidget = require('../page_objects/browsepanel/detailspanel/browse.dependencies.widget');
+const PropertiesWidgetItem = require('../page_objects/browsepanel/detailspanel/properties.widget.itemview');
 const ContentUnpublishDialog = require('../page_objects/content.unpublish.dialog');
 const CreateRequestPublishDialog = require('../page_objects/issue/create.request.publish.dialog');
 const ProjectSelectionDialog = require('../page_objects/project/project.selection.dialog');
@@ -27,6 +27,7 @@ const ContentBrowsePanel = require('../page_objects/browsepanel/content.browse.p
 const SettingsBrowsePanel = require('../page_objects/project/settings.browse.panel');
 const BrowseLayersWidget = require('../page_objects/browsepanel/detailspanel/browse.layers.widget');
 const BrowseVariantsWidget = require('../page_objects/browsepanel/detailspanel/browse.variants.widget');
+const EditSettingDialog = require('../page_objects/details_panel/edit.settings.dialog');
 const fs = require('fs');
 const path = require('path');
 const addContext = require('mochawesome/addContext');
@@ -703,6 +704,14 @@ module.exports = {
             await this.saveScreenshot(screenshot);
             throw new Error('Error during selecting a context, screenshot: ' + screenshot + "  " + err);
         }
+    },
+    async openEditSettingDialog() {
+        let propertiesWidgetItem = new PropertiesWidgetItem();
+        let editSettingsDialog = new EditSettingDialog();
+        // 3. Click on Edit Settings :
+        await propertiesWidgetItem.clickOnEditSettingsButton();
+        await editSettingsDialog.waitForLoaded();
+        return editSettingsDialog;
     },
 
     loadUrl(url) {
