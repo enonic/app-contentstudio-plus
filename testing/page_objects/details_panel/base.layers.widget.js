@@ -109,7 +109,8 @@ class BaseLayersWidget extends Page {
         let locator = this.widgetItemView + xpath.layerViewByName(layerName) +
                       "/following-sibling::div[contains(@id,'LayerContentViewFooter')]/button/span[text()='Localize']";
         await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
-        return await this.clickOnElement(locator);
+        await this.clickOnElement(locator);
+        return await this.pause(1000);
     }
 
     async waitForShowAllButtonDisplayed() {

@@ -38,11 +38,11 @@ class ConfirmationDialog extends Page {
     async clickOnCancelTopButton() {
         await this.waitForElementDisplayed(this.cancelTopButton, appConst.shortTimeout);
         await this.clickOnElement(this.cancelTopButton);
-        await this.waitForDialogClosed();
+        await this.waitForClosed();
         return await this.pause(appConst.TIMEOUT_1);
     }
 
-    waitForDialogOpened() {
+    waitForOpened() {
         return this.waitForElementDisplayed(XPATH.container, appConst.mediumTimeout).catch(err => {
             throw new Error("Confirmation dialog is not loaded! " + err);
         })
@@ -52,7 +52,7 @@ class ConfirmationDialog extends Page {
         return this.isElementDisplayed(XPATH.container);
     }
 
-    async waitForDialogClosed() {
+    async waitForClosed() {
         await this.waitForElementNotDisplayed(XPATH.container, appConst.shortTimeout);
         return this.pause(400);
     }
