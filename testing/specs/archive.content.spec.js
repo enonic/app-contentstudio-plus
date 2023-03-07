@@ -19,8 +19,8 @@ describe('archive.content.spec: tests for archiving content', function () {
 
     let FOLDER1;
     let FOLDER2;
-    const ARCHIVE_DELETE_TITLE = "Delete from Archive";
-    const ARCHIVE_RESTORE_TITLE = "Restore from Archive";
+    const ARCHIVE_DELETE_TITLE = 'Delete from Archive';
+    const ARCHIVE_RESTORE_TITLE = 'Restore from Archive';
 
     it(`Precondition: new folder should be added`,
         async () => {
@@ -65,20 +65,20 @@ describe('archive.content.spec: tests for archiving content', function () {
             await studioUtils.findContentAndClickCheckBox(FOLDER2.displayName);
             // 2. Click on 'Archive...' menu item in the Context menu
             await contentBrowsePanel.rightClickOnItemByDisplayName(FOLDER2.displayName);
-            await studioUtils.saveScreenshot("context-menu-archive");
+            await studioUtils.saveScreenshot('context-menu-archive');
             await contentBrowsePanel.clickOnMenuItem(appConst.GRID_CONTEXT_MENU.ARCHIVE);
             await deleteContentDialog.waitForDialogOpened();
-            await studioUtils.saveScreenshot("folder_to_archive2");
+            await studioUtils.saveScreenshot('folder_to_archive2');
             // 3. Click on 'Archive' button in the modal dialog:
             await deleteContentDialog.clickOnArchiveButton();
             // 4. Verify that the content is not displayed in Content Browse Panel:
             await contentBrowsePanel.waitForContentNotDisplayed(FOLDER2.displayName);
             let message = await contentBrowsePanel.waitForNotificationMessage();
             let expectedMessage = appConst.itemIsArchived(FOLDER2.displayName);
-            assert.equal(message, expectedMessage, "Expected notification message should appear");
+            assert.equal(message, expectedMessage, 'Expected notification message should appear');
             // 5. Navigate to 'Archive Browse Panel' and check the archived content:
             await studioUtils.openArchivePanel();
-            await studioUtils.saveScreenshot("folder_in_archive2");
+            await studioUtils.saveScreenshot('folder_in_archive2');
             await archiveBrowsePanel.waitForContentDisplayed(FOLDER2.displayName);
         });
 
@@ -91,23 +91,23 @@ describe('archive.content.spec: tests for archiving content', function () {
             await studioUtils.openArchivePanel();
             // 2. Do 'rightClick' on the folder and Click on 'Restore...' menu item in the Context menu
             await archiveBrowsePanel.rightClickOnItemByDisplayName(FOLDER2.displayName);
-            await studioUtils.saveScreenshot("context-menu-restore");
+            await studioUtils.saveScreenshot('context-menu-restore');
             await archiveBrowsePanel.clickOnMenuItem(appConst.GRID_CONTEXT_MENU.RESTORE);
             await archiveRestoreDialog.waitForOpened();
             let actualTitle = await archiveRestoreDialog.getTitleInHeader();
             assert.equal(actualTitle, ARCHIVE_RESTORE_TITLE, "Expected title should be displayed in the dialog");
-            await studioUtils.saveScreenshot("folder_to_restore1");
+            await studioUtils.saveScreenshot('folder_to_restore1');
             // 3. Click on 'Restore' button in the modal dialog:
             await archiveRestoreDialog.clickOnRestoreButton();
             // 4. Verify that the content is not displayed in Archive Browse Panel:
             let message = await contentBrowsePanel.waitForNotificationMessage();
-            await studioUtils.saveScreenshot("folder_to_restore_notification");
+            await studioUtils.saveScreenshot('folder_to_restore_notification');
             let expectedMessage = appConst.itemIsRestored(FOLDER2.displayName);
             assert.equal(message, expectedMessage, "Expected notification message should appear");
             await archiveBrowsePanel.waitForContentNotDisplayed(FOLDER2.displayName);
             // 5. Verify the content is present in Content Browse Panel
             await studioUtils.switchToContentMode();
-            await studioUtils.saveScreenshot("folder_is_restored");
+            await studioUtils.saveScreenshot('folder_is_restored');
             await studioUtils.findContentAndClickCheckBox(FOLDER2.displayName);
         });
 
@@ -120,14 +120,14 @@ describe('archive.content.spec: tests for archiving content', function () {
             await archiveBrowsePanel.clickCheckboxAndSelectRowByDisplayName(FOLDER1.displayName);
             // 2. Do 'rightClick' on the folder and Click on 'Restore...' menu item in the Context menu
             await archiveBrowsePanel.rightClickOnItemByDisplayName(FOLDER1.displayName);
-            await studioUtils.saveScreenshot("context-menu-delete");
+            await studioUtils.saveScreenshot('context-menu-delete');
             await archiveBrowsePanel.clickOnMenuItem(appConst.GRID_CONTEXT_MENU.DELETE);
             await archiveDeleteDialog.waitForOpened();
-            await studioUtils.saveScreenshot("delete_archive_dialog");
+            await studioUtils.saveScreenshot('delete_archive_dialog');
             // 3. 'Delete' button and expected title should be displayed in the dialog:
             await archiveDeleteDialog.waitForDeleteButtonDisplayed();
             let title = await archiveDeleteDialog.getTitleInHeader();
-            assert.equal(title, ARCHIVE_DELETE_TITLE, "Expected title should be present in the dialog");
+            assert.equal(title, ARCHIVE_DELETE_TITLE, 'Expected title should be present in the dialog');
             let actualItems = await archiveDeleteDialog.getItemsToDeleteDisplayName();
             assert.equal(actualItems[0], FOLDER1.displayName, "Expected item to delete should be displayed");
         });
@@ -157,7 +157,9 @@ describe('archive.content.spec: tests for archiving content', function () {
             assert.equal(message, expectedMessage, 'Expected notification message should appear');
         });
 
-    beforeEach(() => studioUtils.navigateToContentStudioApp());
+    beforeEach(async () => {
+        return await studioUtils.navigateToContentStudioCloseProjectSelectionDialog();
+    });
     afterEach(() => studioUtils.doCloseAllWindowTabsAndSwitchToHome());
     before(() => {
         return console.log('specification is starting: ' + this.title);
