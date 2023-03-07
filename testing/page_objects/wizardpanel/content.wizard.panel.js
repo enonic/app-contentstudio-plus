@@ -1094,7 +1094,7 @@ class ContentWizardPanel extends Page {
         await this.waitForElementDisplayed(this.resetButton, appConst.longTimeout);
         await this.clickOnElement(this.resetButton);
         let dialog = new ConfirmationDialog();
-        await dialog.waitForDialogOpened();
+        await dialog.waitForOpened();
         return dialog;
     }
 

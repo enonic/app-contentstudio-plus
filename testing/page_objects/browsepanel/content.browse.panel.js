@@ -264,7 +264,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
         await this.waitForMarkAsReadyButtonVisible();
         await this.clickOnElement(this.markAsReadyButton);
         let confirmationDialog = new ConfirmationDialog();
-        await confirmationDialog.waitForDialogOpened();
+        await confirmationDialog.waitForOpened();
         return await confirmationDialog.clickOnYesButton();
     }
 
