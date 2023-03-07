@@ -61,54 +61,52 @@ describe('archive.muiltiselect.restore.spec: tests for restore several items', f
             await archiveBrowsePanel.waitForContentDisplayed(FOLDER2.displayName);
         });
 
-    //Verifies issue https://github.com/enonic/app-contentstudio-plus/issues/311
-    //Confirm restore dialog - the modal dialog should be closed after click on Cancel button or Esc #311
+    // Verifies issue https://github.com/enonic/app-contentstudio-plus/issues/311
+    // Confirm restore dialog - the modal dialog should be closed after click on Cancel button or Esc #311
     it(`GIVEN 2 folders are selected in Archive AND Confirm Value dialog has been opened WHEN 'Cancel' button has been pressed THEN modal dialog should be closed`,
         async () => {
-            let contentBrowsePanel = new ContentBrowsePanel();
             let archiveRestoreDialog = new ArchiveRestoreDialog();
             let archiveBrowsePanel = new ArchiveBrowsePanel();
             let confirmValueDialog = new ConfirmValueDialog();
-            //1. Navigate to 'Archive Browse Panel':
+            // 1. Navigate to 'Archive Browse Panel':
             await studioUtils.openArchivePanel();
-            //2. Select two folders
+            // 2. Select two folders
             await archiveBrowsePanel.clickOnCheckboxAndSelectRowByName(FOLDER1.displayName);
             await archiveBrowsePanel.clickOnCheckboxAndSelectRowByName(FOLDER2.displayName);
-            //3. Click on Restore... button in the browse toolbar
+            // 3. Click on Restore... button in the browse toolbar
             await archiveBrowsePanel.clickOnRestoreButton();
             await archiveRestoreDialog.waitForOpened();
-            //4. Click on Restore in the modal dialog:
+            // 4. Click on Restore in the modal dialog:
             await archiveRestoreDialog.clickOnRestoreButton();
             await confirmValueDialog.waitForDialogOpened();
-            //5. Click on Cancel button in the modal dialog:
+            // 5. Click on Cancel button in the modal dialog:
             await confirmValueDialog.clickOnCancelButton();
-            //6. Verify that both dialogs are closed:
+            // 6. Verify that both dialogs are closed:
             await confirmValueDialog.waitForDialogClosed();
             await archiveRestoreDialog.waitForClosed();
         });
 
-    //Verifies issue https://github.com/enonic/app-contentstudio-plus/issues/311
-    //Confirm restore dialog - the modal dialog should be closed after click on Cancel button or Esc #311
+    // Verifies issue https://github.com/enonic/app-contentstudio-plus/issues/311
+    // Confirm restore dialog - the modal dialog should be closed after click on Cancel button or Esc #311
     it(`GIVEN 2 folders are selected in Archive AND Confirm Value dialog has been opened WHEN 'Esc' key has been pressed THEN modal dialog should be closed`,
         async () => {
-            let contentBrowsePanel = new ContentBrowsePanel();
             let archiveRestoreDialog = new ArchiveRestoreDialog();
             let archiveBrowsePanel = new ArchiveBrowsePanel();
             let confirmValueDialog = new ConfirmValueDialog();
-            //1. Navigate to 'Archive Browse Panel':
+            // 1. Navigate to 'Archive Browse Panel':
             await studioUtils.openArchivePanel();
-            //2. Select two folders
+            // 2. Select two folders
             await archiveBrowsePanel.clickOnCheckboxAndSelectRowByName(FOLDER1.displayName);
             await archiveBrowsePanel.clickOnCheckboxAndSelectRowByName(FOLDER2.displayName);
-            //3. Click on Restore... button in the browse toolbar
+            // 3. Click on Restore... button in the browse toolbar
             await archiveBrowsePanel.clickOnRestoreButton();
             await archiveRestoreDialog.waitForOpened();
-            //4. Click on Restore in the modal dialog:
+            // 4. Click on Restore in the modal dialog:
             await archiveRestoreDialog.clickOnRestoreButton();
             await confirmValueDialog.waitForDialogOpened();
-            //5. Press the ESC key
+            // 5. Press the ESC key
             await confirmValueDialog.pressEscKey();
-            //6. Verify that both dialogs are closed:
+            // 6. Verify that both dialogs are closed:
             await confirmValueDialog.waitForDialogClosed();
             await archiveRestoreDialog.waitForClosed();
         });
@@ -175,8 +173,9 @@ describe('archive.muiltiselect.restore.spec: tests for restore several items', f
             //await archiveBrowsePanel.waitForSelectionTogglerNotVisible();
         });
 
-
-    beforeEach(() => studioUtils.navigateToContentStudioApp());
+    beforeEach(async () => {
+        return await studioUtils.navigateToContentStudioCloseProjectSelectionDialog();
+    });
     afterEach(() => studioUtils.doCloseAllWindowTabsAndSwitchToHome());
     before(() => {
         return console.log('specification is starting: ' + this.title);

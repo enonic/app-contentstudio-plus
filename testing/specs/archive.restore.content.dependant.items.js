@@ -13,7 +13,7 @@ const ConfirmValueDialog = require('../page_objects/confirm.content.delete.dialo
 const ArchiveRestoreDialog = require('../page_objects/archive/archive.restore.dialog');
 const ArchiveDeleteDialog = require('../page_objects/archive/archive.delete.dialog');
 
-describe('archive.restore.content.dependant.spec: tests for archive/restore folder with children', function () {
+describe('archive.restore.content.dependant.items.spec: tests for archive/restore folder with children', function () {
     this.timeout(appConst.SUITE_TIMEOUT);
     webDriverHelper.setupBrowser();
 
@@ -84,7 +84,9 @@ describe('archive.restore.content.dependant.spec: tests for archive/restore fold
             await studioUtils.findContentAndClickCheckBox(FOLDER_DISPLAY_NAME);
         });
 
-    beforeEach(() => studioUtils.navigateToContentStudioApp());
+    beforeEach(async () => {
+        return await studioUtils.navigateToContentStudioCloseProjectSelectionDialog();
+    });
     afterEach(() => studioUtils.doCloseAllWindowTabsAndSwitchToHome());
     before(() => {
         return console.log('specification is starting: ' + this.title);
