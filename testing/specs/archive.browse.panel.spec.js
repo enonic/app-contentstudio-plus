@@ -12,7 +12,6 @@ const DeleteContentDialog = require('../page_objects/delete.content.dialog');
 const ArchiveBrowsePanel = require('../page_objects/archive/archive.browse.panel');
 const ArchiveItemStatisticsPanel = require('../page_objects/archive/archive.item.statistics.panel');
 const ConfirmValueDialog = require('../page_objects/confirm.content.delete.dialog');
-const ArchiveRestoreDialog = require('../page_objects/archive/archive.restore.dialog');
 const ArchiveDeleteDialog = require('../page_objects/archive/archive.delete.dialog');
 const ArchiveContentWidgetItemView = require('../page_objects/archive/archive.widget.item.view');
 
@@ -45,7 +44,7 @@ describe('archive.browse.panel.spec: tests for archive browse panel and selectio
             await contentBrowsePanel.rightClickOnItemByDisplayName(FOLDER2.displayName);
             await contentBrowsePanel.clickOnMenuItem(appConst.GRID_CONTEXT_MENU.ARCHIVE);
             await deleteContentDialog.waitForDialogOpened();
-            await studioUtils.saveScreenshot("folder_to_archive2");
+            await studioUtils.saveScreenshot('folder_to_archive2');
             await deleteContentDialog.clickOnArchiveButton();
             await confirmValueDialog.waitForDialogOpened();
             await confirmValueDialog.typeNumberOrName(2);
@@ -55,7 +54,7 @@ describe('archive.browse.panel.spec: tests for archive browse panel and selectio
             await studioUtils.openArchivePanel();
             // 3. Click on the checkbox:
             await archiveBrowsePanel.clickCheckboxAndSelectRowByDisplayName(FOLDER1.displayName);
-            await studioUtils.saveScreenshot("archive_selection_controller1");
+            await studioUtils.saveScreenshot('archive_selection_controller1');
             await archiveBrowsePanel.clickOnSelectionToggler();
             // 4. Verify that just one item are displayed in the filtered grid:
             let displayNames = await archiveBrowsePanel.getDisplayNamesInGrid();
@@ -97,8 +96,8 @@ describe('archive.browse.panel.spec: tests for archive browse panel and selectio
             let path = await archiveItemStatisticsPanel.getPath();
             assert.equal(path, `/${FOLDER1.displayName}`, "Expected path should be displayed in Item Statistics panel");
             let status = await archiveItemStatisticsPanel.getStatus();
-            assert.isTrue(status.includes("Archived"), "Archived status should be displayed in Item Statistics panel");
-            assert.isTrue(status.includes("by Super User"), "'by Super User' should be displayed in Item Statistics panel");
+            assert.isTrue(status.includes('Archived'), "Archived status should be displayed in Item Statistics panel");
+            assert.isTrue(status.includes('by Super User'), "'by Super User' should be displayed in Item Statistics panel");
             // 3. Verify that workflow icon is not displayed:
             await contentWidgetItemView.waitForWorkflowStateNotDisplayed();
             // 4. Verify the name in the content widget:
@@ -152,7 +151,9 @@ describe('archive.browse.panel.spec: tests for archive browse panel and selectio
             await archiveBrowsePanel.waitForSelectionTogglerNotVisible();
         });
 
-    beforeEach(() => studioUtils.navigateToContentStudioApp());
+    beforeEach(async () => {
+        return await studioUtils.navigateToContentStudioCloseProjectSelectionDialog();
+    });
     afterEach(() => studioUtils.doCloseAllWindowTabsAndSwitchToHome());
     before(() => {
         return console.log('specification is starting: ' + this.title);
