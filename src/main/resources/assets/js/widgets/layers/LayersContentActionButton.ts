@@ -67,7 +67,7 @@ export class LayersContentActionButton extends ActionButton {
     }
 
     private localize(): void {
-        new ContentsLocalizer().localize([this.item.getItem()]).catch(DefaultErrorHandler.handle);
+        new ContentsLocalizer().localizeAndEdit([this.item.getItem()]).catch(DefaultErrorHandler.handle);
     }
 
     private edit(): void {
