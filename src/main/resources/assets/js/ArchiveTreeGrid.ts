@@ -46,7 +46,7 @@ export class ArchiveTreeGrid
             this.filterQuery
                 .setSize(ArchiveContentFetcher.FETCH_SIZE)
                 .setQueryFilters(query.getQueryFilters())
-                .setQueryExpr(query.getQueryExpr())
+                .setQuery(query.getQuery())
                 .setContentTypeNames(query.getContentTypes())
                 .setMustBeReferencedById(query.getMustBeReferencedById());
 
