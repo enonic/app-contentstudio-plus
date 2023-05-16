@@ -122,4 +122,18 @@ module.exports = Object.freeze({
         decreaseIndentButton: `//a[contains(@class,'cke_button') and contains(@title,'Decrease Indent')]`,
         formatDropDownHandle: `//span[contains(@class,'cke_combo__styles') and descendant::a[@class='cke_combo_button']]`,
     },
+    FILTER_PANEL: {
+        clearFilterLink: "//a[contains(@id,'ClearFilterButton')]",
+        searchInput: "//input[contains(@id,'TextSearchField')]",
+        hideSearchPanelButton: "//span[contains(@class, 'hide-filter-panel-button')]",
+        dependenciesSection: "//div[contains(@id,'DependenciesSection')]",
+        showResultsButton: "//span[contains(@class,'show-filter-results')]",
+        showMoreButton: "//button[child::span[text()='Show more']]",
+        showLessButton: "//button[child::span[text()='Show less']]",
+        selectorOptionCheckbox: "//ul[contains(@id,'BucketListBox')]//div[contains(@id,'Checkbox')]",
+        selectorOptionItem: "//ul[contains(@id,'BucketListBox')]//div[contains(@class,'item-view-wrapper')]",
+        ownerAggregationGroupView: "//div[contains(@id,'FilterableAggregationGroupView') and child::h2[text()='Owner']]",
+        aggregationGroupDiv: name => `//div[contains(@id,'AggregationGroupView') and child::h2[text()='${name}']]`,
+        aggregationDropdown: label => `//div[contains(@id,'FilterableAggregationGroupView') and child::h2[text()='${label}']]//div[contains(@id,'SelectableListBoxDropdown')]`,
+    },
 });

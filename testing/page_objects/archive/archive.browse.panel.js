@@ -8,13 +8,14 @@ const BaseBrowsePanel = require('../../page_objects/base.browse.panel');
 
 const XPATH = {
     container: "//div[contains(@id,'ArchiveBrowsePanel')]",
-    toolbar: "//div[contains(@id,'Toolbar')]",
+    toolbar: "//div[contains(@id,'ResponsiveToolbar')]",
     archiveTreeGrid: `//div[contains(@id,'ArchiveTreeGrid')]`,
     treeGridToolbar: `//div[contains(@id,'TreeGridToolbar')]`,
     selectionControllerCheckBox: `//div[contains(@id,'SelectionController')]`,
     numberInSelectionToggler: `//button[contains(@id,'SelectionPanelToggler')]/span`,
     selectedRow: `//div[contains(@class,'slick-viewport')]//div[contains(@class,'slick-row') and descendant::div[contains(@class,'slick-cell') and contains(@class,'highlight')]]`,
     checkedRows: `//div[contains(@class,'slick-viewport')]//div[contains(@class,'slick-cell-checkboxsel selected')]`,
+    searchButton: "//button[contains(@id, 'ActionButton') and contains(@class, 'icon-search')]",
 
     contextMenuItemByName: (name) => {
         return `${lib.TREE_GRID_CONTEXT_MENU}/li[contains(@id,'MenuItem') and contains(.,'${name}')]`;
@@ -66,6 +67,14 @@ class ArchiveBrowsePanel extends BaseBrowsePanel {
 
     get selectionPanelToggler() {
         return `${XPATH.container}${XPATH.treeGridToolbar}${lib.SELECTION_PANEL_TOGGLER}`;
+    }
+
+    get searchButton() {
+        return XPATH.toolbar + XPATH.searchButton;
+    }
+
+    get hideSearchPanelButton() {
+        return "//div[contains(@id,'ArchiveFilterPanel')]" + lib.FILTER_PANEL.hideSearchPanelButton;
     }
 
     get numberInToggler() {
@@ -219,6 +228,17 @@ class ArchiveBrowsePanel extends BaseBrowsePanel {
         }).catch(err => {
             throw Error(`Error when do right click on the row:` + err);
         })
+    }
+
+    // Opens/Closes Filter Panel:
+    async clickOnSearchButton() {
+        await this.waitForElementDisplayed(this.searchButton, appConst.mediumTimeout);
+        return await this.clickOnElement(this.searchButton);
+    }
+
+    async clickOnHideSearchPanelButton() {
+        await this.waitForElementDisplayed(this.hideSearchPanelButton, appConst.mediumTimeout);
+        return await this.clickOnElement(this.hideSearchPanelButton);
     }
 }
 
