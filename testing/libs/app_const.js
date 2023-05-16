@@ -367,4 +367,14 @@ module.exports = Object.freeze({
         USERS_ADMINISTRATOR: 'Users Administrator',
         EVERYONE: 'Everyone'
     },
+    FILTER_PANEL_AGGREGATION_BLOCK: {
+        CONTENT_TYPES: 'Content Types',
+        WORKFLOW: 'Workflow',
+        LAST_MODIFIED: 'Last Modified',
+        LAST_MODIFIED_BY: 'Last Modified by',
+        OWNER: 'Owner',
+        LANGUAGE: 'Language',
+        ARCHIVED: 'Archived',
+        ARCHIVED_BY: 'Archived by',
+    },
 });

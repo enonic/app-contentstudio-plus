@@ -63,5 +63,24 @@ class BrowseFilterPanel extends Page {
         await this.clickOnElement(selector);
         return await this.pause(400);
     }
-};
+
+
+    //clicks on a checkbox in Content Types aggregation block
+    async clickOnCheckboxInContentTypesBlock(contentType) {
+        try {
+            let selector = XPATH.aggregationGroupByName('Content Types') + XPATH.aggregationLabelByName(contentType);
+            await this.pause(1000);
+            let result = await this.getDisplayedElements(this.showMoreButton);
+            if (result.length > 0) {
+                await this.clickOnShowMoreButton();
+            }
+            await this.waitForElementDisplayed(selector, appConst.shortTimeout);
+            await this.clickOnElement(selector);
+            return await this.pause(1200);
+        } catch (err) {
+            await this.saveScreenshot(appConst.generateRandomName("err_content_types_filtering"));
+            throw new Error("Error after clicking on a checkbox in Content Types aggregation block " + err);
+        }
+    }
+}
 module.exports = BrowseFilterPanel;
