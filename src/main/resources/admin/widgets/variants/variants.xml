@@ -1,6 +1,6 @@
 <widget>
-    <display-name>Variants</display-name>
-    <description>Create variants of a content</description>
+    <display-name i18n="widget.variants.displayName">Variants</display-name>
+    <description i18n="widget.variants.description">Create variants of a content</description>
     <interfaces>
         <interface>contentstudio.contextpanel</interface>
     </interfaces>

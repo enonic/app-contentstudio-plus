@@ -1,6 +1,6 @@
 <widget>
-    <display-name>Layers</display-name>
-    <description>See item localisation state</description>
+    <display-name i18n="widget.layers.displayName">Layers</display-name>
+    <description i18n="widget.layers.description">See item localisation state</description>
     <interfaces>
         <interface>contentstudio.contextpanel</interface>
     </interfaces>

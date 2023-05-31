@@ -1,6 +1,6 @@
 <widget xmlns="urn:enonic:xp:model:1.0">
-  <display-name>Archive</display-name>
-  <description>Archive tool</description>
+  <display-name i18n="widget.archive.displayName">Archive</display-name>
+  <description i18n="widget.archive.description">Archive tool</description>
   <interfaces>
     <interface>contentstudio.menuitem</interface>
   </interfaces>
