@@ -150,7 +150,7 @@ export class ArchiveTreeGrid
 
     private getParentPath(parentNode: TreeNode<ArchiveViewItem>, content: ContentSummaryAndCompareStatus): string {
         if (parentNode.hasParent()) {
-            return (<ArchiveContentViewItem>parentNode.getData()).getOriginalParentPath();
+            return (parentNode.getData() as ArchiveContentViewItem).getOriginalParentPath();
         }
 
         return this.getOriginalParentPathForRootItem(content);
@@ -170,7 +170,7 @@ export class ArchiveTreeGrid
     }
 
     private extractTopMostContentItems(event: ArchiveServerEvent): ContentServerChangeItem[] {
-        return <ContentServerChangeItem[]>ArchiveHelper.filterTopMostItems(event.getNodeChange().getChangeItems());
+        return ArchiveHelper.filterTopMostItems(event.getNodeChange().getChangeItems()) as ContentServerChangeItem[];
     }
 
     private fetchItems(parentNode: TreeNode<ArchiveViewItem>): Q.Promise<FetchResponse> {

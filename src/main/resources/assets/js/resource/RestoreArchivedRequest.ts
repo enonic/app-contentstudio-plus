@@ -1,9 +1,9 @@
 import {HttpMethod} from '@enonic/lib-admin-ui/rest/HttpMethod';
 import {TaskArchiveResourceRequest} from './TaskArchiveResourceRequest';
 
-type Params = {
+interface Params {
     contentIds: string[];
-};
+}
 
 export class RestoreArchivedRequest extends TaskArchiveResourceRequest {
     private readonly ids: string[];

@@ -32,7 +32,7 @@ export class ArchiveFilterPanel
 
     private aggregationsFetcher: ArchiveAggregationsFetcher;
 
-    private searchEventListeners: {(query?: ContentQuery): void;}[] = [];
+    private searchEventListeners: ((query?: ContentQuery) => void)[] = [];
 
     private userInfo: LoginResult;
 
@@ -47,12 +47,12 @@ export class ArchiveFilterPanel
         this.initListeners();
    }
 
-    onSearchEvent(listener: {(query?: ContentQuery): void;}): void {
+    onSearchEvent(listener: (query?: ContentQuery) => void): void {
         this.searchEventListeners.push(listener);
    }
 
-    unSearchEvent(listener: {(query?: ContentQuery): void;}): void {
-        this.searchEventListeners = this.searchEventListeners.filter((curr: {(query?: ContentQuery): void;}) => {
+    unSearchEvent(listener: (query?: ContentQuery) => void): void {
+        this.searchEventListeners = this.searchEventListeners.filter((curr: (query?: ContentQuery) => void) => {
             return curr !== listener;
        });
    }
@@ -79,7 +79,7 @@ export class ArchiveFilterPanel
         this.aggregations = new Map<string, AggregationGroupView>();
 
         this.aggregations.set(ContentAggregation.CONTENT_TYPE,
-            new AggregationGroupView(ContentAggregation.CONTENT_TYPE, i18n(`field.${<string>ContentAggregation.CONTENT_TYPE}`)));
+            new AggregationGroupView(ContentAggregation.CONTENT_TYPE, i18n(`field.${ContentAggregation.CONTENT_TYPE as string}`)));
 
         this.aggregations.set(ArchiveAggregation.ARCHIVED,
             new AggregationGroupView(ArchiveAggregation.ARCHIVED, i18n(`field.${ArchiveAggregation.ARCHIVED}`)));
@@ -88,10 +88,10 @@ export class ArchiveFilterPanel
             new FilterableAggregationGroupView(ArchiveAggregation.ARCHIVED_BY, i18n(`field.${ArchiveAggregation.ARCHIVED_BY}`)));
 
         this.aggregations.set(ContentAggregation.OWNER,
-            new FilterableAggregationGroupView(ContentAggregation.OWNER, i18n(`field.${<string>ContentAggregation.OWNER}`)));
+            new FilterableAggregationGroupView(ContentAggregation.OWNER, i18n(`field.${ContentAggregation.OWNER as string}`)));
 
         this.aggregations.set(ContentAggregation.LANGUAGE,
-            new AggregationGroupView(ContentAggregation.LANGUAGE, i18n(`field.${<string>ContentAggregation.LANGUAGE}`)));
+            new AggregationGroupView(ContentAggregation.LANGUAGE, i18n(`field.${ContentAggregation.LANGUAGE as string}`)));
 
         return Array.from(this.aggregations.values());
    }
@@ -125,9 +125,9 @@ export class ArchiveFilterPanel
     private initAggregationGroupView(): void {
         new IsAuthenticatedRequest().sendAndParse().then((loginResult: LoginResult) => {
             this.userInfo = loginResult;
-            (<FilterableAggregationGroupView>this.aggregations.get(ContentAggregation.OWNER)).setIdsToKeepOnToTop(
+            (this.aggregations.get(ContentAggregation.OWNER) as FilterableAggregationGroupView).setIdsToKeepOnToTop(
                 [this.getCurrentUserKeyAsString()]);
-            (<FilterableAggregationGroupView>this.aggregations.get(ArchiveAggregation.ARCHIVED_BY)).setIdsToKeepOnToTop(
+            (this.aggregations.get(ArchiveAggregation.ARCHIVED_BY) as FilterableAggregationGroupView).setIdsToKeepOnToTop(
                 [this.getCurrentUserKeyAsString()]);
 
             return this.getAndUpdateAggregations();
@@ -139,7 +139,7 @@ export class ArchiveFilterPanel
    }
 
     private notifySearchEvent(query?: ContentQuery): void {
-        this.searchEventListeners.forEach((listener: {(q?: ContentQuery): void;}) => {
+        this.searchEventListeners.forEach((listener: (q?: ContentQuery) => void) => {
             listener(query);
        });
    }
