@@ -12,7 +12,7 @@ export class ArchiveLicenseUploadEl
 
     private readonly label: LabelEl;
 
-    private uploadFinishedListeners: { (isValid: boolean): void }[] = [];
+    private uploadFinishedListeners: ((isValid: boolean) => void)[] = [];
 
     constructor() {
         super('license-uploader');
@@ -49,7 +49,7 @@ export class ArchiveLicenseUploadEl
     private uploadLicense(): void {
         let isValid = false;
 
-        new UploadLicenseRequest((<HTMLInputElement>this.input.getHTMLElement()).files[0]).sendAndParse().then(
+        new UploadLicenseRequest((this.input.getHTMLElement() as HTMLInputElement).files[0]).sendAndParse().then(
             (isValidLicense: boolean) => {
                 if (isValidLicense) {
                     window.dispatchEvent(new CustomEvent('ReloadActiveWidgetEvent'));

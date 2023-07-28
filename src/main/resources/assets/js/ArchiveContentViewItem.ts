@@ -56,7 +56,7 @@ export class ArchiveContentViewItemBuilder
     }
 
     setData(value: ContentSummaryAndCompareStatus): ArchiveContentViewItemBuilder {
-        return <ArchiveContentViewItemBuilder>super.setData(value);
+        return super.setData(value) as ArchiveContentViewItemBuilder;
     }
 
     build(): ArchiveContentViewItem {

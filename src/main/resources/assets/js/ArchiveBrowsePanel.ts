@@ -32,8 +32,8 @@ export class ArchiveBrowsePanel
     protected initListeners(): void {
         super.initListeners();
 
-        (<ArchiveFilterPanel>this.filterPanel).onSearchEvent((query?: ContentQuery) => {
-            (<ArchiveTreeGrid>this.treeGrid).setFilterQuery(query);
+        (this.filterPanel as ArchiveFilterPanel).onSearchEvent((query?: ContentQuery) => {
+            (this.treeGrid as ArchiveTreeGrid).setFilterQuery(query);
         });
     }
 

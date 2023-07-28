@@ -48,7 +48,7 @@ export class ArchiveTreeGridHelper {
         if (ObjectHelper.iFrameSafeInstanceOf(dataContext.getData(), ArchiveContentViewItem)) {
             const viewer: Viewer<ContentSummaryAndCompareStatus> = dataContext.getViewer('displayName') ||
                                                                    new ArchiveContentViewer();
-            viewer.setObject((<ArchiveContentViewItem>dataContext.getData()).getData());
+            viewer.setObject((dataContext.getData() as ArchiveContentViewItem).getData());
 
             return viewer;
         }

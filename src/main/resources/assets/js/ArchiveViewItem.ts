@@ -17,7 +17,7 @@ export abstract class ArchiveViewItem implements ViewItem {
             return false;
         }
 
-        const other: ArchiveViewItem = <ArchiveViewItem>o;
+        const other: ArchiveViewItem = o as ArchiveViewItem;
 
         if (!ObjectHelper.stringEquals(this.getId(), other.getId())) {
             return false;

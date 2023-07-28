@@ -76,7 +76,7 @@ export class ArchiveRestoreDialog
     }
 
     private getItemsToRestore(): string[] {
-        return (<ArchiveViewItem[]>ArchiveHelper.filterTopMostItems(this.items)).map((item: ArchiveViewItem) => item.getId());
+        return (ArchiveHelper.filterTopMostItems(this.items) as ArchiveViewItem[]).map((item: ArchiveViewItem) => item.getId());
     }
 
 }
