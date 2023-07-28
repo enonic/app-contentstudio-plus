@@ -122,7 +122,7 @@ function startApplication(): void {
     initApplicationEventListener();
 
     initProjectContext(application)
-        .catch((reason: any) => {
+        .catch((reason) => {
             DefaultErrorHandler.handle(reason);
             NotifyManager.get().showWarning(i18n('notify.settings.project.initFailed'));
         })
