@@ -17,12 +17,12 @@ export class ArchiveWidgetItemView
         return this.viewer;
     }
 
-    setContentAndUpdateView(item: ContentSummaryAndCompareStatus): Q.Promise<any> {
+    setContentAndUpdateView(item: ContentSummaryAndCompareStatus): Q.Promise<void> {
         if (item) {
             this.viewer.setObject(item);
         }
 
-        return Q(item);
+        return Q();
     }
 
     setSubName(subName: string): void {

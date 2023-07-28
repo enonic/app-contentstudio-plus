@@ -50,7 +50,7 @@ export class LayersWidgetItemView
         return instance;
     }
 
-    setContentAndUpdateView(item: ContentSummaryAndCompareStatus): Q.Promise<any> {
+    setContentAndUpdateView(item: ContentSummaryAndCompareStatus): Q.Promise<void> {
         this.item = item;
 
         this.showAllButton.hide();
@@ -59,7 +59,7 @@ export class LayersWidgetItemView
         return this.reload();
     }
 
-    reload(): Q.Promise<any> {
+    reload(): Q.Promise<void> {
         return this.loader.load().then((items: LayerContent[]) => {
             this.layerContentItems = items;
             this.layersView.setItems(items);
@@ -69,7 +69,7 @@ export class LayersWidgetItemView
                 LayersContentTreeDialog.get().setItems(items);
             }
 
-            return Q(null);
+            return Q();
         });
     }
 

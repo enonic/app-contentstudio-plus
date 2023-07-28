@@ -27,7 +27,7 @@ export class GetContentVariantsRequest extends CmsContentResourceRequest<Content
         this.addRequestPathElements('findVariants');
     }
 
-    getParams(): any {
+    getParams(): object {
         return {
             id: this.id,
             from: this.from,

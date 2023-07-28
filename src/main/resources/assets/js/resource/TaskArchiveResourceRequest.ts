@@ -35,7 +35,7 @@ export class TaskArchiveResourceRequest extends ArchiveResourceRequest<TaskId> {
                         default:
                             poll();
                         }
-                    }).catch((reason: any) => {
+                    }).catch((reason) => {
                         DefaultErrorHandler.handle(reason);
                         deferred.reject(reason);
                     }).done();
