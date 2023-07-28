@@ -6,6 +6,6 @@ export class ArchiveAggregationsDisplayNamesResolver
     extends AggregationsDisplayNamesResolver {
 
     protected isPrincipalAggregation(aggregation: Aggregation): boolean {
-        return super.isPrincipalAggregation(aggregation) || aggregation.getName() === ArchiveAggregation.ARCHIVED_BY;
+        return super.isPrincipalAggregation(aggregation) || aggregation.getName() === ArchiveAggregation[ArchiveAggregation.ARCHIVED_BY];
     }
 }

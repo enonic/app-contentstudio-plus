@@ -36,7 +36,7 @@ export class ArchiveTreeGridHelper {
         }];
     }
 
-    public static nameFormatter(_a: any, _b: any, _c: any, _d: any, dataContext: TreeNode<ArchiveViewItem>): string {
+    public static nameFormatter(_a: unknown, _b: unknown, _c: unknown, _d: unknown, dataContext: TreeNode<ArchiveViewItem>): string {
         return ArchiveTreeGridHelper.getViewerForArchiveItem(dataContext).toString();
     }
 
@@ -44,7 +44,7 @@ export class ArchiveTreeGridHelper {
         return SpanEl.fromText(i18n('status.archived')).toString();
     }
 
-    private static getViewerForArchiveItem(dataContext: TreeNode<ArchiveViewItem>): Viewer<any> {
+    private static getViewerForArchiveItem(dataContext: TreeNode<ArchiveViewItem>): Viewer<ContentSummaryAndCompareStatus> {
         if (ObjectHelper.iFrameSafeInstanceOf(dataContext.getData(), ArchiveContentViewItem)) {
             const viewer: Viewer<ContentSummaryAndCompareStatus> = dataContext.getViewer('displayName') ||
                                                                    new ArchiveContentViewer();
