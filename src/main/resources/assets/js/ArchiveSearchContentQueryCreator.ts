@@ -7,14 +7,12 @@ export class ArchiveSearchContentQueryCreator
     protected appendAggregationsAndFilter(contentAggregations?: string[]): void {
         super.appendAggregationsAndFilter(contentAggregations);
 
-        if (!contentAggregations || contentAggregations.some((a: string) =>
-            a === ArchiveAggregation[ArchiveAggregation.ARCHIVED_BY])) {
+        if (!contentAggregations || contentAggregations.some((a: string) => a === ArchiveAggregation.ARCHIVED_BY.toString())) {
             this.appendArchiverAggregationQuery();
             this.appendArchiverFilter();
         }
 
-        if (!contentAggregations || contentAggregations.some((a: string) =>
-            a === ArchiveAggregation[ArchiveAggregation.ARCHIVED])) {
+        if (!contentAggregations || contentAggregations.some((a: string) => a === ArchiveAggregation.ARCHIVED.toString())) {
             this.appendArchivedAggregationQuery();
             this.appArchivedFilter();
         }
