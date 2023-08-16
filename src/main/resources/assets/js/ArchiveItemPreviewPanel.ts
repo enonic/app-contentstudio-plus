@@ -5,6 +5,7 @@ import {ContentPath} from 'lib-contentstudio/app/content/ContentPath';
 import {ArchiveContentViewItem} from './ArchiveContentViewItem';
 import {ContentItemPreviewPanel} from 'lib-contentstudio/app/view/ContentItemPreviewPanel';
 import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
+import {StatusCode} from '@enonic/lib-admin-ui/rest/StatusCode';
 
 export class ArchiveItemPreviewPanel
     extends ContentItemPreviewPanel {
@@ -27,7 +28,8 @@ export class ArchiveItemPreviewPanel
         } else {
             new IsRenderableRequest(item.getData().getContentSummary())
                 .sendAndParse()
-                .then((isRenderable: boolean) => {
+                .then((statusCode: number) => {
+                    const isRenderable = statusCode === StatusCode.OK;
                     item.getData().setRenderable(isRenderable);
                     this.renderableItems.set(item.getId(), isRenderable);
                     this.debouncedSetItem(item);
