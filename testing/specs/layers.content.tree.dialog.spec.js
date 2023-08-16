@@ -14,6 +14,7 @@ const ConfirmValueDialog = require('../page_objects/confirm.content.delete.dialo
 
 describe('layers.content.tree.dialog.spec - tests for Layers Content Tree modal dialog', function () {
     this.timeout(appConst.SUITE_TIMEOUT);
+    // setup standalone mode if WDIO is not defined:
     if (typeof browser === 'undefined') {
         webDriverHelper.setupBrowser();
     }

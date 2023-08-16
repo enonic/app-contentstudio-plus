@@ -120,11 +120,11 @@ task stopServer {
     }
 }
 
-task testCSPlus( type: NpmTask, dependsOn: [npmInstall, startServer, copyApps] ) {
-    args = ['run-script', 'test']
+task w_testCSPlusChrome( type: NpmTask, dependsOn: [npmInstall, startServer, copyApps]) {
+    args = ['run-script', 'test_cs_plus:wdio_chrome']
     finalizedBy stopServer
 }
 
-task testCSPlusLocal( type: NpmTask, dependsOn: [npmInstall] ) {
-    args = ['run-script', 'test']
+task w_testAdminHomeChromeLocal( type: NpmTask, dependsOn: [npmInstall] ) {
+    args = ['run-script', 'test_cs_plus:wdio_chrome']
 }

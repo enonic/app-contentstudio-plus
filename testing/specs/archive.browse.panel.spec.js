@@ -14,10 +14,17 @@ const ArchiveItemStatisticsPanel = require('../page_objects/archive/archive.item
 const ConfirmValueDialog = require('../page_objects/confirm.content.delete.dialog');
 const ArchiveDeleteDialog = require('../page_objects/archive/archive.delete.dialog');
 const ArchiveContentWidgetItemView = require('../page_objects/archive/archive.widget.item.view');
+const ArchivedContentStatusWidget = require('../page_objects/archive/archived.content.status.widget');
+const ArchiveBrowseContextPanel = require('../page_objects/archive/archive.browse.context.panel');
+const ArchivedContentVersionsWidget = require('../page_objects/archive/archived.content.versions.widget');
+const CompareContentVersionsDialog = require('../page_objects/compare.content.versions.dialog');
 
 describe('archive.browse.panel.spec: tests for archive browse panel and selection controller', function () {
     this.timeout(appConst.SUITE_TIMEOUT);
-    webDriverHelper.setupBrowser();
+    // setup standalone mode if WDIO is not defined:
+    if (typeof browser === 'undefined') {
+        webDriverHelper.setupBrowser();
+    }
 
     let FOLDER1;
     let FOLDER2;
@@ -38,7 +45,7 @@ describe('archive.browse.panel.spec: tests for archive browse panel and selectio
             let deleteContentDialog = new DeleteContentDialog();
             let archiveBrowsePanel = new ArchiveBrowsePanel();
             let confirmValueDialog = new ConfirmValueDialog();
-            //1. Select and archive  two folders
+            // 1. Select and archive two folders:
             await studioUtils.findContentAndClickCheckBox(FOLDER1.displayName);
             await studioUtils.findContentAndClickCheckBox(FOLDER2.displayName);
             await contentBrowsePanel.rightClickOnItemByDisplayName(FOLDER2.displayName);
@@ -86,11 +93,11 @@ describe('archive.browse.panel.spec: tests for archive browse panel and selectio
     // Workflow state should not be displayed in Archive #316
     it("WHEN a folder has been selected THEN expected path and status should be displayed in the Item Statistics panel",
         async () => {
-            // 1. Navigate to 'Archive Browse Panel' and check the archived content:
             await studioUtils.openArchivePanel();
             let archiveBrowsePanel = new ArchiveBrowsePanel();
             let archiveItemStatisticsPanel = new ArchiveItemStatisticsPanel();
             let contentWidgetItemView = new ArchiveContentWidgetItemView();
+            // 1. Navigate to 'Archive Browse Panel' and click on the checkbox for the archived content:
             await archiveBrowsePanel.clickOnCheckboxAndSelectRowByName(FOLDER1.displayName);
             // 2. Verify the path and status of the content:
             let path = await archiveItemStatisticsPanel.getPath();

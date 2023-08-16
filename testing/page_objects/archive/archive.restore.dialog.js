@@ -8,7 +8,7 @@ const XPATH = {
     container: `//div[contains(@id,'ArchiveRestoreDialog')]`,
     restoreButton: `//button[contains(@id,'DialogButton') and child::span[contains(.,'Restore')]]`,
     itemListToRestore: "//ul[contains(@id,'ArchiveDialogItemList')]",
-    childListToRestore:"//ul[contains(@id,'ArchiveItemsList')]",
+    childListToRestore: "//ul[contains(@id,'ArchiveItemsList')]",
     header: `//div[contains(@id,'DefaultModalDialogHeader')]`,
     contentTypeByName: function (name) {
         return `//div[@class='content-types-content']//li[contains(@class,'content-types-list-item') and descendant::h6[contains(@class,'main-name') and contains(.,'${name}')]]`;
@@ -46,8 +46,8 @@ class ArchiveRestoreDialog extends Page {
         try {
             await this.waitForElementDisplayed(this.restoreButton, appConst.mediumTimeout)
         } catch (err) {
-            await this.saveScreenshot(appConst.generateRandomName('err_restore_dlg'));
-            throw new Error('Restore from Archive dialog was not loaded! ' + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_restore_dlg');
+            throw new Error('Restore from Archive dialog was not loaded! screenshot: ' + screenshot + ' ' + err);
         }
     }
 
@@ -55,8 +55,8 @@ class ArchiveRestoreDialog extends Page {
         try {
             await this.waitForElementNotDisplayed(XPATH.container, appConst.longTimeout);
         } catch (err) {
-            await this.saveScreenshot(appConst.generateRandomName('err_restore_dlg_close'));
-            throw new Error('Restore from Archive dialog was not closed ' + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_restore_dlg_close');
+            throw new Error('Restore from Archive dialog was not closed, screenshot: ' + screenshot + ' ' + err);
         }
     }
 

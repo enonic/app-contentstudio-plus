@@ -17,7 +17,6 @@ const XPATH = {
     itemsTreeGrid: `//div[contains(@id,'SettingsItemsTreeGrid')]`,
     treeGridToolbar: `//div[contains(@id,'TreeGridToolbar')]`,
     selectionControllerCheckBox: `//div[contains(@id,'SelectionController')]`,
-    numberInSelectionToggler: `//button[contains(@id,'SelectionPanelToggler')]/span`,
     selectedRow: `//div[contains(@class,'slick-viewport')]//div[contains(@class,'slick-row') and descendant::div[contains(@class,'slick-cell') and contains(@class,'highlight')]]`,
     checkedRows: `//div[contains(@class,'slick-viewport')]//div[contains(@class,'slick-cell-checkboxsel selected')]`,
     showIssuesButton: "//button[contains(@id,'ShowIssuesDialogButton')]//span",
@@ -83,7 +82,7 @@ class SettingsBrowsePanel extends BaseBrowsePanel {
     }
 
     get numberInToggler() {
-        return XPATH.treeGridToolbar + XPATH.numberInSelectionToggler;
+        return XPATH.treeGridToolbar + lib.NUMBER_IN_SELECTION_TOGGLER;
     }
 
     get displayNames() {

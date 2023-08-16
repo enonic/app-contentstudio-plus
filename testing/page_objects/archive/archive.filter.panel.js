@@ -136,8 +136,8 @@ class ArchiveFilterPanel extends Page {
             timeout = ms === undefined ? appConst.mediumTimeout : ms;
             return await this.waitForElementDisplayed(XPATH.container + lib.FILTER_PANEL.dependenciesSection, timeout)
         } catch (err) {
-            await this.saveScreenshot(appConst.generateRandomName('err_load_dependencies_section'));
-            throw new Error("Filter Panel: Dependencies section should be visible! " + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_load_dependencies_section');
+            throw new Error("Filter Panel: Dependencies section should be visible! screenshot: " + screenshot + ' ' + err);
         }
     }
 
@@ -160,8 +160,7 @@ class ArchiveFilterPanel extends Page {
             await this.clickOnElement(selector);
             return await this.pause(1200);
         } catch (err) {
-            let screenshot = appConst.generateRandomName('filter_panel');
-            await this.saveScreenshot();
+            let screenshot = await this.saveScreenshotUniqueName(filter_panel);
             throw new Error('Filter Panel ,error after clicking on a checkbox in aggregation block, screenshot: ' + screenshot + ' ' + err);
         }
     }
@@ -215,8 +214,8 @@ class ArchiveFilterPanel extends Page {
             await this.clickOnElement(selector);
             return await this.pause(1200);
         } catch (err) {
-            await this.saveScreenshot(appConst.generateRandomName("err_click_on_aggregation"));
-            throw new Error("Error when click on the aggregation checkbox: " + err);
+            let screenshot = await this.saveScreenshotUniqueName("err_click_on_aggregation");
+            throw new Error("Error when click on the aggregation checkbox, screenshot: " + screenshot + ' ' + err);
         }
     }
 

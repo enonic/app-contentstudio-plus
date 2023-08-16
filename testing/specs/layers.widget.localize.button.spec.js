@@ -15,6 +15,7 @@ const ConfirmationDialog = require("../page_objects/confirmation.dialog");
 
 describe('layer.localize.button.spec - checks Localize button in browse toolbar and Layers widget', function () {
     this.timeout(appConst.SUITE_TIMEOUT);
+    // setup standalone mode if WDIO is not defined:
     if (typeof browser === 'undefined') {
         webDriverHelper.setupBrowser();
     }
@@ -128,9 +129,9 @@ describe('layer.localize.button.spec - checks Localize button in browse toolbar 
             await contentWizardPanel.waitForOpened();
             // 3. Click on Reset button and confirm it:
             await contentWizardPanel.clickOnResetButton();
-            await confirmationDialog.waitForOpened();
+            await confirmationDialog.waitForDialogOpened();
             await confirmationDialog.clickOnYesButton();
-            await confirmationDialog.waitForClosed();
+            await confirmationDialog.waitForDialogClosed();
             // TODO uncomment it
             //await contentWizardPanel.waitForNotificationMessage();
             // 4. Open Layers widget in the wizard:
