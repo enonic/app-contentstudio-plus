@@ -15,7 +15,10 @@ const ArchiveDeleteDialog = require('../page_objects/archive/archive.delete.dial
 
 describe('archive.content.spec: tests for archiving content', function () {
     this.timeout(appConst.SUITE_TIMEOUT);
-    webDriverHelper.setupBrowser();
+    // setup standalone mode if WDIO is not defined:
+    if (typeof browser === 'undefined') {
+        webDriverHelper.setupBrowser();
+    }
 
     let FOLDER1;
     let FOLDER2;

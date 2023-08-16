@@ -15,7 +15,10 @@ const ArchiveRestoreDialog = require('../page_objects/archive/archive.restore.di
 
 describe('archive.muiltiselect.restore.spec: tests for restore several items', function () {
     this.timeout(appConst.SUITE_TIMEOUT);
-    webDriverHelper.setupBrowser();
+    // setup standalone mode if WDIO is not defined:
+    if (typeof browser === 'undefined') {
+        webDriverHelper.setupBrowser();
+    }
 
     let FOLDER1;
     let FOLDER2;
@@ -137,7 +140,7 @@ describe('archive.muiltiselect.restore.spec: tests for restore several items', f
         });
 
     // Verify https://github.com/enonic/app-contentstudio-plus/issues/346
-    //Error after restoring filtered content #346
+    // Error after restoring filtered content #346
     it(`GIVEN existing archived folder with children items is filtered WHEN the folder has been restored THEN 'Hide Selection' circle gets not visible`,
         async () => {
             let contentBrowsePanel = new ContentBrowsePanel();
@@ -145,30 +148,30 @@ describe('archive.muiltiselect.restore.spec: tests for restore several items', f
             let archiveBrowsePanel = new ArchiveBrowsePanel();
             let confirmValueDialog = new ConfirmValueDialog();
             let archiveRestoreDialog = new ArchiveRestoreDialog();
-            //1. Select a folder
+            // 1. Select a folder
             await studioUtils.findContentAndClickCheckBox(FOLDER_DISPLAY_NAME);
-            //2. Archive this folder with children:
+            // 2. Archive this folder with children:
             await contentBrowsePanel.clickOnArchiveButton();
             await deleteContentDialog.waitForDialogOpened();
             await deleteContentDialog.clickOnArchiveButton();
             await confirmValueDialog.waitForDialogOpened();
             await confirmValueDialog.typeNumberOrName(11);
             await confirmValueDialog.clickOnConfirmButton();
-            //3. Navigate to 'Archive Browse Panel' and select the archived content:
+            // 3. Navigate to 'Archive Browse Panel' and select the archived content:
             await studioUtils.openArchivePanel();
             await studioUtils.saveScreenshot("folder_in_archive1_2");
             await archiveBrowsePanel.clickOnCheckboxAndSelectRowByName(FOLDER_NAME);
-            //4. Click on 'Show Selection' circle:
+            // 4. Click on 'Show Selection' circle:
             await archiveBrowsePanel.clickOnSelectionToggler();
-            //5. Open 'Restore from Archive' dialog:
+            // 5. Open 'Restore from Archive' dialog:
             await archiveBrowsePanel.clickOnRestoreButton();
             await archiveRestoreDialog.waitForOpened();
             await archiveRestoreDialog.clickOnRestoreButton();
-            //5. Confirm the value:
+            // 6. Confirm the value:
             await confirmValueDialog.typeNumberOrName(11);
             await confirmValueDialog.clickOnConfirmButton();
             await archiveRestoreDialog.waitForClosed();
-            //7. Verify that selection controller(circle) gets not visible in the toolbar:
+            // 7. Verify that selection controller(circle) gets not visible in the toolbar:
             await studioUtils.saveScreenshot("archive_selection_controller_not_visible_2");
             //await archiveBrowsePanel.waitForSelectionTogglerNotVisible();
         });

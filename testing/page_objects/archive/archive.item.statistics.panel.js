@@ -27,7 +27,7 @@ class ArchiveItemStatisticsPanel extends Page {
             await this.waitForElementDisplayed(this.originalPath, appConst.mediumTimeout);
             return await this.getText(this.originalPath);
         } catch (err) {
-            this.saveScreenshot('err_get_archive_path');
+            await this.saveScreenshot('err_get_archive_path');
             throw new Error('error when getting archive path' + err);
         }
     }
@@ -37,7 +37,7 @@ class ArchiveItemStatisticsPanel extends Page {
             await this.waitForElementDisplayed(this.archiveStatus, appConst.mediumTimeout);
             return await this.getText(this.archiveStatus);
         } catch (err) {
-            this.saveScreenshot('err_get_archive_status');
+            await this.saveScreenshot('err_get_archive_status');
             throw new Error('error when getting archive status' + err);
         }
     }

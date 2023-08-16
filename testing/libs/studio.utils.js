@@ -30,7 +30,6 @@ const BrowseVariantsWidget = require('../page_objects/browsepanel/detailspanel/b
 const EditSettingDialog = require('../page_objects/details_panel/edit.settings.dialog');
 const fs = require('fs');
 const path = require('path');
-const addContext = require('mochawesome/addContext');
 
 module.exports = {
     getBrowser() {
@@ -42,68 +41,68 @@ module.exports = {
     },
     setTextInCKE: function (id, text) {
         let script = `CKEDITOR.instances['${id}'].setData('${text}')`;
-        return webDriverHelper.browser.execute(script).then(() => {
+        return this.getBrowser().execute(script).then(() => {
             let script2 = `CKEDITOR.instances['${id}'].fire('change')`;
-            return webDriverHelper.browser.execute(script2);
+            return this.getBrowser().execute(script2);
         })
     },
     async waitForElementDisplayed(selector, ms) {
-        let element = await webDriverHelper.browser.$(selector);
+        let element = await this.getBrowser().$(selector);
         return await element.waitForDisplayed(ms);
     },
     async clickOnElement(selector) {
-        let el = await webDriverHelper.browser.$(selector);
+        let el = await this.getBrowser().$(selector);
         await el.waitForDisplayed(1500);
         return await el.click();
     },
     async getText(selector) {
-        let el = await webDriverHelper.browser.$(selector);
+        let el = await this.getBrowser().$(selector);
         await el.waitForDisplayed(1500);
         return await el.getText();
     },
 
     async isElementDisplayed(selector) {
-        let el = await webDriverHelper.browser.$(selector);
+        let el = await this.getBrowser().$(selector);
         return await el.isDisplayed();
     },
     getPageSource() {
-        return webDriverHelper.browser.getPageSource();
+        return this.getBrowser().getPageSource();
     },
 
     async switchToFrameBySrc(src) {
         try {
             let selector = `//iframe[contains(@src,'${src}')]`;
-            let el = await webDriverHelper.browser.$(selector);
+            let el = await this.getBrowser().$(selector);
             await el.waitForDisplayed(1500);
-            return await webDriverHelper.browser.switchToFrame(el);
+            return await this.getBrowser().switchToFrame(el);
         } catch (err) {
             throw new Error('Error when switch to frame  ' + err);
         }
     },
     getTitle() {
-        return webDriverHelper.browser.getTitle();
+        return this.getBrowser().getTitle();
     },
 
-    getTextInCKE: function (id) {
+    getTextInCKE (id) {
         let script = `return CKEDITOR.instances['${id}'].getData()`;
-        return webDriverHelper.browser.execute(script);
+        return this.getBrowser().execute(script);
     },
     scrollViewPort(viewportElement, step) {
-        return webDriverHelper.browser.execute("arguments[0].scrollTop=arguments[1]", viewportElement, step);
+        return this.getBrowser().execute("arguments[0].scrollTop=arguments[1]", viewportElement, step);
     },
 
     async insertContentLinkInCke(text, contentDisplayName) {
         let insertLinkDialog = new InsertLinkDialog();
         await insertLinkDialog.typeText(text);
         await insertLinkDialog.selectTargetInContentTab(contentDisplayName);
-        this.saveScreenshot('content_link_dialog');
+        await this.saveScreenshot('content_link_dialog');
         await insertLinkDialog.clickOnInsertButton();
         return await insertLinkDialog.pause(700);
     },
-    doCloseCurrentBrowserTab: function () {
-        return webDriverHelper.browser.getTitle().then(title => {
+    doCloseCurrentBrowserTab () {
+        return this.getBrowser().getTitle().then(title => {
             if (title != 'Enonic XP Home') {
-                return webDriverHelper.browser.closeWindow();
+                return this.getBrowser().closeWindow();
             }
         })
     },
@@ -225,7 +224,7 @@ module.exports = {
         await contentWizardPanel.typeData(folder);
         await contentWizardPanel.clickOnMarkAsReadyButton();
         await this.doCloseWizardAndSwitchToGrid();
-        return await webDriverHelper.browser.pause(1000);
+        return await this.getBrowser().pause(1000);
     },
     async doAddFolder(folder) {
         let contentWizardPanel = new ContentWizardPanel();
@@ -236,7 +235,7 @@ module.exports = {
         await contentWizardPanel.waitAndClickOnSave();
         //3.Close the wizard:
         await this.doCloseWizardAndSwitchToGrid();
-        return await webDriverHelper.browser.pause(1000);
+        return await this.getBrowser().pause(1000);
     },
     doCloseWizardAndSwitchToGrid: function () {
         return this.doCloseCurrentBrowserTab().then(() => {
@@ -257,7 +256,7 @@ module.exports = {
         }
         await this.doCloseCurrentBrowserTab();
         await this.doSwitchToContentBrowsePanel();
-        return await webDriverHelper.browser.pause(1000);
+        return await this.getBrowser().pause(1000);
 
     },
     async doAddReadySite(site) {
@@ -272,9 +271,9 @@ module.exports = {
         }
         await this.doCloseCurrentBrowserTab();
         await this.doSwitchToContentBrowsePanel();
-        return await webDriverHelper.browser.pause(1000);
+        return await this.getBrowser().pause(1000);
     },
-    doOpenSiteWizard: function () {
+    doOpenSiteWizard () {
         return this.openContentWizard(appConst.contentTypes.SITE);
     },
     async doOpenPageTemplateWizard(siteName) {
@@ -442,7 +441,7 @@ module.exports = {
         if (isLoaded) {
             await projectSelectionDialog.clickOnCancelButtonTop();
             await projectSelectionDialog.waitForDialogClosed();
-            return await webDriverHelper.browser.pause(200);
+            return await this.getBrowser().pause(200);
         }
     },
     async doLoginAndClickOnContentStudio(userName, password) {
@@ -456,7 +455,7 @@ module.exports = {
         try {
             console.log('testUtils:switching to Content Browse panel...');
             let browsePanel = new BrowsePanel();
-            await webDriverHelper.browser.switchWindow("Content Studio - Enonic XP Admin");
+            await this.getBrowser().switchWindow("Content Studio - Enonic XP Admin");
             console.log("switched to content browse panel...");
             await browsePanel.waitForGridLoaded(appConst.longTimeout);
             return browsePanel;
@@ -464,9 +463,9 @@ module.exports = {
             throw new Error("Error when switching to Content Studio App " + err);
         }
     },
-    doSwitchToHome: function () {
+    doSwitchToHome () {
         console.log('testUtils:switching to Home page...');
-        return webDriverHelper.browser.switchWindow("Enonic XP Home").then(() => {
+        return this.getBrowser().switchWindow("Enonic XP Home").then(() => {
             console.log("switched to Home...");
         }).then(() => {
             let homePage = new HomePage();
@@ -478,43 +477,43 @@ module.exports = {
         return await this.getBrowser().switchToWindow(tabs[tabs.length - 2]);
     },
     async doCloseWindowTabAndSwitchToBrowsePanel() {
-        await webDriverHelper.browser.closeWindow();
+        await this.getBrowser().closeWindow();
         return await this.doSwitchToContentBrowsePanel();
     },
 
     async doPressBackspace() {
-        await webDriverHelper.browser.keys('\uE003');
-        return await webDriverHelper.browser.pause(200);
+        await this.getBrowser().keys('\uE003');
+        return await this.getBrowser().pause(200);
     },
     doPressTabKey() {
-        return webDriverHelper.browser.keys('Tab');
+        return this.getBrowser().keys('Tab');
     },
     doPressEnter() {
-        return webDriverHelper.browser.keys('Enter');
+        return this.getBrowser().keys('Enter');
     },
 
     doSwitchToNewWizard: function () {
         console.log('testUtils:switching to the new wizard tab...');
         let contentWizardPanel = new ContentWizardPanel();
-        return webDriverHelper.browser.getWindowHandles().then(tabs => {
-            return webDriverHelper.browser.switchToWindow(tabs[tabs.length - 1]);
+        return this.getBrowser().getWindowHandles().then(tabs => {
+            return this.getBrowser().switchToWindow(tabs[tabs.length - 1]);
         }).then(() => {
             return contentWizardPanel.waitForOpened();
         });
     },
     async doSwitchToNextTab() {
-        let tabs = await webDriverHelper.browser.getWindowHandles();
-        return await webDriverHelper.browser.switchToWindow(tabs[tabs.length - 1]);
+        let tabs = await this.getBrowser().getWindowHandles();
+        return await this.getBrowser().switchToWindow(tabs[tabs.length - 1]);
     },
     doCloseAllWindowTabsAndSwitchToHome: function () {
-        return webDriverHelper.browser.getWindowHandles().then(tabIds => {
+        return this.getBrowser().getWindowHandles().then(tabIds => {
             let result = Promise.resolve();
             tabIds.forEach(tabId => {
                 result = result.then(() => {
                     return this.switchAndCheckTitle(tabId, "Enonic XP Home");
                 }).then(result => {
                     if (!result) {
-                        return webDriverHelper.browser.closeWindow().then(() => {
+                        return this.getBrowser().closeWindow().then(() => {
                             console.log(tabId + ' was closed');
                         }).catch(err => {
                             console.log(tabId + ' was not closed ' + err);
@@ -528,8 +527,8 @@ module.exports = {
         });
     },
     switchAndCheckTitle: function (handle, reqTitle) {
-        return webDriverHelper.browser.switchToWindow(handle).then(() => {
-            return webDriverHelper.browser.getTitle().then(title => {
+        return this.getBrowser().switchToWindow(handle).then(() => {
+            return this.getBrowser().getTitle().then(title => {
                 return title.includes(reqTitle);
             }).catch(err => {
                 console.log("Error when getting Title" + err);
@@ -543,7 +542,7 @@ module.exports = {
         if (!fs.existsSync(screenshotsDir)) {
             fs.mkdirSync(screenshotsDir, {recursive: true});
         }
-        return webDriverHelper.browser.saveScreenshot(screenshotsDir + name + '.png').then(() => {
+        return this.getBrowser().saveScreenshot(screenshotsDir + name + '.png').then(() => {
             if (that) {
                 addContext(that, 'screenshots/' + name + '.png');
             }
@@ -592,11 +591,11 @@ module.exports = {
         if (!result) {
             await this.waitForElementDisplayed(lib.APP_MODE_SWITCHER_TOGGLER);
             await this.clickOnElement(lib.APP_MODE_SWITCHER_TOGGLER);
-            return await webDriverHelper.browser.pause(200);
+            return await this.getBrowser().pause(200);
         }
     },
     async isContentStudioMenuOpened() {
-        let element = await webDriverHelper.browser.$("//div[contains(@id,'AppWrapper')]");
+        let element = await this.getBrowser().$("//div[contains(@id,'AppWrapper')]");
         let atrValue = await element.getAttribute("class");
         return atrValue.includes("sidebar-expanded");
     },
@@ -606,7 +605,7 @@ module.exports = {
             await this.openContentStudioMenu();
             await this.waitForElementDisplayed(lib.ARCHIVE_BUTTON, appConst.mediumTimeout);
             await this.clickOnElement(lib.ARCHIVE_BUTTON);
-            await webDriverHelper.browser.pause(300);
+            await this.getBrowser().pause(300);
             await archiveBrowsePanel.waitForGridLoaded(appConst.mediumTimeout);
         } catch (err) {
             await this.saveScreenshot(appConst.generateRandomName("err_open_settings"));
@@ -615,7 +614,7 @@ module.exports = {
     },
     async switchToContentMode() {
         await this.clickOnElement(lib.MODE_CONTENT_BUTTON);
-        await webDriverHelper.browser.pause(200);
+        await this.getBrowser().pause(200);
         return new ContentBrowsePanel();
     },
     generateRandomName: function (part) {
@@ -637,25 +636,25 @@ module.exports = {
         try {
             await this.waitUntilDisplayed(selector, 2000);
         } catch (err) {
-            await webDriverHelper.browser.refresh();
-            await webDriverHelper.browser.pause(2000);
+            await this.getBrowser().refresh();
+            await this.getBrowser().pause(2000);
             await this.closeProjectSelectionDialog();
             await this.waitUntilDisplayed(selector, 2000);
         }
-        await webDriverHelper.browser.pause(100);
+        await this.getBrowser().pause(100);
         let el = await this.getDisplayedElements(selector);
         await el[0].click();
         return await launcherPanel.waitForPanelDisplayed(1000);
     },
     async getDisplayedElements(selector) {
-        let elements = await webDriverHelper.browser.$$(selector);
+        let elements = await this.getBrowser().$$(selector);
         let pr = elements.map(el => el.isDisplayed());
         return await Promise.all(pr).then(result => {
             return elements.filter((el, i) => result[i]);
         });
     },
     waitUntilDisplayed(selector, ms) {
-        return webDriverHelper.browser.waitUntil(() => {
+        return this.getBrowser().waitUntil(() => {
             return this.getDisplayedElements(selector).then(result => {
                 return result.length > 0;
             })
@@ -715,6 +714,6 @@ module.exports = {
     },
 
     loadUrl(url) {
-        return webDriverHelper.browser.url(url);
+        return this.getBrowser().url(url);
     },
 };

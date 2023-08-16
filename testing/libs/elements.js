@@ -32,6 +32,7 @@ module.exports = Object.freeze({
     inputView: "//div[contains(@id,'InputView')]",
     INPUT_VALIDATION_VIEW: "//div[contains(@id,'InputViewValidationViewer')]",
     OCCURRENCE_ERROR_BLOCK: "//div[contains(@id,'InputOccurrenceView')]//div[contains(@class,'error-block')]",
+    NUMBER_IN_SELECTION_TOGGLER: `//button[contains(@id,'SelectionPanelToggler')]/span`,
     radioButtonByLabel: label => {
         return `//span[contains(@class,'radio-button') and child::label[text()='${label}']]//input`
     },

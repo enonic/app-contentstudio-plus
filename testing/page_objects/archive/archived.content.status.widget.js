@@ -19,7 +19,6 @@ class ArchivedContentStatusWidget extends Page {
         await this.waitForElementDisplayed(this.status, appConst.mediumTimeout);
         return await this.getText(this.status);
     }
-
 }
 
 module.exports = ArchivedContentStatusWidget;

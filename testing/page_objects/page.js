@@ -5,8 +5,13 @@ const path = require('path');
 const fs = require('fs');
 
 class Page {
+
     constructor() {
-        this.browser = webDriverHelper.browser;
+        if (typeof browser !== 'undefined') {
+            this.browser = browser;
+        } else {
+            this.browser = webDriverHelper.browser;
+        }
     }
 
     getBrowser() {
@@ -141,15 +146,21 @@ class Page {
     }
 
     saveScreenshot(name) {
-        let screenshotsDir = path.join(__dirname, '/../build/mochawesome-report/screenshots/');
+        let screenshotsDir = path.join(__dirname, '/../build/reports/screenshots/');
         if (!fs.existsSync(screenshotsDir)) {
             fs.mkdirSync(screenshotsDir, {recursive: true});
         }
-        return this.browser.saveScreenshot(screenshotsDir + name + '.png').then(() => {
+        return this.getBrowser().saveScreenshot(screenshotsDir + name + '.png').then(() => {
             console.log('screenshot is saved ' + name);
         }).catch(err => {
             console.log('screenshot was not saved ' + screenshotsDir + ' ' + err);
         })
+    }
+
+    async saveScreenshotUniqueName(namePart) {
+        let screenshotName = appConst.generateRandomName(namePart);
+        await this.saveScreenshot(screenshotName);
+        return screenshotName;
     }
 
     async isElementDisplayed(selector) {
@@ -233,14 +244,14 @@ class Page {
         let timeout;
         timeout = ms === undefined ? appConst.longTimeout : ms;
         let message = "Spinner still displayed! timeout is " + timeout;
-        return this.browser.waitUntil(() => {
+        return this.getBrowser().waitUntil(() => {
             return this.isElementNotDisplayed("//div[@class='spinner']");
         }, {timeout: timeout, timeoutMsg: message});
     }
 
     waitUntilElementNotVisible(selector, ms) {
         let message = "Element still displayed! timeout is " + appConst.longTimeout + "  " + selector;
-        return this.browser.waitUntil(() => {
+        return this.getBrowser().waitUntil(() => {
             return this.isElementNotDisplayed(selector);
         }, {timeout: ms, timeoutMsg: message});
     }
@@ -285,7 +296,7 @@ class Page {
         try {
             await this.waitForElementDisplayed(lib.NOTIFICATION_TEXT, appConst.mediumTimeout);
         } catch (err) {
-            this.saveScreenshot('err_notification_messages');
+            await this.saveScreenshot('err_notification_messages');
             throw new Error('Error when wait for notification message: ' + err);
         }
         await this.pause(300);
@@ -344,7 +355,7 @@ class Page {
         let x = await el.getLocation('x');
         let y = await el.getLocation('y');
         console.log("X:" + x + "Y " + y);
-        return await this.browser.performActions([{
+        return await this.getBrowser().performActions([{
             type: 'pointer',
             id: 'pointer1',
             parameters: {
@@ -364,7 +375,7 @@ class Page {
         let yValue = await el.getLocation('y');
         let y = parseInt(yValue) + offsetY;
         let x = parseInt(xValue) + offsetX;
-        return await this.browser.performActions([{
+        return await this.getBrowser().performActions([{
             type: 'pointer',
             id: 'pointer1',
             parameters: {
