@@ -130,6 +130,44 @@ describe('archive.browse.panel.spec: tests for archive browse panel and selectio
             await archiveItemStatisticsPanel.waitForPanelCleared();
         });
 
+    it("WHEN existing folder is selected THEN 'Archived' status should be displayed in Details Panel",
+        async () => {
+            let archivedContentStatusWidget = new ArchivedContentStatusWidget();
+            // 1. Navigate to 'Archive Browse Panel' and click on a checkbox of a archived folder:
+            await studioUtils.openArchivePanel();
+            let archiveBrowsePanel = new ArchiveBrowsePanel();
+            let contentWidgetItemView = new ArchiveContentWidgetItemView();
+            // 2. Click on the row and select an item:
+            await archiveBrowsePanel.clickOnRowByDisplayName(FOLDER1.displayName);
+            // 3. Verify the Archived status of the content:
+            let actualStatus = await archivedContentStatusWidget.getStatus();
+            assert.equal(actualStatus, 'Archived');
+        });
+
+    it("GIVEN existing folder is selected AND 'Versions widget' is opened WHEN 'Show changes' button in Edited item has been clicked THEN compareContentVersionsDialog should be loaded",
+        async () => {
+            let archiveBrowseContextPanel = new ArchiveBrowseContextPanel()
+            let archivedContentVersionsWidget = new ArchivedContentVersionsWidget();
+            let compareContentVersionsDialog = new CompareContentVersionsDialog();
+            // 1. Navigate to 'Archive Browse Panel' and click on a checkbox of a archived folder:
+            await studioUtils.openArchivePanel();
+            let archiveBrowsePanel = new ArchiveBrowsePanel();
+            // 1. Click on the row and select an item:
+            await archiveBrowsePanel.clickOnRowByDisplayName(FOLDER1.displayName);
+            // 2. Open Versions widget:
+            await archiveBrowseContextPanel.openVersionHistory();
+            // 3. Click on 'Show changes' button:
+            await archivedContentVersionsWidget.clickOnShowChangesButtonByHeader('Edited', 0);
+            // 4. The modal dialog should be loaded:
+            await compareContentVersionsDialog.waitForDialogOpened();
+            // 5. Click on Left dropdown handle:
+            await compareContentVersionsDialog.clickOnLeftDropdownHandle();
+            await studioUtils.saveScreenshot('compare_versions_dlg_archived_options');
+            // 6. Verify that option with 'Archived' icon should be present in the dropdown list:
+            let result = await compareContentVersionsDialog.getArchivedOptionsInDropdownList()
+            assert.equal(result.length, 1, "One item with 'archived-icon' should be present in the selector options");
+        });
+
     it(`GIVEN 2 folders are selected AND selection controller has been clicked WHEN both folders have been deleted THEN selection controller(circle) gets not visible`,
         async () => {
             let archiveDeleteDialog = new ArchiveDeleteDialog();
