@@ -150,7 +150,6 @@ describe('layers.content.tree.dialog.spec - tests for Layers Content Tree modal 
             await settingsBrowsePanel.waitForNotificationMessage();
         });
 
-
     beforeEach(async () => {
         await studioUtils.navigateToContentStudioCloseProjectSelectionDialog();
         return await studioUtils.openSettingsPanel();

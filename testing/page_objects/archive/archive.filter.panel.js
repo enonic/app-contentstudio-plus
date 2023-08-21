@@ -178,8 +178,14 @@ class ArchiveFilterPanel extends Page {
     }
 
     async isCheckboxSelected(blockName, label) {
-        let locator = lib.FILTER_PANEL.aggregationGroupDiv(blockName) + XPATH.aggregationCheckboxByName(label);
-        return await this.isSelected(locator);
+        try {
+            let locator = lib.FILTER_PANEL.aggregationGroupDiv(blockName) + XPATH.aggregationCheckboxByName(label);
+            await this.waitForElementDisplayed(locator, appConst.shortTimeout);
+            return await this.isSelected(locator);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_filter_panel_checkbox');
+            throw new Error("Filter Panel, Error during checking the checkbox , screenshot:" + screenshot + ' ' + err);
+        }
     }
 
     async waitForAggregationGroupDisplayed(blockName) {
