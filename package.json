@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@enonic/lib-admin-ui": "file:./.xp/dev/lib-admin-ui",
-    "jquery": "^3.7.0",
+    "jquery": "^3.7.1",
     "jquery-ui": "^1.13.2",
     "lib-contentstudio": "file:./.xp/dev/lib-contentstudio",
     "normalize-url": "^8.0.0",
@@ -24,7 +24,7 @@
   },
   "devDependencies": {
     "@enonic/eslint-config": "^1.2.0",
-    "@types/jquery": "^3.5.16",
+    "@types/jquery": "^3.5.17",
     "@types/jqueryui": "^1.12.17",
     "@types/normalize-url": "^4.2.0",
     "@types/q": "^1.5.5",
