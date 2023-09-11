@@ -9,7 +9,7 @@
   "devDependencies": {
     "assert": "^2.0.0",
     "chai": "^4.3.8",
-    "glob": "^10.3.3",
+    "glob": "^10.3.4",
     "mocha": "^10.2.0",
     "properties-reader": "^2.3.0",
     "@wdio/mocha-framework": "^8.14.0",
