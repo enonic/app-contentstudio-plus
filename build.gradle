@@ -1,9 +1,9 @@
 plugins {
     id 'java'
     id 'maven-publish'
-    id 'com.enonic.defaults' version '2.0.1'
-    id 'com.enonic.xp.app' version '3.2.0'
-    id "com.github.node-gradle.node" version '3.4.0'
+    id 'com.enonic.defaults' version '2.1.2'
+    id 'com.enonic.xp.app' version '3.4.0'
+    id "com.github.node-gradle.node" version '7.0.0'
 }
 
 apply from: "$rootDir/gradle/env.gradle"
@@ -57,8 +57,8 @@ dependencies {
 
 repositories {
     mavenLocal()
-    xp.enonicRepo('dev')
     mavenCentral()
+    xp.enonicRepo('dev')
 }
 
 configurations.all {
@@ -90,10 +90,12 @@ tasks.register('lint', NpmTask) {
     outputs.upToDateWhen { false }
 }
 
-check.dependsOn( lint )
+check.configure {
+    dependsOn( 'lint' )
+}
 
 tasks.register('webpack', NpmTask) {
-    dependsOn npmInstall
+    dependsOn( 'npmInstall' )
     environment = [ 'NODE_ENV': nodeEnvironment() ]
     description = 'Build UI resources (ts, css, etc).'
     args = [ 'run', 'build' ]
@@ -114,7 +116,7 @@ jar {
         exclude 'assets/**/*.map'
     }
 
-    dependsOn webpack
+    dependsOn( 'webpack' )
 }
 
 if ( hasEnvironment() )

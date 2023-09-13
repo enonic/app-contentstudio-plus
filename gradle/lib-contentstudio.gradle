@@ -1,3 +1,5 @@
+import org.codehaus.groovy.runtime.MethodClosure
+
 def isLibContentStudioIncluded()
 {
     return new File( "$rootDir/../app-contentstudio" ).exists()
@@ -25,13 +27,14 @@ if ( hasLibContentStudio() )
 }
 
 ext {
-    hasLibContentStudio = this.&hasLibContentStudio
-    isLibContentStudioIncluded = this.&isLibContentStudioIncluded
+    hasLibContentStudio = this.&hasLibContentStudio as MethodClosure
+    isLibContentStudioIncluded = this.&isLibContentStudioIncluded as MethodClosure
 }
 
 if ( !hasFlushTask() )
 {
-    task flush( type: Delete, dependsOn: clean ) {
+    tasks.register('flush', Delete) {
+        dependsOn( 'clean' )
         description = 'Clean the project from built sources and dependencies'
         delete '.xp'
     }
