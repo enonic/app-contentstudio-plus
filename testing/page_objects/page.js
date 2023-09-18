@@ -287,7 +287,8 @@ class Page {
             await this.pause(400);
             return await this.getText(notificationXpath);
         } catch (err) {
-            throw new Error('Error when wait for the notification message: ' + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_notification');
+            throw new Error('Error when wait for the notification message, screenshot:  ' + screenshot + '  ' + err);
         }
     }
 
@@ -303,12 +304,14 @@ class Page {
         return await this.getTextInDisplayedElements(lib.NOTIFICATION_TEXT);
     }
 
-    waitForExpectedNotificationMessage(expectedMessage) {
-        let selector = `//div[contains(@id,'NotificationMessage')]//div[contains(@class,'notification-text') and contains(.,'${expectedMessage}')]`;
-        return this.waitForElementDisplayed(selector, appConst.longTimeout).catch(err => {
-            this.saveScreenshot('err_notification_mess');
-            throw new Error('expected notification message was not shown! ' + err);
-        })
+    async waitForExpectedNotificationMessage(expectedMessage) {
+        try {
+            let selector = `//div[contains(@id,'NotificationMessage')]//div[contains(@class,'notification-text') and contains(.,'${expectedMessage}')]`;
+            await this.waitForElementDisplayed(selector, appConst.shortTimeout)
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_notification');
+            throw new Error('expected notification message was not shown, screenshot: ' + screenshot + "  " + err);
+        }
     }
 
     waitForErrorNotificationMessage() {

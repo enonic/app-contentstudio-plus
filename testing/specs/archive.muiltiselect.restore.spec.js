@@ -41,26 +41,26 @@ describe('archive.muiltiselect.restore.spec: tests for restore several items', f
             let deleteContentDialog = new DeleteContentDialog();
             let archiveBrowsePanel = new ArchiveBrowsePanel();
             let confirmValueDialog = new ConfirmValueDialog();
-            //1. Select two folders
+            // 1. Select two folders
             await studioUtils.findContentAndClickCheckBox(FOLDER1.displayName);
             await studioUtils.findContentAndClickCheckBox(FOLDER2.displayName);
-            //2. Click on 'Archive...' menu item in the Context menu
+            // 2. Click on 'Archive...' menu item in the Context menu
             await contentBrowsePanel.rightClickOnItemByDisplayName(FOLDER2.displayName);
             await contentBrowsePanel.clickOnMenuItem(appConst.GRID_CONTEXT_MENU.ARCHIVE);
             await deleteContentDialog.waitForDialogOpened();
-            await studioUtils.saveScreenshot("folder_to_archive2");
-            //3. Click on 'Archive' button in Archive/Delete modal dialog:
+            await studioUtils.saveScreenshot('folder_to_archive2');
+            // 3. Click on 'Archive' button in Archive/Delete modal dialog:
             await deleteContentDialog.clickOnArchiveButton();
-            //4. Verify that 'Confirm Archive' dialog is loaded:
+            // 4. Verify that 'Confirm Archive' dialog is loaded:
             await confirmValueDialog.waitForDialogOpened();
             await confirmValueDialog.typeNumberOrName(2);
-            //5. Confirm the archiving:
+            // 5. Confirm the archiving:
             await confirmValueDialog.clickOnConfirmButton();
-            //6. Verify that the content is not displayed in Content Browse Panel:
+            // 6. Verify that the content is not displayed in Content Browse Panel:
             await contentBrowsePanel.waitForContentNotDisplayed(FOLDER2.displayName);
-            //7. Navigate to 'Archive Browse Panel' and check the archived content:
+            // 7. Navigate to 'Archive Browse Panel' and check the archived content:
             await studioUtils.openArchivePanel();
-            await studioUtils.saveScreenshot("folder_in_archive2");
+            await studioUtils.saveScreenshot('folder_in_archive2');
             await archiveBrowsePanel.waitForContentDisplayed(FOLDER2.displayName);
         });
 
@@ -119,22 +119,22 @@ describe('archive.muiltiselect.restore.spec: tests for restore several items', f
             let archiveRestoreDialog = new ArchiveRestoreDialog();
             let archiveBrowsePanel = new ArchiveBrowsePanel();
             let confirmValueDialog = new ConfirmValueDialog();
-            //1. Navigate to 'Archive Browse Panel':
+            // 1. Navigate to 'Archive Browse Panel':
             await studioUtils.openArchivePanel();
-            //2. Select two folders
+            // 2. Select two folders
             await archiveBrowsePanel.clickOnCheckboxAndSelectRowByName(FOLDER1.displayName);
             await archiveBrowsePanel.clickOnCheckboxAndSelectRowByName(FOLDER2.displayName);
-            //3. Click on Restore... button in the browse toolbar
+            // 3. Click on Restore... button in the browse toolbar
             await archiveBrowsePanel.clickOnRestoreButton();
             await archiveRestoreDialog.waitForOpened();
-            //4. Click on Restore in the modal dialog:
+            // 4. Click on Restore in the modal dialog:
             await archiveRestoreDialog.clickOnRestoreButton();
             await confirmValueDialog.waitForDialogOpened();
-            //5. Confirm the value:
+            // 5. Confirm the value:
             await confirmValueDialog.typeNumberOrName(2);
             await confirmValueDialog.clickOnConfirmButton();
             await archiveRestoreDialog.waitForClosed();
-            //6. Verify that both folders are removed from Archive-grid
+            // 6. Verify that both folders are removed from Archive-grid
             await archiveBrowsePanel.waitForContentNotDisplayed(FOLDER1.displayName);
             await archiveBrowsePanel.waitForContentNotDisplayed(FOLDER2.displayName);
         });
@@ -159,7 +159,7 @@ describe('archive.muiltiselect.restore.spec: tests for restore several items', f
             await confirmValueDialog.clickOnConfirmButton();
             // 3. Navigate to 'Archive Browse Panel' and select the archived content:
             await studioUtils.openArchivePanel();
-            await studioUtils.saveScreenshot("folder_in_archive1_2");
+            await studioUtils.saveScreenshot('folder_in_archive1_2');
             await archiveBrowsePanel.clickOnCheckboxAndSelectRowByName(FOLDER_NAME);
             // 4. Click on 'Show Selection' circle:
             await archiveBrowsePanel.clickOnSelectionToggler();
@@ -172,8 +172,8 @@ describe('archive.muiltiselect.restore.spec: tests for restore several items', f
             await confirmValueDialog.clickOnConfirmButton();
             await archiveRestoreDialog.waitForClosed();
             // 7. Verify that selection controller(circle) gets not visible in the toolbar:
-            await studioUtils.saveScreenshot("archive_selection_controller_not_visible_2");
-            //await archiveBrowsePanel.waitForSelectionTogglerNotVisible();
+            await studioUtils.saveScreenshot('archive_selection_controller_not_visible_2');
+            await archiveBrowsePanel.waitForSelectionTogglerNotVisible();
         });
 
     beforeEach(async () => {

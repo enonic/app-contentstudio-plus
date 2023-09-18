@@ -1,12 +1,12 @@
 /**
- * Created by on 6/26/2017.
+ * Created on 6/26/2017.
  */
 const Page = require('./page');
 const appConst = require('../libs/app_const');
 const XPATH = {
     container: `//div[contains(@class,'launcher-panel')]`,
     userName: "//div[@class='user-info']//p",
-    activeLink: "//div[@class='app-row active']//p[@class='app-name']",
+    activeLink: "//div[@class='app-row active']",
     launcherToggler: "//button[contains(@class,'launcher-button')]"
 };
 
@@ -25,11 +25,11 @@ class LauncherPanel extends Page {
     }
 
     get usersLink() {
-        return XPATH.container + `//a[contains(@data-id,'app.users')]`;
+        return XPATH.container + `//a[contains(@data-id,'app.users')]//p[@class='app-name']`;
     }
 
     get contentStudioLink() {
-        return XPATH.container + `//a[contains(@data-id,'app.contentstudio')]`;
+        return XPATH.container + `//a[contains(@data-id,'app.contentstudio')]//p[@class='app-name']`;
     }
 
     get applicationsLink() {
@@ -42,6 +42,8 @@ class LauncherPanel extends Page {
 
     async clickOnUsersLink() {
         await this.waitForElementDisplayed(this.usersLink, appConst.mediumTimeout);
+        await this.waitForElementEnabled(this.usersLink, appConst.longTimeout);
+        await this.pause(400);
         await this.clickOnElement(this.usersLink);
         return await this.pause(500);
     }
@@ -49,6 +51,7 @@ class LauncherPanel extends Page {
     async clickOnContentStudioLink() {
         await this.waitForElementDisplayed(this.contentStudioLink, appConst.longTimeout);
         await this.waitForElementEnabled(this.contentStudioLink, appConst.longTimeout);
+        await this.pause(300);
         await this.clickOnElement(this.contentStudioLink);
         return await this.pause(1000);
     }
@@ -61,17 +64,22 @@ class LauncherPanel extends Page {
         return this.waitForElementDisplayed(this.logoutLink);
     }
 
-    waitForPanelDisplayed(ms) {
+    isDisplayed(ms) {
         return this.waitForElementDisplayed(XPATH.container, ms).catch(err => {
             return false;
         })
     }
 
+    async waitForPanelDisplayed() {
+        await this.waitForElementDisplayed(XPATH.container, appConst.mediumTimeout);
+        await this.pause(500);
+    }
+
     async waitForPanelClosed() {
         await this.getBrowser().waitUntil(async () => {
             let atr = await this.getAttribute(XPATH.container, 'class');
-            return atr.includes('slideout');
-        }, {timeout: appConst.mediumTimeout, timeoutMsg: "Launcher Panel is not hidden: "});
+            return !atr.includes('visible');
+        }, {timeout: appConst.mediumTimeout, timeoutMsg: 'Launcher Panel is not hidden: '});
     }
 
     async isPanelOpened() {
@@ -96,10 +104,10 @@ class LauncherPanel extends Page {
         return await this.getText(this.userName);
     }
 
-    async getActiveLink() {
+    async getActiveRowId() {
         let locator = XPATH.container + XPATH.activeLink;
         await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
-        return await this.getText(locator);
+        return await this.getAttribute(locator, 'id');
     }
 
     async clickOnLauncherToggler() {

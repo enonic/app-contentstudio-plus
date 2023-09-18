@@ -29,7 +29,7 @@ describe('layer.localize.button.spec - checks Localize button in browse toolbar 
             let settingsBrowsePanel = new SettingsBrowsePanel();
             await studioUtils.closeProjectSelectionDialog();
             await studioUtils.openSettingsPanel();
-            //1.'Default' project should be loaded after closing the 'Select project' dialog, then open wizard for new layer:
+            // 1.'Default' project should be loaded after closing the 'Select project' dialog, then open wizard for new layer:
             await settingsBrowsePanel.openProjectWizardDialog();
             let layer = projectUtils.buildLayer('Default', appConst.LANGUAGES.NORSK_NO, appConst.PROJECT_ACCESS_MODE.PUBLIC, null,
                 null, LAYER_DISPLAY_NAME);
@@ -39,11 +39,11 @@ describe('layer.localize.button.spec - checks Localize button in browse toolbar 
 
     it("Precondition 2 - two new folders should be added in 'Default' context",
         async () => {
-            //Default project should be loaded automatically when SU is logged in the second time.
-            //1. folder1 - status is 'work in progress'
+            // Default project should be loaded automatically when SU is logged in the second time.
+            // 1. folder1 - status is 'work in progress'
             let folder = contentBuilder.buildFolder(FOLDER_NAME);
             await studioUtils.doAddFolder(folder);
-            //2. folder2 - status is 'Ready to Publish'
+            // 2. folder2 - status is 'Ready to Publish'
             let folder2 = contentBuilder.buildFolder(FOLDER_2_NAME);
             await studioUtils.doAddReadyFolder(folder2);
         });
@@ -51,13 +51,13 @@ describe('layer.localize.button.spec - checks Localize button in browse toolbar 
     it("GIVEN layer context is switched WHEN a content that is inherited from a parent has been selected THEN 'Localize' button gets visible and enabled",
         async () => {
             let contentBrowsePanel = new ContentBrowsePanel();
-            //1. Default project is loaded by default, so need to select the layer's context:
+            // 1. Default project is loaded by default, so need to select the layer's context:
             await studioUtils.openProjectSelectionDialogAndSelectContext(LAYER_DISPLAY_NAME);
-            //Wait for content is inherited from the parent project:
+            // Wait for content is inherited from the parent project:
             await contentBrowsePanel.pause(5000);
             await studioUtils.findAndSelectItem(FOLDER_NAME);
             await studioUtils.saveScreenshot('localize_button_browse_panel_enabled');
-            //2. Verify that Localize button is enabled in the browse toolbar
+            // 2. Verify that Localize button is enabled in the browse toolbar
             await contentBrowsePanel.waitForLocalizeButtonEnabled();
         });
 
@@ -78,17 +78,17 @@ describe('layer.localize.button.spec - checks Localize button in browse toolbar 
 
     it("GIVEN content that is inherited from a parent has been selected WHEN Layers widget has been opened THEN expected layers should be present",
         async () => {
-            //1. Select the folder in layer and open Layers widget:
+            // 1. Select the folder in layer and open Layers widget:
             await studioUtils.findAndSelectItem(FOLDER_NAME);
             let browseLayersWidget = await studioUtils.openLayersWidgetInBrowsePanel();
             let layers = await browseLayersWidget.getLayersName();
-            //2. Verify names of layers:
+            // 2. Verify names of layers:
             assert.equal(layers[0], 'Default', 'Default project should be present in the widget');
             assert.equal(layers[1], LAYER_DISPLAY_NAME, "layer's display name should be present in the widget");
             let language = await browseLayersWidget.getLayerLanguage(LAYER_DISPLAY_NAME);
-            //3. Verify 'Localize' button in the widget:
+            // 3. Verify 'Localize' button in the widget:
             await browseLayersWidget.waitForLocalizeButtonEnabled(LAYER_DISPLAY_NAME);
-            //4. Verify the language in the widget:
+            // 4. Verify the language in the widget:
             assert.equal(language, "(no)", 'Expected language should be displayed in the layer');
         });
 
@@ -192,7 +192,6 @@ describe('layer.localize.button.spec - checks Localize button in browse toolbar 
             // Show All button should be displayed:
             await wizardLayersWidget.waitForShowAllButtonDisplayed();
         });
-
 
     it("GIVEN localized folder has been opened WHEN widget-item for 'Default' project has been clicked THEN 'Open' button button gets visible",
         async () => {

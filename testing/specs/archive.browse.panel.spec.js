@@ -118,13 +118,12 @@ describe('archive.browse.panel.spec: tests for archive browse panel and selectio
             await studioUtils.openArchivePanel();
             let archiveBrowsePanel = new ArchiveBrowsePanel();
             let archiveItemStatisticsPanel = new ArchiveItemStatisticsPanel();
-            let contentWidgetItemView = new ArchiveContentWidgetItemView();
             // 1. Click on the row and select an item:
             await archiveBrowsePanel.clickOnRowByDisplayName(FOLDER1.displayName);
             // 2. Verify the path and status of the content:
             let path = await archiveItemStatisticsPanel.getPath();
             assert.equal(path, `/${FOLDER1.displayName}`, 'Expected path should be displayed in Item Statistics panel');
-            // 3. Click on he row and unselect the item
+            // 3. Click on the row and unselect the item
             await archiveBrowsePanel.clickOnRowByDisplayName(FOLDER1.displayName);
             // 4. Verify that Item Statistics panel is cleared:
             await archiveItemStatisticsPanel.waitForPanelCleared();

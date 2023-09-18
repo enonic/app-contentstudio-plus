@@ -2,7 +2,7 @@
  * Created on 5/31/2017.
  */
 const ContentDuplicateDialog = require('../content.duplicate.dialog');
-const CreateIssueDialog = require('../issue/create.task.dialog');
+const CreateIssueDialog = require('../issue/create.issue.dialog');
 const lib = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
 const ConfirmationDialog = require('../confirmation.dialog');
@@ -30,7 +30,10 @@ const XPATH = {
     requestPublishMenuItem: "//ul[contains(@id,'Menu')]//li[contains(@id,'MenuItem') and text()='Request Publish']",
     contentPublishMenuButton: `//div[contains(@id,'ContentBrowsePublishMenuButton')]`,
     selectionControllerCheckBox: `//div[contains(@id,'SelectionController')]`,
+    numberInSelectionToggler: `//button[contains(@id,'SelectionPanelToggler')]/span`,
     moreFoldButton: "//div[contains(@id,'FoldButton')]",
+    editButton: `//button[contains(@id, 'ActionButton') and child::span[text()='Edit']]`,
+    newButton: `//button[contains(@id, 'ActionButton') and child::span[text()='New...']]`,
 
     contentSummaryListViewerByName(name) {
         return `//div[contains(@id,'ContentSummaryListViewer') and descendant::p[contains(@class,'sub-name') and contains(.,'${name}')]]`
@@ -151,7 +154,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
     }
 
     get numberInSelectionToggler() {
-        return XPATH.treeGridToolbar + lib.NUMBER_IN_SELECTION_TOGGLER;
+        return XPATH.treeGridToolbar + XPATH.numberInSelectionToggler;
     }
 
     get publishButton() {
@@ -352,7 +355,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
         }
     }
 
-    // Opens Filter Panel:
+    //Opens Filter Panel:
     clickOnSearchButton() {
         return this.clickOnElement(this.searchButton);
     }
@@ -418,7 +421,8 @@ class ContentBrowsePanel extends BaseBrowsePanel {
         try {
             await this.waitForElementDisabled(this.previewButton, appConst.mediumTimeout)
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName("err_preview_btn_disabled");
+            let screenshot = appConst.generateRandomName("err_preview_btn_disabled");
+            await this.saveScreenshot(screenshot);
             throw Error('Preview button should be disabled, screenshot  : ' + screenshot + "  " + err);
         }
     }
@@ -427,7 +431,8 @@ class ContentBrowsePanel extends BaseBrowsePanel {
         try {
             await this.waitForElementEnabled(this.previewButton, appConst.mediumTimeout)
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName("err_preview_btn_enabled");
+            let screenshot = appConst.generateRandomName("err_preview_btn_enabled");
+            await this.saveScreenshot(screenshot);
             throw Error('Preview button should be enabled, screenshot  : ' + screenshot + "  " + err);
         }
     }

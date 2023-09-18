@@ -1,4 +1,3 @@
-const appConst = require('./app_const');
 const path = require('path');
 
 /**
@@ -50,7 +49,7 @@ WebDriverHelper.prototype.setupBrowser = function setupBrowser(w, h) {
             automationProtocol: "webdriver",
             capabilities: {
                 browserName: browser_name,
-                browserVersion: browserVersion,
+                browserVersion: '116.0.5845.96',
                 'goog:chromeOptions': makeChromeOptions(isHeadless, width, height)
             }
         };
