@@ -7,7 +7,7 @@
     "test_cs_plus:wdio_chrome": "npx wdio ./wdio.chrome.conf.js"
   },
   "devDependencies": {
-    "assert": "^2.0.0",
+    "assert": "^2.1.0",
     "chai": "^4.3.7",
     "properties-reader": "^2.2.0",
     "@wdio/mocha-framework": "^8.16.3",
