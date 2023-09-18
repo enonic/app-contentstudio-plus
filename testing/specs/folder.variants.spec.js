@@ -20,7 +20,6 @@ describe('folder.variants.spec - tests for Create Variant modal dialog', functio
     const NOT_AVAILABLE_MESSAGE = 'Not available';
     const FOLDER_NAME = studioUtils.generateRandomName('folder');
     const VARIANT_NAME_1 = appConst.generateRandomName('variant');
-    const VARIANT_NAME_2 = appConst.generateRandomName('variant');
 
 
     it(`Precondition: new folder should be added`,
@@ -155,7 +154,6 @@ describe('folder.variants.spec - tests for Create Variant modal dialog', functio
             await contentBrowsePanel.waitForVariantIconDisplayed(VARIANT_NAME_1);
             await contentBrowsePanel.waitForVariantIconDisplayed(copyName);
         });
-
 
     beforeEach(async () => {
         return await studioUtils.navigateToContentStudioCloseProjectSelectionDialog();

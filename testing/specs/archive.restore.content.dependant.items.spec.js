@@ -24,7 +24,7 @@ describe('archive.restore.content.dependant.items.spec: tests for archive/restor
     const FOLDER_DISPLAY_NAME = appConst.TEST_FOLDER_2_DISPLAY_NAME;
     const FOLDER_NAME = appConst.TEST_FOLDER_2_NAME;
 
-    const DEPENDENT_ITEM_NAME = "circles";
+    const DEPENDENT_ITEM_NAME = 'circles';
     const TEST_DISPLAY_NAME = 'presentation';
 
     it(`GIVEN existing folder is archived WHEN 'Delete from Archive' dialog is opened THEN expected dependent items should be present in the dialog`,
