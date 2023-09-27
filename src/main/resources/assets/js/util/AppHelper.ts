@@ -14,6 +14,10 @@ export class AppHelper {
         return AppHelper.getWidgetClass('variants');
     }
 
+    static getPublishReportWidgetClass(): string {
+        return AppHelper.getWidgetClass('publish-report');
+    }
+
     private static getWidgetClass(widgetName: string): string {
         return `${AppHelper.getCommonWidgetClass()}-${widgetName}`;
     }

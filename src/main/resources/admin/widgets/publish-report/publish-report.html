@@ -1,0 +1,15 @@
+<widget id="cs-plus-widget-publish-report">
+    {{#isNoIdMode}}
+    <div class="error">Select an item - and we'll show you the details!</div>
+    {{/isNoIdMode}}
+
+    {{#isNoPublishMode}}
+    <div class="error">This content has never been published</div>
+    {{/isNoPublishMode}}
+
+    {{#isNormalMode}}
+    <link rel="stylesheet" href="{{stylesUri}}" type="text/css" media="all"/>
+    <script src="{{jsUri}}" data-config-service-url="{{configServiceUrl}}" data-content-id="{{contentId}}"></script>
+    {{/isNormalMode}}
+
+</widget>

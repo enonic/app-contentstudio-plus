@@ -1,5 +1,4 @@
 import {ContentDuplicateDialog} from 'lib-contentstudio/app/duplicate/ContentDuplicateDialog';
-import {AppHelper} from '../../../util/AppHelper';
 
 export class DuplicateVariantDialog extends ContentDuplicateDialog {
 
