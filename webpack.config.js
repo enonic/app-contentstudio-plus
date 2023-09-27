@@ -18,8 +18,10 @@ module.exports = {
         'styles/main': './styles/main.less',
         'js/widgets/layers': './js/widgets/layers/main.ts',
         'js/widgets/variants': './js/widgets/variants/main.ts',
+        'js/widgets/publish-report': './js/widgets/publish-report/main.ts',
         'styles/widgets/layers': './styles/widgets/layers/main.less',
         'styles/widgets/variants': './styles/widgets/variants/main.less',
+        'styles/widgets/publish-report': './styles/widgets/publish-report/main.less',
         'styles/license': './styles/license.less'
     },
     output: {
