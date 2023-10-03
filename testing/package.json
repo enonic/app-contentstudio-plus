@@ -8,7 +8,7 @@
   },
   "devDependencies": {
     "assert": "^2.1.0",
-    "chai": "^4.3.7",
+    "chai": "^4.3.10",
     "properties-reader": "^2.2.0",
     "@wdio/mocha-framework": "^8.16.17",
     "@wdio/cli": "^8.16.18",
