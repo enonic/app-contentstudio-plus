@@ -13,6 +13,8 @@ import {Form} from '@enonic/lib-admin-ui/ui/form/Form';
 import {Fieldset} from '@enonic/lib-admin-ui/ui/form/Fieldset';
 import {ValidationResult} from '@enonic/lib-admin-ui/ui/form/ValidationResult';
 import {DateRangeInput} from './DateRangeInput';
+import {Action} from '@enonic/lib-admin-ui/ui/Action';
+import {Body} from '@enonic/lib-admin-ui/dom/Body';
 
 export class PublishReportDialog
     extends ModalDialog {
@@ -57,6 +59,7 @@ export class PublishReportDialog
         return super.doRender().then((rendered: boolean) => {
             this.appendChildToContentPanel(this.form);
             this.appendChildToContentPanel(this.comparisonsContainer);
+            this.addAction(new Action(i18n('widget.publish.report.dialog.button.print')).onExecuted(() => window.print()));
 
             this.comparisonsContainer.getEl().setTabIndex(0); // preventing date popups from opening on click on dialog
 
@@ -72,6 +75,14 @@ export class PublishReportDialog
         super.open();
 
         this.fetchAllPublishedVersions().catch(DefaultErrorHandler.handle);
+
+        Body.get().addClass('publish-report-dialog-open');
+    }
+
+    close() {
+        Body.get().removeClass('publish-report-dialog-open');
+
+        super.close();
     }
 
     show() {
