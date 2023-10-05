@@ -39,7 +39,7 @@ export class ComparisonsContainer
 
     private handleNoPublishVersionsWithinPeriod(): void {
         this.setModeClass('no-publish-versions');
-        this.setHtml(i18n('widget.publish.report.mode.none'));
+        this.setHtml(i18n('widget.publishReport.mode.none'));
     }
 
     private handleSinglePublishVersionWithingPeriod(): void {

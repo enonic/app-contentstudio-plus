@@ -1,6 +1,6 @@
 <widget>
-  <display-name i18n="widget.publish.report.displayName">Publishing report</display-name>
-  <description i18n="widget.publish.report.description">Compare published versions</description>
+  <display-name i18n="widget.publishReport.displayName">Publishing report</display-name>
+  <description i18n="widget.publishReport.description">Compare published versions</description>
   <interfaces>
     <interface>contentstudio.contextpanel</interface>
   </interfaces>
