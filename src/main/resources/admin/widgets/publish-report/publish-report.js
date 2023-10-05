@@ -22,23 +22,19 @@ const makeParamsNoContentId = () => {
     }
 }
 
-const makeParamsNoAnyPublish = () => {
+const makeParams = (content) => {
     return {
-        isNoPublishMode: true
-    }
-}
-
-const makeParams = (contentId) => {
-    return {
-        isNormalMode: true,
-        contentId: contentId || '',
+        contentId: content._id || '',
         stylesUri: portal.assetUrl({
             path: 'styles/widgets/publish-report.css'
         }),
         jsUri: portal.assetUrl({
             path: 'js/widgets/publish-report.js'
         }),
-        configServiceUrl: portal.serviceUrl({service: 'config'})
+        configServiceUrl: portal.serviceUrl({service: 'config'}),
+        isNoIdMode: false,
+        isNormalMode: !!content.publish.first,
+        isNoPublishMode: !content.publish.first
     }
 }
 
@@ -48,11 +44,7 @@ const getViewParams = (req) => {
     if (contentId) {
         const content = contentLib.get({key: contentId});
 
-        if (content.publish.first) {
-            return makeParams(contentId);
-        }
-
-        return makeParamsNoAnyPublish();
+        return makeParams(content);
     }
 
     return makeParamsNoContentId();

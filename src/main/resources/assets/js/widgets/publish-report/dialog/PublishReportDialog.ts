@@ -38,7 +38,7 @@ export class PublishReportDialog
     private constructor() {
         super({
             class: 'publish-report-dialog',
-            title: i18n('widget.publish.report.dialog.title'),
+            title: i18n('widget.publishReport.dialog.title'),
         });
     }
 
@@ -59,7 +59,7 @@ export class PublishReportDialog
         return super.doRender().then((rendered: boolean) => {
             this.appendChildToContentPanel(this.form);
             this.appendChildToContentPanel(this.comparisonsContainer);
-            this.addAction(new Action(i18n('widget.publish.report.dialog.button.print')).onExecuted(() => window.print()));
+            this.addAction(new Action(i18n('widget.publishReport.dialog.button.print')).onExecuted(() => window.print()));
 
             this.comparisonsContainer.getEl().setTabIndex(0); // preventing date popups from opening on click on dialog
 

@@ -20,8 +20,8 @@ export class DateRangeInput extends FormInputEl {
 
         this.from = new DatePickerBuilder().build().addClass('from') as DatePicker;
         this.to = new DatePickerBuilder().build().addClass('to') as DatePicker;
-        const labelFrom: LabelEl = new LabelEl(i18n('widget.publish.report.date.range.label.from'), this.from, 'labelFrom');
-        const labelTo: LabelEl = new LabelEl(i18n('widget.publish.report.date.range.label.to'), this.to, 'labelTo');
+        const labelFrom: LabelEl = new LabelEl(i18n('widget.publishReport.dateRange.label.from'), this.from, 'labelFrom');
+        const labelTo: LabelEl = new LabelEl(i18n('widget.publishReport.dateRange.label.to'), this.to, 'labelTo');
 
         this.appendChildren(labelFrom, labelTo, this.from as Element, this.to);
 
@@ -86,11 +86,11 @@ export class DateRangeInput extends FormInputEl {
 
     validate(): string {
         if (!this.from.isValid() || !this.to.isValid()) {
-            return i18n('widget.publish.report.date.range.invalid.value');
+            return i18n('widget.publishReport.dateRange.invalid.value');
         }
 
         if (this.fromDate?.getTime() > this.toDate?.getTime()) {
-            return i18n('widget.publish.report.date.range.invalid.range');
+            return i18n('widget.publishReport.dateRange.invalid.range');
         }
 
         return null;

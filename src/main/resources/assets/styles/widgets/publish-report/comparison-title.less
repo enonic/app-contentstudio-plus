@@ -1,6 +1,14 @@
 .comparison-title {
+  font-size: 14px;
+
   .part-for-first-date, .part-for-second-date {
     font-weight: bold;
+  }
+
+  .part-for-second-date {
+    &:after {
+      content: ":";
+    }
   }
 
   > span:not(:last-child) {
