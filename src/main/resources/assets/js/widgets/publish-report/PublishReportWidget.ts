@@ -28,8 +28,8 @@ export class PublishReportWidget
     }
 
     private initDialogButton(): Button {
-        const button: Button = new Button(i18n('widget.publish.report.button.text'));
-        button.addClass('publish-report-widget-button-open');
+        const button: Button = new Button(i18n('widget.publishReport.button.text'));
+        button.addClass('widget-publish-report-button-open');
 
         button.onClicked(() => {
             PublishReportDialog.get().setContentId(this.contentId).open();

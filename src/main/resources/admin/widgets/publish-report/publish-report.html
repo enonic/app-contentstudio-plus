@@ -3,12 +3,15 @@
     <div class="error">Select an item - and we'll show you the details!</div>
     {{/isNoIdMode}}
 
+    {{^isNoIdMode}}
+    <link rel="stylesheet" href="{{stylesUri}}" type="text/css" media="all"/>
+    {{/isNoIdMode}}
+
     {{#isNoPublishMode}}
-    <div class="error">This content has never been published</div>
+    <div class="not-published">This content has never been published</div>
     {{/isNoPublishMode}}
 
     {{#isNormalMode}}
-    <link rel="stylesheet" href="{{stylesUri}}" type="text/css" media="all"/>
     <script src="{{jsUri}}" data-config-service-url="{{configServiceUrl}}" data-content-id="{{contentId}}"></script>
     {{/isNormalMode}}
 

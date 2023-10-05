@@ -13,7 +13,7 @@ export class SingleVersionPublishedTitle
     constructor() {
         super('single-version-published-title');
 
-        this.partBeforeFirst = new SpanEl('part-before-first').setHtml(i18n('widget.publish.report.date.range.compare.title.part1'));
+        this.partBeforeFirst = new SpanEl('part-before-first').setHtml(i18n('status.published'));
         this.partFirstDate = new SpanEl('part-for-first-date');
     }
 
