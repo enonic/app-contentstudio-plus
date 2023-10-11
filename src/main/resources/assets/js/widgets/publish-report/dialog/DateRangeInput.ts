@@ -4,6 +4,7 @@ import {SelectedDateChangedEvent} from '@enonic/lib-admin-ui/ui/time/SelectedDat
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {LabelEl} from '@enonic/lib-admin-ui/dom/LabelEl';
 import {Element} from '@enonic/lib-admin-ui/dom/Element';
+import {DateHelper} from '@enonic/lib-admin-ui/util/DateHelper';
 
 export class DateRangeInput extends FormInputEl {
 
@@ -15,6 +16,10 @@ export class DateRangeInput extends FormInputEl {
 
     private toDate: Date;
 
+    private firstPublishDate: Date;
+
+    private limitToDate: Date;
+
     constructor() {
         super('div', 'date-time-input');
 
@@ -22,6 +27,9 @@ export class DateRangeInput extends FormInputEl {
         this.to = new DatePickerBuilder().build().addClass('to') as DatePicker;
         const labelFrom: LabelEl = new LabelEl(i18n('widget.publishReport.dateRange.label.from'), this.from, 'labelFrom');
         const labelTo: LabelEl = new LabelEl(i18n('widget.publishReport.dateRange.label.to'), this.to, 'labelTo');
+
+        this.limitToDate = new Date(); // "To" value can't be later than current date
+        this.limitToDate.setHours(23, 59, 59, 999);
 
         this.appendChildren(labelFrom, labelTo, this.from as Element, this.to);
 
@@ -42,6 +50,10 @@ export class DateRangeInput extends FormInputEl {
 
     private updateFromDate(date: Date): void {
         this.fromDate = date;
+
+        if (this.fromDate) {
+            this.fromDate.setHours(0, 0, 0, 0);
+        }
     }
 
     private updateToDate(date: Date): void {
@@ -54,6 +66,12 @@ export class DateRangeInput extends FormInputEl {
 
     private generateFormInputValue(): string { // generating value to trigger value change event and validation
         return this.from.getTextInput().getValue() + ' - ' + this.to.getTextInput().getValue();
+    }
+
+    setFirstPublishDate(value: Date): this {
+        this.firstPublishDate = value ? new Date(value) : value;
+        this.firstPublishDate?.setHours(0, 0, 0, 0);
+        return this;
     }
 
     getFrom(): Date {
@@ -93,6 +111,20 @@ export class DateRangeInput extends FormInputEl {
             return i18n('widget.publishReport.dateRange.invalid.range');
         }
 
-        return null;
+        let compoundMessage: string = null;
+
+        if (this.firstPublishDate && this.fromDate?.getTime() < this.firstPublishDate.getTime()) {
+            const formattedDate = DateHelper.formatDate(this.firstPublishDate);
+            compoundMessage = i18n('widget.publishReport.dateRange.invalid.from', formattedDate);
+        }
+
+        if (this.toDate && this.toDate.getTime() > this.limitToDate.getTime()) {
+            const msg = i18n('widget.publishReport.dateRange.invalid.to');
+
+            compoundMessage = compoundMessage ? `${compoundMessage} , ${msg}` : msg;
+
+        }
+
+        return compoundMessage;
     }
 }

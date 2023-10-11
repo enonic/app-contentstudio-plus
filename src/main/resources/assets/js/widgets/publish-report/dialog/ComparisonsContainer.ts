@@ -2,17 +2,20 @@ import {DivEl} from '@enonic/lib-admin-ui/dom/DivEl';
 import {ContentVersion} from 'lib-contentstudio/app/ContentVersion';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {ContentId} from 'lib-contentstudio/app/content/ContentId';
-import {ComparisonBlock, ComparisonMode} from './ComparisonBlock';
+import {ComparisonBlock} from './ComparisonBlock';
 import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
+import {ComparisonMode} from './ComparisonMode';
 
 export class ComparisonsContainer
     extends DivEl {
 
     private static CLASS_NAME: string = 'comparisons-container';
 
-    private publishedVersions: ContentVersion[];
+    private filteredPublishedVersions: ContentVersion[];
 
     private contentId: ContentId;
+
+    private totalPublishedVersions: number = 0;
 
     constructor() {
         super(ComparisonsContainer.CLASS_NAME);
@@ -23,10 +26,17 @@ export class ComparisonsContainer
         return this;
     }
 
-    setVersions(versions: ContentVersion[]): this {
-        this.publishedVersions = versions;
+    setTotalPublishedVersions(totalPublishedVersions: number): this {
+        this.totalPublishedVersions = totalPublishedVersions;
+        return this;
+    }
 
-        if (versions.length === 0) {
+    setFilteredVersions(versions: ContentVersion[]): this {
+        this.filteredPublishedVersions = versions;
+
+        if (this.totalPublishedVersions === 0) {
+            this.handleNoAnyPublishVersions();
+        } else if (versions.length === 0) {
             this.handleNoPublishVersionsWithinPeriod();
         } else if (versions.length === 1) {
             this.handleSinglePublishVersionWithingPeriod();
@@ -37,21 +47,26 @@ export class ComparisonsContainer
         return this;
     }
 
-    private handleNoPublishVersionsWithinPeriod(): void {
+    private handleNoAnyPublishVersions(): void {
         this.setModeClass('no-publish-versions');
         this.setHtml(i18n('widget.publishReport.mode.none'));
     }
 
+    private handleNoPublishVersionsWithinPeriod(): void {
+        this.setModeClass('no-publish-versions');
+        this.setHtml(i18n('widget.publishReport.mode.offline'));
+    }
+
     private handleSinglePublishVersionWithingPeriod(): void {
         this.setModeClass('single-publish-version');
-        this.addDisplayEntireContentBlock(this.publishedVersions[0]);
+        this.addDisplayEntireContentBlock(this.filteredPublishedVersions[0]);
     }
 
     private handePublishVersions(): void {
         this.setModeClass('multi-publish-versions');
 
-        this.publishedVersions.forEach((v1: ContentVersion, index: number) => {
-            const v2: ContentVersion = this.publishedVersions[index + 1];
+        this.filteredPublishedVersions.forEach((v1: ContentVersion, index: number) => {
+            const v2: ContentVersion = this.filteredPublishedVersions[index + 1];
 
             if (v2) {
                 this.addComparisonBlock(v1, v2);

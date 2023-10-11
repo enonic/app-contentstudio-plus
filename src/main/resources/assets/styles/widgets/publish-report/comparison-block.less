@@ -18,6 +18,7 @@
 
     pre {
       white-space: pre-wrap;
+      display: flex;
     }
 
     ul {
@@ -29,10 +30,8 @@
 
       h3 {
         display: block;
-        text-align: center;
-        color: @admin-font-gray1;
         font-family: @admin-font-family;
-        margin-top: 50px;
+        font-size: 16px;
       }
     }
   }
@@ -40,6 +39,26 @@
   &.loading {
     .compare-element {
       min-height: 50px;
+    }
+  }
+
+  @media screen and (max-width: 540px) {
+    padding: 10px 0;
+
+    .header {
+      margin-bottom: 5px;
+
+      .form-input {
+        margin: 5px 0;
+      }
+    }
+
+    .compare-element {
+      padding-left: 0;
+
+      > div {
+        padding-left: 0;
+      }
     }
   }
 }
