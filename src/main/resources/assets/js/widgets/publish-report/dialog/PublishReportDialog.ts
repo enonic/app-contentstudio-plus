@@ -15,6 +15,9 @@ import {ValidationResult} from '@enonic/lib-admin-ui/ui/form/ValidationResult';
 import {DateRangeInput} from './DateRangeInput';
 import {Action} from '@enonic/lib-admin-ui/ui/Action';
 import {Body} from '@enonic/lib-admin-ui/dom/Body';
+import {GetContentSummaryByIdRequest} from 'lib-contentstudio/app/resource/GetContentSummaryByIdRequest';
+import {ContentSummary} from 'lib-contentstudio/app/content/ContentSummary';
+import {H6El} from '@enonic/lib-admin-ui/dom/H6El';
 
 export class PublishReportDialog
     extends ModalDialog {
@@ -22,6 +25,8 @@ export class PublishReportDialog
     private static INSTANCE: PublishReportDialog;
 
     private contentId: ContentId;
+
+    private content: ContentSummary;
 
     private publishedVersions: ContentVersion[];
 
@@ -34,6 +39,8 @@ export class PublishReportDialog
     private dateRangeInput: DateRangeInput;
 
     private dateRangeFormItem: FormItem;
+
+    private subTitleEl: H6El;
 
     private constructor() {
         super({
@@ -59,6 +66,8 @@ export class PublishReportDialog
         return super.doRender().then((rendered: boolean) => {
             this.appendChildToContentPanel(this.form);
             this.appendChildToContentPanel(this.comparisonsContainer);
+            this.appendChildToHeader(this.subTitleEl);
+
             this.addAction(new Action(i18n('widget.publishReport.dialog.button.print')).onExecuted(() => window.print()));
 
             this.comparisonsContainer.getEl().setTabIndex(0); // preventing date popups from opening on click on dialog
@@ -74,7 +83,7 @@ export class PublishReportDialog
 
         super.open();
 
-        this.fetchAllPublishedVersions().catch(DefaultErrorHandler.handle);
+        this.fetchData().catch(DefaultErrorHandler.handle);
 
         Body.get().addClass('publish-report-dialog-open');
     }
@@ -97,6 +106,7 @@ export class PublishReportDialog
         super.initElements();
 
         this.comparisonsContainer = new ComparisonsContainer();
+        this.subTitleEl = new H6El('sub-title');
         this.setup();
     }
 
@@ -146,24 +156,32 @@ export class PublishReportDialog
         this.form.add(fieldSet);
     }
 
-    private fetchAllPublishedVersions(): Q.Promise<void> {
+    private fetchData(): Q.Promise<void> {
         this.comparisonsContainer.setContentId(this.contentId);
         this.loadMask.show();
 
-        return new GetContentVersionsRequest(this.contentId).sendAndParse().then((versions: ContentVersions) => {
+        return Q.all([this.fetchContent(), this.fetchVersions()]).spread((content: ContentSummary, versions: ContentVersions) => {
+            this.content = content;
+
             this.publishedVersions = versions.get().filter((contentVersion: ContentVersion) => {
                 const publishInfo = contentVersion.getPublishInfo();
-
                 return publishInfo?.isPublished() && !publishInfo.isScheduled();
             });
 
+            this.comparisonsContainer.setTotalPublishedVersions(this.publishedVersions.length);
             this.setInitialDateRangeValues();
+            this.subTitleEl.setHtml(this.content.getPath().toString());
+            this.dateRangeInput.setFirstPublishDate(this.content.getPublishFirstTime());
         }).finally(() => {
             this.loadMask.hide();
         });
     }
 
     private setInitialDateRangeValues(): void {
+        this.dateRangeInput.setFromTo(this.getEarliestVersionPublishDate(), new Date());
+    }
+
+    private getEarliestVersionPublishDate(): Date {
         let earliestPublishDate: Date = null;
 
         this.publishedVersions.forEach((contentVersion: ContentVersion) => {
@@ -177,9 +195,7 @@ export class PublishReportDialog
             }
         });
 
-        if (earliestPublishDate) {
-            this.dateRangeInput.setFromTo(earliestPublishDate, new Date());
-        }
+        return earliestPublishDate ?? this.content.getPublishFirstTime();
     }
 
     private getFrom(): Date {
@@ -201,7 +217,15 @@ export class PublishReportDialog
                    (toTime ? versionPublishTime <= toTime : true);
         });
 
-        this.comparisonsContainer.setVersions(filteredVersions);
+        this.comparisonsContainer.setFilteredVersions(filteredVersions);
+    }
+
+    private fetchContent(): Q.Promise<ContentSummary> {
+        return new GetContentSummaryByIdRequest(this.contentId).sendAndParse();
+    }
+
+    private fetchVersions(): Q.Promise<ContentVersions> {
+        return new GetContentVersionsRequest(this.contentId).sendAndParse();
     }
 
 }

@@ -25,21 +25,51 @@ body.publish-report-dialog-open {
                 padding: 0;
                 font-size: 14px;
 
-                .date-time-picker {
-                  .@{_COMMON_PREFIX}wrapper {
-                    &:before {
-                      display: none;
-                    }
+                .date-time-input {
+                  background-color: @admin-white;
 
-                    .form-input {
-                      border: none;
+                  .date-time-picker {
+                    .@{_COMMON_PREFIX}wrapper {
+                      &:before {
+                        display: none;
+                      }
+
+                      .form-input {
+                        border: none;
+                        padding-left: 0;
+                      }
+
+                      .date-time-dialog {
+                        display: none !important;
+                      }
                     }
                   }
                 }
               }
 
-              .comparison-block .header .checkbox {
-                display: none;
+              .comparison-block {
+                padding: 0;
+
+                .compare-element {
+                  padding-left: 0;
+
+                  > div {
+                    padding-left: 0;
+                  }
+                }
+
+                .header .checkbox {
+                  display: none;
+                }
+
+                .jsondiffpatch-delta .jsondiffpatch-node {
+                  display: block;
+                }
+
+                li {
+                  display: flex;
+                  flex-wrap: wrap;
+                }
               }
             }
           }

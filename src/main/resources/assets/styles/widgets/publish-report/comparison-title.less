@@ -1,14 +1,12 @@
 .comparison-title {
   font-size: 14px;
 
-  .part-for-first-date, .part-for-second-date {
-    font-weight: bold;
+  &::after {
+    content: ":";
   }
 
-  .part-for-second-date {
-    &:after {
-      content: ":";
-    }
+  .part-for-first-date, .part-for-second-date {
+    font-weight: bold;
   }
 
   > span:not(:last-child) {
@@ -16,6 +14,10 @@
   }
 
   @media screen and (max-width: 540px) {
-    display: grid;
+    font-size: 12px;
+
+    .part-before-first {
+      display: none;
+    }
   }
 }

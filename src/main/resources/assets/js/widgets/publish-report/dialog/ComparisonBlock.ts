@@ -11,11 +11,7 @@ import {DateHelper} from '@enonic/lib-admin-ui/util/DateHelper';
 import {LoadMask} from '@enonic/lib-admin-ui/ui/mask/LoadMask';
 import {ComparisonHelper} from './ComparisonHelper';
 import {ComparisonTitle} from './ComparisonTitle';
-import {SingleVersionPublishedTitle} from './SingleVersionPublishedTitle';
-
-export enum ComparisonMode {
-    COMPARE, DISPLAY_SINGLE
-}
+import {ComparisonMode} from './ComparisonMode';
 
 export class ComparisonBlock
     extends DivEl {
@@ -26,7 +22,7 @@ export class ComparisonBlock
 
     private readonly headerElement: DivEl;
 
-    private readonly titleElement: ComparisonTitle | SingleVersionPublishedTitle;
+    private readonly titleElement: ComparisonTitle;
 
     private readonly changesCheckbox?: Checkbox;
 
@@ -55,7 +51,7 @@ export class ComparisonBlock
 
         this.diffElement = new DivEl('compare-element jsondiffpatch-delta');
         this.headerElement = new DivEl('header');
-        this.titleElement = this.isCompareMode() ? new ComparisonTitle() : new SingleVersionPublishedTitle();
+        this.titleElement = new ComparisonTitle(this.mode);
         this.loadMask = new LoadMask(this.diffElement);
 
         this.changesCheckbox = this.isCompareMode() ? new CheckboxBuilder().setLabelText(i18n('field.content.showEntire')).build() : null;
@@ -150,14 +146,9 @@ export class ComparisonBlock
     }
 
     private updateHeader(): void {
-        if (this.isCompareMode()) {
-            const newerVersionDate = DateHelper.formatDateTime(this.newerVersion.getPublishInfo().getTimestamp());
-            const olderVersionDate = DateHelper.formatDateTime(this.olderVersion.getPublishInfo().getTimestamp());
-            (this.titleElement as ComparisonTitle).setDates(olderVersionDate, newerVersionDate);
-        } else {
-            const versionDate = DateHelper.formatDateTime(this.newerVersion.getPublishInfo().getTimestamp());
-            (this.titleElement as SingleVersionPublishedTitle).setDate(versionDate);
-        }
+        const newerVersionDate = DateHelper.formatDateTime(this.newerVersion.getPublishInfo().getTimestamp());
+        const olderVersionDate = this.isCompareMode() ? DateHelper.formatDateTime(this.olderVersion.getPublishInfo().getTimestamp()) : null;
+        this.titleElement.setDates(newerVersionDate, olderVersionDate);
     }
 
     private isCompareMode(): boolean {
