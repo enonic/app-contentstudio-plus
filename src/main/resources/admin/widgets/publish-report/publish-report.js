@@ -33,6 +33,7 @@ const makeParams = (content) => {
         }),
         configServiceUrl: portal.serviceUrl({service: 'config'}),
         isNoIdMode: false,
+        publishFirst: content.publish.first,
         isNormalMode: !!content.publish.first,
         isNoPublishMode: !content.publish.first
     }

@@ -34,8 +34,12 @@ export class ComparisonTitle
     }
 
     setDates(firstDateString: string, secondDateString?: string): void {
-        this.partFirstDate.setHtml(firstDateString);
-        this.partSecondDate?.setHtml(secondDateString);
+        if (this.isCompareMode()) {
+            this.partFirstDate.setHtml(secondDateString);
+            this.partSecondDate.setHtml(firstDateString);
+        } else {
+            this.partFirstDate.setHtml(firstDateString);
+        }
     }
 
     doRender(): Q.Promise<boolean> {

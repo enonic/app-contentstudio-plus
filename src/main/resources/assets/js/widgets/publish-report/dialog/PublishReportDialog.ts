@@ -1,18 +1,12 @@
 import {ModalDialog} from '@enonic/lib-admin-ui/ui/dialog/ModalDialog';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import * as Q from 'q';
-import {FormView} from '@enonic/lib-admin-ui/form/FormView';
 import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import {ContentId} from 'lib-contentstudio/app/content/ContentId';
 import {GetContentVersionsRequest} from 'lib-contentstudio/app/resource/GetContentVersionsRequest';
 import {ContentVersions} from 'lib-contentstudio/app/ContentVersions';
 import {ContentVersion} from 'lib-contentstudio/app/ContentVersion';
 import {ComparisonsContainer} from './ComparisonsContainer';
-import {FormItem, FormItemBuilder} from '@enonic/lib-admin-ui/ui/form/FormItem';
-import {Form} from '@enonic/lib-admin-ui/ui/form/Form';
-import {Fieldset} from '@enonic/lib-admin-ui/ui/form/Fieldset';
-import {ValidationResult} from '@enonic/lib-admin-ui/ui/form/ValidationResult';
-import {DateRangeInput} from './DateRangeInput';
 import {Action} from '@enonic/lib-admin-ui/ui/Action';
 import {Body} from '@enonic/lib-admin-ui/dom/Body';
 import {GetContentSummaryByIdRequest} from 'lib-contentstudio/app/resource/GetContentSummaryByIdRequest';
@@ -32,13 +26,13 @@ export class PublishReportDialog
 
     private comparisonsContainer: ComparisonsContainer;
 
-    private formItems: FormItem[];
+    private contentPromise: Q.Promise<ContentSummary>;
 
-    private form: Form;
+    private versionsPromise: Q.Promise<ContentVersions>;
 
-    private dateRangeInput: DateRangeInput;
+    private fromDate: Date;
 
-    private dateRangeFormItem: FormItem;
+    private toDate: Date;
 
     private subTitleEl: H6El;
 
@@ -62,9 +56,14 @@ export class PublishReportDialog
         return this;
     }
 
+    setFromTo(from: Date, to?: Date): PublishReportDialog {
+        this.fromDate = from;
+        this.toDate = to ?? new Date();
+        return this;
+    }
+
     doRender(): Q.Promise<boolean> {
         return super.doRender().then((rendered: boolean) => {
-            this.appendChildToContentPanel(this.form);
             this.appendChildToContentPanel(this.comparisonsContainer);
             this.appendChildToHeader(this.subTitleEl);
 
@@ -78,8 +77,6 @@ export class PublishReportDialog
 
     open(): void {
         this.comparisonsContainer.removeChildren();
-        this.dateRangeInput.reset();
-        this.dateRangeFormItem.validate(new ValidationResult(), true);
 
         super.open();
 
@@ -94,66 +91,11 @@ export class PublishReportDialog
         super.close();
     }
 
-    show() {
-        super.show();
-
-        this.whenRendered(() => {
-            this.dateRangeInput.hideFromPopup();
-        });
-    }
-
     protected initElements(): void {
         super.initElements();
 
         this.comparisonsContainer = new ComparisonsContainer();
         this.subTitleEl = new H6El('sub-title');
-        this.setup();
-    }
-
-    protected initListeners(): void {
-        super.initListeners();
-
-        this.dateRangeInput.onValueChanged(() => {
-            const validationResult: ValidationResult = new ValidationResult();
-            this.dateRangeFormItem.validate(validationResult, true);
-
-            if (validationResult.isValid()) {
-                this.comparisonsContainer.removeChildren();
-                this.filterVersionsByDateRange();
-            }
-        });
-    }
-
-    private setup(): void {
-        this.formItems = this.createFormItems();
-
-        this.createForm();
-    }
-
-    private createFormItems(): FormItem[] {
-        return [this.createDateRangeFormItem()];
-    }
-
-    private createDateRangeFormItem(): FormItem {
-        this.dateRangeInput = new DateRangeInput();
-
-        this.dateRangeFormItem = new FormItemBuilder(this.dateRangeInput)
-            .setValidator((input: DateRangeInput) => input.validate())
-            .build();
-
-        return this.dateRangeFormItem;
-    }
-
-    private createForm(): void {
-        this.form = new Form(FormView.VALIDATION_CLASS);
-
-        const fieldSet: Fieldset = new Fieldset();
-
-        this.formItems.forEach((formItem: FormItem) => {
-            fieldSet.add(formItem);
-        });
-
-        this.form.add(fieldSet);
     }
 
     private fetchData(): Q.Promise<void> {
@@ -169,46 +111,17 @@ export class PublishReportDialog
             });
 
             this.comparisonsContainer.setTotalPublishedVersions(this.publishedVersions.length);
-            this.setInitialDateRangeValues();
+            this.comparisonsContainer.removeChildren();
+            this.filterVersionsByDateRange();
             this.subTitleEl.setHtml(this.content.getPath().toString());
-            this.dateRangeInput.setFirstPublishDate(this.content.getPublishFirstTime());
         }).finally(() => {
             this.loadMask.hide();
         });
     }
 
-    private setInitialDateRangeValues(): void {
-        this.dateRangeInput.setFromTo(this.getEarliestVersionPublishDate(), new Date());
-    }
-
-    private getEarliestVersionPublishDate(): Date {
-        let earliestPublishDate: Date = null;
-
-        this.publishedVersions.forEach((contentVersion: ContentVersion) => {
-            const versionPublishDate: Date = contentVersion.getPublishInfo().getTimestamp();
-
-            if (earliestPublishDate) {
-                earliestPublishDate =
-                    earliestPublishDate.getTime() < versionPublishDate.getTime() ? earliestPublishDate : versionPublishDate;
-            } else {
-                earliestPublishDate = versionPublishDate;
-            }
-        });
-
-        return earliestPublishDate ?? this.content.getPublishFirstTime();
-    }
-
-    private getFrom(): Date {
-        return this.dateRangeInput.getFrom();
-    }
-
-    private getTo(): Date {
-        return this.dateRangeInput.getTo();
-    }
-
     private filterVersionsByDateRange(): void {
-        const fromTime = this.getFrom()?.getTime();
-        const toTime = this.getTo()?.getTime();
+        const fromTime = this.fromDate.getTime();
+        const toTime = this.toDate.getTime();
 
         const filteredVersions: ContentVersion[] = this.publishedVersions.filter((contentVersion: ContentVersion) => {
             const versionPublishTime = contentVersion.getPublishInfo().getTimestamp()?.getTime();
@@ -221,11 +134,13 @@ export class PublishReportDialog
     }
 
     private fetchContent(): Q.Promise<ContentSummary> {
-        return new GetContentSummaryByIdRequest(this.contentId).sendAndParse();
+        this.contentPromise = this.contentPromise ?? new GetContentSummaryByIdRequest(this.contentId).sendAndParse();
+        return this.contentPromise;
     }
 
     private fetchVersions(): Q.Promise<ContentVersions> {
-        return new GetContentVersionsRequest(this.contentId).sendAndParse();
+        this.versionsPromise = this.versionsPromise ?? new GetContentVersionsRequest(this.contentId).sendAndParse();
+        return this.versionsPromise;
     }
 
 }
