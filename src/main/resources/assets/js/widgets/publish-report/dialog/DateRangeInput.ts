@@ -21,7 +21,7 @@ export class DateRangeInput extends FormInputEl {
     private limitToDate: Date;
 
     constructor() {
-        super('div', 'date-time-input');
+        super('div', 'date-range-input');
 
         this.from = new DatePickerBuilder().build().addClass('from') as DatePicker;
         this.to = new DatePickerBuilder().build().addClass('to') as DatePicker;
@@ -31,7 +31,7 @@ export class DateRangeInput extends FormInputEl {
         this.limitToDate = new Date(); // "To" value can't be later than current date
         this.limitToDate.setHours(23, 59, 59, 999);
 
-        this.appendChildren(labelFrom, labelTo, this.from as Element, this.to);
+        this.appendChildren(labelFrom, this.from as Element, labelTo, this.to);
 
         this.initListeners();
     }
@@ -96,10 +96,6 @@ export class DateRangeInput extends FormInputEl {
         this.to.setDateTime(null, false);
         this.toDate = null;
         this.setValue('', true, false);
-    }
-
-    hideFromPopup(): void {
-        this.from.hidePopup();
     }
 
     validate(): string {
