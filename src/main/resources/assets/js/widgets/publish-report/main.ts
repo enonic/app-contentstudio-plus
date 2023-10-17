@@ -6,6 +6,7 @@ import {PublishReportWidget} from './PublishReportWidget';
 
 void (async () => {
     const contentId = document.currentScript.getAttribute('data-content-id');
+    const publishFirstAsString = document.currentScript.getAttribute('data-publish-first');
     const configServiceUrl = document.currentScript.getAttribute('data-config-service-url');
     if (!configServiceUrl) {
         throw 'Missing \'data-config-service-url\' attribute';
@@ -23,6 +24,7 @@ void (async () => {
 
         const widget: PublishReportWidget = PublishReportWidget.get();
         widget.setContentId(contentId);
+        widget.setPublishFirstDateString(publishFirstAsString);
         widgetContainerEl.appendChild(widget);
 
         void widget.render();
