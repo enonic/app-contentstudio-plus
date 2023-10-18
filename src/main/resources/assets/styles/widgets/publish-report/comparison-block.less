@@ -1,17 +1,19 @@
 .comparison-block {
+  margin-bottom: 10px;
+  border-bottom: 1px solid @admin-dark-gray-border;
+  padding-bottom: 20px;
+
   .header {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     justify-content: space-between;
+    align-items: center;
     margin-bottom: 10px;
-
-    .form-input {
-      margin: 10px 25px 0;
-    }
   }
 
   .compare-element {
     display: block;
+    padding: 0;
 
     pre {
       white-space: pre-wrap;
@@ -44,6 +46,7 @@
 
     .header {
       margin-bottom: 5px;
+      flex-wrap: wrap;
 
       .form-input {
         margin: 5px 0;
