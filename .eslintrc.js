@@ -1,7 +1,10 @@
 module.exports = {
   extends: '@enonic/eslint-config',
   parserOptions: {
-    project: 'tsconfig.json',
+    project: [
+      './src/main/resources/tsconfig.json',
+      './src/main/resources/_static/tsconfig.json'
+    ],
     tsconfigRootDir: __dirname,
   },
   'rules': {

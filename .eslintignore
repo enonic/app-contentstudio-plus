@@ -1,7 +1,8 @@
-node_modules/
-build/
-dist/
-.xp/
+/build/
+/dist/
+/node_modules/
+/tsup/
+/.xp/
 **/*.js
 **/*.d.ts
 **/spec/**

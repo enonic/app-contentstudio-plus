@@ -1,7 +1,7 @@
-const ErrorLoggerPlugin = require('error-logger-webpack-plugin');
+// const ErrorLoggerPlugin = require('error-logger-webpack-plugin');
 const CircularDependencyPlugin = require('circular-dependency-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const ProvidePlugin = require('webpack/lib/ProvidePlugin');
+// const ProvidePlugin = require('webpack/lib/ProvidePlugin');
 const TerserPlugin = require('terser-webpack-plugin');
 
 const path = require('path');
@@ -13,12 +13,12 @@ const assets = path.join(__dirname, '/build/resources/main/assets');
 module.exports = {
     context: path.join(__dirname, '/src/main/resources/assets'),
     entry: {
-        'js/archive': './js/archive.ts',
-        'js/main': './js/main.ts',
+        // 'js/archive': './js/archive.ts',
+        // 'js/main': './js/main.ts',
         'styles/main': './styles/main.less',
-        'js/widgets/layers': './js/widgets/layers/main.ts',
-        'js/widgets/variants': './js/widgets/variants/main.ts',
-        'js/widgets/publish-report': './js/widgets/publish-report/main.ts',
+        // 'js/widgets/layers': './js/widgets/layers/main.ts',
+        // 'js/widgets/variants': './js/widgets/variants/main.ts',
+        // 'js/widgets/publish-report': './js/widgets/publish-report/main.ts',
         'styles/widgets/layers': './styles/widgets/layers/main.less',
         'styles/widgets/variants': './styles/widgets/variants/main.less',
         'styles/widgets/publish-report': './styles/widgets/publish-report/main.less',
@@ -29,14 +29,17 @@ module.exports = {
         filename: './[name].js'
     },
     resolve: {
-        extensions: ['.ts', '.js', '.less', '.css']
+        extensions: [
+            // '.ts', '.js',
+            '.less', '.css'
+        ]
     },
     module: {
         rules: [
-            {
-                test: /\.tsx?$/,
-                use: [{loader: 'ts-loader', options: {configFile: 'tsconfig.json'}}]
-            },
+            // {
+            //     test: /\.tsx?$/,
+            //     use: [{loader: 'ts-loader', options: {configFile: 'tsconfig.json'}}]
+            // },
             {
                 test: /\.less$/,
                 use: [
@@ -56,26 +59,26 @@ module.exports = {
             }
         ]
     },
-    optimization: {
-        minimizer: [
-            new TerserPlugin({
-                extractComments: false,
-                terserOptions: {
-                    compress: {
-                        drop_console: false
-                    },
-                    keep_classnames: true,
-                    keep_fnames: true
-                }
-            })
-        ]
-    },
+    // optimization: {
+    //     minimizer: [
+    //         new TerserPlugin({
+    //             extractComments: false,
+    //             terserOptions: {
+    //                 compress: {
+    //                     drop_console: false
+    //                 },
+    //                 keep_classnames: true,
+    //                 keep_fnames: true
+    //             }
+    //         })
+    //     ]
+    // },
     plugins: [
-        new ProvidePlugin({
-            $: 'jquery',
-            jQuery: 'jquery',
-            'window.jQuery': 'jquery'
-        }),
+        // new ProvidePlugin({
+        //     $: 'jquery',
+        //     jQuery: 'jquery',
+        //     'window.jQuery': 'jquery'
+        // }),
         new MiniCssExtractPlugin({
             filename: '[name].css',
             chunkFilename: './styles/[id].css'

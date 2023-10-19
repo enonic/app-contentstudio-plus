@@ -1,0 +1,24 @@
+{
+    "compilerOptions": {
+        "esModuleInterop": true, // import Q from 'q';
+        "module": "commonjs",
+        "target": "es5",
+        "sourceMap": true,
+        "types": [
+            "jquery",
+            "jqueryui",
+            "q"
+        ],
+        "lib": [
+            "es2015",
+            "es2015.promise",
+            "dom"
+        ]
+    },
+    "exclude": [
+        "./**/*.d.ts"
+    ],
+    "include": [
+        "./**/*.ts"
+    ]
+}
