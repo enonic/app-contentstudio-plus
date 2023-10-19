@@ -1,6 +1,7 @@
+import type {Element} from '@enonic/lib-admin-ui/dom/Element';
+
 import {i18nAdd} from '@enonic/lib-admin-ui/util/MessagesInitializer';
 import {Body} from '@enonic/lib-admin-ui/dom/Body';
-import {Element} from '@enonic/lib-admin-ui/dom/Element';
 import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
 import {ArchiveAppContainer} from './ArchiveAppContainer';
 
