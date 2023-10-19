@@ -9,9 +9,11 @@ import {ContentVersion} from 'lib-contentstudio/app/ContentVersion';
 import {ComparisonsContainer} from './ComparisonsContainer';
 import {Action} from '@enonic/lib-admin-ui/ui/Action';
 import {Body} from '@enonic/lib-admin-ui/dom/Body';
-import {GetContentSummaryByIdRequest} from 'lib-contentstudio/app/resource/GetContentSummaryByIdRequest';
+import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import {ContentSummary} from 'lib-contentstudio/app/content/ContentSummary';
+import {GetContentSummaryByIdRequest} from 'lib-contentstudio/app/resource/GetContentSummaryByIdRequest';
 import {H6El} from '@enonic/lib-admin-ui/dom/H6El';
+import {ArchiveContentFetcher} from '../../../ArchiveContentFetcher';
 
 export class PublishReportDialog
     extends ModalDialog {
@@ -22,11 +24,13 @@ export class PublishReportDialog
 
     private content: ContentSummary;
 
+    private isContentArchived: boolean;
+
     private publishedVersions: ContentVersion[];
 
     private comparisonsContainer: ComparisonsContainer;
 
-    private contentPromise: Q.Promise<ContentSummary>;
+    private contentPromise: Q.Promise<ContentSummary> | Q.Promise<ContentSummaryAndCompareStatus>;
 
     private versionsPromise: Q.Promise<ContentVersions>;
 
@@ -59,6 +63,11 @@ export class PublishReportDialog
     setFromTo(from: Date, to?: Date): PublishReportDialog {
         this.fromDate = from;
         this.toDate = to ?? new Date();
+        return this;
+    }
+
+    setIsContentArchived(value: boolean): PublishReportDialog {
+        this.isContentArchived = value;
         return this;
     }
 
@@ -133,8 +142,10 @@ export class PublishReportDialog
         this.comparisonsContainer.setFilteredVersions(filteredVersions);
     }
 
-    private fetchContent(): Q.Promise<ContentSummary> {
-        this.contentPromise = this.contentPromise ?? new GetContentSummaryByIdRequest(this.contentId).sendAndParse();
+    private fetchContent(): Q.Promise<ContentSummary> | Q.Promise<ContentSummaryAndCompareStatus> {
+        this.contentPromise = this.contentPromise ??
+            (this.isContentArchived ? new ArchiveContentFetcher().fetch(this.contentId) : new GetContentSummaryByIdRequest(this.contentId).sendAndParse());
+
         return this.contentPromise;
     }
 

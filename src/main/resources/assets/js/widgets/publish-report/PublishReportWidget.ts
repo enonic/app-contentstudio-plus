@@ -27,6 +27,8 @@ export class PublishReportWidget
 
     private dateRangeFormItem: FormItem;
 
+    private isContentArchived: boolean;
+
     constructor() {
         super(AppHelper.getPublishReportWidgetClass());
     }
@@ -43,6 +45,12 @@ export class PublishReportWidget
         const publishFirst = new Date(value);
         this.dateRangeInput.setFromTo(publishFirst, new Date());
         this.dateRangeInput.setFirstPublishDate(publishFirst);
+
+        return this;
+    }
+
+    setIsContentArchived(value: boolean): this {
+        this.isContentArchived = value;
 
         return this;
     }
@@ -90,6 +98,7 @@ export class PublishReportWidget
             PublishReportDialog.get()
                 .setContentId(this.contentId)
                 .setFromTo(this.dateRangeInput.getFrom(), this.dateRangeInput.getTo())
+                .setIsContentArchived(this.isContentArchived)
                 .open();
         });
 
