@@ -11,8 +11,7 @@
     "build": "webpack --color",
     "lint": "eslint **/*.ts",
     "lint:quiet": "eslint --quiet **/*.ts",
-    "fix": "eslint --fix **/*.ts",
-    "postinstall": "cd node_modules/lib-contentstudio && npm install"
+    "fix": "eslint --fix **/*.ts"
   },
   "dependencies": {
     "@enonic/lib-admin-ui": "file:./.xp/dev/lib-admin-ui",
