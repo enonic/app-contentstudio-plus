@@ -48,6 +48,7 @@ function get(_r: Request): Response {
         configServiceUrl: serviceUrl({service: 'config'}),
         launcherPath: getLauncherPath()
     };
+    // log.debug('params:%s', JSON.stringify(params, null, 4));
 
     return {
         contentType: 'text/html',
