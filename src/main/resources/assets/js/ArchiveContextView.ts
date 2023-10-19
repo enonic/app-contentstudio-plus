@@ -1,5 +1,6 @@
 import {ContextView} from 'lib-contentstudio/app/view/context/ContextView';
 import * as Q from 'q';
+import {Widget} from '@enonic/lib-admin-ui/content/Widget';
 import {WidgetView} from 'lib-contentstudio/app/view/context/WidgetView';
 import {WidgetItemView} from 'lib-contentstudio/app/view/context/WidgetItemView';
 import {AttachmentsWidgetItemView} from 'lib-contentstudio/app/view/context/widget/details/AttachmentsWidgetItemView';
@@ -8,11 +9,12 @@ import {ArchiveStatusWidgetItemView} from './widgets/ArchiveStatusWidgetItemView
 import {ArchiveContentViewItem} from './ArchiveContentViewItem';
 import {ArchivePropertiesWidgetItemView} from './widgets/ArchivePropertiesWidgetItemView';
 import {ArchiveWidgetItemView} from './widgets/ArchiveWidgetItemView';
+import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
 
 export class ArchiveContextView
     extends ContextView {
 
-    private archiveItem: ArchiveContentViewItem;
+    private static allowedWidgetIds = ['publish-report'];
 
     private archiveWidgetItemView: ArchiveWidgetItemView;
 
@@ -20,18 +22,23 @@ export class ArchiveContextView
 
     constructor() {
         super();
-
         this.addClass('archive-context-view');
     }
 
-    getCustomWidgetViewsAndUpdateDropdown(): Q.Promise<void> {
-        this.widgetsSelectionRow.updateWidgetsDropdown(this.widgetViews);
-        return Q();
+    protected fetchCustomWidgetViews(): Q.Promise<Widget[]> {
+        const appId = CONFIG.getString('appId');
+        const allowedWidgetIds = ArchiveContextView.allowedWidgetIds.map((widgetId: string) =>
+            // If allowed widgetId is missing appId, assume it's from the Content Studio+ app
+            widgetId.split(':').length == 2 ? widgetId : `${appId}:${widgetId}`
+        );
+        const allowedWidgets = super.fetchCustomWidgetViews().then((widgets: Widget[]) =>
+            widgets.filter((widget: Widget) => allowedWidgetIds.indexOf(widget.getWidgetDescriptorKey().toString()) > -1)
+        );
+
+        return Q(allowedWidgets);
     }
 
     setArchiveItem(item: ArchiveContentViewItem): void {
-        this.archiveItem = item;
-
         if (item) {
             this.archiveWidgetItemView.whenRendered(() => {
                 this.archiveWidgetItemView.setSubName(item.getOriginalFullPath());

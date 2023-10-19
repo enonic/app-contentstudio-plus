@@ -1,5 +1,6 @@
 const portal = require('/lib/xp/portal');
 const contentLib = require('/lib/xp/content');
+const contextLib = require('/lib/xp/context');
 const mustache = require('/lib/mustache');
 
 const handleGet = (req) => {
@@ -22,7 +23,7 @@ const makeParamsNoContentId = () => {
     }
 }
 
-const makeParams = (content) => {
+const makeParams = (content, isArchived) => {
     return {
         contentId: content._id || '',
         stylesUri: portal.assetUrl({
@@ -35,17 +36,43 @@ const makeParams = (content) => {
         isNoIdMode: false,
         publishFirst: content.publish.first,
         isNormalMode: !!content.publish.first,
-        isNoPublishMode: !content.publish.first
+        isNoPublishMode: !content.publish.first,
+        isArchived
     }
+}
+
+const getContent = (contentId) => {
+    return contentLib.get({
+        key: contentId
+    });
+}
+
+const getContentFromArchive = (contentId, repository) => {
+    return contextLib.run({
+            repository: repository,
+            attributes: {
+                contentRootPath: __.newBean('com.enonic.xp.app.contentstudio.plus.AdminBean').getArchiveRootPath()
+            }
+        }, () => getContent(contentId)
+    );
 }
 
 const getViewParams = (req) => {
     const contentId = getContentId(req);
+    let isArchived = false;
 
     if (contentId) {
-        const content = contentLib.get({key: contentId});
+        let content = getContent(contentId);
+        if (!content) {
+            content = getContentFromArchive(contentId, req.params.repository);
+            if (content) {
+                isArchived = true;
+            }
+        }
 
-        return makeParams(content);
+        if (content) {
+            return makeParams(content, isArchived);
+        }
     }
 
     return makeParamsNoContentId();
