@@ -20,12 +20,13 @@ export default function buildStaticConfig(): Options {
             'widgets/variants': `${DIR_SRC_STATIC}/widgets/variants/main.ts`,
             'widgets/publish-report': `${DIR_SRC_STATIC}/widgets/publish-report/main.ts`,
         },
-        // esbuildOptions(options, context) {
+        esbuildOptions(options, context) {
             // options.banner = {
             //     js: `const jQuery = $;` // jQuery UI Tabbable requires this
             // };
+            options.keepNames = true;
             // options.outbase = DIR_SRC_STATIC;
-        // },
+        },
         esbuildPlugins: [
             esbuildPluginExternalGlobal.externalGlobalPlugin({
                 'jquery': 'window.$'
