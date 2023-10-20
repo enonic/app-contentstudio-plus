@@ -128,16 +128,16 @@ export class ComparisonBlock
     }
 
     private fetchVersionPromise(version: ContentVersion): Q.Promise<Object> {
-        const versionId = version.getId();
+        const versionId: string = version.getId();
 
         if (ComparisonBlock.cache.has(versionId)) {
             return ComparisonBlock.cache.get(versionId);
         }
 
-        const promise = new GetContentVersionRequest(this.contentId)
+        const promise: Q.Promise<ContentJson> = new GetContentVersionRequest(this.contentId)
             .setVersion(versionId)
-            .sendRequest().then(content => {
-                return ComparisonHelper.processContentJson(content, version);
+            .sendRequest().then((content: ContentJson) => {
+                return ComparisonHelper.processContentJson(content);
             });
 
         ComparisonBlock.cache.set(version.getId(), promise);
