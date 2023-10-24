@@ -24,7 +24,7 @@
   },
   "devDependencies": {
     "@enonic/eslint-config": "^1.2.0",
-    "@types/jquery": "^3.5.22",
+    "@types/jquery": "^3.5.25",
     "@types/jqueryui": "^1.12.18",
     "@types/normalize-url": "^4.2.0",
     "@types/q": "^1.5.7",
