@@ -3,6 +3,9 @@ const contentLib = require('/lib/xp/content');
 const contextLib = require('/lib/xp/context');
 const mustache = require('/lib/mustache');
 
+
+const defaultContainerId = 'cs-plus-widget-publish-report';
+
 const handleGet = (req) => {
     return renderWidgetView(req);
 }
@@ -19,7 +22,8 @@ const getContentId = (req) => {
 
 const makeParamsNoContentId = () => {
     return {
-        isNoIdMode: true
+        isNoIdMode: true,
+        containerId: defaultContainerId,
     }
 }
 
@@ -37,6 +41,7 @@ const makeParams = (content, isArchived) => {
         publishFirst: content.publish.first,
         isNormalMode: !!content.publish.first,
         isNoPublishMode: !content.publish.first,
+        containerId: defaultContainerId + (isArchived ? '-archived' : ''),
         isArchived
     }
 }

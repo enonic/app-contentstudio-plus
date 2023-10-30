@@ -12,13 +12,15 @@ void (async () => {
 
     const contentId = document.currentScript.getAttribute('data-content-id');
     const publishFirstAsString = document.currentScript.getAttribute('data-publish-first');
-    const isArchived = document.currentScript.getAttribute('data-archived');
+    const isArchivedAttrValue = document.currentScript.getAttribute('data-archived');
+    const isArchived = Boolean(isArchivedAttrValue == 'true');
 
     await CONFIG.init(configServiceUrl);
     await i18nInit(CONFIG.getString('services.i18nUrlStudio'));
     await i18nAdd(CONFIG.getString('services.i18nUrl'));
 
-    const widgetContainer = document.getElementById(AppHelper.getPublishReportWidgetClass());
+    const containerId = AppHelper.getPublishReportWidgetClass() + (isArchived ? '-archived' : '');
+    const widgetContainer = document.getElementById(containerId);
 
     if (widgetContainer) {
         const widgetContainerEl = Element.fromHtmlElement((widgetContainer), true);
@@ -27,7 +29,7 @@ void (async () => {
         const widget: PublishReportWidget =
             PublishReportWidget.get()
             .setPublishFirstDateString(publishFirstAsString)
-            .setIsContentArchived(Boolean(isArchived == 'true'));
+            .setIsContentArchived(isArchived);
 
         widget.setContentId(contentId);
 
