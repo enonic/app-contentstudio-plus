@@ -4,21 +4,47 @@ import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {ContentId} from 'lib-contentstudio/app/content/ContentId';
 import {ComparisonBlock} from './ComparisonBlock';
 import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
-import {ComparisonMode} from './ComparisonMode';
+import * as Q from 'q';
+import {DateHelper} from '@enonic/lib-admin-ui/util/DateHelper';
+import {TextAndDateBlock} from './TextAndDateBlock';
+
+interface PublishState {
+    isPublished: boolean;
+    timestamp: Date;
+}
 
 export class ComparisonsContainer
     extends DivEl {
 
     private static CLASS_NAME: string = 'comparisons-container';
 
-    private filteredPublishedVersions: ContentVersion[];
+    private allVersions: ContentVersion[];
 
     private contentId: ContentId;
 
-    private totalPublishedVersions: number = 0;
+    private from: Date;
+
+    private to: Date;
+
+    private readonly stateAfterBlock: TextAndDateBlock;
+
+    private readonly comparisonsBlock: DivEl;
+
+    private readonly stateBeforeBlock: TextAndDateBlock;
 
     constructor() {
         super(ComparisonsContainer.CLASS_NAME);
+
+        this.stateAfterBlock = new TextAndDateBlock('state-after-block');
+        this.comparisonsBlock = new DivEl('comparisons-block');
+        this.stateBeforeBlock = new TextAndDateBlock('state-before-block');
+    }
+
+    doRender(): Q.Promise<boolean> {
+        return super.doRender().then((rendered: boolean) => {
+            this.appendChildren(this.stateAfterBlock, this.comparisonsBlock, this.stateBeforeBlock);
+            return rendered;
+        });
     }
 
     setContentId(contentId: ContentId): this {
@@ -26,25 +52,117 @@ export class ComparisonsContainer
         return this;
     }
 
-    setTotalPublishedVersions(totalPublishedVersions: number): this {
-        this.totalPublishedVersions = totalPublishedVersions;
+    setFromTo(from: Date, to?: Date): this {
+        this.from = from;
+        this.to = to;
         return this;
     }
 
-    setFilteredVersions(versions: ContentVersion[]): this {
-        this.filteredPublishedVersions = versions;
+    clean(): this {
+        this.comparisonsBlock.removeChildren();
+        return this;
+    }
 
-        if (this.totalPublishedVersions === 0) {
+    setAllVersions(versions: ContentVersion[]): this {
+        this.allVersions = versions;
+
+        let hasAnyPublishedVersions: boolean = false;
+        let lastBeforeToVersion: PublishState = null; // last Published/Unpublished version before TO date
+        let lastBeforeFromVersion: PublishState = null; // last Published/Unpublished version before FROM date
+        let firstPublishAfterFrom: Date = null; // first Published version after FROM date
+
+        let totalPublishedWithinFromTo: number = 0;
+        let newerVersion: ContentVersion = null;
+        let offlineVersionInBetween: PublishState = null;
+
+
+        this.allVersions.forEach((v: ContentVersion) => {
+            const timestamp: Date = this.getVersionTimestamp(v);
+            const isPublished: boolean = this.isPublished(v);
+
+            if (isPublished) {
+                hasAnyPublishedVersions = true;
+            }
+
+            if (this.isAfterTo(timestamp.getTime())) {
+                // skip, not interested in versions after TO date
+            } else if (this.isWithinFromTo(timestamp.getTime())) { // versions within FROM and TO, interested only in PUB/UNPUPLISHED ones
+                if (isPublished) {
+                    totalPublishedWithinFromTo++;
+                    firstPublishAfterFrom = timestamp;
+
+                    if (!lastBeforeToVersion) {
+                        lastBeforeToVersion = {isPublished: true, timestamp: timestamp};
+                    }
+
+                    if (newerVersion) {
+                        this.compareVersions(newerVersion, v, offlineVersionInBetween?.timestamp);
+                        newerVersion = v;
+                        offlineVersionInBetween = null;
+                    } else {
+                        newerVersion = v;
+                    }
+                } else if (this.isUnpublished(v)) {
+                    if (!lastBeforeToVersion) {
+                        lastBeforeToVersion = {isPublished: false, timestamp: timestamp};
+                    }
+
+
+                    offlineVersionInBetween = {isPublished: false, timestamp: timestamp};
+                }
+
+            } else { // before from
+                if (!lastBeforeFromVersion) {
+                    if (isPublished) {
+                        lastBeforeFromVersion = {isPublished: true, timestamp: timestamp};
+                    } else if (this.isUnpublished(v)) {
+                        lastBeforeFromVersion = {isPublished: false, timestamp: timestamp};
+                    }
+                }
+            }
+
+        });
+
+        this.updateHeading(lastBeforeToVersion);
+        this.updateFooter(lastBeforeFromVersion, firstPublishAfterFrom);
+
+        if (!hasAnyPublishedVersions) {
             this.handleNoAnyPublishVersions();
-        } else if (versions.length === 0) {
+        } else if (totalPublishedWithinFromTo === 0) {
             this.handleNoPublishVersionsWithinPeriod();
-        } else if (versions.length === 1) {
-            this.handleSinglePublishVersionWithingPeriod();
-        } else {
-           this.handePublishVersions();
+        } else if (totalPublishedWithinFromTo === 1) {
+            this.handleSinglePublishVersionWithingPeriod(newerVersion);
         }
 
         return this;
+    }
+
+    private isWithinFromTo(time: number): boolean {
+        return time && (this.from ? time >= this.from.getTime() : true) && (this.to ? time <= this.to.getTime() : true);
+    }
+
+    private isAfterTo(time: number): boolean {
+        return time && (this.to ? time > this.to.getTime() : false);
+    }
+
+    private isBeforeFrom(time: number): boolean {
+        return time && (this.from ? time < this.from.getTime() : false);
+    }
+
+    private isPublished(v: ContentVersion): boolean {
+        return v.hasPublishInfo() && v.getPublishInfo().isPublished() && !v.getPublishInfo().isScheduled();
+    }
+
+    private isUnpublished(v: ContentVersion): boolean {
+        return v.getPublishInfo()?.isUnpublished();
+    }
+
+    private getVersionTimestamp(version: ContentVersion): Date {
+        if (version.hasPublishInfo()) {
+            return version.getPublishInfo().getTimestamp();
+        }
+
+        return version.getTimestamp();
     }
 
     private handleNoAnyPublishVersions(): void {
@@ -57,38 +175,44 @@ export class ComparisonsContainer
         this.setHtml(i18n('widget.publishReport.mode.offline'));
     }
 
-    private handleSinglePublishVersionWithingPeriod(): void {
+    private handleSinglePublishVersionWithingPeriod(singleVersion: ContentVersion): void {
         this.setModeClass('single-publish-version');
-        this.addDisplayEntireContentBlock(this.filteredPublishedVersions[0]);
+        this.addDisplayEntireContentBlock(singleVersion);
     }
 
-    private handePublishVersions(): void {
-        this.setModeClass('multi-publish-versions');
-
-        this.filteredPublishedVersions.forEach((v1: ContentVersion, index: number) => {
-            const v2: ContentVersion = this.filteredPublishedVersions[index + 1];
-
-            if (v2) {
-                this.addComparisonBlock(v1, v2);
-            }
-        });
-    }
-
-    private addComparisonBlock(v1: ContentVersion, v2: ContentVersion, mode?: ComparisonMode): void {
-        const comparisonBlock: ComparisonBlock = new ComparisonBlock(mode)
+    private compareVersions(v1: ContentVersion, v2?: ContentVersion, offline?: Date): void {
+        const comparisonBlock: ComparisonBlock = new ComparisonBlock()
             .setContentId(this.contentId)
+            .setOfflineFrom(offline)
             .setVersions(v1, v2);
 
-        this.appendChild(comparisonBlock);
+        this.comparisonsBlock.appendChild(comparisonBlock);
 
         comparisonBlock.load().catch(DefaultErrorHandler.handle);
     }
 
     private addDisplayEntireContentBlock(version: ContentVersion): void {
-        this.addComparisonBlock(version, version, ComparisonMode.DISPLAY_SINGLE);
+        this.compareVersions(version);
     }
 
     private setModeClass(className: string): void {
         this.setClass(`${ComparisonsContainer.CLASS_NAME} ${className}`);
+    }
+
+    private updateHeading(publishState?: PublishState): void {
+        const dateToUse: Date = publishState ? publishState.timestamp : this.to;
+        const dateAsString: string = DateHelper.formatDateTime(dateToUse);
+        const text = publishState?.isPublished ?
+                     i18n('widget.publishReport.state.online.after') :
+                     i18n('widget.publishReport.state.offline.after');
+        this.stateAfterBlock.setEntry(text, dateAsString);
+    }
+
+    private updateFooter(publishStateBeforeFrom?: PublishState, firstPublishAfterFrom?: Date): void {
+        const dateAsString: string = DateHelper.formatDateTime(firstPublishAfterFrom || this.from);
+        const text = publishStateBeforeFrom?.isPublished ?
+                     i18n('widget.publishReport.state.online.before') :
+                     i18n('widget.publishReport.state.offline.before');
+        this.stateBeforeBlock.setEntry(text, dateAsString);
     }
 }
