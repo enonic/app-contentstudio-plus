@@ -10,8 +10,9 @@ import {ContentId} from 'lib-contentstudio/app/content/ContentId';
 import {DateHelper} from '@enonic/lib-admin-ui/util/DateHelper';
 import {LoadMask} from '@enonic/lib-admin-ui/ui/mask/LoadMask';
 import {ComparisonHelper} from './ComparisonHelper';
-import {ComparisonTitle} from './ComparisonTitle';
+import {TextAndDateBlock} from './TextAndDateBlock';
 import {ComparisonMode} from './ComparisonMode';
+import {SpanEl} from '@enonic/lib-admin-ui/dom/SpanEl';
 
 export class ComparisonBlock
     extends DivEl {
@@ -22,9 +23,9 @@ export class ComparisonBlock
 
     private readonly headerElement: DivEl;
 
-    private readonly titleElement: ComparisonTitle;
+    private readonly titleElement: TextAndDateBlock;
 
-    private readonly changesCheckbox?: Checkbox;
+    private readonly changesCheckbox: Checkbox;
 
     private readonly loadMask: LoadMask;
 
@@ -33,28 +34,27 @@ export class ComparisonBlock
 
     private readonly htmlFormatter: HtmlFormatter;
 
-    private readonly mode: ComparisonMode;
-
 
     private contentId: ContentId;
 
     private newerVersion: ContentVersion;
 
-    private olderVersion: ContentVersion;
+    private olderVersion?: ContentVersion;
 
-    constructor(mode?: ComparisonMode) {
+    private offlineFrom?: Date;
+
+    constructor() {
         super('comparison-block');
 
-        this.mode = mode ?? ComparisonMode.COMPARE;
         this.diffPatcher = new DiffPatcher();
         this.htmlFormatter = formatters.html;
 
         this.diffElement = new DivEl('compare-element jsondiffpatch-delta');
         this.headerElement = new DivEl('header');
-        this.titleElement = new ComparisonTitle(this.mode);
+        this.titleElement = new TextAndDateBlock();
         this.loadMask = new LoadMask(this.diffElement);
 
-        this.changesCheckbox = this.isCompareMode() ? new CheckboxBuilder().setLabelText(i18n('field.content.showEntire')).build() : null;
+        this.changesCheckbox = new CheckboxBuilder().setLabelText(i18n('field.content.showEntire')).build();
 
         this.initListeners();
     }
@@ -64,28 +64,40 @@ export class ComparisonBlock
         return this;
     }
 
-    setVersions(newerVersion: ContentVersion, olderVersion: ContentVersion): this {
+    setVersions(newerVersion: ContentVersion, olderVersion?: ContentVersion): this {
         this.newerVersion = newerVersion;
         this.olderVersion = olderVersion;
+
+        this.changesCheckbox.setVisible(!!olderVersion);
+
+        return this;
+    }
+
+    setOfflineFrom(from: Date): this {
+        this.offlineFrom = from;
         return this;
     }
 
     doRender(): Q.Promise<boolean> {
         return super.doRender().then((rendered: boolean) => {
             this.headerElement.appendChild(this.titleElement);
+            this.headerElement.appendChild(this.changesCheckbox);
 
-            if (this.isCompareMode()) {
-                this.headerElement.appendChild(this.changesCheckbox);
+
+            this.appendChild(this.headerElement);
+
+            if (this.offlineFrom) {
+                this.appendChild(this.createOfflineSubtitle());
             }
 
-            this.appendChildren(this.headerElement, this.diffElement);
+            this.appendChild(this.diffElement);
 
             return rendered;
         });
     }
 
     load(): Q.Promise<void> {
-        this.htmlFormatter.showUnchanged(this.isDisplaySingleMode(), this.diffElement.getHTMLElement(), 0);
+        this.htmlFormatter.showUnchanged(!this.olderVersion, this.diffElement.getHTMLElement(), 0);
 
         const promises = [
             this.fetchVersionPromise(this.newerVersion),
@@ -97,8 +109,8 @@ export class ComparisonBlock
         this.loadMask.show();
         this.addClass('loading');
 
-        return Q.all(promises).spread((newerVersionJson: Object, olderVersionJson: Object) => {
-            if (this.isCompareMode()) {
+        return Q.all(promises).spread((newerVersionJson: Object, olderVersionJson?: Object) => {
+            if (this.olderVersion) {
                 this.displayDiff(newerVersionJson, olderVersionJson);
             } else {
                 this.displaySingleVersion(newerVersionJson);
@@ -122,12 +134,16 @@ export class ComparisonBlock
     }
 
     private initListeners(): void {
-        this.changesCheckbox?.onValueChanged(event => {
+        this.changesCheckbox.onValueChanged(event => {
             this.htmlFormatter.showUnchanged(event.getNewValue() === 'true', this.diffElement.getHTMLElement(), 0);
         });
     }
 
     private fetchVersionPromise(version: ContentVersion): Q.Promise<Object> {
+        if (!version) {
+            return Q.resolve(null);
+        }
+
         const versionId: string = version.getId();
 
         if (ComparisonBlock.cache.has(versionId)) {
@@ -147,16 +163,34 @@ export class ComparisonBlock
 
     private updateHeader(): void {
         const newerVersionDate = DateHelper.formatDateTime(this.newerVersion.getPublishInfo().getTimestamp());
-        const olderVersionDate = this.isCompareMode() ? DateHelper.formatDateTime(this.olderVersion.getPublishInfo().getTimestamp()) : null;
-        this.titleElement.setDates(newerVersionDate, olderVersionDate);
+        const olderVersionDate = this.olderVersion ? DateHelper.formatDateTime(this.olderVersion.getPublishInfo().getTimestamp()) : null;
+
+        if (olderVersionDate) {
+            this.titleElement
+                .setEntry(i18n('widget.publishReport.dateRange.compare.title.part1'), olderVersionDate)
+                .addEntry(i18n('widget.publishReport.dateRange.compare.title.part2'), newerVersionDate);
+        } else {
+            this.titleElement.setEntry(i18n('status.published'), newerVersionDate);
+        }
     }
 
-    private isCompareMode(): boolean {
-        return this.mode === ComparisonMode.COMPARE;
+    private createOfflineSubtitle(): TextAndDateBlock {
+        const subtitle = new TextAndDateBlock('subtitle');
+        const text1 = i18n('widget.publishReport.dateRange.compare.subtitle.part1');
+        const datePart1 = DateHelper.formatDateTime(this.offlineFrom);
+        const text2 = i18n('widget.publishReport.dateRange.compare.subtitle.part2');
+        const datePart2 = DateHelper.formatDateTime(this.newerVersion.getPublishInfo().getTimestamp());
+
+        subtitle.setEntry(text1, datePart1).addEntry(text2, datePart2);
+
+        return subtitle;
     }
 
-    private isDisplaySingleMode(): boolean {
-        return this.mode === ComparisonMode.DISPLAY_SINGLE;
+    private makeTextPart(text: string, className: string): SpanEl {
+        return new SpanEl(className).setHtml(text);
     }
 
+    private makeDatePart(date: Date, className: string): SpanEl {
+        return new SpanEl(className).setHtml(DateHelper.formatDateTime(date));
+    }
 }

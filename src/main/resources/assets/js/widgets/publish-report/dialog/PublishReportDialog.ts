@@ -5,7 +5,6 @@ import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import {ContentId} from 'lib-contentstudio/app/content/ContentId';
 import {GetContentVersionsRequest} from 'lib-contentstudio/app/resource/GetContentVersionsRequest';
 import {ContentVersions} from 'lib-contentstudio/app/ContentVersions';
-import {ContentVersion} from 'lib-contentstudio/app/ContentVersion';
 import {ComparisonsContainer} from './ComparisonsContainer';
 import {Action} from '@enonic/lib-admin-ui/ui/Action';
 import {Body} from '@enonic/lib-admin-ui/dom/Body';
@@ -25,8 +24,6 @@ export class PublishReportDialog
     private content: ContentSummary;
 
     private isContentArchived: boolean;
-
-    private publishedVersions: ContentVersion[];
 
     private comparisonsContainer: ComparisonsContainer;
 
@@ -85,7 +82,7 @@ export class PublishReportDialog
     }
 
     open(): void {
-        this.comparisonsContainer.removeChildren();
+        this.comparisonsContainer.clean();
 
         super.open();
 
@@ -113,38 +110,17 @@ export class PublishReportDialog
 
         return Q.all([this.fetchContent(), this.fetchVersions()]).spread((content: ContentSummary, versions: ContentVersions) => {
             this.content = content;
-
-            this.publishedVersions = versions.get().filter((contentVersion: ContentVersion) => {
-                const publishInfo = contentVersion.getPublishInfo();
-                return publishInfo?.isPublished() && !publishInfo.isScheduled();
-            });
-
-            this.comparisonsContainer.setTotalPublishedVersions(this.publishedVersions.length);
-            this.comparisonsContainer.removeChildren();
-            this.filterVersionsByDateRange();
+            this.comparisonsContainer.clean();
+            this.comparisonsContainer.setFromTo(this.fromDate, this.toDate).setAllVersions(versions.get());
             this.subTitleEl.setHtml(this.content.getPath().toString());
         }).finally(() => {
             this.loadMask.hide();
         });
     }
 
-    private filterVersionsByDateRange(): void {
-        const fromTime = this.fromDate.getTime();
-        const toTime = this.toDate.getTime();
-
-        const filteredVersions: ContentVersion[] = this.publishedVersions.filter((contentVersion: ContentVersion) => {
-            const versionPublishTime = contentVersion.getPublishInfo().getTimestamp()?.getTime();
-            return versionPublishTime &&
-                   (fromTime ? versionPublishTime >= fromTime : true) &&
-                   (toTime ? versionPublishTime <= toTime : true);
-        });
-
-        this.comparisonsContainer.setFilteredVersions(filteredVersions);
-    }
-
     private fetchContent(): Q.Promise<ContentSummary> | Q.Promise<ContentSummaryAndCompareStatus> {
         this.contentPromise = this.contentPromise ??
-            (this.isContentArchived ? new ArchiveContentFetcher().fetch(this.contentId) : new GetContentSummaryByIdRequest(this.contentId).sendAndParse());
+                              (this.isContentArchived ? new ArchiveContentFetcher().fetch(this.contentId) : new GetContentSummaryByIdRequest(this.contentId).sendAndParse());
 
         return this.contentPromise;
     }
