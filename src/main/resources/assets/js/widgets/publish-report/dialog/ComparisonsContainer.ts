@@ -26,8 +26,6 @@ export class ComparisonsContainer
 
     private to: Date;
 
-    private readonly stateAfterBlock: TextAndDateBlock;
-
     private readonly comparisonsBlock: DivEl;
 
     private readonly stateBeforeBlock: TextAndDateBlock;
@@ -35,14 +33,13 @@ export class ComparisonsContainer
     constructor() {
         super(ComparisonsContainer.CLASS_NAME);
 
-        this.stateAfterBlock = new TextAndDateBlock('state-after-block');
         this.comparisonsBlock = new DivEl('comparisons-block');
         this.stateBeforeBlock = new TextAndDateBlock('state-before-block');
     }
 
     doRender(): Q.Promise<boolean> {
         return super.doRender().then((rendered: boolean) => {
-            this.appendChildren(this.stateAfterBlock, this.comparisonsBlock, this.stateBeforeBlock);
+            this.appendChildren(this.comparisonsBlock, this.stateBeforeBlock);
             return rendered;
         });
     }
@@ -123,7 +120,6 @@ export class ComparisonsContainer
 
         });
 
-        this.updateHeading(lastBeforeToVersion);
         this.updateFooter(lastBeforeFromVersion, firstPublishAfterFrom);
 
         if (!hasAnyPublishedVersions) {
@@ -197,15 +193,6 @@ export class ComparisonsContainer
 
     private setModeClass(className: string): void {
         this.setClass(`${ComparisonsContainer.CLASS_NAME} ${className}`);
-    }
-
-    private updateHeading(publishState?: PublishState): void {
-        const dateToUse: Date = publishState ? publishState.timestamp : this.to;
-        const dateAsString: string = DateHelper.formatDateTime(dateToUse);
-        const text = publishState?.isPublished ?
-                     i18n('widget.publishReport.state.online.after') :
-                     i18n('widget.publishReport.state.offline.after');
-        this.stateAfterBlock.setEntry(text, dateAsString);
     }
 
     private updateFooter(publishStateBeforeFrom?: PublishState, firstPublishAfterFrom?: Date): void {

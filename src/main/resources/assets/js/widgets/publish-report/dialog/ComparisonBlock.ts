@@ -176,12 +176,10 @@ export class ComparisonBlock
 
     private createOfflineSubtitle(): TextAndDateBlock {
         const subtitle = new TextAndDateBlock('subtitle');
-        const text1 = i18n('widget.publishReport.dateRange.compare.subtitle.part1');
-        const datePart1 = DateHelper.formatDateTime(this.offlineFrom);
-        const text2 = i18n('widget.publishReport.dateRange.compare.subtitle.part2');
-        const datePart2 = DateHelper.formatDateTime(this.newerVersion.getPublishInfo().getTimestamp());
+        const text = i18n('widget.publishReport.dateRange.compare.subtitle');
+        const datePart = DateHelper.formatDateTime(this.offlineFrom);
 
-        subtitle.setEntry(text1, datePart1).addEntry(text2, datePart2);
+        subtitle.setEntry(text, datePart);
 
         return subtitle;
     }
