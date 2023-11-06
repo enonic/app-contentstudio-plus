@@ -11,6 +11,7 @@ import {TextAndDateBlock} from './TextAndDateBlock';
 interface PublishState {
     isPublished: boolean;
     timestamp: Date;
+    version?: ContentVersion;
 }
 
 export class ComparisonsContainer
@@ -28,18 +29,21 @@ export class ComparisonsContainer
 
     private readonly comparisonsBlock: DivEl;
 
+    private readonly stateAfterBlock: TextAndDateBlock;
+
     private readonly stateBeforeBlock: TextAndDateBlock;
 
     constructor() {
         super(ComparisonsContainer.CLASS_NAME);
 
+        this.stateAfterBlock = new TextAndDateBlock('state-after-block');
         this.comparisonsBlock = new DivEl('comparisons-block');
         this.stateBeforeBlock = new TextAndDateBlock('state-before-block');
     }
 
     doRender(): Q.Promise<boolean> {
         return super.doRender().then((rendered: boolean) => {
-            this.appendChildren(this.comparisonsBlock, this.stateBeforeBlock);
+            this.appendChildren(this.stateAfterBlock, this.comparisonsBlock, this.stateBeforeBlock);
             return rendered;
         });
     }
@@ -72,7 +76,6 @@ export class ComparisonsContainer
         let newerVersion: ContentVersion = null;
         let offlineVersionInBetween: PublishState = null;
 
-
         this.allVersions.forEach((v: ContentVersion) => {
             const timestamp: Date = this.getVersionTimestamp(v);
             const isPublished: boolean = this.isPublished(v);
@@ -83,7 +86,7 @@ export class ComparisonsContainer
 
             if (this.isAfterTo(timestamp.getTime())) {
                 // skip, not interested in versions after TO date
-            } else if (this.isWithinFromTo(timestamp.getTime())) { // versions within FROM and TO, interested only in PUB/UNPUPLISHED ones
+            } else if (this.isWithinFromTo(timestamp.getTime())) { // versions within FROM and TO, interested only in PUB/UNPUBLISHED ones
                 if (isPublished) {
                     totalPublishedWithinFromTo++;
                     firstPublishAfterFrom = timestamp;
@@ -94,16 +97,14 @@ export class ComparisonsContainer
 
                     if (newerVersion) {
                         this.compareVersions(newerVersion, v, offlineVersionInBetween?.timestamp);
-                        newerVersion = v;
-                        offlineVersionInBetween = null;
-                    } else {
-                        newerVersion = v;
                     }
+
+                    newerVersion = v;
+                    offlineVersionInBetween = null;
                 } else if (this.isUnpublished(v)) {
                     if (!lastBeforeToVersion) {
                         lastBeforeToVersion = {isPublished: false, timestamp: timestamp};
                     }
-
 
                     offlineVersionInBetween = {isPublished: false, timestamp: timestamp};
                 }
@@ -111,7 +112,7 @@ export class ComparisonsContainer
             } else { // before from
                 if (!lastBeforeFromVersion) {
                     if (isPublished) {
-                        lastBeforeFromVersion = {isPublished: true, timestamp: timestamp};
+                        lastBeforeFromVersion = {isPublished: true, timestamp: timestamp, version: v};
                     } else if (this.isUnpublished(v)) {
                         lastBeforeFromVersion = {isPublished: false, timestamp: timestamp};
                     }
@@ -120,7 +121,14 @@ export class ComparisonsContainer
 
         });
 
-        this.updateFooter(lastBeforeFromVersion, firstPublishAfterFrom);
+        // if there's a published version before FROM date and no unpublish in between, then show comparison
+        if (newerVersion && !offlineVersionInBetween && lastBeforeFromVersion?.isPublished) {
+            this.compareVersions(newerVersion, lastBeforeFromVersion.version);
+            totalPublishedWithinFromTo++;
+        }
+
+        this.updateHeading(lastBeforeToVersion);
+        this.updateFooter(offlineVersionInBetween);
 
         if (!hasAnyPublishedVersions) {
             this.handleNoAnyPublishVersions();
@@ -195,11 +203,27 @@ export class ComparisonsContainer
         this.setClass(`${ComparisonsContainer.CLASS_NAME} ${className}`);
     }
 
-    private updateFooter(publishStateBeforeFrom?: PublishState, firstPublishAfterFrom?: Date): void {
-        const dateAsString: string = DateHelper.formatDateTime(firstPublishAfterFrom || this.from);
-        const text = publishStateBeforeFrom?.isPublished ?
-                     i18n('widget.publishReport.state.online.before') :
-                     i18n('widget.publishReport.state.offline.before');
-        this.stateBeforeBlock.setEntry(text, dateAsString);
+    private updateHeading(publishState?: PublishState): void {
+        if (!publishState || publishState.isPublished) { // not showing heading if content remains online after TO date
+            this.stateAfterBlock.setVisible(false);
+        } else {
+            this.stateAfterBlock.setVisible(true);
+
+            const dateAsString: string = DateHelper.formatDateTime(publishState.timestamp);
+            const text = i18n('widget.publishReport.state.offline.after');
+            this.stateAfterBlock.setEntry(text, dateAsString);
+        }
+    }
+
+    private updateFooter(unpublishedAfterFromVersion?: PublishState): void {
+        if (unpublishedAfterFromVersion) { // unpublished between from and first publish after from
+            const dateAsString: string = DateHelper.formatDateTime(unpublishedAfterFromVersion.timestamp);
+            const text = i18n('widget.publishReport.state.offline.after');
+            this.stateBeforeBlock.setEntry(text, dateAsString);
+            this.stateBeforeBlock.setVisible(true);
+        } else {
+            this.stateBeforeBlock.setVisible(false);
+        }
+
     }
 }
