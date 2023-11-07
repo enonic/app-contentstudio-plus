@@ -7,7 +7,7 @@ import {assetUrl, serviceUrl} from '/lib/xp/portal';
 import {localize} from '/lib/xp/i18n';
 // @ts-expect-error Cannot find module '/lib/router' or its corresponding type declarations.ts(2307)
 import newRouter from '/lib/router';
-import {immutableGetter, getAdminUrl} from '/lib/app-contentstudio-plus/urlHelper';
+import {immutableGetter, getAdminUrl, getAdminNodeModuleUrl} from '/lib/app-contentstudio-plus/urlHelper';
 import {
 	FILEPATH_MANIFEST_NODE_MODULES,
 	GETTER_ROOT,
@@ -30,14 +30,9 @@ function get(_r: Request): Response {
         assetsUri: assetUrl({
             path: ''
         }),
-        jqueryUrl: getAdminUrl({
-            manifestPath: FILEPATH_MANIFEST_NODE_MODULES,
-            path: 'jquery/dist/jquery.min.js',
-        }, TOOL_NAME),
-        jqueryUiUrl: getAdminUrl({
-            manifestPath: FILEPATH_MANIFEST_NODE_MODULES,
-            path: 'jquery-ui-dist/jquery-ui.min.js',
-        }, TOOL_NAME),
+        jqueryUrl: getAdminNodeModuleUrl('jquery/dist/jquery.min.js', TOOL_NAME),
+        jqueryUiUrl: getAdminNodeModuleUrl('jquery-ui-dist/jquery-ui.min.js', TOOL_NAME),
+        legacySlickgridUrl: getAdminNodeModuleUrl('@enonic/legacy-slickgrid/index.js', TOOL_NAME),
         mainBundleUrl: getAdminUrl({
             path: 'main.js'
         }, TOOL_NAME),

@@ -3,7 +3,7 @@ import type { Options } from '.';
 
 import CopyWithHashPlugin from '@enonic/esbuild-plugin-copy-with-hash';
 import TsupPluginManifest from '@enonic/tsup-plugin-manifest';
-import esbuildPluginExternalGlobal from 'esbuild-plugin-external-global';
+import GlobalsPlugin from 'esbuild-plugin-globals';
 import {
     DIR_DST_STATIC,
     DIR_SRC_STATIC
@@ -28,10 +28,14 @@ export default function buildStaticConfig(): Options {
             // options.outbase = DIR_SRC_STATIC;
         },
         esbuildPlugins: [
-            esbuildPluginExternalGlobal.externalGlobalPlugin({
-                'jquery': 'window.$'
+            GlobalsPlugin({
+                '@enonic/legacy-slickgrid.*'(modulename) {
+                    return 'Slick';
+                },
+                'jquery': '$',
             }),
             CopyWithHashPlugin({
+                // addHashesToFileNames: false,
                 context: 'node_modules',
                 manifest: `node_modules-manifest.json`,
                 patterns: [
@@ -63,7 +67,9 @@ export default function buildStaticConfig(): Options {
         // grep -r 'require("' build/resources/main/_static | grep -v 'require("/'|grep -v chunk
         noExternal: [ // Same as dependencies in package.json
             /@enonic\/lib-admin-ui/,
-            'jquery', // This will bundle jQuery into the bundle, unless you use the esbuildPluginExternalGlobal
+            // It seems these need to be listed here for global plugins to work
+            /@enonic\/legacy-slickgrid.*/,
+            'jquery',
             'jquery-ui',
             /^lib-contentstudio/,
             'normalize-url',
