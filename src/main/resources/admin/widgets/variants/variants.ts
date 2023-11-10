@@ -3,6 +3,7 @@ import type {Request, Response} from '/types/';
 // @ts-expect-error No types for /lib/mustache yet.
 import {render} from '/lib/mustache';
 import {assetUrl, getContent, serviceUrl} from '/lib/xp/portal';
+import {getAdminUrl} from '/lib/app-contentstudio-plus/urlHelper';
 
 const VIEW = resolve('variants.html');
 
@@ -14,11 +15,14 @@ export function get(req: Request): Response {
     }
 
     const params = {
-        contentId: contentId || '',
         assetsUri: assetUrl({
             path: ''
         }),
-        configServiceUrl: serviceUrl({service: 'config'})
+        configServiceUrl: serviceUrl({service: 'config'}),
+        contentId: contentId || '',
+        variantsBundleUrl: getAdminUrl({
+            path: 'widgets/variants/main.js'
+        }, 'main')
     };
 
     return {
