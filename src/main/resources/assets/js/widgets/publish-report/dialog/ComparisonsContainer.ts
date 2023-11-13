@@ -212,6 +212,7 @@ export class ComparisonsContainer
             const dateAsString: string = DateHelper.formatDateTime(publishState.timestamp);
             const text = i18n('widget.publishReport.state.offline.after');
             this.stateAfterBlock.setEntry(text, dateAsString);
+            this.stateAfterBlock.setIconClass('icon-version-unpublished');
         }
     }
 
@@ -221,6 +222,7 @@ export class ComparisonsContainer
             const text = i18n('widget.publishReport.state.offline.after');
             this.stateBeforeBlock.setEntry(text, dateAsString);
             this.stateBeforeBlock.setVisible(true);
+            this.stateBeforeBlock.setIconClass('icon-version-unpublished');
         } else {
             this.stateBeforeBlock.setVisible(false);
         }

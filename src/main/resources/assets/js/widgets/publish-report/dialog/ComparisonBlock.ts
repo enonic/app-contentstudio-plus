@@ -11,7 +11,6 @@ import {DateHelper} from '@enonic/lib-admin-ui/util/DateHelper';
 import {LoadMask} from '@enonic/lib-admin-ui/ui/mask/LoadMask';
 import {ComparisonHelper} from './ComparisonHelper';
 import {TextAndDateBlock} from './TextAndDateBlock';
-import {ComparisonMode} from './ComparisonMode';
 import {SpanEl} from '@enonic/lib-admin-ui/dom/SpanEl';
 
 export class ComparisonBlock
@@ -168,7 +167,8 @@ export class ComparisonBlock
         if (olderVersionDate) {
             this.titleElement
                 .setEntry(i18n('widget.publishReport.dateRange.compare.title.part1'), olderVersionDate)
-                .addEntry(i18n('widget.publishReport.dateRange.compare.title.part2'), newerVersionDate);
+                .addEntry(i18n('widget.publishReport.dateRange.compare.title.part2'), newerVersionDate)
+                .setIconClass('icon-compare');
         } else {
             this.titleElement.setEntry(i18n('status.published'), newerVersionDate);
         }
