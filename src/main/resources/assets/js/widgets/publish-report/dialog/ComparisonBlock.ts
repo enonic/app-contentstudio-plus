@@ -170,7 +170,7 @@ export class ComparisonBlock
                 .addEntry(i18n('widget.publishReport.dateRange.compare.title.part2'), newerVersionDate)
                 .setIconClass('icon-compare');
         } else {
-            this.titleElement.setEntry(i18n('status.published'), newerVersionDate);
+            this.titleElement.setEntry(i18n('widget.publishReport.state.online'), newerVersionDate);
         }
     }
 
