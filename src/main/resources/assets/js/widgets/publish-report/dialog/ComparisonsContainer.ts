@@ -121,9 +121,10 @@ export class ComparisonsContainer
 
         });
 
-        // if there's a published version before FROM date and no unpublish in between, then show comparison
-        if (newerVersion && !offlineVersionInBetween && lastBeforeFromVersion?.isPublished) {
-            this.compareVersions(newerVersion, lastBeforeFromVersion.version);
+        // if there's a published version before FROM date then show comparison
+        if (newerVersion && lastBeforeFromVersion?.isPublished) {
+            this.compareVersions(newerVersion, lastBeforeFromVersion.version, offlineVersionInBetween?.timestamp);
+            offlineVersionInBetween = null;
             totalPublishedWithinFromTo++;
         }
 

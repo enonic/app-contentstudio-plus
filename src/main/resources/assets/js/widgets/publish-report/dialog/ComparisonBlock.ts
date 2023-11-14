@@ -170,7 +170,7 @@ export class ComparisonBlock
                 .addEntry(i18n('widget.publishReport.dateRange.compare.title.part2'), newerVersionDate)
                 .setIconClass('icon-compare');
         } else {
-            this.titleElement.setEntry(i18n('widget.publishReport.state.online'), newerVersionDate);
+            this.titleElement.setEntry(i18n('widget.publishReport.state.online'), newerVersionDate).setIconClass('icon-version-published');
         }
     }
 
@@ -179,16 +179,9 @@ export class ComparisonBlock
         const text = i18n('widget.publishReport.dateRange.compare.subtitle');
         const datePart = DateHelper.formatDateTime(this.offlineFrom);
 
-        subtitle.setEntry(text, datePart);
+        subtitle.setEntry(text, datePart).setIconClass('icon-version-unpublished');
 
         return subtitle;
     }
 
-    private makeTextPart(text: string, className: string): SpanEl {
-        return new SpanEl(className).setHtml(text);
-    }
-
-    private makeDatePart(date: Date, className: string): SpanEl {
-        return new SpanEl(className).setHtml(DateHelper.formatDateTime(date));
-    }
 }
