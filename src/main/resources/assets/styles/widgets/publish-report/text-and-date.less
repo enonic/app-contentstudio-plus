@@ -1,11 +1,30 @@
 .text-and-date {
   font-size: 14px;
+  display: flex;
+
+  .state-icon {
+    margin-right: 5px;
+
+    &::before {
+      font-size: 18px;
+    }
+
+    &.icon-version-published {
+      color: @admin-green;
+      display: flex;
+      align-items: center;
+
+      &::before {
+        font-size: 16px;
+      }
+    }
+  }
 
   .date, .date {
     font-weight: bold;
   }
 
-  > span:not(:last-child) {
+  > span:not(:last-child):not(.state-icon) {
     margin-right: 3px;
   }
 

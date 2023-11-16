@@ -121,9 +121,10 @@ export class ComparisonsContainer
 
         });
 
-        // if there's a published version before FROM date and no unpublish in between, then show comparison
-        if (newerVersion && !offlineVersionInBetween && lastBeforeFromVersion?.isPublished) {
-            this.compareVersions(newerVersion, lastBeforeFromVersion.version);
+        // if there's a published version before FROM date then show comparison
+        if (newerVersion && lastBeforeFromVersion?.isPublished) {
+            this.compareVersions(newerVersion, lastBeforeFromVersion.version, offlineVersionInBetween?.timestamp);
+            offlineVersionInBetween = null;
             totalPublishedWithinFromTo++;
         }
 
@@ -212,6 +213,7 @@ export class ComparisonsContainer
             const dateAsString: string = DateHelper.formatDateTime(publishState.timestamp);
             const text = i18n('widget.publishReport.state.offline.after');
             this.stateAfterBlock.setEntry(text, dateAsString);
+            this.stateAfterBlock.setIconClass('icon-version-unpublished');
         }
     }
 
@@ -221,6 +223,7 @@ export class ComparisonsContainer
             const text = i18n('widget.publishReport.state.offline.after');
             this.stateBeforeBlock.setEntry(text, dateAsString);
             this.stateBeforeBlock.setVisible(true);
+            this.stateBeforeBlock.setIconClass('icon-version-unpublished');
         } else {
             this.stateBeforeBlock.setVisible(false);
         }
