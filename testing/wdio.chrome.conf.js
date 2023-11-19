@@ -1,5 +1,9 @@
 const path = require('path')
 const { TimelineService } = require('wdio-timeline-reporter/timeline-service');
+import {ReportAggregator} from 'wdio-html-nice-reporter';
+
+let reportAggregator;
+
 exports.config = {
 
     specs: [
@@ -37,7 +41,7 @@ exports.config = {
     // Default request retries count
     connectionRetryCount: 3,
 
-    services: [[TimelineService]],
+    //services: [[TimelineService]],
 
     framework: 'mocha',
     mochaOpts: {
@@ -47,11 +51,46 @@ exports.config = {
     // Set directory to store all logs into
     outputDir: "./build/reports/logs/",
 
-    reporters: ['concise', ['timeline', { outputDir: './build/reports/timeline' }]
+    reporters: ['concise',
+        ["html-nice", {
+            outputDir: '/build/reports/html-reports/',
+            filename: 'report.html',
+            reportTitle: 'Test Report Title',
+            linkScreenshots: true,
+            //to show the report in a browser when done
+            showInBrowser: true,
+            collapseTests: false,
+            //to turn on screenshots after every test
+            useOnAfterCommandForScreenshot: false
+        }]
     ],
 
     // Hook that gets executed before the suite starts
     beforeSuite: function (suite) {
         browser.url(this.baseUrl);
     },
+
+    /**
+     * Gets executed once before all workers get launched.
+     * @param {Object} config wdio configuration object
+     * @param {Array.<Object>} capabilities list of capabilities details
+     */
+    onPrepare: function (config, capabilities) {
+        reportAggregator = new ReportAggregator(
+          {
+              outputDir: '/build/reports/html-reports/',
+              filename: process.env.TEST_BROWSER + '-master-report.html',
+              reportTitle: 'Micro-Magic Web Test Report',
+              browserName: process.env.TEST_BROWSER ? process.env.TEST_BROWSER : 'unspecified',
+              showInBrowser: true
+          });
+
+        reportAggregator.clean();
+    },
+
+    onComplete: function (exitCode, config, capabilities, results) {
+        (async () => {
+            await reportAggregator.createReport();
+        })();
+    }
 };
