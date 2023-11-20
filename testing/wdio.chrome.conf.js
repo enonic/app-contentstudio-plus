@@ -1,6 +1,5 @@
 const path = require('path')
-const { TimelineService } = require('wdio-timeline-reporter/timeline-service');
-import {ReportAggregator} from 'wdio-html-nice-reporter';
+const { ReportAggregator }  = require('wdio-html-nice-reporter');
 
 let reportAggregator;
 
