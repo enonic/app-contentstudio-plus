@@ -1,5 +1,5 @@
-const path = require('path')
-const { TimelineService } = require('wdio-timeline-reporter/timeline-service');
+const path = require('path');
+
 exports.config = {
 
     specs: [
@@ -37,8 +37,6 @@ exports.config = {
     // Default request retries count
     connectionRetryCount: 3,
 
-    services: [[TimelineService]],
-
     framework: 'mocha',
     mochaOpts: {
         ui: 'bdd',
@@ -47,7 +45,8 @@ exports.config = {
     // Set directory to store all logs into
     outputDir: "./build/reports/logs/",
 
-    reporters: ['concise', ['timeline', { outputDir: './build/reports/timeline' }]
+    reporters: ['concise',
+        ['allure', {outputDir: './build/reports/allure', disableWebdriverStepsReporting: true, disableWebdriverScreenshotsReporting: true,}],
     ],
 
     // Hook that gets executed before the suite starts
