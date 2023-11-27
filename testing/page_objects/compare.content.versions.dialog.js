@@ -11,7 +11,6 @@ const XPATH = {
     containerBottom: `//div[@class='container bottom']`,
     revertMenuButton: "//button[contains(@id,'Button') and descendant::li[contains(@id,'MenuItem') and text()='Revert']]",
     revertMenuItem: "//ul[contains(@id,'Menu')]/li[contains(@id,'MenuItem') and text()='Revert']",
-    showEntireContentCheckboxDiv: "//div[contains(@id,'Checkbox') and child::label[text()='Show entire content']]",
     listItemNameAndIconView: "//div[contains(@id,'NamesAndIconView') and not(descendant::h6[contains(.,'version')])]",
     contentPanel: "//div[contains(@id,'ModalDialogContentPanel')]",
 };
@@ -47,7 +46,7 @@ class CompareContentVersionsDialog extends Page {
     }
 
     get showEntireContentCheckbox() {
-        return XPATH.container + XPATH.showEntireContentCheckboxDiv + '//label';
+        return XPATH.container + lib.SHOW_ENTIRE_CONTENT_CHECKBOX_DIV + '//label';
     }
 
     async expandLeftDropdownClickOnModifiedOption(index) {
@@ -205,7 +204,7 @@ class CompareContentVersionsDialog extends Page {
     }
 
     async isShowEntireContentCheckboxSelected() {
-        let checkBoxInput = XPATH.container + XPATH.showEntireContentCheckboxDiv + lib.CHECKBOX_INPUT;
+        let checkBoxInput = XPATH.container + lib.SHOW_ENTIRE_CONTENT_CHECKBOX_DIV + lib.CHECKBOX_INPUT;
         await this.waitForElementDisplayed(this.showEntireContentCheckbox, appConst.mediumTimeout);
         return await this.isSelected(checkBoxInput);
     }

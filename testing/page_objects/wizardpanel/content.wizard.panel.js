@@ -272,6 +272,12 @@ class ContentWizardPanel extends Page {
         return await versionPanel.waitForVersionsLoaded();
     }
 
+    async openPublishReportWidget() {
+        let wizardDetailsPanel = new DetailsPanel();
+        await this.openDetailsPanel();
+        await wizardDetailsPanel.openPublishReport();
+    }
+
     async openDependenciesWidget() {
         try {
             let wizardDetailsPanel = new DetailsPanel();

@@ -33,6 +33,7 @@ module.exports = Object.freeze({
     INPUT_VALIDATION_VIEW: "//div[contains(@id,'InputViewValidationViewer')]",
     OCCURRENCE_ERROR_BLOCK: "//div[contains(@id,'InputOccurrenceView')]//div[contains(@class,'error-block')]",
     NUMBER_IN_SELECTION_TOGGLER: `//button[contains(@id,'SelectionPanelToggler')]/span`,
+    checkBoxDiv: label => `//div[contains(@id,'Checkbox') and child::label[contains(.,'${label}')]]`,
     radioButtonByLabel: label => {
         return `//span[contains(@class,'radio-button') and child::label[text()='${label}']]//input`
     },
@@ -95,6 +96,11 @@ module.exports = Object.freeze({
     SETTINGS_BUTTON: "//button[contains(@id,WidgetButton) and @title='Settings']",
     ARCHIVE_BUTTON: "//button[contains(@id,WidgetButton) and @title='Archive']",
     MODE_CONTENT_BUTTON: "//button[contains(@id,WidgetButton) and @title='Content']",
+    SHOW_ENTIRE_CONTENT_CHECKBOX_DIV: "//div[contains(@id,'Checkbox') and child::label[text()='Show entire content']]",
+    DATE_PICKER:{
+        fromDateInput:"//div[contains(@id,'DatePicker') and preceding-sibling::label[text()='From']]//input[contains(@id,'TextInput')]",
+        toDateInput: "//div[contains(@id,'DatePicker') and preceding-sibling::label[text()='To']]//input[contains(@id,'TextInput')]",
+    },
     CKE: {
         insertTableButton: `//a[contains(@class,'cke_button') and contains(@title,'Table')]`,
         insertLinkButton: `//a[contains(@class,'cke_button') and contains(@title,'Link')]`,
@@ -136,5 +142,28 @@ module.exports = Object.freeze({
         ownerAggregationGroupView: "//div[contains(@id,'FilterableAggregationGroupView') and child::h2[text()='Owner']]",
         aggregationGroupDiv: name => `//div[contains(@id,'AggregationGroupView') and child::h2[text()='${name}']]`,
         aggregationDropdown: label => `//div[contains(@id,'FilterableAggregationGroupView') and child::h2[text()='${label}']]//div[contains(@id,'SelectableListBoxDropdown')]`,
+    },
+    DEPENDANTS: {
+        EDIT_ENTRY: "//div[contains(@id,'DialogStateEntry') and contains(@class,'edit-entry')]",
+        DEPENDANTS_BLOCK: "//div[contains(@class, 'dependants') and descendant::span[contains(@class,'dependants-title') and text()='Dependencies']]",
+        DEPENDENT_ITEM_LIST_UL: "//ul[contains(@id,'DialogDependantItemsList')]",
+        DEPENDENT_ITEM_LIST_UL_2: "//ul[contains(@id,'PublishDialogDependantList')]",
+        DEPENDANT_ITEM_VIEWER: "//div[contains(@id,'DependantItemViewer')]",
+    },
+    BUTTONS: {
+        PUBLISH_REPORT_GENERATE:"//button[contains(@class,'widget-publish-report-button')]",
+        BUTTON_WITH_SPAN_ADD: "//button[child::span[text()='Add']]",
+        NEW_CONTENT_BUTTON: "//button[contains(@class,'new-content-button')]",
+        REFRESH_BUTTON: "//button[contains(@class,'icon-loop')]",
+        DROP_DOWN_HANDLE: "//button[contains(@id,'DropdownHandle')]",
+        SELECTION_PANEL_TOGGLER: `//button[contains(@id,'SelectionPanelToggler')]`,
+        OPTION_SET_MENU_BUTTON: "//button[contains(@id,'MoreButton')]",
+        SELECTOR_MODE_TOGGLER: "//button[contains(@id,'ModeTogglerButton')]",
+        UPLOAD_BUTTON: "//button[contains(@class,'upload-button')]",
+        actionButton: (label) => `//button[contains(@id,'ActionButton') and child::span[contains(.,'${label}')]]`,
+        button: (label, cssValue) => `//button[contains(@class,'${cssValue}') and child::span[contains(.,'${label}')]]`,
+        dialogButton: label => `//button[contains(@id,'DialogButton') and child::span[contains(.,'${label}')]]`,
+        dialogButtonStrict: label => `//button[contains(@id,'DialogButton') and child::span[text()='${label}']]`,
+        togglerButton: (label) => `//button[contains(@id,'TogglerButton') and child::span[text()='${label}']]`,
     },
 });

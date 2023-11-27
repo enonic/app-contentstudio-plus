@@ -13,7 +13,6 @@ const XPATH = {
     containerBottom: `//div[@class='container bottom']`,
     revertMenuButton: "//button[contains(@id,'Button') and descendant::li[contains(@id,'MenuItem') and text()='Revert']]",
     revertMenuItem: "//ul[contains(@id,'Menu')]/li[contains(@id,'MenuItem') and text()='Revert']",
-    showEntireContent: "//div[contains(@id,'Checkbox') and child::label[text()='Show entire content']]"
 };
 
 class CompareContentVersionsDialog extends Page {
@@ -39,7 +38,7 @@ class CompareContentVersionsDialog extends Page {
     }
 
     get showEntireContent() {
-        return XPATH.container + XPATH.showEntireContent + "//label";
+        return XPATH.container + lib.SHOW_ENTIRE_CONTENT_CHECKBOX_DIV + "//label";
     }
 
     async clickOnLeftRevertMenuButton() {
