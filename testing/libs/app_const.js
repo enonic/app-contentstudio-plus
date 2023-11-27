@@ -147,6 +147,7 @@ module.exports = Object.freeze({
         LAYERS: 'Layers',
         EMULATOR: 'Emulator',
         VARIANTS: 'Variants',
+        PUBLISHING_REPORT: 'Publishing report',
     },
     EMULATOR_RESOLUTION: {
         MEDIUM_PHONE: 'Medium Phone',

@@ -45,7 +45,21 @@ class BaseDetailsPanel extends Page {
             return await this.pause(200);
         } catch (err) {
             await this.saveScreenshot(appConst.generateRandomName('err_open_versions'));
-            throw new Error("Error when opening Version History: " + err);
+            throw new Error("Error when opening Version History widget: " + err);
+        }
+    }
+
+    async openPublishReport() {
+        try {
+            await this.clickOnWidgetSelectorDropdownHandle();
+            let publishingReportOption = this.widgetSelectorDropdown + lib.itemByDisplayName(appConst.WIDGET_TITLE.PUBLISHING_REPORT);
+            await this.waitForElementDisplayed(publishingReportOption, appConst.mediumTimeout);
+            let elements = await this.getDisplayedElements(publishingReportOption);
+            await elements[0].click();
+            return await this.pause(200);
+        } catch (err) {
+            await this.saveScreenshot(appConst.generateRandomName('err_open_publish_report'));
+            throw new Error("Error when opening Publishing report widget: " + err);
         }
     }
 
