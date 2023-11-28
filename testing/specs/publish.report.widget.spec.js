@@ -1,11 +1,10 @@
 /**
- * Created on 20.11.20213
+ * Created on 20.11.2023
  */
 const chai = require('chai');
 const assert = chai.assert;
 const webDriverHelper = require('../libs/WebDriverHelper');
 const appConst = require('../libs/app_const');
-const ContentBrowsePanel = require('../page_objects/browsepanel/content.browse.panel');
 const studioUtils = require('../libs/studio.utils.js');
 const contentBuilder = require("../libs/content.builder");
 
@@ -13,9 +12,9 @@ const ContentWizardPanel = require('../page_objects/wizardpanel/content.wizard.p
 const WizardPublishReportWidget = require('../page_objects/wizardpanel/details/wizard.publish.report.widget');
 const ContentPublishDialog = require('../page_objects/content.publish.dialog');
 
-describe('archive.content.spec: tests for archiving content', function () {
+describe('publish.report.widget.spec: tests for publish report widget', function () {
     this.timeout(appConst.SUITE_TIMEOUT);
-    // setup standalone mode if WDIO is not defined:
+    // set up the standalone mode if WDIO-mode is not used:
     if (typeof browser === 'undefined') {
         webDriverHelper.setupBrowser();
     }
