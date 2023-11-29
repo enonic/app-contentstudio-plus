@@ -9,8 +9,8 @@
   },
   "scripts": {
     "build": "webpack --color",
-    "lint": "eslint **/*.ts",
-    "lint:quiet": "eslint --quiet **/*.ts",
+    "lint": "eslint src/**/*.ts --cache",
+    "lint:quiet": "eslint --quiet src/**/*.ts --cache",
     "fix": "eslint --fix **/*.ts",
     "postinstall": "cd node_modules/lib-contentstudio && npm install"
   },
