@@ -17,7 +17,7 @@
     "@wdio/concise-reporter": "^8.26.2",
     "@wdio/allure-reporter": "8.26.3",
     "allure-commandline": "^2.25.0",
-    "webdriverio": "^8.26.2"
+    "webdriverio": "^8.27.0"
   },
   "engines": {
     "node": ">= 18.12.1",
