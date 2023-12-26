@@ -41,8 +41,11 @@ class Page {
 
     async getDisplayedElements(selector) {
         let elements = await this.findElements(selector);
-        let pr = elements.map(el => el.isDisplayed());
-        return await Promise.all(pr).then(result => {
+        if (elements.length === 0) {
+            return [];
+        }
+        let pr = await elements.map(async (el) => await el.isDisplayed());
+        return Promise.all(pr).then(result => {
             return elements.filter((el, i) => result[i]);
         });
     }
@@ -68,21 +71,27 @@ class Page {
     }
 
     async getTextInElements(selector) {
-        let strings = [];
+        let results = [];
         let elements = await this.findElements(selector);
-        elements.forEach(el => {
-            strings.push(el.getText());
-        });
-        return Promise.all(strings);
+        if (elements.length === 0) {
+            return [];
+        }
+        for (const item of elements) {
+            results.push(await item.getText());
+        }
+        return results
     }
 
     async getTextInDisplayedElements(selector) {
-        let strings = [];
+        let results = [];
         let elements = await this.getDisplayedElements(selector);
-        elements.forEach(el => {
-            strings.push(el.getText());
-        });
-        return Promise.all(strings);
+        if (elements.length === 0) {
+            return [];
+        }
+        for (const item of elements) {
+            results.push(await item.getText());
+        }
+        return results;
     }
 
     async clearTextInput(locator) {
