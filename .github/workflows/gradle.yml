@@ -43,7 +43,7 @@ jobs:
             -   name: Build with Gradle
                 run: ./gradlew build -Pcom.enonic.xp.app.production=true
 
-            -   uses: actions/upload-artifact@v3
+            -   uses: actions/upload-artifact@v4
                 with:
                   name: contentstudio.plus
                   path: build/libs/contentstudio.plus.jar
@@ -110,7 +110,7 @@ jobs:
                   SLACK_ICON: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
                   SLACK_COLOR: ${{ job.status }}
 
-            -   uses: actions/upload-artifact@v3
+            -   uses: actions/upload-artifact@v4
                 if: always()
                 with:
                     name: 'ui-test-report-${{ matrix.suite }}'
