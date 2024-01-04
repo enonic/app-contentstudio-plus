@@ -1,8 +1,7 @@
 /**
  * Created on 20.11.2023
  */
-const chai = require('chai');
-const assert = chai.assert;
+const assert = require('node:assert');
 const webDriverHelper = require('../libs/WebDriverHelper');
 const appConst = require('../libs/app_const');
 const studioUtils = require('../libs/studio.utils.js');
@@ -125,7 +124,8 @@ describe('publish.report.widget.spec: tests for publish report widget', function
             await wizardPublishReportWidget.waitForGenerateButtonDisabled();
             // 5. Expected validation message should appear:
             let actualMessage = await wizardPublishReportWidget.getValidationMessage();
-            assert.isTrue(actualMessage.includes('There were no publications before'), "Expected validation message should appears in the widget");
+            assert.ok(actualMessage.includes('There were no publications before'),
+                "Expected validation message should appears in the widget");
         });
 
     beforeEach(async () => {

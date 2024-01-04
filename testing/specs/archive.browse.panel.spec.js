@@ -1,8 +1,7 @@
 /**
  * Created on 01.12.2021
  */
-const chai = require('chai');
-const assert = chai.assert;
+const assert = require('node:assert');
 const webDriverHelper = require('../libs/WebDriverHelper');
 const appConst = require('../libs/app_const');
 const ContentBrowsePanel = require('../page_objects/browsepanel/content.browse.panel');
@@ -72,9 +71,9 @@ describe('archive.browse.panel.spec: tests for archive browse panel and selectio
             await archiveBrowsePanel.waitForSelectionTogglerNotVisible();
             // 7. Verify that Grid returns to the initial state:
             displayNames = await archiveBrowsePanel.getDisplayNamesInGrid();
-            assert.isTrue(displayNames.length > 1, 'Initial state of Grid is restored');
+            assert.ok(displayNames.length > 1, 'Initial state of Grid is restored');
             let result = await archiveBrowsePanel.isSelectionControllerSelected();
-            assert.isFalse(result, 'Selection Controller checkBox should not be selected');
+            assert.ok(result, 'Selection Controller checkBox should not be selected');
         });
 
     it("WHEN Selection Controller checkbox is selected (All items are checked) THEN 'Delete..' 'Restore...' buttons should be enabled",
@@ -103,8 +102,8 @@ describe('archive.browse.panel.spec: tests for archive browse panel and selectio
             let path = await archiveItemStatisticsPanel.getPath();
             assert.equal(path, `/${FOLDER1.displayName}`, "Expected path should be displayed in Item Statistics panel");
             let status = await archiveItemStatisticsPanel.getStatus();
-            assert.isTrue(status.includes('Archived'), "Archived status should be displayed in Item Statistics panel");
-            assert.isTrue(status.includes('by Super User'), "'by Super User' should be displayed in Item Statistics panel");
+            assert.ok(status.includes('Archived'), "Archived status should be displayed in Item Statistics panel");
+            assert.ok(status.includes('by Super User'), "'by Super User' should be displayed in Item Statistics panel");
             // 3. Verify that workflow icon is not displayed:
             await contentWidgetItemView.waitForWorkflowStateNotDisplayed();
             // 4. Verify the name in the content widget:
