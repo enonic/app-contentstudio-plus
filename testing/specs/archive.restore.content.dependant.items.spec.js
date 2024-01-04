@@ -1,8 +1,7 @@
 /**
  * Created on 17.11.2021
  */
-const chai = require('chai');
-const assert = chai.assert;
+const assert = require('node:assert');
 const webDriverHelper = require('../libs/WebDriverHelper');
 const appConst = require('../libs/app_const');
 const ContentBrowsePanel = require('../page_objects/browsepanel/content.browse.panel');
@@ -55,7 +54,7 @@ describe('archive.restore.content.dependant.items.spec: tests for archive/restor
             await archiveDeleteDialog.waitForOpened();
             // 6. Verify the dependent items
             let result = await archiveDeleteDialog.getChildItemsToDeletePath();
-            assert.isTrue(result[0].includes(DEPENDENT_ITEM_NAME), 'Expected dependent items should be present in the dialog');
+            assert.ok(result[0].includes(DEPENDENT_ITEM_NAME), 'Expected dependent items should be present in the dialog');
             assert.equal(result.length, 11, 'Expected number of dependent items should be present in the dialog');
         });
 
@@ -98,13 +97,13 @@ describe('archive.restore.content.dependant.items.spec: tests for archive/restor
             await archiveFilterPanel.waitForAggregationGroupDisplayed(appConst.FILTER_PANEL_AGGREGATION_BLOCK.ARCHIVED_BY);
             // 3. The checkbox should not be selected by default:
             let isSelected = await archiveFilterPanel.isCheckboxSelected(appConst.FILTER_PANEL_AGGREGATION_BLOCK.ARCHIVED_BY, 'Me');
-            assert.isFalse(isSelected, 'Archived By checkbox should not be selected');
+            assert.ok(isSelected === false, 'Archived By checkbox should not be selected');
             // 4. Click on 'Archived by' checkbox:
             await archiveFilterPanel.clickOnAggregationCheckbox(appConst.FILTER_PANEL_AGGREGATION_BLOCK.ARCHIVED_BY, 'Me');
             // 5. Verify that 'Archived by' checkbox is selected now:
             await studioUtils.saveScreenshot('archived_by_is_selected');
             isSelected = await archiveFilterPanel.isCheckboxSelected(appConst.FILTER_PANEL_AGGREGATION_BLOCK.ARCHIVED_BY, 'Me');
-            assert.isTrue(isSelected, 'Archived By checkbox should be selected');
+            assert.ok(isSelected, 'Archived By checkbox should be selected');
         });
 
     it(`GIVEN Filter Panel is opened WHEN content name has been typed in the search input THEN '1 hits' should appear in the filter panel`,
@@ -150,7 +149,7 @@ describe('archive.restore.content.dependant.items.spec: tests for archive/restor
             await archiveRestoreDialog.waitForOpened();
             // 3. Verify the dependent items
             let result = await archiveRestoreDialog.getChildItemsToRestorePath();
-            assert.isTrue(result[0].includes(DEPENDENT_ITEM_NAME), "Expected dependent items should be present in the dialog");
+            assert.ok(result[0].includes(DEPENDENT_ITEM_NAME), "Expected dependent items should be present in the dialog");
             assert.equal(result.length, 11, "Expected number of dependent items should be present in the dialog");
             // 4. Click on 'Restore' button:
             await archiveRestoreDialog.clickOnRestoreButton();

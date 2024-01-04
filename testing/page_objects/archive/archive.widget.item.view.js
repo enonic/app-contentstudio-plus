@@ -42,8 +42,8 @@ class ArchiveContentWidgetItemView extends Page {
         try {
             return await this.waitForElementNotDisplayed(xpath.workInProgressIcon, appConst.mediumTimeout);
         } catch (err) {
-            await this.saveScreenshot("err_widget_item_workflow");
-            throw new Error("Workflow state should not be displayed in the archive widget item " + err);
+            let screenshot = await this.saveScreenshotUniqueName("err_widget_item_workflow");
+            throw new Error("Workflow state should not be displayed in the archive widget item, screenshot " + screenshot + ' ' + err);
         }
     }
 }

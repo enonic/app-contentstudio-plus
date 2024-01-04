@@ -1,8 +1,7 @@
 /**
  * Created on 20.02.2023
  */
-const chai = require('chai');
-const assert = chai.assert;
+const assert = require('node:assert');
 const webDriverHelper = require('../libs/WebDriverHelper');
 const studioUtils = require('../libs/studio.utils.js');
 const CreateVariantDialog = require('../page_objects/details_panel/create.variant.dialog');
@@ -135,8 +134,8 @@ describe('folder.variants.spec - tests for Create Variant modal dialog', functio
             let varCreated = appConst.variantCreated(FOLDER_NAME);
             let varDuplicated = appConst.itemDuplicated(VARIANT_NAME_1);
             let messages = await contentBrowsePanel.waitForNotificationMessages();
-            assert.isTrue(messages.includes(varCreated), 'Variant has been created - this message should appear');
-            assert.isTrue(messages.includes(varDuplicated), 'Item is duplicated - this message should appear');
+            assert.ok(messages.includes(varCreated), 'Variant has been created - this message should appear');
+            assert.ok(messages.includes(varDuplicated), 'Item is duplicated - this message should appear');
         });
 
     it("GIVEN folder with 2 variants has been filtered WHEN expander icon has been clicked THEN expected duplicated variant with icon should be displayed",
