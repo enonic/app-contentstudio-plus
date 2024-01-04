@@ -38,7 +38,7 @@ describe('archive.browse.panel.spec: tests for archive browse panel and selectio
             await studioUtils.doAddFolder(FOLDER2);
         });
 
-    it(`WHEN a checkbox row has been clicked THEN SelectionPanelToggler gets visible`,
+    it(`WHEN checkbox in a row has been clicked THEN SelectionPanelToggler gets visible`,
         async () => {
             let contentBrowsePanel = new ContentBrowsePanel();
             let deleteContentDialog = new DeleteContentDialog();
@@ -73,7 +73,7 @@ describe('archive.browse.panel.spec: tests for archive browse panel and selectio
             displayNames = await archiveBrowsePanel.getDisplayNamesInGrid();
             assert.ok(displayNames.length > 1, 'Initial state of Grid is restored');
             let result = await archiveBrowsePanel.isSelectionControllerSelected();
-            assert.ok(result, 'Selection Controller checkBox should not be selected');
+            assert.ok(result === false, 'Selection Controller checkBox should not be selected');
         });
 
     it("WHEN Selection Controller checkbox is selected (All items are checked) THEN 'Delete..' 'Restore...' buttons should be enabled",
