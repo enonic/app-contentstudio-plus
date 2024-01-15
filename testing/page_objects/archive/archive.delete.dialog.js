@@ -61,7 +61,7 @@ class ArchiveDeleteDialog extends Page {
     async waitForClosed() {
         try {
             await this.waitForElementNotDisplayed(XPATH.container, appConst.mediumTimeout)
-        } catch (error) {
+        } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_delete_dlg_close');
             throw new Error("Archive Delete dialog was not closed, screenshot:  " + screenshot + ' ' + err);
         }

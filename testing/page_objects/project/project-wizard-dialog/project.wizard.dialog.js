@@ -13,7 +13,7 @@ const XPATH = {
     nextButton: "//button[contains(@id,'DialogButton') and child::span[text()='Next']]",
     backButton: "//button[contains(@id,'DialogButton') and child::span[text()='Back']]",
     skipButton: "//button[contains(@id,'DialogButton') and child::span[text()='Skip']]",
-    copyFromParentButton: "//button[contains(@id,'Button') and child::span[text()='Copy from parent']]",
+    copyFromParentButton: parent => `//button[contains(@id,'Button') and child::span[text()='Copy from ${parent}']]`,
 };
 
 class ProjectWizardDialog extends Page {
@@ -42,8 +42,8 @@ class ProjectWizardDialog extends Page {
         try {
             return await this.waitUntilDisplayed(this.skipButton, appConst.mediumTimeout);
         } catch (err) {
-            await this.saveScreenshot(appConst.generateRandomName("err_skip_button"));
-            throw new Error("Skip button is not displayed: " + err);
+            await this.saveScreenshot(appConst.generateRandomName('err_skip_button'));
+            throw new Error('Skip button is not displayed: ' + err);
         }
     }
 
@@ -51,56 +51,55 @@ class ProjectWizardDialog extends Page {
         try {
             return await this.waitForElementNotDisplayed(this.copyFromParentButton, appConst.mediumTimeout);
         } catch (err) {
-            let screenshot = appConst.generateRandomName("err_copy_from_parent_button");
-            await this.saveScreenshot(screenshot);
-            throw new Error("Copy from parent button is displayed: screenshot " + screenshot + "  " + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_copy_from_parent_button');
+            throw new Error('Copy from parent button is displayed: screenshot ' + screenshot + "  " + err);
         }
     }
 
-    async waitForCopyFromParentButtonDisplayed() {
+    async waitForCopyFromParentButtonDisplayed(parent) {
         try {
-            return await this.waitUntilDisplayed(this.copyFromParentButton, appConst.mediumTimeout);
+            let locator = XPATH.container + XPATH.copyFromParentButton(parent)
+            return await this.waitUntilDisplayed(locator, appConst.mediumTimeout);
         } catch (err) {
-            let screenshot = appConst.generateRandomName("err_copy_from_parent_button");
-            await this.saveScreenshot(screenshot);
-            throw new Error("Copy from parent button is not displayed, screenshot: " + screenshot + "  " + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_copy_from_parent_button');
+            throw new Error('Copy from parent button is not displayed, screenshot: ' + screenshot + '  ' + err);
         }
     }
 
-    async waitForCopyFromParentButtonDisabled() {
+    async waitForCopyFromParentButtonDisabled(parent) {
         try {
-            await this.waitUntilDisplayed(this.copyFromParentButton, appConst.mediumTimeout);
-            let elements = await this.getDisplayedElements(this.copyFromParentButton);
+            let locator = XPATH.container + XPATH.copyFromParentButton(parent);
+            await this.waitUntilDisplayed(locator, appConst.mediumTimeout);
+            let elements = await this.getDisplayedElements(locator);
             await elements[0].waitForEnabled(
-                {timeout: appConst.mediumTimeout, reverse: true, timeoutMsg: "Copy button should be disabled!"});
+                {timeout: appConst.mediumTimeout, reverse: true, timeoutMsg: 'Copy button should be disabled!'});
         } catch (err) {
-            let screenshot = appConst.generateRandomName("err_copy_from_parent_button");
-            await this.saveScreenshot(screenshot);
-            throw new Error("Copy from parent button is not disabled, screenshot: " + screenshot + "  " + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_copy_from_parent_button');
+            throw new Error('Copy from parent button is not disabled, screenshot: ' + screenshot + '  ' + err);
         }
     }
 
-    async waitForCopyFromParentButtonEnabled() {
+    async waitForCopyFromParentButtonEnabled(parent) {
         try {
-            await this.waitUntilDisplayed(this.copyFromParentButton, appConst.mediumTimeout);
-            let elements = await this.getDisplayedElements(this.copyFromParentButton);
+            let locator = XPATH.container + XPATH.copyFromParentButton(parent);
+            await this.waitUntilDisplayed(locator, appConst.mediumTimeout);
+            let elements = await this.getDisplayedElements(locator);
             await elements[0].waitForEnabled(
-                {timeout: appConst.mediumTimeout, timeoutMsg: "Copy button should be enabled!"});
+                {timeout: appConst.mediumTimeout, timeoutMsg: 'Copy button should be enabled!'});
         } catch (err) {
-            let screenshot = appConst.generateRandomName("err_copy_from_parent_button");
-            await this.saveScreenshot(screenshot);
-            throw new Error("Copy from parent button is not disabled, screenshot: " + screenshot + "  " + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_copy_from_parent_button');
+            throw new Error('Copy from parent button is not enabled, screenshot: ' + screenshot + '  ' + err);
         }
     }
 
-    async clickOnCopyFromParentButton() {
+    async clickOnCopyFromParentButton(parent) {
         try {
-            await this.waitForCopyFromParentButtonDisplayed();
-            let elements = await this.getDisplayedElements(this.copyFromParentButton);
+            let locator = XPATH.container + XPATH.copyFromParentButton(parent);
+            await this.waitForCopyFromParentButtonDisplayed(parent);
+            let elements = await this.getDisplayedElements(locator);
             return await elements[0].click();
         } catch (err) {
-            let screenshot = appConst.generateRandomName("err_copy_from_parent_button");
-            await this.saveScreenshot(screenshot);
+            let screenshot = await this.saveScreenshotUniqueName('err_copy_from_parent_button');
             throw new Error("Click on 'Copy from parent' button, screenshot: " + screenshot + "  " + err);
         }
     }
@@ -110,8 +109,8 @@ class ProjectWizardDialog extends Page {
             await this.waitForSkipButtonDisplayed();
             return await this.waitForElementEnabled(this.skipButton, appConst.mediumTimeout);
         } catch (err) {
-            await this.saveScreenshot(appConst.generateRandomName("err_skip_button"));
-            throw new Error("Skip button is not enabled: " + err);
+            await this.saveScreenshot(appConst.generateRandomName('err_skip_button'));
+            throw new Error('Skip button is not enabled: ' + err);
         }
     }
 
@@ -126,8 +125,8 @@ class ProjectWizardDialog extends Page {
         try {
             return await this.waitUntilDisplayed(this.nextButton, appConst.mediumTimeout);
         } catch (err) {
-            await this.saveScreenshot(appConst.generateRandomName("err_next_button"));
-            throw new Error("Next button is not displayed: " + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_next_button');
+            throw new Error("'Next' button is not displayed:screenshot " + screenshot + ' ' + err);
         }
     }
 
@@ -135,9 +134,8 @@ class ProjectWizardDialog extends Page {
         try {
             return await this.waitForElementEnabled(this.nextButton, appConst.mediumTimeout);
         } catch (err) {
-            let screenshot = appConst.generateRandomName("err_next_disabled");
-            await this.saveScreenshot(appConst.generateRandomName("err_next_button"));
-            throw new Error("Next button is not enabled. Screenshot: " + screenshot + " " + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_next_disabled');
+            throw new Error(" 'Next' button is not enabled. Screenshot: " + screenshot + ' ' + err);
         }
     }
 
@@ -145,9 +143,8 @@ class ProjectWizardDialog extends Page {
         try {
             return await this.waitForElementDisabled(this.nextButton, appConst.mediumTimeout);
         } catch (err) {
-            let screenshot = appConst.generateRandomName("err_next_enabled");
-            await this.saveScreenshot(screenshot);
-            throw new Error("Next button is not disabled Screenshot: " + screenshot + "  " + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_next_enabled');
+            throw new Error('Next button is not disabled Screenshot: ' + screenshot + '  ' + err);
         }
     }
 
@@ -163,8 +160,8 @@ class ProjectWizardDialog extends Page {
         try {
             return await this.waitUntilDisplayed(this.backButton, appConst.mediumTimeout);
         } catch (err) {
-            await this.saveScreenshot(appConst.generateRandomName("err_back_button"));
-            throw new Error("Back button is not displayed: " + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_back_button');
+            throw new Error('Back button is not displayed: screenshot ' + screenshot + ' ' + err);
         }
     }
 
@@ -182,7 +179,8 @@ class ProjectWizardDialog extends Page {
         try {
             return await this.waitForElementNotDisplayed(XPATH.container, appConst.saveProjectTimeout);
         } catch (err) {
-            throw new Error("Layers Content Tree dialog should be closed " + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_wizard_not_closed');
+            throw new Error('Layers Content Tree dialog should be closed, screenshot ' + screenshot + '  ' + err);
         }
     }
 
@@ -190,7 +188,7 @@ class ProjectWizardDialog extends Page {
         try {
             return await this.waitForElementDisplayed(this.cancelButtonTop, appConst.shortTimeout);
         } catch (err) {
-            throw new Error("Layers Content Tree dialog dialog - Cancel button is not displayed :" + err);
+            throw new Error('Layers Content Tree dialog dialog - Cancel button is not displayed :' + err);
         }
     }
 
@@ -208,12 +206,10 @@ class ProjectWizardDialog extends Page {
             await this.waitForElementEnabled(this.backButton, appConst.mediumTimeout);
             return await this.clickOnElement(this.backButton);
         } catch (err) {
-            let screenshot = appConst.generateRandomName("err_back_button");
-            await this.saveScreenshot(screenshot);
-            throw new Error("Error after clicking on Back button, Screenshot: " + screenshot + "  " + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_back_button');
+            throw new Error('Error after clicking on Back button, Screenshot: ' + screenshot + '  ' + err);
         }
     }
-
 }
 
 module.exports = ProjectWizardDialog;
