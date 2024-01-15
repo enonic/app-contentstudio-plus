@@ -26,16 +26,18 @@ class NewSettingsItemDialog extends Page {
             await this.clickOnElement(this.cancelButtonTop);
             return await this.waitForDialogClosed();
         } catch (err) {
-            this.saveScreenshot('err_click_on_cancel_button');
+            await this.saveScreenshot('err_click_on_cancel_button');
             throw new Error('New Settings dialog, error when clicking on Cancel(Top) button  ' + err);
         }
     }
 
-    waitForDialogLoaded() {
-        return this.waitForElementDisplayed(this.cancelButton, appConst.shortTimeout).catch(err => {
-            this.saveScreenshot('err_open_insert_anchor_dialog');
+    async waitForDialogLoaded() {
+        try {
+            await this.waitForElementDisplayed(this.cancelButton, appConst.shortTimeout)
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_new_settings_item');
             throw new Error('New Settings dialog Dialog should be opened!' + err);
-        });
+        }
     }
 
     async waitForDialogClosed() {
@@ -78,5 +80,6 @@ class NewSettingsItemDialog extends Page {
         return this.waitForElementDisplayed(selector, appConst.shortTimeout);
     }
 }
+
 module.exports = NewSettingsItemDialog;
 

@@ -76,6 +76,7 @@ describe('layers.content.tree.dialog.spec - tests for Layers Content Tree modal 
             assert.equal(layers[2], LAYER2_DISPLAY_NAME, 'The second layer should be present in the tree layers');
         });
 
+    // TODO finish the test:
     it.skip("GIVEN 'Layers Tree' is opened WHEN layer-item has been clicked THEN Edit button gets visible",
         async () => {
             await studioUtils.switchToContentMode();
