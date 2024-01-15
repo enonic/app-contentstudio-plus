@@ -1,4 +1,5 @@
 import com.enonic.uitest.server.ServerInstance
+import org.codehaus.groovy.runtime.GStringImpl
 
 plugins {
     id 'java'
@@ -13,18 +14,18 @@ configurations {
 }
 
 ext {
-    unpackDir = "$buildDir/install"
-    distroDir = "$unpackDir/enonic-xp-generic-$xpVersion"
-    appDir = "$projectDir/test-applications"
-    seleniumDir = "$projectDir/test-applications/selenium"
-    xpHome = "$distroDir/home"
-    deployDir = "$xpHome/deploy"
-    licenseDir = "$xpHome/license"
-    configDir = "$xpHome/config"
+    unpackDir = "$buildDir/install" as GStringImpl
+    distroDir = "$unpackDir/enonic-xp-generic-$xpVersion" as GStringImpl
+    appDir = "$projectDir/test-applications" as GStringImpl
+    seleniumDir = "$projectDir/test-applications/selenium" as GStringImpl
+    xpHome = "$distroDir/home" as GStringImpl
+    deployDir = "$xpHome/deploy" as GStringImpl
+    licenseDir = "$xpHome/license" as GStringImpl
+    configDir = "$xpHome/config" as GStringImpl
     xpServer = new ServerInstance()
-    contentStudioFile = "$deployDir/contentstudio-${version}.jar"
-    contentStudioPlusFile = "$deployDir/contentstudio.plus-${version}.jar"
-    contentStudioPlusAppUrl = project.hasProperty('contentStudioPlusAppUrl') ? contentStudioPlusAppUrl : "file:///$projectDir/../build/libs/contentstudio.plus.jar"
+    contentStudioFile = "$deployDir/contentstudio-${version}.jar" as GStringImpl
+    contentStudioPlusFile = "$deployDir/contentstudio.plus-${version}.jar" as GStringImpl
+    contentStudioPlusAppUrl = project.hasProperty('contentStudioPlusAppUrl') ? contentStudioPlusAppUrl : "file:///$projectDir/../build/libs/contentstudio.plus.jar" as GStringImpl
 }
 
 dependencies {
@@ -32,14 +33,14 @@ dependencies {
     deploy "com.enonic.app:contentstudio:$libContentStudioVersion@jar"
 }
 
-task unpackDistro( type: Copy ) {
+tasks.register('unpackDistro', Copy) {
     from {
         configurations.distro.collect { zipTree( it ) }
     }
     into file( unpackDir )
 }
 
-task copyLicense( type: Copy ) {
+tasks.register('copyLicense', Copy) {
     doLast {
         println "Copy license"
     }
@@ -49,7 +50,7 @@ task copyLicense( type: Copy ) {
     mustRunAfter unpackDistro
 }
 
-task copyConfig( type: Copy ) {
+tasks.register('copyConfig', Copy) {
     doLast {
         println "$appDir${File.separator}common-config"
     }
@@ -60,7 +61,7 @@ task copyConfig( type: Copy ) {
     mustRunAfter unpackDistro
 }
 
-task copyApps( type: Copy ) {
+tasks.register('copyApps', Copy) {
     doLast {
         println '*********************************************************'
         println '* task started:copyApps  *'
@@ -74,8 +75,7 @@ task copyApps( type: Copy ) {
     mustRunAfter 'startServer'
 }
 
-
-task deployContentStudio( type: Copy ) {
+tasks.register('deployContentStudio', Copy) {
     from {
         configurations.deploy
     }
@@ -83,7 +83,7 @@ task deployContentStudio( type: Copy ) {
     mustRunAfter unpackDistro
 }
 
-task deployContentStudioPlus( type: DefaultTask ) {
+tasks.register('deployContentStudioPlus', DefaultTask) {
     outputs.files( contentStudioPlusFile )
     doLast {
         println 'Retrieving Content Studio Plus App from:'
@@ -106,7 +106,8 @@ task deployContentStudioPlus( type: DefaultTask ) {
 }
 
 
-task startServer( dependsOn: [unpackDistro, copyConfig, copyLicense, deployContentStudio, deployContentStudioPlus] ) {
+tasks.register('startServer') {
+    dependsOn( unpackDistro, copyConfig, copyLicense, deployContentStudio, deployContentStudioPlus )
     doLast {
         xpServer.installDir = file( distroDir )
         xpServer.start()
@@ -114,27 +115,29 @@ task startServer( dependsOn: [unpackDistro, copyConfig, copyLicense, deployConte
     mustRunAfter npmInstall
 }
 
-task stopServer {
+tasks.register('stopServer') {
     doLast {
         xpServer.stop()
     }
 }
 
-task cleanup(type: Delete) {
+tasks.register('cleanup', Delete) {
     delete './build/reports/allure'
 }
 
-task generateReportAndStopServer( type: NpmTask ) {
+tasks.register('generateReportAndStopServer', NpmTask ) {
     args = ['run-script', 'allure-report']
     finalizedBy cleanup
     finalizedBy stopServer
 }
 
-task w_testCSPlusChrome( type: NpmTask, dependsOn: [npmInstall, startServer, copyApps]) {
+tasks.register('w_testCSPlusChrome', NpmTask) {
+    dependsOn( npmInstall, startServer, copyApps )
     args = ['run-script', 'test_cs_plus:wdio_chrome']
     finalizedBy generateReportAndStopServer
 }
 
-task w_testAdminHomeChromeLocal( type: NpmTask, dependsOn: [npmInstall] ) {
+tasks.register('w_testAdminHomeChromeLocal', NpmTask) {
+    dependsOn( npmInstall )
     args = ['run-script', 'test_cs_plus:wdio_chrome']
 }
