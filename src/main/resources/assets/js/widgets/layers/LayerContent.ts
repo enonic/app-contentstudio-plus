@@ -44,7 +44,7 @@ export class LayerContent implements Equitable {
             return false;
         }
 
-        const other: LayerContent = <LayerContent>o;
+        const other: LayerContent = o as LayerContent;
 
         return ObjectHelper.equals(this.project, other.project) && ObjectHelper.equals(this.item, other.item);
     }

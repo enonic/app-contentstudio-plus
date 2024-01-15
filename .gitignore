@@ -17,3 +17,4 @@ npm-debug.log
 generated-java
 node_modules/
 .xp
+/.eslintcache
