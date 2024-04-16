@@ -10,7 +10,7 @@ const ProjectWizardDialogPermissionsStep = require('../page_objects/project/proj
 const ProjectWizardDialogApplicationsStep = require('../page_objects/project/project-wizard-dialog/project.wizard.applications.step');
 const ProjectWizardDialogNameAndIdStep = require('../page_objects/project/project-wizard-dialog/project.wizard.name.id.step');
 const ProjectWizardDialogSummaryStep = require('../page_objects/project/project-wizard-dialog/project.wizard.summary.step');
-const appConst = require("./app_const");
+const appConst = require('./app_const');
 const path = require('path');
 const fs = require('fs');
 const webDriverHelper = require('./WebDriverHelper');
@@ -38,13 +38,9 @@ module.exports = {
     },
     async fillParentNameStep(parents) {
         let parentProjectStep = new ProjectWizardDialogParentProjectStep();
-        if (Array.isArray(parents)) {
-            for (let name of parents) {
-                await parentProjectStep.selectParentProject(name);
-            }
-        }
-        else{
-            await parentProjectStep.selectParentProject(parents);
+        parents = [].concat(parents);
+        for (let name of parents) {
+            await parentProjectStep.selectParentProject(name);
         }
         await parentProjectStep.clickOnNextButton();
         return new ProjectWizardDialogLanguageStep();
@@ -65,7 +61,7 @@ module.exports = {
             await accessModeStep.clickOnAccessModeRadio(accessMode);
         } else {
             //set the default access mode for ui-tests:
-            await accessModeStep.clickOnAccessModeRadio("Private");
+            await accessModeStep.clickOnAccessModeRadio('Private');
         }
         await accessModeStep.clickOnNextButton();
         return new ProjectWizardDialogPermissionsStep();
@@ -145,7 +141,7 @@ module.exports = {
         } catch (err) {
             let screenshot = appConst.generateRandomName('err_save_proj');
             await this.saveScreenshot(screenshot);
-            throw new Error("Error when saving a project, screenshot:" + screenshot + "  " + err);
+            throw new Error('Error when saving a project, screenshot:' + screenshot + '  ' + err);
         }
     },
     async waitForElementDisplayed(locator, ms) {
