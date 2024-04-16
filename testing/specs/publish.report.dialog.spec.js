@@ -6,7 +6,7 @@ const webDriverHelper = require('../libs/WebDriverHelper');
 const appConst = require('../libs/app_const');
 const PublishReportDialog = require('../page_objects/publish.report.dialog');
 const studioUtils = require('../libs/studio.utils.js');
-const contentBuilder = require("../libs/content.builder");
+const contentBuilder = require('../libs/content.builder');
 const ContentWizardPanel = require('../page_objects/wizardpanel/content.wizard.panel');
 const WizardPublishReportWidget = require('../page_objects/wizardpanel/details/wizard.publish.report.widget');
 const ContentPublishDialog = require('../page_objects/content.publish.dialog');
@@ -57,7 +57,7 @@ describe('publish.report.dialog.spec: tests for publish report dialog', function
             await publishReportDialog.waitForShowEntireContentCheckboxNotDisplayed();
             // 6. Verify the 'Item went online' in the header of the single comparison block:
             let actualText = await publishReportDialog.getHeaderInComparisonBlock(0);
-            assert.equal(actualText, ITEM_ONLINE_TEXT, "'Item went online' - this text should be displayed in the single comparison block");
+            assert.equal(actualText, ITEM_ONLINE_TEXT, `'Item went online' - this text should be displayed in the single comparison block`);
         });
 
     it(`GIVEN existing folder has been unpublished in the wizard WHEN 'Publish report' modal dialog has been opened THEN 'Item went offline' text should appear`,
@@ -82,13 +82,13 @@ describe('publish.report.dialog.spec: tests for publish report dialog', function
             await publishReportDialog.waitForDialogLoaded();
             // 5. Verify that the Comparisons-block with 'Item went offline' text gets visible in the modal dialog:
             let actualText = await publishReportDialog.getAllComparisonsBlockHeader();
-            assert.equal(actualText, ITEM_OFFLINE_TEXT, "'Item went offline' should be displayed in the modal dialog");
+            assert.equal(actualText, ITEM_OFFLINE_TEXT, `'Item went offline' should be displayed in the modal dialog`);
             // 6. Verify the date in the 'Item went offline' block:
             let actualDate = await publishReportDialog.getAllComparisonsDate();
-            assert.ok(actualDate.includes(CURRENT_DATE), "Current date should be displayed in the text and date block");
+            assert.ok(actualDate.includes(CURRENT_DATE), 'Current date should be displayed in the text and date block');
             // 7. Verify  that the comparison block remains visible -  'Item went online' text should be in the header of the single comparison block
             actualText = await publishReportDialog.getHeaderInComparisonBlock(0);
-            assert.equal(actualText, ITEM_ONLINE_TEXT, "Item went online - this text should be displayed in the comparison block");
+            assert.equal(actualText, ITEM_ONLINE_TEXT, 'Item went online - this text should be displayed in the comparison block');
         });
 
     it(`GIVEN existing folder has been published in the second time WHEN 'Publish report' modal dialog has been opened THEN 'Comparing' text should appear in the modal dialog`,
@@ -112,16 +112,16 @@ describe('publish.report.dialog.spec: tests for publish report dialog', function
             await publishReportDialog.waitForDialogLoaded();
             // 5. Verify 'Comparing' text in the header of the single comparison block:
             let actualText = await publishReportDialog.getHeaderInComparisonBlock(0);
-            assert.equal(actualText, ITEM_REPUBLISHED_HEADER, "'Comparing' - this text should be displayed in the single comparison block");
+            assert.equal(actualText, ITEM_REPUBLISHED_HEADER, `'Comparing' - this text should be displayed in the single comparison block`);
             let actualDate = await publishReportDialog.getDateInHeaderOfComparisonBlock(0);
-            assert.ok(actualDate.includes(CURRENT_DATE), "Current date should be displayed in the text and date block");
+            assert.ok(actualDate.includes(CURRENT_DATE), 'Current date should be displayed in the text and date block');
             // 6. Verify the text in the subtitle of the single comparison block - 'NB: Item was offline from'
             let subTitle = await publishReportDialog.getSubtitleInComparisonBlock(0);
             assert.equal(subTitle, ITEM_REPUBLISHED_SUBTITLE,
-                "'NB: Item was offline from' - should be displayed in the subtitle of the comparison block");
+                `'NB: Item was offline from' - should be displayed in the subtitle of the comparison block`);
             // 7. Verify that 'Show entire content' checkbox is displayed and not selected:
             let isSelected = await publishReportDialog.isShowEntireContentCheckboxSelected(0);
-            assert.ok(isSelected === false, "'Show entire content' checkbox should not be selected");
+            assert.ok(isSelected === false, `'Show entire content' checkbox should not be selected`);
         });
 
     beforeEach(async () => {

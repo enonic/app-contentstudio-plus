@@ -7,7 +7,7 @@ const studioUtils = require('../libs/studio.utils.js');
 const projectUtils = require('../libs/project.utils.js');
 const SettingsBrowsePanel = require('../page_objects/project/settings.browse.panel');
 const ContentBrowsePanel = require('../page_objects/browsepanel/content.browse.panel');
-const contentBuilder = require("../libs/content.builder");
+const contentBuilder = require('../libs/content.builder');
 const appConst = require('../libs/app_const');
 const ConfirmValueDialog = require('../page_objects/confirm.content.delete.dialog');
 
@@ -44,18 +44,16 @@ describe('layers.content.tree.dialog.spec - tests for Layers Content Tree modal 
             await settingsBrowsePanel.waitForNotificationMessage();
         });
 
-    it('Precondition 2 - the second layer(Norsk no) should be added in Default project',
+    it('Precondition 2 - the second layer(Norsk no) should be added in the just created layer',
         async () => {
             let settingsBrowsePanel = new SettingsBrowsePanel();
-            //1.Select the just created layer and create one more layer:
-            await settingsBrowsePanel.openProjectWizardDialog();
-            let layer = projectUtils.buildLayer(LAYER1_DISPLAY_NAME, appConst.LANGUAGES.NORSK_NO, appConst.PROJECT_ACCESS_MODE.PUBLIC,
-                null, null, LAYER2_DISPLAY_NAME);
+            let layer = projectUtils.buildLayer(LAYER1_DISPLAY_NAME, appConst.LANGUAGES.NORSK_NO, appConst.PROJECT_ACCESS_MODE.PUBLIC, null,null,LAYER2_DISPLAY_NAME);
+            await settingsBrowsePanel.clickOnNewButton();
             await projectUtils.fillFormsWizardAndClickOnCreateButton(layer);
             await settingsBrowsePanel.waitForNotificationMessage();
         });
 
-    it("GIVEN existing folder is selected in the layer WHEN 'Show All' button has been clicked THEN 'Layers Tree' dialog should be loaded",
+    it(`GIVEN existing folder is selected in the layer WHEN 'Show All' button has been clicked THEN 'Layers Tree' dialog should be loaded`,
         async () => {
             let contentBrowsePanel = new ContentBrowsePanel();
             await studioUtils.switchToContentMode();
@@ -77,7 +75,7 @@ describe('layers.content.tree.dialog.spec - tests for Layers Content Tree modal 
         });
 
     // TODO finish the test:
-    it.skip("GIVEN 'Layers Tree' is opened WHEN layer-item has been clicked THEN Edit button gets visible",
+    it.skip(`GIVEN 'Layers Tree' is opened WHEN layer-item has been clicked THEN Edit button gets visible`,
         async () => {
             await studioUtils.switchToContentMode();
             // 1. Open modal dialog and select the layer's context:
@@ -89,7 +87,7 @@ describe('layers.content.tree.dialog.spec - tests for Layers Content Tree modal 
             await layersContentTreeDialog.clickOnLayerItem(LAYER1_DISPLAY_NAME);
         });
 
-    it("GIVEN inherited content is selected AND 'Layers Tree dialog' is opened WHEN current list item has been clicked THEN 'Localise' button gets visible in the tree list item",
+    it(`GIVEN inherited content is selected AND 'Layers Tree dialog' is opened WHEN current list item has been clicked THEN 'Localise' button gets visible in the tree list item`,
         async () => {
             let contentBrowsePanel = new ContentBrowsePanel();
             await studioUtils.switchToContentMode();
@@ -104,10 +102,10 @@ describe('layers.content.tree.dialog.spec - tests for Layers Content Tree modal 
             await studioUtils.saveScreenshot('layers_tree_dialog_2');
             // 4. Verify that 'Localize' button is present in the tree item:
             let buttonLabel = await layersContentTreeDialog.getButtonLabelInItemView(LAYER1_DISPLAY_NAME);
-            assert.equal(buttonLabel, 'Localize', "'Localize' button gets visible in the tree list item");
+            assert.equal(buttonLabel, 'Localize', `'Localize' button gets visible in the tree list item`);
         });
 
-    it("GIVEN the local copy of inherited folder is selected WHEN Layers widget has been opened THEN only one item with button 'Edit' should be present in the widget",
+    it(`GIVEN the local copy of inherited folder is selected WHEN Layers widget has been opened THEN only one item with button 'Edit' should be present in the widget`,
         async () => {
             let contentBrowsePanel = new ContentBrowsePanel();
             await studioUtils.switchToContentMode();
@@ -130,7 +128,7 @@ describe('layers.content.tree.dialog.spec - tests for Layers Content Tree modal 
             await browseLayersWidget.waitForShowAllButtonDisplayed();
         });
 
-    it("WHEN children layers have been sequentially removed THEN parent project can be deleted",
+    it('WHEN children layers have been sequentially removed THEN parent project can be deleted',
         async () => {
             let settingsBrowsePanel = new SettingsBrowsePanel();
             let confirmValueDialog = new ConfirmValueDialog();
