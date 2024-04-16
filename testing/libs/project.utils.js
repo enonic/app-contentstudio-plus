@@ -17,7 +17,7 @@ const webDriverHelper = require('./WebDriverHelper');
 
 module.exports = {
     getBrowser() {
-        if (typeof browser !== "undefined") {
+        if (typeof browser !== 'undefined') {
             return browser;
         } else {
             return webDriverHelper.browser;
@@ -36,21 +36,17 @@ module.exports = {
         await summaryStep.waitForDialogClosed();
         return await settingsBrowsePanel.pause(500);
     },
-    async fillParentNameStep(parentName) {
+    async fillParentNameStep(parents) {
         let parentProjectStep = new ProjectWizardDialogParentProjectStep();
-        //check if parent project was selected in Grid:
-        if (await parentProjectStep.isSelectedParentProjectDisplayed()) {
-            await parentProjectStep.clickOnNextButton();
-        } else if (parentName) {
-            //click on 'Layer' radio, select a parent project then click on Next button:
-            await parentProjectStep.clickOnLayerRadioButton();
-            await parentProjectStep.selectParentProject(parentName);
-            await parentProjectStep.clickOnNextButton();
-        } else {
-            //click on 'Project' radio, select a parent project then click on Next button:
-            await parentProjectStep.clickOnProjectRadioButton();
-            await parentProjectStep.clickOnNextButton();
+        if (Array.isArray(parents)) {
+            for (let name of parents) {
+                await parentProjectStep.selectParentProject(name);
+            }
         }
+        else{
+            await parentProjectStep.selectParentProject(parents);
+        }
+        await parentProjectStep.clickOnNextButton();
         return new ProjectWizardDialogLanguageStep();
     },
     async fillLanguageStep(language) {
@@ -119,8 +115,13 @@ module.exports = {
     },
     async fillFormsWizard(project) {
         try {
-            let languageStep = await this.fillParentNameStep(project.parentName);
-            await languageStep.waitForLoaded();
+            if (!project.parents) {
+                let parentProjectStep = new ProjectWizardDialogParentProjectStep();
+                await parentProjectStep.clickOnSkipButton();
+            } else {
+                let languageStep = await this.fillParentNameStep(project.parents);
+                await languageStep.waitForLoaded();
+            }
             let accessModeStep = await this.fillLanguageStep(project.language);
             await accessModeStep.waitForLoaded();
             let permissionsStep = await this.fillAccessModeStep(project.accessMode);
@@ -142,10 +143,14 @@ module.exports = {
             await projectWizardDialogSummaryStep.pause(1000);
             await projectWizardDialogSummaryStep.waitForLoaded();
         } catch (err) {
-            let screenshot = appConst.generateRandomName("err_save_proj");
+            let screenshot = appConst.generateRandomName('err_save_proj');
             await this.saveScreenshot(screenshot);
             throw new Error("Error when saving a project, screenshot:" + screenshot + "  " + err);
         }
+    },
+    async waitForElementDisplayed(locator, ms) {
+        let element = await this.getBrowser().$(locator);
+        return await element.waitForDisplayed(ms);
     },
     async fillFormsWizardAndClickOnCreateButton(project) {
         let settingsBrowsePanel = new SettingsBrowsePanel();
@@ -174,6 +179,15 @@ module.exports = {
         await confirmValueDialog.waitForDialogClosed();
         return await settingsBrowsePanel.waitForNotificationMessage();
     },
+    async selectParentAndOpenProjectWizardDialog(parentName) {
+        let settingsBrowsePanel = new SettingsBrowsePanel();
+        await settingsBrowsePanel.clickOnRowByDisplayName(parentName);
+        await settingsBrowsePanel.clickOnNewButton();
+        let parentProjectStep = new ProjectWizardDialogParentProjectStep();
+        await parentProjectStep.waitForLoaded();
+        return parentProjectStep;
+    },
+
     saveScreenshot(name, that) {
         let screenshotsDir = path.join(__dirname, '/../build/reports/screenshots/');
         if (!fs.existsSync(screenshotsDir)) {
@@ -196,10 +210,10 @@ module.exports = {
             principalsToAccess: principalsToAccess
         };
     },
-    buildLayer(parentName, language, accessMode, principalsToAccess, applications, name, identifier, description) {
+    buildLayer(parents, language, accessMode, principalsToAccess, applications, name, identifier, description) {
         return {
             language: language,
-            parentName: parentName,
+            parents: parents,
             accessMode: accessMode,
             applications: applications,
             name: name,
