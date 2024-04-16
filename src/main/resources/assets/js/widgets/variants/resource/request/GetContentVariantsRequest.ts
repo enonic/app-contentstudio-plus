@@ -37,10 +37,13 @@ export class GetContentVariantsRequest extends CmsContentResourceRequest<Content
 
     fetchWithCompareStatus(): Q.Promise<ContentSummaryAndCompareStatus[]> {
         return super.sendAndParse().then((items: ContentSummary[]) => {
-            return new ContentSummaryAndCompareStatusFetcher().fetchStatus(items).then((contents: ContentSummaryAndCompareStatus[]) => {
-                GetContentVariantsRequest.variantsCache.set(this.id, contents);
-                return contents;
-            });
+            const contentIds = items.map((item: ContentSummary) => item.getContentId());
+            return new ContentSummaryAndCompareStatusFetcher()
+                .fetchAndCompareStatus(contentIds)
+                .then((contents: ContentSummaryAndCompareStatus[]) => {
+                    GetContentVariantsRequest.variantsCache.set(this.id, contents);
+                    return contents;
+                });
         });
     }
 

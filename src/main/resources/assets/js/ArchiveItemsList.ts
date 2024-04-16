@@ -7,6 +7,7 @@ import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import {Element} from '@enonic/lib-admin-ui/dom/Element';
 import {AppHelper} from '@enonic/lib-admin-ui/util/AppHelper';
 import {ArchiveResourceRequest} from './resource/ArchiveResourceRequest';
+import {ContentSummary} from 'lib-contentstudio/app/content/ContentSummary';
 
 export class ArchiveItemsList extends ListBox<ContentSummaryAndCompareStatus> {
 
@@ -85,9 +86,11 @@ export class ArchiveItemsList extends ListBox<ContentSummaryAndCompareStatus> {
         const idsToLoad: ContentId[] = this.idsToLoad.slice(totalLoaded, totalLoaded + 10);
 
         this.archiveContentFetcher.fetchByIds(idsToLoad)
-            .then((items: ContentSummaryAndCompareStatus[]) => {
+            .then((items: ContentSummary[]) => {
                 this.loading = false;
-                this.addItems(items);
+                const contentSummaries: ContentSummaryAndCompareStatus[] =
+                    items.map((contentSummary: ContentSummary) => ContentSummaryAndCompareStatus.fromContentSummary(contentSummary));
+                this.addItems(contentSummaries);
                 this.removeClass(ArchiveItemsList.LOADING_CLASS);
             })
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
