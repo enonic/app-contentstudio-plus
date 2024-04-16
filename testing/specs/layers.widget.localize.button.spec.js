@@ -12,7 +12,7 @@ const ContentWizard = require('../page_objects/wizardpanel/content.wizard.panel'
 const appConst = require('../libs/app_const');
 const ConfirmationDialog = require("../page_objects/confirmation.dialog");
 
-describe('layer.localize.button.spec - checks Localize button in browse toolbar and Layers widget', function () {
+describe('layers.widget.localize.button.spec - checks Localize button in browse toolbar and Layers widget', function () {
     this.timeout(appConst.SUITE_TIMEOUT);
     // setup standalone mode if WDIO is not defined:
     if (typeof browser === 'undefined') {
@@ -29,7 +29,7 @@ describe('layer.localize.button.spec - checks Localize button in browse toolbar 
             await studioUtils.closeProjectSelectionDialog();
             await studioUtils.openSettingsPanel();
             // 1.'Default' project should be loaded after closing the 'Select project' dialog, then open wizard for new layer:
-            await projectUtils.selectParentAndOpenProjectWizardDialog('Default');
+            await settingsBrowsePanel.openProjectWizardDialog();
             let layer = projectUtils.buildLayer('Default', appConst.LANGUAGES.NORSK_NO, appConst.PROJECT_ACCESS_MODE.PUBLIC, null,
                 null, LAYER_DISPLAY_NAME);
             await projectUtils.fillFormsWizardAndClickOnCreateButton(layer);
