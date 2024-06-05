@@ -1,5 +1,4 @@
-import com.enonic.uitest.server.ServerInstance
-import org.codehaus.groovy.runtime.GStringImpl
+import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 
 plugins {
     id 'java'
@@ -13,31 +12,26 @@ configurations {
     deploy
 }
 
-ext {
-    unpackDir = "$buildDir/install" as GStringImpl
-    distroDir = "$unpackDir/enonic-xp-generic-$xpVersion" as GStringImpl
-    appDir = "$projectDir/test-applications" as GStringImpl
-    seleniumDir = "$projectDir/test-applications/selenium" as GStringImpl
-    xpHome = "$distroDir/home" as GStringImpl
-    deployDir = "$xpHome/deploy" as GStringImpl
-    licenseDir = "$xpHome/license" as GStringImpl
-    configDir = "$xpHome/config" as GStringImpl
-    xpServer = new ServerInstance()
-    contentStudioFile = "$deployDir/contentstudio-${version}.jar" as GStringImpl
-    contentStudioPlusFile = "$deployDir/contentstudio.plus-${version}.jar" as GStringImpl
-    contentStudioPlusAppUrl = project.hasProperty('contentStudioPlusAppUrl') ? contentStudioPlusAppUrl : "file:///$projectDir/../build/libs/contentstudio.plus.jar" as GStringImpl
-}
+def unpackDir = layout.buildDirectory.dir("install").get()
+def distroDir = unpackDir.dir("enonic-xp-generic-$xpVersion")
+def appDir = "$projectDir/test-applications"
+def xpHome = "$distroDir/home"
+def deployDir = distroDir.dir("home/deploy")
+def licenseDir = distroDir.dir("home/license")
+def configDir = "$xpHome/config"
+def contentStudioPlusFile = "$deployDir/contentstudio.plus-${version}.jar"
+def contentStudioPlusAppUrl = project.hasProperty('contentStudioPlusAppUrl') ? contentStudioPlusAppUrl : "file:///$projectDir/../build/libs/contentstudio.plus.jar" as GStringImpl
 
 dependencies {
     distro "com.enonic.xp:enonic-xp-generic:$xpVersion@zip"
     deploy "com.enonic.app:contentstudio:$libContentStudioVersion@jar"
 }
 
-tasks.register('unpackDistro', Copy) {
+tasks.register( 'unpackDistro', Copy ) {
     from {
         configurations.distro.collect { zipTree( it ) }
     }
-    into file( unpackDir )
+    into unpackDir
 }
 
 tasks.register('copyLicense', Copy) {
@@ -46,7 +40,7 @@ tasks.register('copyLicense', Copy) {
     }
     from file (rootProject.projectDir)
     include 'enonic.platform.subscription.lic'
-    into file( licenseDir )
+    into licenseDir
     mustRunAfter unpackDistro
 }
 
@@ -57,7 +51,7 @@ tasks.register('copyConfig', Copy) {
     from "$appDir${File.separator}common-config"
     include '**.*.cfg'
     include '*.properties'
-    into file( configDir )
+    into configDir
     mustRunAfter unpackDistro
 }
 
@@ -71,15 +65,15 @@ tasks.register('copyApps', Copy) {
     }
     from file( appDir )
     include '*.jar'
-    into file( deployDir )
-    mustRunAfter 'startServer'
+    into deployDir
+    mustRunAfter unpackDistro
 }
 
 tasks.register('deployContentStudio', Copy) {
     from {
         configurations.deploy
     }
-    into file( deployDir )
+    into deployDir
     mustRunAfter unpackDistro
 }
 
@@ -106,18 +100,37 @@ tasks.register('deployContentStudioPlus', DefaultTask) {
 }
 
 
-tasks.register('startServer') {
-    dependsOn( unpackDistro, copyConfig, copyLicense, deployContentStudio, deployContentStudioPlus )
+def process
+tasks.register( 'startServer' ) {
+    dependsOn( unpackDistro, copyConfig, copyLicense, deployContentStudio, deployContentStudioPlus, copyApps )
     doLast {
-        xpServer.installDir = file( distroDir )
-        xpServer.start()
+        def pb
+        if (DefaultNativePlatform.getCurrentOperatingSystem().windows) {
+            pb = new ProcessBuilder('cmd', '/c', "${distroDir}\\bin\\server.bat")
+        }
+        else {
+            pb = new ProcessBuilder("${distroDir}/bin/server.sh")
+        }
+        Map<String, String> env = pb.environment()
+        env.put("XP_HOME", "${xpHome}".toString())
+
+        def logsPath = layout.buildDirectory.dir("reports/logs").get()
+        mkdir logsPath.asFile
+        pb.redirectOutput(logsPath.file("xp.log").asFile)
+        pb.redirectErrorStream(true)
+        process = pb.start()
+        sleep(90000)
     }
-    mustRunAfter npmInstall
 }
 
-tasks.register('stopServer') {
+
+tasks.register( 'stopServer' ) {
     doLast {
-        xpServer.stop()
+        if (DefaultNativePlatform.getCurrentOperatingSystem().windows) {
+            Runtime.getRuntime().exec("taskkill /F /T /PID " + process.pid());
+        } else {
+            process.destroy()
+        }
     }
 }
 
@@ -132,7 +145,7 @@ tasks.register('generateReportAndStopServer', NpmTask ) {
 }
 
 tasks.register('w_testCSPlusChrome', NpmTask) {
-    dependsOn( npmInstall, startServer, copyApps )
+    dependsOn( npmInstall, startServer )
     args = ['run-script', 'test_cs_plus:wdio_chrome']
     finalizedBy generateReportAndStopServer
 }
