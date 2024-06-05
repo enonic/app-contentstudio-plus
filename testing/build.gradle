@@ -20,7 +20,7 @@ def deployDir = distroDir.dir("home/deploy")
 def licenseDir = distroDir.dir("home/license")
 def configDir = "$xpHome/config"
 def contentStudioPlusFile = "$deployDir/contentstudio.plus-${version}.jar"
-def contentStudioPlusAppUrl = project.hasProperty('contentStudioPlusAppUrl') ? contentStudioPlusAppUrl : "file:///$projectDir/../build/libs/contentstudio.plus.jar" as GStringImpl
+def contentStudioPlusAppUrl = project.hasProperty('contentStudioPlusAppUrl') ? contentStudioPlusAppUrl : "file:///$projectDir/../build/libs/contentstudio.plus.jar"
 
 dependencies {
     distro "com.enonic.xp:enonic-xp-generic:$xpVersion@zip"
