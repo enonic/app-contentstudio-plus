@@ -5,16 +5,16 @@ import {ContentId} from 'lib-contentstudio/app/content/ContentId';
 import {Action} from '@enonic/lib-admin-ui/ui/Action';
 import {GetDescendantsOfContentsRequest} from 'lib-contentstudio/app/resource/GetDescendantsOfContentsRequest';
 import {ArchiveItemsList} from './ArchiveItemsList';
-import {ArchiveViewItem} from './ArchiveViewItem';
 import {ArchiveDialogItemList} from './ArchiveDialogItemList';
 import {ArchiveResourceRequest} from './resource/ArchiveResourceRequest';
+import {ArchiveContentViewItem} from './ArchiveContentViewItem';
 
 export abstract class ArchiveDialog
     extends ModalDialog {
 
     protected confirmValueDialog: ConfirmValueDialog;
 
-    protected items: ArchiveViewItem[];
+    protected items: ArchiveContentViewItem[];
 
     protected archiveItemViewers: ArchiveDialogItemList;
 
@@ -30,12 +30,12 @@ export abstract class ArchiveDialog
         super(config);
     }
 
-    setItems(items: ArchiveViewItem[]): ArchiveDialog {
+    setItems(items: ArchiveContentViewItem[]): ArchiveDialog {
         this.items = items;
-        this.archiveItemViewers.setItems(items.map(item => item.getData()));
+        this.archiveItemViewers.setItems(items);
 
         void new GetDescendantsOfContentsRequest()
-            .setContentPaths(items.map((item: ArchiveViewItem) => item.getData().getContentSummary().getPath()))
+            .setContentPaths(items.map((item: ArchiveContentViewItem) => item.getContentSummary().getPath()))
             .setContentRootPath(ArchiveResourceRequest.ARCHIVE_PATH)
             .sendAndParse()
             .then((ids: ContentId[]) => {

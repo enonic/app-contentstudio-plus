@@ -4,7 +4,6 @@ import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {ContentAggregation} from 'lib-contentstudio/app/browse/filter/ContentAggregation';
 import {ContentQuery} from 'lib-contentstudio/app/content/ContentQuery';
-import {ArchiveViewItem} from './ArchiveViewItem';
 import {ArchiveResourceRequest} from './resource/ArchiveResourceRequest';
 import * as Q from 'q';
 import {Aggregation} from '@enonic/lib-admin-ui/aggregation/Aggregation';
@@ -21,10 +20,11 @@ import {AppHelper} from '@enonic/lib-admin-ui/util/AppHelper';
 import {ProjectContext} from 'lib-contentstudio/app/project/ProjectContext';
 import {ArchiveServerEvent} from 'lib-contentstudio/app/event/ArchiveServerEvent';
 import {NodeServerChangeType} from '@enonic/lib-admin-ui/event/NodeServerChange';
+import {ArchiveContentViewItem} from './ArchiveContentViewItem';
 
 
 export class ArchiveFilterPanel
-    extends BrowseFilterPanel<ArchiveViewItem> {
+    extends BrowseFilterPanel<ArchiveContentViewItem> {
 
     private aggregations: Map<string, AggregationGroupView>;
 

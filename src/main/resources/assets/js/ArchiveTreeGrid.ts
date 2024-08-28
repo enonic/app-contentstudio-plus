@@ -6,13 +6,9 @@ import {TreeGridContextMenu} from '@enonic/lib-admin-ui/ui/treegrid/TreeGridCont
 import {ArchiveTreeGridActions} from './ArchiveTreeGridActions';
 import {ArchiveViewItem} from './ArchiveViewItem';
 import {TreeNode} from '@enonic/lib-admin-ui/ui/treegrid/TreeNode';
-import {ArchiveContentViewItem, ArchiveContentViewItemBuilder} from './ArchiveContentViewItem';
-import {ProjectContext} from 'lib-contentstudio/app/project/ProjectContext';
 import {ArchiveServerEvent} from 'lib-contentstudio/app/event/ArchiveServerEvent';
-import {ContentServerEventsHandler} from 'lib-contentstudio/app/event/ContentServerEventsHandler';
 import {ContentPath} from 'lib-contentstudio/app/content/ContentPath';
 import {ContentId} from 'lib-contentstudio/app/content/ContentId';
-import {NodeServerChangeType} from '@enonic/lib-admin-ui/event/NodeServerChange';
 import {ContentServerChangeItem} from 'lib-contentstudio/app/event/ContentServerChangeItem';
 import {ArchiveHelper} from './ArchiveHelper';
 import {ContentQuery} from 'lib-contentstudio/app/content/ContentQuery';
@@ -64,40 +60,7 @@ export class ArchiveTreeGrid
     }
 
     protected initListeners(): void {
-        ArchiveServerEvent.on((event: ArchiveServerEvent) => {
-            const type: NodeServerChangeType = event.getNodeChange().getChangeType();
 
-            if (type === NodeServerChangeType.MOVE || type === NodeServerChangeType.DELETE) {
-                const itemsToRemove: ContentServerChangeItem[] = this.extractTopMostContentItems(event);
-                const allEventItemsIds: string[] =
-                    event.getNodeChange().getChangeItems().map((item: ContentServerChangeItem) => item.getContentId().toString());
-
-                this.deselectNodes(allEventItemsIds); // required because treegrid lacks delete for multiple ids
-
-                itemsToRemove.forEach((item: ContentServerChangeItem) => {
-                    const id: string = item.getContentId().toString();
-                    this.collapseNodeByDataId(id); // required because treegrid lacks delete for multiple ids
-                    this.deleteNodeByDataId(id);
-                });
-            }
-        });
-
-        let isRefreshTriggered = false;
-
-        ContentServerEventsHandler.getInstance().onContentArchived(() => {
-            if (!isRefreshTriggered) {
-                isRefreshTriggered = true;
-
-                this.whenShown(() => {
-                    this.refresh();
-                    isRefreshTriggered = false;
-                });
-            }
-        });
-
-        ProjectContext.get().onProjectChanged(() => {
-            this.refresh();
-        });
     }
 
     protected fetchChildren(parentNode?: TreeNode<ArchiveViewItem>): Q.Promise<ArchiveViewItem[]> {
@@ -117,7 +80,7 @@ export class ArchiveTreeGrid
 
         return this.fetchItems(parentNode).then((fetchResponse: FetchResponse) => {
             parentNode.setMaxChildren(fetchResponse.total);
-            return this.getParentNodeChildrenItems(parentNode).concat(this.createNewArchiveItems(parentNode, fetchResponse));
+            return null; //this.getParentNodeChildrenItems(parentNode).concat(this.createNewArchiveItems(parentNode, fetchResponse));
         });
     }
 
@@ -127,30 +90,9 @@ export class ArchiveTreeGrid
         }
     }
 
-    private getParentNodeChildrenItems(parentNode: TreeNode<ArchiveViewItem>): ArchiveViewItem[] {
-        return parentNode.getChildren().map((child: TreeNode<ArchiveViewItem>) => child.getData());
-    }
-
-    private createNewArchiveItems(parentNode: TreeNode<ArchiveViewItem>, fetchResponse: FetchResponse): ArchiveContentViewItem[] {
-        const newArchiveViewItems: ArchiveContentViewItem[] = fetchResponse.items.map((c: ContentSummaryAndCompareStatus) => {
-            return new ArchiveContentViewItemBuilder()
-                .setOriginalParentPath(this.getParentPath(parentNode, c))
-                .setData(c)
-                .build();
-        });
-
-        if (parentNode.getChildren().length + newArchiveViewItems.length < fetchResponse.total) {
-            newArchiveViewItems.push(new ArchiveContentViewItemBuilder()
-                .setData(new ContentSummaryAndCompareStatus())
-                .build());
-        }
-
-        return newArchiveViewItems;
-    }
-
     private getParentPath(parentNode: TreeNode<ArchiveViewItem>, content: ContentSummaryAndCompareStatus): string {
         if (parentNode.hasParent()) {
-            return (parentNode.getData() as ArchiveContentViewItem).getOriginalParentPath();
+          //  return (parentNode.getData() as ArchiveContentViewItem).getOriginalParentPath();
         }
 
         return this.getOriginalParentPathForRootItem(content);
