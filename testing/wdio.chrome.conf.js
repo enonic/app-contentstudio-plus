@@ -11,6 +11,7 @@ exports.config = {
     capabilities: [{
         browserName: 'chrome',
         browserVersion: '115.0.5790.170',
+        "wdio:enforceWebDriverClassic": true,
         'goog:chromeOptions': {
             "args": [
                 "--headless", "--disable-gpu", "--no-sandbox",
