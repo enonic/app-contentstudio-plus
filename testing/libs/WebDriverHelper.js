@@ -47,6 +47,7 @@ WebDriverHelper.prototype.setupBrowser = function setupBrowser(w, h) {
         let options = {
             logLevel: "error",
             automationProtocol: "webdriver",
+            "wdio:enforceWebDriverClassic": true,
             capabilities: {
                 browserName: browser_name,
                 browserVersion: browser_version,
