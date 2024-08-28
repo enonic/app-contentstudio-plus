@@ -2,13 +2,13 @@ import {TreeGridBuilder} from '@enonic/lib-admin-ui/ui/treegrid/TreeGridBuilder'
 import {GridColumnConfig} from '@enonic/lib-admin-ui/ui/grid/GridColumn';
 import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import {TreeNode} from '@enonic/lib-admin-ui/ui/treegrid/TreeNode';
-import {ArchiveViewItem} from './ArchiveViewItem';
 import {ObjectHelper} from '@enonic/lib-admin-ui/ObjectHelper';
 import {ArchiveContentViewItem} from './ArchiveContentViewItem';
 import {Viewer} from '@enonic/lib-admin-ui/ui/Viewer';
 import {ArchiveContentViewer} from './ArchiveContentViewer';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {SpanEl} from '@enonic/lib-admin-ui/dom/SpanEl';
+import {ArchiveViewItem} from './ArchiveViewItem';
 
 export class ArchiveTreeGridHelper {
 
@@ -36,7 +36,7 @@ export class ArchiveTreeGridHelper {
         }];
     }
 
-    public static nameFormatter(_a: unknown, _b: unknown, _c: unknown, _d: unknown, dataContext: TreeNode<ArchiveViewItem>): string {
+    public static nameFormatter(_a: unknown, _b: unknown, _c: unknown, _d: unknown, dataContext: TreeNode<ArchiveContentViewItem>): string {
         return ArchiveTreeGridHelper.getViewerForArchiveItem(dataContext).toString();
     }
 
@@ -44,11 +44,11 @@ export class ArchiveTreeGridHelper {
         return SpanEl.fromText(i18n('status.archived')).toString();
     }
 
-    private static getViewerForArchiveItem(dataContext: TreeNode<ArchiveViewItem>): Viewer<ContentSummaryAndCompareStatus> {
+    private static getViewerForArchiveItem(dataContext: TreeNode<ArchiveContentViewItem>): Viewer<ContentSummaryAndCompareStatus> {
         if (ObjectHelper.iFrameSafeInstanceOf(dataContext.getData(), ArchiveContentViewItem)) {
             const viewer: Viewer<ContentSummaryAndCompareStatus> = dataContext.getViewer('displayName') ||
                                                                    new ArchiveContentViewer();
-            viewer.setObject((dataContext.getData() as ArchiveContentViewItem).getData());
+          //  viewer.setObject((dataContext.getData() as ArchiveContentViewItem));
 
             return viewer;
         }
