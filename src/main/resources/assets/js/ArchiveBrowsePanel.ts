@@ -1,5 +1,4 @@
 import {BrowseItemPanel} from '@enonic/lib-admin-ui/app/browse/BrowseItemPanel';
-import {ArchiveTreeGrid} from './ArchiveTreeGrid';
 import {ArchiveBrowseItemPanel} from './ArchiveBrowseItemPanel';
 import * as Q from 'q';
 import {ArchiveContextView} from './ArchiveContextView';
@@ -100,10 +99,6 @@ export class ArchiveBrowsePanel
     protected updateContextView(item: ArchiveContentViewItem): Q.Promise<void> {
         this.contextView.setArchiveItem(item);
         return this.contextView.setItem(item);
-    }
-
-    protected createTreeGrid(): ArchiveTreeGrid {
-        return new ArchiveTreeGrid();
     }
 
     protected createBrowseItemPanel(): BrowseItemPanel {
