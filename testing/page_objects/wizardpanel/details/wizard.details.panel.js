@@ -7,24 +7,23 @@ const appConst = require('../../../libs/app_const');
 
 const xpath = {
     container: `//div[contains(@id,'ContentWizardPanel')]//div[contains(@id,'DockedContextPanel') or contains(@id,'FloatingContextPanel')]`,
-    widgetSelectorDropdown: `//div[contains(@id,'WidgetSelectorDropdown')]`,
     widgetItem: `//div[contains(@id,'ContentWidgetItemView')]`
 };
 
 class WizardDetailsPanel extends BaseDetailsPanel {
 
     get widgetSelectorDropdown() {
-        return xpath.container + xpath.widgetSelectorDropdown;
+        return xpath.container + lib.DROPDOWN_SELECTOR.WIDGET_FILTER_DROPDOWN;
     }
 
     get widgetSelectorDropdownHandle() {
-        return xpath.container + xpath.widgetSelectorDropdown + lib.DROP_DOWN_HANDLE;
+        return xpath.container + lib.DROPDOWN_SELECTOR.WIDGET_FILTER_DROPDOWN + lib.DROP_DOWN_HANDLE;
     }
 
     async isContentInvalid() {
         let selector = xpath.container + xpath.widgetItem + lib.CONTENT_SUMMARY_AND_STATUS_VIEWER;
         let attr = await this.getAttribute(selector, 'class');
-        return await attr.includes("invalid");
+        return await attr.includes('invalid');
     }
 
     async waitForDetailsPanelLoaded() {
@@ -35,15 +34,15 @@ class WizardDetailsPanel extends BaseDetailsPanel {
                 return getPanelWidth(width) > 150;
             }, {timeout: appConst.mediumTimeout, timeoutMsg: "Details Panel was not loaded in " + appConst.mediumTimeout});
         } catch (err) {
-            await this.saveScreenshot(appConst.generateRandomName("err_load_details"));
-            throw new Error(err);
+            let screenshot = await this.saveScreenshotUniqueName('err_load_details');
+            throw new Error("Details Panel was not loaded, screenshot:" + screenshot + ' ' + err);
         }
     }
 
     isDetailsPanelLoaded() {
         return this.getBrowser().waitUntil(() => {
             return this.findElement(xpath.container).then(el => {
-                return this.getBrowser().getElementCSSValue(el.elementId, "width");
+                return this.getBrowser().getElementCSSValue(el.elementId, 'width');
             }).then(width => {
                 console.log("width: " + width);
                 return getPanelWidth(width) > 0;
@@ -53,10 +52,34 @@ class WizardDetailsPanel extends BaseDetailsPanel {
             return false;
         });
     }
+
+    async openVersionHistory() {
+        try {
+            return await super.openVersionHistory();
+        } catch (err) {
+            //Workaround for issue with the empty selector:
+            await this.saveScreenshot(appConst.generateRandomName("err_versions"));
+            await this.refresh();
+            await this.pause(4000);
+            await super.openVersionHistory();
+        }
+    }
+
+    async openDependencies() {
+        try {
+            return await super.openDependencies();
+        } catch (err) {
+            //Workaround for issue with the empty selector:
+            await this.saveScreenshot(appConst.generateRandomName("err_dependencies"));
+            await this.refresh();
+            await this.pause(4000);
+            await super.openDependencies();
+        }
+    }
 }
 
 function getPanelWidth(width) {
-    return width.substring(0, width.indexOf("px"));
+    return width.substring(0, width.indexOf('px'));
 }
 
 module.exports = WizardDetailsPanel;
