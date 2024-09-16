@@ -13,7 +13,6 @@ import {ContentVersions} from 'lib-contentstudio/app/ContentVersions';
 import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import {DateTimeFormatter} from '@enonic/lib-admin-ui/ui/treegrid/DateTimeFormatter';
 
-
 export class ArchiveItemPreviewToolbar
     extends ItemPreviewToolbar<ArchiveContentViewItem> {
 
@@ -22,7 +21,7 @@ export class ArchiveItemPreviewToolbar
     private readonly originalPathEl: SpanEl;
 
     constructor() {
-        super('archive-status-toolbar');
+        super({className: 'archive-status-toolbar'});
 
         this.archivedEl = new DivEl('archived');
 
