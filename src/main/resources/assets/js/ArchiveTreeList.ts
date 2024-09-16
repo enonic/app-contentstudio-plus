@@ -4,7 +4,6 @@ import {TreeListBox, TreeListBoxParams, TreeListElement, TreeListElementParams} 
 import {ArchiveContentViewItem} from './ArchiveContentViewItem';
 import {ArchiveContentFetcher} from './ArchiveContentFetcher';
 import {ContentPath} from 'lib-contentstudio/app/content/ContentPath';
-import {ArchiveContentViewer} from './ArchiveContentViewer';
 import {FetchResponse} from './FetchResponse';
 import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import {ArchiveListItemViewer} from './ArchiveListItemViewer';

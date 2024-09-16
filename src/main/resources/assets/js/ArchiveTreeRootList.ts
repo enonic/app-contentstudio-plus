@@ -8,6 +8,8 @@ export class ArchiveTreeRootList extends ArchiveTreeList {
 
     private filterQuery: ContentQuery;
 
+    private selectionMode: boolean;
+
     setFilterQuery(query: ContentQuery): void {
         this.filterQuery = query ? new ContentQuery() : null;
 
@@ -23,6 +25,17 @@ export class ArchiveTreeRootList extends ArchiveTreeList {
         this.load();
     }
 
+    protected handleLazyLoad(): void {
+        if (!this.selectionMode) {
+            super.handleLazyLoad();
+        }
+    }
+
+    reset(): void {
+        this.selectionMode = false;
+        this.filterQuery = null;
+    }
+
     protected fetchRootItems(): Q.Promise<FetchResponse> {
         if (!this.filterQuery) {
             return super.fetchRootItems();
@@ -31,6 +44,10 @@ export class ArchiveTreeRootList extends ArchiveTreeList {
         this.filterQuery.setFrom(this.getItemCount());
 
         return this.fetcher.fetchByQuery(this.filterQuery);
+    }
+
+    setSelectionMode(selectionMode: boolean): void {
+        this.selectionMode = selectionMode;
     }
 
 }
