@@ -1,7 +1,10 @@
+/*global app*/
+
 const portal = require('/lib/xp/portal');
 const contentLib = require('/lib/xp/content');
 const contextLib = require('/lib/xp/context');
 const mustache = require('/lib/mustache');
+const admin = require('/lib/xp/admin');
 
 
 const defaultContainerId = 'cs-plus-widget-publish-report';
@@ -36,7 +39,7 @@ const makeParams = (content, isArchived) => {
         jsUri: portal.assetUrl({
             path: 'js/widgets/publish-report.js'
         }),
-        configServiceUrl: portal.serviceUrl({service: 'config'}),
+        configServiceUrl: `${admin.getToolUrl(app.name, 'main')}/_/${app.name}/config`,
         isNoIdMode: false,
         publishFirst: content.publish.first,
         isNormalMode: !!content.publish.first,
@@ -46,10 +49,17 @@ const makeParams = (content, isArchived) => {
     }
 }
 
-const getContent = (contentId) => {
+const doGetContent = (contentId) => {
     return contentLib.get({
         key: contentId
     });
+}
+
+const getContent = (contentId, repository) => {
+    return contextLib.run({
+            repository: repository
+        }, () => doGetContent(contentId)
+    );
 }
 
 const getContentFromArchive = (contentId, repository) => {
@@ -58,7 +68,7 @@ const getContentFromArchive = (contentId, repository) => {
             attributes: {
                 contentRootPath: __.newBean('com.enonic.xp.app.contentstudio.plus.AdminBean').getArchiveRootPath()
             }
-        }, () => getContent(contentId)
+        }, () => doGetContent(contentId)
     );
 }
 
@@ -67,7 +77,7 @@ const getViewParams = (req) => {
     let isArchived = false;
 
     if (contentId) {
-        let content = getContent(contentId);
+        let content = getContent(contentId, req.params.repository);
         if (!content) {
             content = getContentFromArchive(contentId, req.params.repository);
             if (content) {
