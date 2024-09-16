@@ -8,6 +8,7 @@ const i18n = require('/lib/xp/i18n');
 function handleGet() {
     const view = resolve('./main.html');
     const locales = admin.getLocales();
+    const toolUrlBase = admin.getToolUrl(app.name, 'main');
 
     const params = {
         appName: i18n.localize({
@@ -23,8 +24,10 @@ function handleGet() {
             path: '',
             application: 'com.enonic.app.contentstudio'
         }),
-        configServiceUrl: portal.serviceUrl({service: 'config'}),
-        launcherPath: admin.getLauncherPath()
+        configServiceUrl: `${toolUrlBase}/_/${app.name}/config`,
+        launcherPath: admin.getLauncherPath(),
+        toolBaseUrl: toolUrlBase,
+        toolAppName: app.name,
     };
 
     return {

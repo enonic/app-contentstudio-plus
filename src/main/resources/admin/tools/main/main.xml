@@ -8,4 +8,8 @@
     <principal>role:cms.cm.app</principal>
     <principal>role:system.admin.login</principal>
   </allow>
+  <apis>
+    <api>config</api>
+    <api>i18n</api>
+  </apis>
 </tool>

@@ -1,5 +1,8 @@
+/*global app*/
+
 const portal = require('/lib/xp/portal');
 const mustache = require('/lib/mustache');
+const admin = require('/lib/xp/admin');
 
 function handleGet(req) {
     return renderWidgetView(req);
@@ -18,7 +21,7 @@ function renderWidgetView(req) {
         assetsUri: portal.assetUrl({
             path: ''
         }),
-        configServiceUrl: portal.serviceUrl({service: 'config'})
+        configServiceUrl: `${admin.getToolUrl(app.name, 'main')}/_/${app.name}/config`,
     };
 
     return {

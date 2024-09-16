@@ -1,8 +1,12 @@
+/*global app*/
+
 const portal = require('/lib/xp/portal');
 const mustache = require('/lib/mustache');
+const admin = require('/lib/xp/admin');
 
 function handleGet() {
     const view = resolve('./archive.html');
+    const serviceBaseUrl = `${admin.getToolUrl(app.name, 'main')}/_/${app.name}`;
     const params = {
         assetsUri: portal.assetUrl({
             path: 'js/archive.js'
@@ -10,8 +14,8 @@ function handleGet() {
         stylesUri: portal.assetUrl({
             path: 'styles/main.css'
         }),
-        configServiceUrl: portal.serviceUrl({service: 'config'}),
-        i18nServiceUrl: portal.serviceUrl({service: 'i18n'})
+        configServiceUrl: `${serviceBaseUrl}/config`,
+        i18nServiceUrl: `${serviceBaseUrl}/i18n`,
     };
 
     return {
