@@ -44,7 +44,7 @@ class BasePublishReportWidget extends Page {
 
     async waitForWidgetLoaded() {
         try {
-            let locator = "//div[contains(@id,'WidgetViewer')]" + lib.itemByName('Compare published versions');
+            let locator = "//div[contains(@id,'WidgetSelectedOptionView')]" + lib.itemByName('Compare published versions');
             return await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_publish_report_load');

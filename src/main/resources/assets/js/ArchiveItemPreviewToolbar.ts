@@ -37,7 +37,7 @@ export class ArchiveItemPreviewToolbar
         super.setItem(item);
 
         if (item) {
-            const summary: ContentSummary = item.getData().getContentSummary();
+            const summary: ContentSummary = item.getContentSummary();
             this.updatedArchivedBlock(summary);
             this.updateOriginalPathBlock(item);
         }

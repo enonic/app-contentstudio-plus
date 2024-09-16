@@ -2,18 +2,18 @@ import * as Q from 'q';
 import {TreeGridActions} from '@enonic/lib-admin-ui/ui/treegrid/actions/TreeGridActions';
 import {Action} from '@enonic/lib-admin-ui/ui/Action';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
-import {ArchiveViewItem} from './ArchiveViewItem';
 import {ArchiveDeleteDialog} from './ArchiveDeleteDialog';
 import {ArchiveRestoreDialog} from './ArchiveRestoreDialog';
+import {ArchiveContentViewItem} from './ArchiveContentViewItem';
 
 export class ArchiveTreeGridActions
-    implements TreeGridActions<ArchiveViewItem> {
+    implements TreeGridActions<ArchiveContentViewItem> {
 
     private readonly restoreAction: Action;
 
     private readonly deleteAction: Action;
 
-    private selectedItems: ArchiveViewItem[] = [];
+    private selectedItems: ArchiveContentViewItem[] = [];
 
     constructor() {
         this.restoreAction = this.createRestoreAction();
@@ -24,7 +24,7 @@ export class ArchiveTreeGridActions
         return [this.restoreAction, this.deleteAction];
     }
 
-    updateActionsEnabledState(selectedItems: ArchiveViewItem[]): Q.Promise<void> {
+    updateActionsEnabledState(selectedItems: ArchiveContentViewItem[]): Q.Promise<void> {
         this.selectedItems = selectedItems;
 
         const state: boolean = selectedItems.length > 0;

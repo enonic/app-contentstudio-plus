@@ -12,11 +12,19 @@ const XPATH = {
     contextMenuItemByName: (name) => {
         return `${lib.TREE_GRID_CONTEXT_MENU}/li[contains(@id,'MenuItem') and contains(.,'${name}')]`;
     },
-    checkboxByDisplayName: displayName => `${lib.itemByDisplayName(
-        displayName)}/ancestor::div[contains(@class,'slick-row')]/div[contains(@class,'slick-cell-checkboxsel')]/label`,
 };
 
 class BaseBrowsePanel extends Page {
+
+    get refreshButton() {
+        return this.treeGridToolbar + lib.BUTTONS.REFRESH_BUTTON;
+    }
+
+    //refresh the grid:
+    async clickOnRefreshButton() {
+        await this.clickOnElement(this.refreshButton);
+        return await this.pause(1000);
+    }
 
     async waitForGridLoaded(ms) {
         try {
@@ -24,7 +32,8 @@ class BaseBrowsePanel extends Page {
             await this.waitForElementDisplayed(this.treeGrid, timeout);
             await this.waitForSpinnerNotVisible(timeout);
         } catch (err) {
-            throw new Error('Browse panel was not loaded in ' + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_switch');
+            throw new Error(`Error occurred in grid,  screenshot: ${screenshot} ` + err);
         }
     }
 
@@ -33,26 +42,13 @@ class BaseBrowsePanel extends Page {
     }
 
     hotKeyDelete() {
-        return this.getBrowser().status().then(status => {
-            if (status.os.name.toLowerCase().includes('wind') || status.os.name.toLowerCase().includes('linux')) {
-                return this.getBrowser().keys(['Control', 'Delete']);
-            }
-            if (status.os.name.toLowerCase().includes('mac')) {
-                return this.getBrowser().keys(['Command', 'Delete']);
-            }
-        })
+        return this.getBrowser().keys(['Control', 'Delete']);
     }
 
     async hotKeyEdit() {
         let status = await this.getBrowser().status();
-        if (status.os.name.toLowerCase().includes('wind') || status.os.name.toLowerCase().includes('linux')) {
-            await this.getBrowser().keys(['Control', 'e']);
-            return await this.pause(500);
-        }
-        if (status.os.name.toLowerCase().includes('mac')) {
-            await this.getBrowser().keys(['Command', 'e']);
-            return await this.pause(500);
-        }
+        await this.getBrowser().keys(['Control', 'e']);
+        return await this.pause(500);
     }
 
     async clickOnSelectionControllerCheckbox() {
@@ -60,12 +56,12 @@ class BaseBrowsePanel extends Page {
             await this.clickOnElement(this.selectionControllerCheckBox);
             return await this.pause(300);
         } catch (err) {
-            this.saveScreenshot('err_click_on_selection_controller');
-            throw new Error('error when click on selection_controller ' + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_click_on_selection_controller');
+            throw new Error('error when click on selection_controller, screenshot: ' + screenshot + ' ' + err);
         }
     }
 
-    //wait for the "Show Selection" circle appears in the toolbar
+    // wait for the "Show Selection" circle appears in the toolbar
     async waitForSelectionTogglerVisible() {
         try {
             await this.waitForElementDisplayed(this.selectionPanelToggler, appConst.mediumTimeout);
@@ -78,10 +74,10 @@ class BaseBrowsePanel extends Page {
 
     async waitForSelectionTogglerNotVisible() {
         try {
-            return await this.waitForElementNotDisplayed(this.selectionPanelToggler, appConst.mediumTimeout);
+            await this.waitForElementNotDisplayed(this.selectionPanelToggler, appConst.mediumTimeout);
         } catch (err) {
-            await this.saveScreenshot("err_selection_toggler_should_not_visible");
-            throw new Error("Selection toggler should not be visible")
+            let screenshot = await this.saveScreenshotUniqueName("err_selection_toggler_should_not_visible");
+            throw new Error(`Selection toggler should not be visible, screenshot: ${screenshot} ` + err);
         }
     }
 
@@ -92,8 +88,8 @@ class BaseBrowsePanel extends Page {
             await this.clickOnElement(this.selectionPanelToggler);
             return await this.pause(400);
         } catch (err) {
-            this.saveScreenshot("err_clicking_on_selection_toggler");
-            throw new Error("Selection Toggler: " + err);
+            let screenshot = await this.saveScreenshotUniqueName("err_clicking_on_selection_toggler");
+            throw new Error("Selection Toggler, screenshot: " + screenshot + '' + err);
         }
     }
 
@@ -101,14 +97,14 @@ class BaseBrowsePanel extends Page {
     async waitForSelectionControllerPartial() {
         let selector = this.selectionControllerCheckBox + "//input[@type='checkbox']";
         await this.getBrowser().waitUntil(async () => {
-            let text = await this.getAttribute(selector, "class");
+            let text = await this.getAttribute(selector, 'class');
             return text.includes('partial');
         }, {timeout: appConst.shortTimeout, timeoutMsg: "Selection Controller checkBox should displayed as partial"});
     }
 
     async isSelectionControllerPartial() {
         let selector = this.selectionControllerCheckBox + "//input[@type='checkbox']";
-        let text = await this.getAttribute(selector, "class");
+        let text = await this.getAttribute(selector, 'class');
         return text.includes('partial');
     }
 
@@ -118,7 +114,7 @@ class BaseBrowsePanel extends Page {
         return this.isSelected(selector);
     }
 
-    //gets list of content display names
+    // gets list of content display names
     getDisplayNamesInGrid() {
         return this.getTextInElements(this.displayNames).catch(err => {
             this.saveScreenshot('err_get_display_name_grid');
@@ -130,38 +126,44 @@ class BaseBrowsePanel extends Page {
         try {
             return await this.waitForElementDisabled(this.newButton, appConst.mediumTimeout);
         } catch (err) {
-            await this.saveScreenshot('err_new_disabled_button');
-            throw Error('New... button should be disabled, timeout: ' + appConst.mediumTimeout + 'ms')
+            let screenshot = await this.saveScreenshotUniqueName('err_new_disabled_button');
+            throw Error('New... button should be disabled, timeout: ' + screenshot + ' ' + err);
         }
     }
 
     //Wait for `New` button is visible
     waitForNewButtonVisible() {
         return this.waitForElementDisplayed(this.newButton, appConst.mediumTimeout).catch(err => {
-            this.saveScreenshot("err_new_project_button");
+            this.saveScreenshot('err_new_project_button');
             throw new Error("New button is not visible! " + err);
         })
     }
 
-    waitForNewButtonEnabled() {
-        return this.waitForElementEnabled(this.newButton, appConst.mediumTimeout).catch(err => {
-            this.saveScreenshot('err_new_button');
-            throw new Error('New button is not enabled in : ' + err);
-        })
+    async waitForNewButtonEnabled() {
+        try {
+            await this.waitForElementEnabled(this.newButton, appConst.mediumTimeout);
+            await this.pause(400);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_new_button');
+            throw new Error('New button is not enabled , screenshot: ' + screenshot + ' ' + err);
+        }
     }
 
     waitForEditButtonDisabled() {
         return this.waitForElementDisabled(this.editButton, appConst.mediumTimeout).catch(err => {
             this.saveScreenshot('err_edit_disabled_button');
-            throw Error('Edit button should be disabled, timeout: ' + appConst.mediumTimeout + 'ms')
+            throw Error('Edit button should be disabled, timeout: ' + appConst.mediumTimeout + 'ms' + ' ' + err)
         })
     }
 
-    waitForEditButtonEnabled() {
-        return this.waitForElementEnabled(this.editButton, appConst.longTimeout).catch(err => {
-            this.saveScreenshot('err_edit_button');
-            throw Error('Edit button is not enabled after ' + appConst.longTimeout + 'ms')
-        })
+    async waitForEditButtonEnabled() {
+        try {
+            await this.waitForElementEnabled(this.editButton, appConst.longTimeout);
+            return await this.pause(300);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_edit_button');
+            throw Error('Edit button is not enabled, screenshot: ' + screenshot + " " + err);
+        }
     }
 
     isEditButtonEnabled() {
@@ -171,61 +173,105 @@ class BaseBrowsePanel extends Page {
     async clickOnNewButton() {
         await this.waitForNewButtonEnabled();
         await this.pause(200);
-        await this.clickOnElement(this.newButton);
-        await this.pause(200);
+        return await this.clickOnElement(this.newButton);
     }
 
     async clickOnEditButton() {
         try {
             await this.waitForElementEnabled(this.editButton, appConst.mediumTimeout);
             await this.clickOnElement(this.editButton);
-            return await this.pause(700);
+            return await this.pause(500);
         } catch (err) {
-            this.saveScreenshot('err_browse_panel_edit_button');
-            throw new Error('Browse Panel: Edit button is not enabled! ' + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_browse_panel_edit_button');
+            throw new Error('Browse Panel: Edit button is not enabled! screenshot:  ' + screenshot + ' ' + err);
         }
     }
 
-    clickOnRowByName(name) {
-        let nameXpath = this.treeGrid + lib.itemByName(name);
-        return this.waitForElementDisplayed(nameXpath, appConst.mediumTimeout).then(() => {
-            return this.clickOnElement(nameXpath);
-        }).catch(err => {
-            this.saveScreenshot('err_find_' + name);
-            throw Error('Row with the name ' + name + ' was not found' + err);
-        }).then(() => {
-            return this.pause(300);
-        })
+    async clickOnRowByName(name) {
+        try {
+            let nameXpath = this.treeGrid + lib.itemByName(name);
+            await this.waitForElementDisplayed(nameXpath, appConst.mediumTimeout);
+            await this.clickOnElement(nameXpath);
+            return await this.pause(300);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_find_content');
+            throw Error('Row with the content was not found, screenshot: ' + screenshot + ' ' + err);
+        }
     }
+
+    // Click on row-checkbox by name
+    async clickOnCheckboxByName(name) {
+        let listElements = lib.TREE_GRID.itemTreeGridListElementByName(name);
+        let result = await this.findElements(listElements);
+        if (result === 0) {
+            throw new Error('Checkbox was not found!');
+        }
+        let listElement = result[result.length - 1];
+        let checkboxElement = await listElement.$('.' + lib.DIV.CHECKBOX_DIV + '/label');
+        // check only the last element:
+        await checkboxElement.waitForDisplayed();
+        await checkboxElement.click();
+        return await this.pause(200);
+    }
+
+    async waitForRowCheckboxSelected(itemName) {
+        let listElements = lib.TREE_GRID.itemTreeGridListElementByName(itemName);
+        let result = await this.findElements(listElements);
+        if (result === 0) {
+            throw new Error('Checkbox was not found!');
+        }
+        // get the last 'ContentsTreeGridListElement' element:
+        let listElement = result[result.length - 1];
+        // get the checkbox input for the last 'ContentsTreeGridListElement' element
+        let checkboxElement = await listElement.$('.' + lib.INPUTS.CHECKBOX_INPUT);
+
+        await this.getBrowser().waitUntil(async () => {
+            let isSelected = await checkboxElement.isSelected();
+            return isSelected;
+        }, {timeout: appConst.mediumTimeout, timeoutMsg: "Checkbox is not selected"});
+    }
+
+    async clickOnCheckboxByDisplayName(displayName) {
+        let checkboxElement = lib.TREE_GRID.itemTreeGridListElementByDisplayName(displayName) + lib.DIV.CHECKBOX_DIV + '/label';
+        await this.waitForElementDisplayed(checkboxElement, appConst.mediumTimeout);
+        await this.clickOnElement(checkboxElement);
+        return await this.pause(200);
+    }
+
 
     async waitForContextMenuDisplayed() {
         await this.getBrowser().waitUntil(async () => {
             let result = await this.getDisplayedElements(lib.TREE_GRID_CONTEXT_MENU);
-            return result.length;
+            return result.length > 0;
         }, {timeout: appConst.mediumTimeout, timeoutMsg: "Context menu was not loaded"});
+    }
+
+    async waitForContextMenuItemNotDisplayed(menuItem) {
+        let menuItemSelector = XPATH.contextMenuItemByName(menuItem);
+        return await this.waitForElementNotDisplayed(menuItemSelector, appConst.mediumTimeout);
     }
 
     async waitForContextMenuItemEnabled(menuItem) {
         let menuItemSelector = XPATH.contextMenuItemByName(menuItem);
         let el = await this.getDisplayedElements(menuItemSelector);
-        if (!el.length) {
+        if (el.length === 0) {
             throw new Error("Menu item is not displayed: " + menuItem);
         }
         return await this.browser.waitUntil(async () => {
-            let result = await el[0].getAttribute("class");
-            return !result.includes("disabled");
+            let result = await el[0].getAttribute('class');
+            return !result.includes('disabled');
         }, {timeout: appConst.mediumTimeout, timeoutMsg: "context menu item is not enabled in 3000 ms"});
     }
 
     async waitForContextMenuItemDisabled(menuItem) {
         let menuItemSelector = XPATH.contextMenuItemByName(menuItem);
         let el = await this.getDisplayedElements(menuItemSelector);
-        if (!el.length) {
+        if (el.length === 0) {
             throw new Error("Menu item is not displayed: " + menuItem);
         }
         return await this.browser.waitUntil(async () => {
-            let result = await el[0].getAttribute("class");
-            return result.includes("disabled");
+            let result = await el[0].getAttribute('class');
+            return result.includes('disabled');
         }, {timeout: appConst.mediumTimeout, timeoutMsg: "context menu item is not disabled in 3000 ms"});
     }
 
@@ -233,7 +279,11 @@ class BaseBrowsePanel extends Page {
         let menuItemSelector = XPATH.contextMenuItemByName(menuItem);
         await this.waitForContextMenuItemEnabled(menuItem);
         let el = await this.getDisplayedElements(menuItemSelector);
-        return await el[0].click();
+        if (el.length === 0) {
+            throw new Error("Menu item is not displayed: " + menuItem);
+        }
+        await el[0].click();
+        return await this.pause(1000);
     }
 
     async doubleClickOnRowByDisplayName(displayName) {
@@ -243,32 +293,11 @@ class BaseBrowsePanel extends Page {
             await this.doDoubleClick(nameXpath);
             return await this.pause(1000);
         } catch (err) {
-            this.saveScreenshot('err_find_' + displayName);
-            throw Error('Browse Panel - Row with the displayName ' + displayName + ' was not found' + err)
+            let screenshot = await this.saveScreenshotUniqueName('err_find_');
+            throw Error('Browse Panel - Row with the displayName was not found, screenshot: ' + screenshot + ' ' + err)
         }
     }
 
-    async clickCheckboxAndSelectRowByDisplayName(displayName) {
-        try {
-            const displayNameXpath = XPATH.checkboxByDisplayName(displayName);
-            await this.waitForElementDisplayed(displayNameXpath, appConst.mediumTimeout);
-            await this.clickOnElement(displayNameXpath);
-            return await this.pause(400);
-        } catch (err) {
-            this.saveScreenshot('err_find_item');
-            throw Error(`Row with the displayName ${displayName} was not found.` + err);
-        }
-    }
-
-    async waitForRowCheckboxSelected(itemName) {
-        let checkboxDiv = this.treeGrid + `${lib.itemByName(
-            itemName)}/ancestor::div[contains(@class,'slick-row')]/div[contains(@class,'slick-cell-checkboxsel')]`;
-
-        await this.getBrowser().waitUntil(async () => {
-            let classAttr = await this.getAttribute(checkboxDiv, 'class');
-            return classAttr.includes("selected");
-        }, {timeout: appConst.mediumTimeout, timeoutMsg: "row and Checkbox is not selected"});
-    }
 }
 
 module.exports = BaseBrowsePanel;

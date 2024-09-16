@@ -148,6 +148,7 @@ module.exports = Object.freeze({
         EMULATOR: 'Emulator',
         VARIANTS: 'Variants',
         PUBLISHING_REPORT: 'Publishing report',
+        DETAILS: 'Details'
     },
     EMULATOR_RESOLUTION: {
         MEDIUM_PHONE: 'Medium Phone',
@@ -332,7 +333,7 @@ module.exports = Object.freeze({
         PUBLISH_TREE: "Publish Tree...",
         MARK_AS_READY: "Mark as ready",
         UNPUBLISH: "Unpublish...",
-        CREATE_TASK: "Create Task..."
+        CREATE_ISSUE: "Create Issue..."
     },
     GRID_CONTEXT_MENU: {
         ARCHIVE: "Archive...",
