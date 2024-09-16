@@ -63,6 +63,17 @@ export class ArchiveBrowsePanel
             this.treeListBox.setFilterQuery(query);
         });
 
+        this.treeListBox.onItemsAdded((items: ArchiveContentViewItem[], itemViews: ArchiveTreeListElement[]) => {
+            items.forEach((item: ArchiveContentViewItem, index) => {
+                const listElement = itemViews[index]?.getDataView();
+
+                listElement?.onContextMenu((event: MouseEvent) => {
+                    event.preventDefault();
+                    this.contextMenu.showAt(event.clientX, event.clientY);
+                });
+            });
+        });
+
         ArchiveServerEvent.on((event: ArchiveServerEvent) => {
             const type: NodeServerChangeType = event.getNodeChange().getChangeType();
 
@@ -141,13 +152,16 @@ export class ArchiveBrowsePanel
         return new ArchiveFilterPanel();
     }
 
-    protected enableSelectionMode() {
-        this.filterPanel.setSelectedItems(this.selectableListBoxPanel.getSelectedItems().map(item => item.getId()));
+    protected enableSelectionMode(): void {
+        this.treeListBox.setSelectionMode(true);
+        const selectedItems = this.selectableListBoxPanel.getSelectedItems() as ArchiveContentViewItem[];
+        this.treeListBox.setItems(selectedItems);
     }
 
-    protected disableSelectionMode() {
+    protected disableSelectionMode(): void {
+        this.treeListBox.reset();
         this.filterPanel.resetConstraints();
         this.hideFilterPanel();
-        this.treeListBox.setFilterQuery(null);
+
     }
 }
