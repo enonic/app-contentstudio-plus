@@ -1,7 +1,10 @@
+/*global app*/
+
 const portal = require('/lib/xp/portal');
 const contentLib = require('/lib/xp/content');
 const contextLib = require('/lib/xp/context');
 const mustache = require('/lib/mustache');
+const admin = require('/lib/xp/admin');
 
 
 const defaultContainerId = 'cs-plus-widget-publish-report';
@@ -36,7 +39,7 @@ const makeParams = (content, isArchived) => {
         jsUri: portal.assetUrl({
             path: 'js/widgets/publish-report.js'
         }),
-        configServiceUrl: portal.serviceUrl({service: 'config'}),
+        configServiceUrl: `${admin.getToolUrl(app.name, 'main')}/_/${app.name}/config`,
         isNoIdMode: false,
         publishFirst: content.publish.first,
         isNormalMode: !!content.publish.first,
