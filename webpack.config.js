@@ -5,10 +5,11 @@ const ProvidePlugin = require('webpack/lib/ProvidePlugin');
 const TerserPlugin = require('terser-webpack-plugin');
 
 const path = require('path');
-
+const fs = require('fs');
 const isProd = process.env.NODE_ENV === 'production';
-
 const assets = path.join(__dirname, '/build/resources/main/assets');
+
+const swcConfig = JSON.parse(fs.readFileSync('./.swcrc'));
 
 module.exports = {
     context: path.join(__dirname, '/src/main/resources/assets'),
@@ -34,8 +35,17 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /\.tsx?$/,
-                use: [{loader: 'ts-loader', options: {configFile: 'tsconfig.json'}}]
+                test: /\.ts$/,
+                use: [
+                    {
+                        loader: 'swc-loader',
+                        options: {
+                            ...swcConfig,
+                            sourceMaps: isProd ? false : 'inline',
+                            inlineSourcesContent: !isProd,
+                        },
+                    },
+                ],
             },
             {
                 test: /\.less$/,
@@ -45,25 +55,13 @@ module.exports = {
                     {loader: 'postcss-loader', options: {sourceMap: !isProd}},
                     {loader: 'less-loader', options: {sourceMap: !isProd}},
                 ]
-            },
-            {
-                test: /\.(eot|woff|woff2|ttf)$|icomoon-studio-plus.svg/,
-                use: 'file-loader?name=fonts/[name].[ext]'
-            },
-            {
-                test: /^\.(svg|png|jpg|gif)$/,
-                use: 'file-loader?name=img/[name].[ext]'
             }
         ]
     },
     optimization: {
         minimizer: [
             new TerserPlugin({
-                extractComments: false,
                 terserOptions: {
-                    compress: {
-                        drop_console: false
-                    },
                     keep_classnames: true,
                     keep_fnames: true
                 }

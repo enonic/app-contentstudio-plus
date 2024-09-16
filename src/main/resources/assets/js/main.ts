@@ -23,7 +23,7 @@ import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
 // on-demand, when parsing XML schemas and has not real usage in app
 declare let require: { context: (directory: string, useSubdirectories: boolean, filter: RegExp) => void };
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-return
+
 const importAll = (r): void => r.keys().forEach(r);
 importAll(require.context('lib-contentstudio/app/inputtype', true, /^(?!\.[\\](ui)).*(\.js)$/));
 
@@ -141,11 +141,11 @@ function startContentBrowser(application: Application): void {
 
 void (async () => {
     if (!document.currentScript) {
-        throw 'Legacy browsers are not supported';
+        throw Error('Legacy browsers are not supported');
     }
     const configServiceUrl = document.currentScript.getAttribute('data-config-service-url');
     if (!configServiceUrl) {
-        throw 'Missing \'data-config-service-url\' attribute';
+        throw Error('Missing \'data-config-service-url\' attribute');
     }
 
     await CONFIG.init(configServiceUrl);

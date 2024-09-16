@@ -16,7 +16,7 @@ const init = async (configServiceUrl: string, i18nServiceUrl: string): Promise<v
 
 void (async (currentScript: HTMLOrSVGScriptElement) => {
     if (!currentScript) {
-        throw 'Legacy browsers are not supported';
+        throw Error('Legacy browsers are not supported');
     }
 
     const configServiceUrl = currentScript.getAttribute('data-config-service-url');
@@ -24,7 +24,7 @@ void (async (currentScript: HTMLOrSVGScriptElement) => {
     const elemId: string = currentScript.getAttribute('data-widget-id');
 
     if (!configServiceUrl || !i18nServiceUrl || !elemId) {
-        throw 'Missing attributes on inject script';
+        throw Error('Missing attributes on inject script');
     }
 
     await init(configServiceUrl, i18nServiceUrl);

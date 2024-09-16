@@ -7,7 +7,7 @@ import {PublishReportWidget} from './PublishReportWidget';
 void (async () => {
     const configServiceUrl = document.currentScript.getAttribute('data-config-service-url');
     if (!configServiceUrl) {
-        throw 'Missing \'data-config-service-url\' attribute';
+        throw Error('Missing \'data-config-service-url\' attribute');
     }
 
     const contentId = document.currentScript.getAttribute('data-content-id');

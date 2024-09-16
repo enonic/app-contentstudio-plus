@@ -8,7 +8,6 @@ import {CreateVariantDialog} from '../../dialog/CreateVariantDialog';
 import {GetContentVariantsRequest} from '../../resource/request/GetContentVariantsRequest';
 import {ContentEventsProcessor} from 'lib-contentstudio/app/ContentEventsProcessor';
 import {EditContentEvent} from 'lib-contentstudio/app/event/EditContentEvent';
-import {AppHelper} from '../../../../util/AppHelper';
 
 export class VariantsListItemViewMenuButton
     extends MenuButton {
@@ -16,14 +15,17 @@ export class VariantsListItemViewMenuButton
     private item: ContentSummaryAndCompareStatus;
 
     constructor() {
-        super(new Action(), [new Action(i18n('action.edit'))]);
+        super({
+            defaultAction: new Action(),
+            menuActions: [new Action(i18n('action.edit'))]
+        });
     }
 
     protected initListeners(): void {
         super.initListeners();
 
-        this.mainAction.onExecuted(this.handleMainActionExecuted.bind(this));
-        this.menuActions[0].onExecuted(this.handleSecondaryActionExecuted.bind(this));
+        this.getDefaultAction().onExecuted(this.handleMainActionExecuted.bind(this));
+        this.getMenuActions()[0].onExecuted(this.handleSecondaryActionExecuted.bind(this));
         this.onClicked((e: MouseEvent) => e.stopPropagation());
     }
 
@@ -59,7 +61,7 @@ export class VariantsListItemViewMenuButton
 
     private updateMainActionLabel(): void {
         const label: string = this.item.isVariant() ? i18n('action.duplicate') : i18n('widget.variants.create.text');
-        this.mainAction.setLabel(label);
+        this.getActionButton().setLabel(label);
     }
 
     doRender(): Q.Promise<boolean> {
