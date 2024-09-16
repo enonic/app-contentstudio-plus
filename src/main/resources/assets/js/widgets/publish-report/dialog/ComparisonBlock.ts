@@ -108,7 +108,7 @@ export class ComparisonBlock
         this.loadMask.show();
         this.addClass('loading');
 
-        return Q.all(promises).spread((newerVersionJson: Object, olderVersionJson?: Object) => {
+        return Q.all(promises).spread((newerVersionJson: object, olderVersionJson?: object) => {
             if (this.olderVersion) {
                 this.displayDiff(newerVersionJson, olderVersionJson);
             } else {
@@ -120,14 +120,14 @@ export class ComparisonBlock
         });
     }
 
-    private displayDiff(newerVersionJson: Object, olderVersionJson: Object): void {
+    private displayDiff(newerVersionJson: object, olderVersionJson: object): void {
         const delta: Delta = this.diffPatcher.diff(olderVersionJson, newerVersionJson);
         const text = !!delta ? formatters.html.format(delta, newerVersionJson) :
                      `<h3>${i18n('dialog.compareVersions.versionsIdentical')}</h3>`;
         this.diffElement.setHtml(text, false).toggleClass('empty', !delta);
     }
 
-    private displaySingleVersion(versionJson: Object): void {
+    private displaySingleVersion(versionJson: object): void {
         const text = formatters.html.format({}, versionJson);
         this.diffElement.setHtml(text, false);
     }
@@ -138,7 +138,7 @@ export class ComparisonBlock
         });
     }
 
-    private fetchVersionPromise(version: ContentVersion): Q.Promise<Object> {
+    private fetchVersionPromise(version: ContentVersion): Q.Promise<object> {
         if (!version) {
             return Q.resolve(null);
         }
