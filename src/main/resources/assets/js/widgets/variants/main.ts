@@ -8,7 +8,7 @@ void (async () => {
     const contentId = document.currentScript.getAttribute('data-content-id');
     const configServiceUrl = document.currentScript.getAttribute('data-config-service-url');
     if (!configServiceUrl) {
-        throw 'Missing \'data-config-service-url\' attribute';
+        throw Error('Missing \'data-config-service-url\' attribute');
     }
 
     await CONFIG.init(configServiceUrl);
