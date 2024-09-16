@@ -3,7 +3,7 @@
  */
 const lib = require('../../../libs/elements');
 const appConst = require('../../../libs/app_const');
-const ComboBox = require('../../components/loader.combobox');
+const LocaleComboBox = require('../../components/selectors/locale.selector.dropdown');
 const ProjectWizardDialog = require('./project.wizard.dialog');
 
 const XPATH = {
@@ -22,7 +22,7 @@ class ProjectWizardDialogLanguageStep extends ProjectWizardDialog {
     }
 
     get languageOptionsFilterInput() {
-        return XPATH.container + XPATH.localeComboBoxDiv + lib.COMBO_BOX_OPTION_FILTER_INPUT;
+        return XPATH.container + XPATH.localeComboBoxDiv + lib.OPTION_FILTER_INPUT;
     }
 
     waitForLanguageFilterInputDisplayed() {
@@ -40,17 +40,23 @@ class ProjectWizardDialogLanguageStep extends ProjectWizardDialog {
     }
 
     async selectLanguage(language) {
-        let comboBox = new ComboBox();
-        await comboBox.typeTextAndSelectOption(language, XPATH.localeStep + XPATH.localeComboBoxDiv);
+        let localeComboBox = new LocaleComboBox();
+        await localeComboBox.clickOnFilteredLanguageAndClickOnOk(language, XPATH.localeStep);
         console.log("Project Wizard, language is selected: " + language);
         return await this.pause(300);
     }
 
     async waitForLoaded() {
-        await this.getBrowser().waitUntil(async () => {
-            let actualDescription = await this.getStepDescription();
-            return actualDescription.includes(DESCRIPTION);
-        }, {timeout: appConst.shortTimeout, timeoutMsg: "Project Wizard Dialog, step 2 is not loaded"});
+        try {
+            await this.getBrowser().waitUntil(async () => {
+                let actualDescription = await this.getStepDescription();
+                return actualDescription.includes(DESCRIPTION);
+            }, {timeout: appConst.shortTimeout, timeoutMsg: "Project Wizard Dialog, step 2 is not loaded"});
+
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_language_step');
+            throw new Error("Error occurred in Project wizard language step, screenshot:" + screenshot + ' ' + err);
+        }
     }
 }
 
