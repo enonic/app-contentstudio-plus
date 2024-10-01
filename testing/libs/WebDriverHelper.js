@@ -1,5 +1,3 @@
-const path = require('path');
-
 /**
  * Helper class that encapsulates webdriverio
  * and sets up mocha hooks for easier test writing.
@@ -49,6 +47,7 @@ WebDriverHelper.prototype.setupBrowser = function setupBrowser(w, h) {
             automationProtocol: "webdriver",
             "wdio:enforceWebDriverClassic": true,
             capabilities: {
+                "wdio:enforceWebDriverClassic": true,
                 browserName: browser_name,
                 browserVersion: browser_version,
                 'goog:chromeOptions': makeChromeOptions(isHeadless, width, height)
