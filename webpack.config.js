@@ -15,7 +15,6 @@ module.exports = {
     context: path.join(__dirname, '/src/main/resources/assets'),
     entry: {
         'js/archive': './js/archive.ts',
-        'js/main': './js/main.ts',
         'styles/main': './styles/main.less',
         'js/widgets/layers': './js/widgets/layers/main.ts',
         'js/widgets/variants': './js/widgets/variants/main.ts',

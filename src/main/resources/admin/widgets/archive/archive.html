@@ -1,4 +1,5 @@
 <widget id="widget-archive">
-    <script src="{{assetsUri}}" data-config-service-url="{{configServiceUrl}}" data-i18n-service-url="{{i18nServiceUrl}}" data-widget-id="widget-archive"></script>
     <link rel="stylesheet" type="text/css" href="{{stylesUri}}">
+    <script type="application/json" id="{{configScriptId}}">{{{configAsJson}}}</script>
+    <script src="{{assetsUri}}" data-i18n-service-url="{{i18nServiceUrl}}" data-config-script-id="{{configScriptId}}" data-widget-id="widget-archive"></script>
 </widget>

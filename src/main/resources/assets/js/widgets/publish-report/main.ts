@@ -3,11 +3,12 @@ import {AppHelper} from '../../util/AppHelper';
 import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
 import {i18nAdd, i18nInit} from '@enonic/lib-admin-ui/util/MessagesInitializer';
 import {PublishReportWidget} from './PublishReportWidget';
+import {resolveConfig} from '../../util/WidgetConfigResolver';
 
 void (async () => {
-    const configServiceUrl = document.currentScript.getAttribute('data-config-service-url');
-    if (!configServiceUrl) {
-        throw Error('Missing \'data-config-service-url\' attribute');
+    const configScriptId = document.currentScript.getAttribute('data-config-script-id');
+    if (!configScriptId) {
+        throw Error('Missing \'data-config-script-id\' attribute');
     }
 
     const contentId = document.currentScript.getAttribute('data-content-id');
@@ -15,7 +16,7 @@ void (async () => {
     const isArchivedAttrValue = document.currentScript.getAttribute('data-archived');
     const isArchived = Boolean(isArchivedAttrValue == 'true');
 
-    await CONFIG.init(configServiceUrl);
+    CONFIG.setConfig(resolveConfig(configScriptId));
     await i18nInit(CONFIG.getString('services.i18nUrlStudio'));
     await i18nAdd(CONFIG.getString('services.i18nUrl'));
 

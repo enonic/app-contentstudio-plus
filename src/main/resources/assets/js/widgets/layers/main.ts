@@ -2,16 +2,18 @@ import {Element} from '@enonic/lib-admin-ui/dom/Element';
 import {LayersWidget} from '../layers/LayersWidget';
 import {AppHelper} from '../../util/AppHelper';
 import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
-import {i18nInit, i18nAdd} from '@enonic/lib-admin-ui/util/MessagesInitializer';
+import {i18nAdd, i18nInit} from '@enonic/lib-admin-ui/util/MessagesInitializer';
+import {resolveConfig} from '../../util/WidgetConfigResolver';
 
 void (async () => {
     const contentId = document.currentScript.getAttribute('data-content-id');
-    const configServiceUrl = document.currentScript.getAttribute('data-config-service-url');
-    if (!configServiceUrl) {
-        throw Error('Missing \'data-config-service-url\' attribute');
+    const configScriptId = document.currentScript.getAttribute('data-config-script-id');
+    if (!configScriptId) {
+        throw Error('Missing \'data-config-script-id\' attribute');
     }
 
-    await CONFIG.init(configServiceUrl);
+    CONFIG.setConfig(resolveConfig(configScriptId));
+
     await i18nInit(CONFIG.getString('services.i18nUrlStudio'));
     await i18nAdd(CONFIG.getString('services.i18nUrl'));
 

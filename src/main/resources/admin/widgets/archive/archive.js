@@ -2,11 +2,11 @@
 
 const portal = require('/lib/xp/portal');
 const mustache = require('/lib/mustache');
-const admin = require('/lib/xp/admin');
+const configLib = require('/lib/config');
 
 function handleGet() {
     const view = resolve('./archive.html');
-    const serviceBaseUrl = `${admin.getToolUrl(app.name, 'main')}/_/${app.name}`;
+
     const params = {
         assetsUri: portal.assetUrl({
             path: 'js/archive.js'
@@ -14,8 +14,12 @@ function handleGet() {
         stylesUri: portal.assetUrl({
             path: 'styles/main.css'
         }),
-        configServiceUrl: `${serviceBaseUrl}/config`,
-        i18nServiceUrl: `${serviceBaseUrl}/i18n`,
+        i18nServiceUrl: portal.apiUrl({
+            application: app.name,
+            api: 'i18n',
+        }),
+        configScriptId: 'archive-widget-config-json',
+        configAsJson: JSON.stringify(configLib.getConfig(), null, 4).replace(/<(\/?script|!--)/gi, "\\u003C$1"),
     };
 
     return {

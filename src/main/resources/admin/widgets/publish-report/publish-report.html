@@ -12,7 +12,8 @@
     {{/isNoPublishMode}}
 
     {{#isNormalMode}}
-    <script src="{{jsUri}}" data-config-service-url="{{configServiceUrl}}" data-content-id="{{contentId}}" data-publish-first="{{publishFirst}}" data-archived="{{isArchived}}"></script>
+    <script type="application/json" id="{{configScriptId}}">{{{configAsJson}}}</script>
+    <script src="{{jsUri}}" data-config-script-id="{{configScriptId}}" data-content-id="{{contentId}}" data-publish-first="{{publishFirst}}" data-archived="{{isArchived}}"></script>
     {{/isNormalMode}}
 
 </widget>
