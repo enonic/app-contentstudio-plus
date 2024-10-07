@@ -1,4 +1,5 @@
 <widget id="cs-plus-widget-variants">
     <link rel="stylesheet" href="{{assetsUri}}/styles/widgets/variants.css" type="text/css" media="all"/>
-    <script src="{{assetsUri}}/js/widgets/variants.js" data-config-service-url="{{configServiceUrl}}" data-content-id="{{contentId}}"></script>
+    <script type="application/json" id="{{configScriptId}}">{{{configAsJson}}}</script>
+    <script src="{{assetsUri}}/js/widgets/variants.js" data-config-script-id="{{configScriptId}}" data-content-id="{{contentId}}"></script>
 </widget>

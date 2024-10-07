@@ -2,7 +2,7 @@
 
 const portal = require('/lib/xp/portal');
 const mustache = require('/lib/mustache');
-const admin = require('/lib/xp/admin');
+const configLib = require('/lib/config');
 
 function handleGet(req) {
     return renderWidgetView(req);
@@ -21,7 +21,8 @@ function renderWidgetView(req) {
         assetsUri: portal.assetUrl({
             path: ''
         }),
-        configServiceUrl: `${admin.getToolUrl(app.name, 'main')}/_/${app.name}/config`,
+        configScriptId: 'layers-widget-config-json',
+        configAsJson: JSON.stringify(configLib.getConfig(), null, 4).replace(/<(\/?script|!--)/gi, "\\u003C$1"),
     };
 
     return {

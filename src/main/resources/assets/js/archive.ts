@@ -3,15 +3,16 @@ import {Body} from '@enonic/lib-admin-ui/dom/Body';
 import {Element} from '@enonic/lib-admin-ui/dom/Element';
 import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
 import {ArchiveAppContainer} from './ArchiveAppContainer';
+import {resolveConfig} from './util/WidgetConfigResolver';
 
 const injectApp = (widgetElem: Element): void => {
     const archiveAppContainer: ArchiveAppContainer = new ArchiveAppContainer();
     widgetElem.appendChild(archiveAppContainer);
 };
 
-const init = async (configServiceUrl: string, i18nServiceUrl: string): Promise<void> => {
+const init = async (configScriptId: string, i18nServiceUrl: string): Promise<void> => {
     await i18nAdd(i18nServiceUrl);
-    await CONFIG.init(configServiceUrl);
+    CONFIG.setConfig(resolveConfig(configScriptId));
 };
 
 void (async (currentScript: HTMLOrSVGScriptElement) => {
@@ -19,15 +20,15 @@ void (async (currentScript: HTMLOrSVGScriptElement) => {
         throw Error('Legacy browsers are not supported');
     }
 
-    const configServiceUrl = currentScript.getAttribute('data-config-service-url');
+    const configScriptId = currentScript.getAttribute('data-config-script-id');
     const i18nServiceUrl = currentScript.getAttribute('data-i18n-service-url');
     const elemId: string = currentScript.getAttribute('data-widget-id');
 
-    if (!configServiceUrl || !i18nServiceUrl || !elemId) {
+    if (!configScriptId || !i18nServiceUrl || !elemId) {
         throw Error('Missing attributes on inject script');
     }
 
-    await init(configServiceUrl, i18nServiceUrl);
+    await init(configScriptId, i18nServiceUrl);
 
     const body: Body = Body.get();
     const widgetEl: Element = body.findChildById(elemId, true);
