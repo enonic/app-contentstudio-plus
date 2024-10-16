@@ -26,11 +26,11 @@ export class ArchiveItemPreviewPanel
         if (this.renderableItems.has(item.getId())) {
             this.debouncedSetItem(item);
         } else {
-            new IsRenderableRequest(item.getData().getContentSummary())
+            new IsRenderableRequest(item.getContentSummary())
                 .sendAndParse()
                 .then((statusCode: number) => {
                     const isRenderable = statusCode === StatusCode.OK;
-                    item.getData().setRenderable(isRenderable);
+                    item.setRenderable(isRenderable);
                     this.renderableItems.set(item.getId(), isRenderable);
                     this.debouncedSetItem(item);
                 }).catch(DefaultErrorHandler.handle);
@@ -46,7 +46,7 @@ export class ArchiveItemPreviewPanel
     }
 
     protected viewItemToContent(item: ArchiveContentViewItem): ContentSummaryAndCompareStatus {
-        return item.getData();
+        return item;
     }
 
     protected isNonBinaryItemRenderable(item: ContentSummaryAndCompareStatus): boolean {

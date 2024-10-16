@@ -10,4 +10,56 @@
   .split-panel .tree-grid-toolbar {
     background-color: @admin-white;
   }
+
+  .tree-grid-toolbar {
+    margin-top: 0;
+
+    .selection-controller {
+      padding-left: 11px;
+    }
+  }
+
+  .archive-tree-list {
+    .tree-list-element {
+      .item-view-wrapper {
+        &.selected {
+          > .toggle-and-item-wrapper {
+            .archive-content-viewer {
+              .xp-admin-common-names-view * {
+                color: @admin-white;
+              }
+
+              .archive-status {
+                span {
+                  color: @admin-white;
+                }
+              }
+            }
+          }
+        }
+
+        .toggle-and-item-wrapper {
+          display: grid;
+          grid-template-columns: 32px 1fr;
+        }
+
+        .archive-list-item-viewer {
+          display: grid;
+          grid-template-columns: 1fr 90px;
+
+          .status-viewer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+          }
+        }
+      }
+    }
+  }
+
+  .archive-list-box-wrapper {
+    overflow: auto;
+    height: calc(100% - 40px); // minus toolbar height
+  }
+
 }
