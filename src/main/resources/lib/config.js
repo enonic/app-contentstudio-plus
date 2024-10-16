@@ -2,6 +2,22 @@
 
 const portal = require('/lib/xp/portal');
 const admin = require('/lib/xp/admin');
+const i18n = require('/lib/xp/i18n');
+
+const getPhrases = function () {
+    const locales = admin.getLocales();
+    const phrases = {};
+    const bundles = ['i18n/common', 'i18n/common_wcag', 'i18n/phrases', 'i18n/dialogs', 'i18n/wcag', 'i18n/messages'];
+
+    for (const bundleIndex in bundles) {
+        const bundlePhrases = i18n.getPhrases(locales, [bundles[bundleIndex]]);
+        for (const key in bundlePhrases) {
+            phrases[key] = bundlePhrases[key]
+        }
+    }
+
+    return phrases;
+};
 
 const getConfig = () => {
     const csAppName = 'com.enonic.app.contentstudio';
@@ -14,14 +30,14 @@ const getConfig = () => {
         }),
         appId: app.name,
         services: {
-            i18nUrl: portal.apiUrl({
-                application: app.name,
-                api: 'i18n',
-            }),
-            i18nUrlStudio: portal.apiUrl({
-                application: csAppName,
-                api: 'i18n',
-            }),
+            // i18nUrl: portal.apiUrl({
+            //     application: app.name,
+            //     api: 'i18n',
+            // }),
+            // i18nUrlStudio: portal.apiUrl({
+            //     application: csAppName,
+            //     api: 'i18n',
+            // }),
             contentUrl: portal.apiUrl({
                 application: csAppName,
                 api: 'content',
@@ -32,6 +48,7 @@ const getConfig = () => {
             }),
         },
         toolUri: csToolUri,
+        phrases: JSON.stringify(getPhrases(), null, 4),
     };
 }
 
