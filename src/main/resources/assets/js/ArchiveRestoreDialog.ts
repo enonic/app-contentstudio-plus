@@ -3,8 +3,8 @@ import {RestoreArchivedRequest} from './resource/RestoreArchivedRequest';
 import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import {TaskId} from '@enonic/lib-admin-ui/task/TaskId';
 import {ArchiveProgressDialog} from './ArchiveProgressDialog';
-import {ArchiveViewItem} from './ArchiveViewItem';
 import {ArchiveHelper} from './ArchiveHelper';
+import {ArchiveContentViewItem} from './ArchiveContentViewItem';
 
 export class ArchiveRestoreDialog
     extends ArchiveProgressDialog {
@@ -76,7 +76,7 @@ export class ArchiveRestoreDialog
     }
 
     private getItemsToRestore(): string[] {
-        return (ArchiveHelper.filterTopMostItems(this.items) as ArchiveViewItem[]).map((item: ArchiveViewItem) => item.getId());
+        return (ArchiveHelper.filterTopMostItems(this.items) as ArchiveContentViewItem[]).map((item: ArchiveContentViewItem) => item.getId());
     }
 
 }
