@@ -1,9 +1,7 @@
 import {ItemStatisticsPanel} from '@enonic/lib-admin-ui/app/view/ItemStatisticsPanel';
 import {ObjectHelper} from '@enonic/lib-admin-ui/ObjectHelper';
 import {ArchiveItemPreviewPanel} from './ArchiveItemPreviewPanel';
-import {ArchiveViewItem} from './ArchiveViewItem';
 import {ArchiveContentViewItem} from './ArchiveContentViewItem';
-import {ArchiveResourceRequest} from './resource/ArchiveResourceRequest';
 
 export class ArchiveItemStatisticsPanel
     extends ItemStatisticsPanel {
@@ -18,12 +16,12 @@ export class ArchiveItemStatisticsPanel
         this.appendChild(this.previewPanel);
     }
 
-    setItem(item: ArchiveViewItem): void {
+    setItem(item: ArchiveContentViewItem): void {
         if (ObjectHelper.equals(this.getItem(), item)) {
             return;
         }
 
-        this.previewPanel.setItem(item as ArchiveContentViewItem);
+        this.previewPanel.setItem(item);
     }
 
     clearItem(): void {
