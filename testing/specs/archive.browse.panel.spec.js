@@ -66,7 +66,7 @@ describe('archive.browse.panel.spec: tests for archive browse panel and selectio
             let displayNames = await archiveBrowsePanel.getDisplayNamesInGrid();
             assert.equal(displayNames.length, 1, 'Single item should be present in the filtered grid');
             // 5. Verify that checkboxes are clickable: Unselect one item in the filtered grid:
-            await archiveBrowsePanel.clickOnCheckbox(FOLDER1.displayName);
+            await archiveBrowsePanel.clickOnCheckboxByName(FOLDER1.displayName);
             // 6. Verify that the selection toggler(circle in the toolbar) gets not visible :
             await archiveBrowsePanel.waitForSelectionTogglerNotVisible();
             // 7. Verify that Grid returns to the initial state:

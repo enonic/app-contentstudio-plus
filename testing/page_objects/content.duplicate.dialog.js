@@ -3,25 +3,22 @@ const appConst = require('../libs/app_const');
 const lib = require('../libs/elements');
 const XPATH = {
     container: `//div[contains(@id,'ContentDuplicateDialog')]`,
-    duplicateButton: `//button/span[contains(.,'Duplicate')]`,
-    cancelButton: `//button/span[text()='Cancel']`,
     includeChildToggler: `//div[contains(@id,'IncludeChildrenToggler')]`,
-    showDependentItemsLink: `//h6[@class='dependants-header' and contains(.,'Show dependent items')]`,
-    hideDependentItemsLink: `//h6[@class='dependants-header' and contains(.,'Hide dependent items')]`,
+    dependantsHeader: "//div[@class='dependants-header']/span[@class='dependants-title']",
 };
 
 class ContentDuplicateDialog extends Page {
 
-    get showDependentItemsLink() {
-        return XPATH.container + XPATH.showDependentItemsLink;
+    get dependentsHeader() {
+        return XPATH.container + XPATH.dependantsHeader;
     }
 
-    get hideDependentItemsLink() {
-        return XPATH.container + XPATH.hideDependentItemsLink;
+    get allDependantsCheckbox() {
+        return XPATH.container + lib.checkBoxDiv('All');
     }
 
     get duplicateButton() {
-        return `${XPATH.container}` + `${XPATH.duplicateButton}`;
+        return XPATH.container + lib.dialogButton('Duplicate');
     }
 
     get includeChildToggler() {
@@ -29,24 +26,11 @@ class ContentDuplicateDialog extends Page {
     }
 
     get cancelButton() {
-        return XPATH.container + XPATH.cancelButton;
+        return XPATH.container + lib.dialogButton('Cancel');
     }
 
     isIncludeChildTogglerDisplayed() {
         return this.isElementDisplayed(this.includeChildToggler);
-    }
-
-    isShowDependentItemsLinkDisplayed() {
-        return this.waitForElementDisplayed(this.showDependentItemsLink, appConst.shortTimeout).catch(err => {
-            return false;
-        })
-    }
-
-    waitForHideDependentItemLinkDisplayed() {
-        return this.waitForElementDisplayed(this.hideDependentItemsLink, appConst.shortTimeout).catch((err) => {
-            this.saveScreenshot('err_load_hide_dependent_link');
-            throw new Error('Hide Dependent link must be loaded ' + err);
-        })
     }
 
     isDuplicateButtonDisplayed() {
@@ -58,53 +42,60 @@ class ContentDuplicateDialog extends Page {
     }
 
     async clickOnIncludeChildToggler() {
-        await this.clickOnElement(this.includeChildToggler);
-        return await this.pause(1000);
+        try {
+            await this.clickOnElement(this.includeChildToggler);
+            return await this.pause(1000);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_duplicate_dlg_child_toggler');
+            throw new Error("Content Duplicate dialog, error, screenshot:" + screenshot + ' ' + err);
+        }
     }
 
     async clickOnDuplicateButton() {
-        await this.waitForElementEnabled(this.duplicateButton, appConst.mediumTimeout);
-        await this.clickOnElement(this.duplicateButton);
-        return await this.pause(500);
-    }
-
-    async clickOnShowDependentItemLink() {
-        await this.waitForElementEnabled(this.showDependentItemsLink, appConst.shortTimeout);
-        await this.clickOnElement(this.showDependentItemsLink);
-        return await this.pause(500);
-    }
-
-    waitForDialogOpened() {
-        return this.waitForElementDisplayed(XPATH.container, appConst.mediumTimeout).catch(err => {
-            throw new Error("Content Duplicate dialog is not loaded " + err);
-        })
-    }
-
-    waitForDialogClosed() {
-        return this.waitForElementNotDisplayed(XPATH.container, appConst.mediumTimeout).catch(err => {
-            throw new Error("Content Duplicate dialog must be closed  " + err);
-        })
-    }
-
-    async getNumberInDependentItemsLink() {
         try {
-            let linkText = await this.getText(this.showDependentItemsLink);
-            let startIndex = linkText.indexOf('(');
-            if (startIndex === -1) {
-                throw new Error("Content Duplicate Dialog - error when get a number in  `show dependent items` link  ");
-            }
-            let endIndex = linkText.indexOf(')');
-            if (endIndex === -1) {
-                throw new Error("Content Duplicate Dialog - error when get a number in  `show dependent items` link  ");
-            }
-            return linkText.substring(startIndex + 1, endIndex);
+            await this.waitForElementEnabled(this.duplicateButton, appConst.mediumTimeout);
+            await this.clickOnElement(this.duplicateButton);
+            return await this.pause(500);
         } catch (err) {
-            throw new Error(err);
+            let screenshot = await this.saveScreenshotUniqueName('err_duplicate_btn');
+            throw new Error('Error after clicking on Duplicate button, screenshot:  ' + screenshot + ' ' + err);
+        }
+    }
+
+    waitForDependantsHeaderDisplayed() {
+        return this.waitForElementDisplayed(this.dependentsHeader, appConst.mediumTimeout);
+    }
+
+    async getDependantsHeader() {
+        await this.waitForDependantsHeaderDisplayed();
+        return await this.getText(XPATH.dependantsHeader);
+    }
+
+    async waitForDependantsHeaderNotDisplayed() {
+        return await this.waitForElementNotDisplayed(this.dependentsHeader);
+    }
+
+    async waitForDialogOpened() {
+        try {
+            await this.waitForElementDisplayed(XPATH.container, appConst.mediumTimeout);
+            await this.pause(400);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_duplicate_dlg');
+            throw new Error("'Content Duplicate' dialog was not loaded, screenshot:  " + screenshot + ' ' + err);
+        }
+    }
+
+    async waitForDialogClosed() {
+        try {
+            return await this.waitForElementNotDisplayed(XPATH.container, appConst.mediumTimeout);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_duplicate_dlg');
+            throw new Error("'Content Duplicate' dialog must be closed, screenshot:  " + screenshot + ' ' + err);
         }
     }
 
     //gets number in `Duplicate` button, It is total number of items to duplicate
-    async getTotalNumberItemsToDuplicate() {
+    async getNumberItemsInDuplicateButton() {
         try {
             await this.getBrowser().waitUntil(async () => {
                 let text = await this.getText(this.duplicateButton);
@@ -115,26 +106,33 @@ class ContentDuplicateDialog extends Page {
             let endIndex = result.indexOf(')');
             return result.substring(startIndex + 1, endIndex);
         } catch (err) {
-            throw new Error("Error when getting number in Duplicate button " + err);
+            throw new Error("Error when getting number in 'Duplicate' button " + err);
         }
     }
 
-    getDisplayNamesToDuplicate() {
-        let selector = XPATH.container + `//ul[contains(@id,'DialogTogglableItemList')]` + lib.H6_DISPLAY_NAME;
-        return this.getTextInElements(selector).then(result => {
-            return result;
-        }).catch(err => {
-            throw new Error('Duplicate Dialog: error when getting display names : ' + err)
-        })
+    async getDisplayNamesToDuplicate() {
+        try {
+            let selector = XPATH.container + `//ul[contains(@id,'DialogTogglableItemList')]` + lib.H6_DISPLAY_NAME;
+            return await this.getTextInElements(selector);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_duplicate_dlg');
+            throw new Error('Duplicate Dialog: error when getting display names, screenshot : ' + screenshot + ' ' + err)
+        }
     }
 
-    getDependentsName() {
-        let selector = XPATH.container + `//ul[contains(@id,'DialogDependantList')]` + lib.H6_DISPLAY_NAME;
-        return this.getTextInElements(selector).then(result => {
-            return result;
-        }).catch(err => {
-            throw new Error('Duplicate Dialog: error when getting dependents name : ' + err)
-        })
+    async getDependentsName() {
+        try {
+            let locator = XPATH.container + lib.DEPENDANTS.DEPENDENT_ITEM_LIST_UL + lib.H6_DISPLAY_NAME;
+            return await this.getTextInElements(locator);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_duplicate_dlg');
+            throw new Error('Duplicate Dialog: error when getting dependents name, screenshot : ' + screenshot + '' + err)
+        }
     }
-};
+
+    waitForAllCheckboxNotDisplayed() {
+        return this.waitForElementNotDisplayed(this.allDependantsCheckbox, appConst.mediumTimeout);
+    }
+}
+
 module.exports = ContentDuplicateDialog;
