@@ -4,6 +4,7 @@ import {Element} from '@enonic/lib-admin-ui/dom/Element';
 import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
 import {ArchiveAppContainer} from './ArchiveAppContainer';
 import {resolveConfig} from './util/WidgetConfigResolver';
+import {Messages} from '@enonic/lib-admin-ui/util/Messages';
 
 const injectApp = (widgetElem: Element): void => {
     const archiveAppContainer: ArchiveAppContainer = new ArchiveAppContainer();
@@ -11,8 +12,15 @@ const injectApp = (widgetElem: Element): void => {
 };
 
 const init = async (configScriptId: string, i18nServiceUrl: string): Promise<void> => {
-    await i18nAdd(i18nServiceUrl);
+    // await i18nAdd(i18nServiceUrl);
     CONFIG.setConfig(resolveConfig(configScriptId));
+
+    try {
+        const phrases: object = JSON.parse(CONFIG.getString('phrases')) as object;
+        Messages.addMessages(phrases);
+    } catch (e) {
+        console.error('Failed to parse phrases', e);
+    }
 };
 
 void (async (currentScript: HTMLOrSVGScriptElement) => {
