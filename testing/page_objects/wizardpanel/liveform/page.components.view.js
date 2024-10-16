@@ -1,199 +1,128 @@
 /**
  * Created on 28.03.2018.
  */
-const Page = require('../../page');
 const lib = require('../../../libs/elements');
 const appConst = require('../../../libs/app_const');
-const ContentWizard = require('../../wizardpanel/content.wizard.panel');
+const BasePageComponentView = require('../base.page.components.view');
 const xpath = {
-    container: "//div[contains(@id,'PageComponentsView')]",
-    closeButton: "//button[contains(@id,'CloseButton')]",
+    container: "//div[contains(@id,'PageComponentsView') and contains(@class,'draggable')]",
+    pcvDialogMinimizer: "//button[contains(@id,'Button') and contains(@class,'minimize-button')]",
+    showPcvDialogButton: "//button[contains(@id,'Button') and @title='Show Component View']",
+    hidePcvDialogButton: "//button[contains(@id,'Button') and @title='Hide Component View']",
     pageComponentsItemViewer: "//div[contains(@id,'PageComponentsItemViewer')]",
-    pageComponentsTreeGrid: `//div[contains(@id,'PageComponentsTreeGrid')]`,
-    fragmentsName: "//div[contains(@id,'PageComponentsItemViewer') and descendant::div[contains(@class,'icon-fragment')]]" +
-                   lib.H6_DISPLAY_NAME,
-    contextMenuItemByName: function (name) {
-        return `//dl[contains(@id,'TreeContextMenu')]//*[contains(@id,'TreeMenuItem') and text()='${name}']`;
-    },
-    componentByName: function (name) {
-        return `//div[contains(@id,'PageComponentsItemViewer') and descendant::h6[contains(@class,'main-name')  and text()='${name}']]`
-    },
-    componentDescriptionByName: function (name) {
-        return `//div[contains(@id,'PageComponentsItemViewer') and descendant::h6[contains(@class,'main-name')  and text()='${name}']]` +
-               lib.P_SUB_NAME;
-    },
-    componentByDescription: function (description) {
-        return `//div[contains(@id,'PageComponentsItemViewer') and descendant::p[contains(@class,'sub-name')  and contains(.,'${description}')]]`;
-    },
-    itemExpanderIcon: (name) => `//div[contains(@class,'slick-row') and descendant::h6[contains(@class,'main-name') and text()='${name}']]//span[@class='toggle icon expand']`,
 };
 
-//Modal Dialog:
-class PageComponentView extends Page {
+// Modal Dialog:
+class PageComponentView extends BasePageComponentView {
 
-    get closeButton() {
-        return xpath.container + xpath.closeButton;
+    get container() {
+        return xpath.container;
     }
 
-    async clickOnCloseButton() {
-        await this.clickOnElement(this.closeButton);
-        return await this.waitForClosed();
+    // Button to Show/Hide Page Component View modal dialog( by the class - 'minimize-button' )
+    get pcvDialogMinimizer() {
+        return xpath.container + xpath.pcvDialogMinimizer;
     }
 
-    async clickOnComponent(displayName) {
+    // button by the title 'Show Component View', this button shows PCV modal dialog
+    get showPcvDialogButton() {
+        return xpath.container + xpath.showPcvDialogButton;
+    }
+
+    // button by the title 'Hide Component View', this button hides PCV modal dialog
+    get hidePcvDialogButton() {
+        return xpath.container + xpath.hidePcvDialogButton;
+    }
+
+    //Wait for PCV modal dialog minimizer-toggler is visible
+    async waitForPcvDialogMinimizerTogglerVisible() {
         try {
-            let selector = xpath.container + lib.itemByDisplayName(displayName);
-            await this.waitForElementDisplayed(selector, appConst.mediumTimeout);
-            await this.clickOnElement(selector);
-            return await this.pause(400);
+            await this.waitForElementDisplayed(this.pcvDialogMinimizer, appConst.mediumTimeout);
         } catch (err) {
-            await this.saveScreenshot(appConst.generateRandomName('err_component_click'));
-            throw new Error("Page Component View - Error when clicking on the component " + err);
+            await this.saveScreenshot(appConst.generateRandomName('err_component_view_minimizer'));
+            throw new Error('PCV dialog, minimizer-button should be visible ' + '  ' + err);
         }
     }
 
-    async openMenu(componentName) {
+    // Button to Show Component View dialog:
+    async waitForShowPcvDialogButtonDisplayed() {
         try {
-            let menuButton = xpath.componentByName(componentName) + "/../..//div[contains(@class,'menu-icon')]";
-            await this.waitForElementDisplayed(menuButton, appConst.shortTimeout);
-            await this.clickOnElement(menuButton);
-            return await this.pause(500);
+            return await this.waitForElementDisplayed(this.showPcvDialogButton, appConst.mediumTimeout);
         } catch (err) {
-            await this.saveScreenshot(appConst.generateRandomName('err_component_view'));
-            throw new Error('Page Component View, open menu - Error when clicking on `Menu button`: ' + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_show_component_view_button');
+            throw new Error('Show Component View button is not visible , screenshot: ' + screenshot + '  ' + err);
         }
     }
 
-    async openMenuByDescription(description) {
+    async waitForHidePcvDialogButtonDisplayed() {
         try {
-            let menuButton = xpath.componentByDescription(description) + "/../..//div[contains(@class,'menu-icon')]";
-            await this.waitForElementDisplayed(menuButton, appConst.shortTimeout);
-            await this.clickOnElement(menuButton);
-            return await this.pause(500);
+            return await this.waitForElementDisplayed(this.hidePcvDialogButton, appConst.mediumTimeout);
         } catch (err) {
-            await this.saveScreenshot(appConst.generateRandomName('err_component_view'));
-            throw new Error('Page Component View, open menu - Error when clicking on `Menu button`: ' + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_hide_component_view_not_displayed');
+            throw new Error("'Hide Component View' button should should be visible, screenshot: " + screenshot + ' ' + err);
         }
     }
 
-    async clickOnComponent(componentName) {
+    async waitForHidePcvDialogButtonNotDisplayed() {
         try {
-            let component = xpath.componentByName(componentName);
-            await this.waitForElementDisplayed(component, appConst.shortTimeout);
-            await this.clickOnElement(component);
-            return await this.pause(500);
+            return await this.waitForElementNotDisplayed(this.hidePcvDialogButton, appConst.mediumTimeout);
         } catch (err) {
-            await this.saveScreenshot('err_component_view');
-            throw new Error('Error when clicking on the `Component`: ' + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_hide_component_view_btn');
+            throw new Error("'Hide Component View' button should not be displayed, screenshot: " + screenshot + ' ' + err);
         }
     }
 
-    async isComponentSelected(displayName) {
-        let rowXpath = lib.slickRowByDisplayName(xpath.container, displayName) + "//div[contains(@class,'slick-cell')]";
-        await this.waitForElementDisplayed(rowXpath, appConst.shortTimeout);
-        let cell = await this.findElement(rowXpath);
-        let attr = await cell.getAttribute("class");
-        return attr.includes("selected");
-    }
-
-    waitForMenuItemPresent(name) {
-        let selector = xpath.contextMenuItemByName(name);
-        return this.waitForElementDisplayed(selector, appConst.shortTimeout);
-    }
-
-    waitForMenuItemNotDisplayed(menuItem) {
-        let selector = xpath.contextMenuItemByName(menuItem);
-        return this.waitForElementNotDisplayed(selector, appConst.shortTimeout);
-    }
-
-    //example: clicks on Insert/Image menu items
-    selectMenuItem(items) {
-        let result = Promise.resolve();
-        items.forEach(menuItem => {
-            result = result.then(() => this.clickOnMenuItem(menuItem));
-        });
-        return result;
-    }
-
-    async selectMenuItemAndCloseDialog(items) {
-        let contentWizard = new ContentWizard();
-        await this.selectMenuItem(items);
-        await this.pause(500);
-        //TODO remove the workaround
-        await contentWizard.clickOnComponentViewToggler();
-        return await this.waitForClosed();
-    }
-
-    async clickOnMenuItem(menuItem) {
+    // Click on Hide Component View button and close the modal dialog:
+    async clickOnHidePageComponentDialogButton() {
         try {
-            let selector = xpath.contextMenuItemByName(menuItem);
-            await this.waitForElementDisplayed(selector, appConst.mediumTimeout);
-            await this.clickOnElement(selector);
-            return await this.pause(500);
+            await this.waitForHidePcvDialogButtonDisplayed();
+            await this.clickOnElement(this.hidePcvDialogButton);
+            return await this.pause(300);
         } catch (err) {
-            await this.saveScreenshot(appConst.generateRandomName("err_menu_item"));
-            throw new Error("Page Component View: Menu Item still not visible - " + menuItem + " " + err);
+            await this.saveScreenshot('err_hide_component_view_btn');
+            throw new Error("Error when clicking on 'Hide Component View' button " + err);
         }
     }
 
-    waitForOpened() {
-        return this.waitForElementDisplayed(xpath.container, appConst.shortTimeout);
-    }
-
-    waitForClosed() {
-        return this.waitForElementNotDisplayed(xpath.container, appConst.shortTimeout);
-    }
-
-    async swapComponents(sourceName, destinationName) {
-        let sourceElem = xpath.container + xpath.componentByName(sourceName);
-        let destinationElem = xpath.container + xpath.componentByName(destinationName);
-        let source = await this.findElement(sourceElem);
-        let destination = await this.findElement(destinationElem);
-        await source.dragAndDrop(destination);
-        return await this.pause(1000);
-    }
-
-    async getComponentDescription(name, index) {
-        let selector = xpath.container + xpath.componentDescriptionByName(name);
-        if (typeof index === 'undefined' || index === null) {
-            return await this.getText(selector);
-        } else {
-            let result = await this.getTextInElements(selector);
-            if (index > result.length) {
-                throw new Error(`Component with the index ${index} was not found`)
-            }
-            return result[index];
+    async clickOnShowPageComponentDialogButton() {
+        try {
+            await this.waitForShowPcvDialogButtonDisplayed();
+            await this.clickOnElement(this.showPcvDialogButton);
+            return await this.pause(300);
+        } catch (err) {
+            await this.saveScreenshot('err_show_component_view_btn');
+            throw new Error("Error when clicking on 'Show Component View' button " + err);
         }
     }
 
-    async isItemWithDefaultIcon(partDisplayName, index) {
-        let selector = xpath.componentByName(partDisplayName) +
-                       "//div[contains(@id,'NamesAndIconView')]//div[contains(@class,'xp-admin-common-wrapper')]" +
-                       "//div[contains(@class,'font-icon-default')]";
-        let items = await this.findElements(selector);
-        if (!items.length) {
-            throw new Error("Component-item with an icon was not found! " + partDisplayName);
-        }
-        if (typeof index === 'undefined' || index === null) {
-            return await items[0].isDisplayed();
-        }
-        return await items[index].isDisplayed();
+    waitForPcvDialogMinimizerDisplayed() {
+        return this.waitForElementDisplayed(this.pcvDialogMinimizer, appConst.mediumTimeout);
     }
 
-    getFragmentsDisplayName() {
-        let locator = xpath.container + xpath.fragmentsName;
-        return this.getTextInDisplayedElements(locator);
+    waitForPcvDialogMinimizerNotDisplayed() {
+        return this.waitForElementNotDisplayed(this.pcvDialogMinimizer, appConst.mediumTimeout);
     }
 
-    getPageComponentsDisplayName() {
-        let locator = xpath.container + lib.SLICK_VIEW_PORT + xpath.pageComponentsItemViewer + lib.H6_DISPLAY_NAME;
-        return this.getTextInDisplayedElements(locator);
+    async clickOnComponentViewToggleButton() {
+        await this.waitForPcvDialogMinimizerDisplayed();
+        await this.clickOnElement(this.pcvDialogMinimizer);
+        await this.pause(400);
     }
 
-    async expandItem(item) {
-        let locator = xpath.itemExpanderIcon(item);
-        await this.clickOnElement(locator);
-        return await this.pause(200);
+    async waitForLoaded() {
+        await this.waitForElementDisplayed(this.container, appConst.mediumTimeout);
+        await this.pause(700);
+    }
+
+    waitForNotDisplayed() {
+        return this.waitForElementNotDisplayed(this.container, appConst.mediumTimeout);
+    }
+
+    async waitForCollapsed() {
+        await this.getBrowser().waitUntil(async () => {
+            let result = await this.getAttribute(this.container, 'class');
+            return result.includes('collapsed');
+        }, {timeout: appConst.mediumTimeout, timeoutMsg: "Page Component View modal dialog should be closed"});
     }
 }
 

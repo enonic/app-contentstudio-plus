@@ -1,4 +1,3 @@
-import {ArchiveDialog} from './ArchiveDialog';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {DeleteContentRequest} from 'lib-contentstudio/app/resource/DeleteContentRequest';
 import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
@@ -42,7 +41,7 @@ export class ArchiveDeleteDialog
         const request: DeleteContentRequest = new DeleteContentRequest();
         request.setContentRootPath(ArchiveResourceRequest.ARCHIVE_PATH);
 
-        this.items.forEach(item => request.addContentPath(item.getData().getPath()));
+        this.items.forEach(item => request.addContentPath(item.getPath()));
 
         request.sendAndParse().then((taskId: TaskId) => {
             this.progressManager.pollTask(taskId);
