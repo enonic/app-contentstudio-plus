@@ -45,7 +45,7 @@ class ContentWidgetItemView extends Page {
 
     async waitForWorkInProgressIconNotDisplayed() {
         try {
-            return await this.waitForElementNotDisplayed(xpath.container, appConst.workInProgressIcon);
+            return await this.waitForElementNotDisplayed(xpath.workInProgressIcon, appConst.mediumTimeout);
         } catch (err) {
             this.saveScreenshot("err_widget_item_workflow");
             throw new Error("Workflow state should not be displayed in the widget item " + err);
@@ -53,5 +53,3 @@ class ContentWidgetItemView extends Page {
     }
 }
 module.exports = ContentWidgetItemView;
-
-
