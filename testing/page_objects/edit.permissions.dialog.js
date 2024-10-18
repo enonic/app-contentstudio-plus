@@ -1,9 +1,11 @@
 const Page = require('./page');
 const appConst = require('../libs/app_const');
 const lib = require('../libs/elements');
-const ComboBox = require('./components/loader.combobox');
+const AccessControlComboBox = require('./components/selectors/access.control.combobox');
 const xpath = {
     container: `//div[contains(@id,'EditPermissionsDialog')]`,
+    accessSelector: "//div[contains(@id,'AccessSelector')]",
+    contentPath: "//p[@class='path']",
     applyButton: `//button[contains(@id,'DialogButton') and child::span[contains(.,'Apply')]]`,
     cancelButton: `//button/span[text()='Cancel']`,
     overwriteChildPermissionsCheckbox: `//div[contains(@class,'overwrite-child')]`,
@@ -13,15 +15,13 @@ const xpath = {
     permissionToggleByOperationName: name => `//a[contains(@id,'PermissionToggle') and text()='${name}']`,
     aclEntryByName:
         name => `//div[contains(@id,'PrincipalContainerSelectedOptionView') and descendant::p[contains(@class,'sub-name') and contains(.,'${name}')]]`,
+    aclEntryByDisplayName:
+        displayName => `//div[contains(@id,'PrincipalContainerSelectedOptionView') and descendant::h6[contains(@class,'main-name') and contains(.,'${displayName}')]]`,
     menuItemByName:
         name => `//li[contains(@id,'TabMenuItem') and child::a[text()='${name}']]`,
 };
 
 class EditPermissionsDialog extends Page {
-
-    get principalsOptionFilterInput() {
-        return xpath.container + lib.COMBO_BOX_OPTION_FILTER_INPUT;
-    }
 
     get cancelButton() {
         return xpath.container + xpath.cancelButton;
@@ -37,6 +37,10 @@ class EditPermissionsDialog extends Page {
 
     get inheritPermissionsCheckbox() {
         return xpath.container + xpath.inheritPermissionsCheckbox;
+    }
+
+    get contentPath() {
+        return xpath.container + xpath.contentPath;
     }
 
     async waitForDialogLoaded() {
@@ -67,16 +71,20 @@ class EditPermissionsDialog extends Page {
         let selector = xpath.container + xpath.aclEntryByName(principalName) + lib.REMOVE_ICON;
         return this.clickOnElement(selector).catch(err => {
             this.saveScreenshot("err_remove_acl_entry");
-            throw new Error("Error when trying to remove acl entry " + err);
+            throw new Error("Error when remove acl entry " + err);
         });
     }
 
-    //filters and select a principal
-    filterAndSelectPrincipal(principalDisplayName) {
-        let comboBox = new ComboBox();
-        return comboBox.typeTextAndSelectOption(principalDisplayName, xpath.container).then(() => {
+    // filters and select a principal
+    async filterAndSelectPrincipal(principalDisplayName) {
+        try {
+            let accessControlComboBox = new AccessControlComboBox();
+            await accessControlComboBox.selectFilteredPrincipalAndClickOnApply(principalDisplayName, xpath.container);
             console.log("Edit Permissions Dialog, principal is selected: " + principalDisplayName);
-        })
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_perm_dlg');
+            throw new Error("Error during updating permissions, screenshot:" + screenshot + "  " + err);
+        }
     }
 
     //finds an entry, clicks on 'tab-menu-button' (Can Write or Can Read or Custom...)  and selects new required 'operation'
@@ -111,12 +119,21 @@ class EditPermissionsDialog extends Page {
 
     async clickOnApplyButton() {
         try {
+            await this.waitForApplyButtonEnabled();
             await this.clickOnElement(this.applyButton);
             return await this.pause(500);
         } catch (err) {
-            this.saveScreenshot('err_click_on_apply_button_permis_dialog');
+            await this.saveScreenshot('err_click_on_apply_button_permis_dialog');
             throw new Error('Error when clicking Apply dialog must be closed ' + err);
         }
+    }
+
+    waitForApplyButtonEnabled() {
+        return this.waitForElementEnabled(this.cancelButton, appConst.mediumTimeout);
+    }
+
+    waitForApplyButtonDisabled() {
+        return this.waitForElementDisabled(this.applyButton, appConst.mediumTimeout);
     }
 
     async isOperationAllowed(principalName, operation) {
@@ -141,7 +158,7 @@ class EditPermissionsDialog extends Page {
             await this.clickOnElement(this.inheritPermissionsCheckbox + '/label');
             return await this.pause(500);
         } catch (err) {
-            this.saveScreenshot('err_click_on_inherit_permis_dialog');
+            await this.saveScreenshot('err_click_on_inherit_permis_dialog');
             throw new Error('Error when clicking on Inherit permissions ' + err);
         }
     }
@@ -164,6 +181,32 @@ class EditPermissionsDialog extends Page {
             throw new Error('Error when checking Overwrite child permissions link ' + err);
         })
     }
+
+    async waitForAccessSelectorDisabled(principalName) {
+        let locator = xpath.aclEntryByDisplayName(principalName) + xpath.accessSelector;
+        await this.getBrowser().waitUntil(async () => {
+            let result = await this.getAttribute(locator, "class");
+            return result.includes("disabled");
+        }, {timeout: appConst.mediumTimeout, timeoutMsg: "Access selector should be disabled "});
+    }
+
+    async waitForAccessSelectorEnabled(principalDisplayName) {
+        let locator = xpath.aclEntryByDisplayName(principalDisplayName) + xpath.accessSelector;
+        await this.getBrowser().waitUntil(async () => {
+            let result = await this.getAttribute(locator, "class");
+            return !result.includes("disabled");
+        }, {timeout: appConst.mediumTimeout, timeoutMsg: "Access selector should be enabled "});
+    }
+
+    getContentPath() {
+        return this.getText(this.contentPath);
+    }
+
+    async clickOnCancelButton() {
+        await this.waitForElementDisplayed(this.cancelButton, appConst.mediumTimeout);
+        return await this.clickOnElement(this.cancelButton);
+    }
 }
+
 module.exports = EditPermissionsDialog;
 

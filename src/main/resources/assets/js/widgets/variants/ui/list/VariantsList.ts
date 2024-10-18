@@ -39,7 +39,7 @@ export class VariantsList
     update(originalItem: ContentSummaryAndCompareStatus, variants: ContentSummaryAndCompareStatus[]): VariantsList {
         this.clearItems();
         this.appendChild(new H6El('variants-widget-list-subheader').setHtml(i18n('widget.variants.item.type.original')));
-        this.addItem(originalItem);
+        this.addItems(originalItem);
         this.appendChild(new H6El('variants-widget-list-subheader').setHtml(i18n('widget.variants.list.header.variants')));
         this.addItems(variants);
 

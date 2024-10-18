@@ -14,14 +14,14 @@ const ContentUnpublishDialog = require('../content.unpublish.dialog');
 
 const XPATH = {
     container: "//div[contains(@id,'ContentBrowsePanel')]",
-    toolbar: "//div[contains(@id,'ContentBrowseToolbar')]",
-    treeGridToolbar: "//div[contains(@id,'ContentTreeGridToolbar')]",
-    treeGrid: "//div[contains(@id,'ContentTreeGrid')]",
+    toolbarDiv: "//div[contains(@id,'ContentBrowseToolbar')]",
+    treeGridToolbar: "//div[contains(@id,'ListBoxToolbar') and contains(@class,'tree-grid-toolbar')]",
+    selectableListBoxPanelDiv: "//div[contains(@id,'SelectableListBoxPanel')]",
+    contentsTreeGridRootUL: "//ul[contains(@id,'ContentsTreeGridRootList')]",
     appBar: "//div[contains(@id,'AppBar')]",
     projectViewerButton: "//div[contains(@id,'ProjectViewer')]",
-    highlightedRow: `//div[contains(@class,'slick-viewport')]//div[contains(@class,'slick-row') and descendant::div[contains(@class,'slick-cell') and contains(@class,'highlight')]]`,
-    checkedRows: `//div[contains(@class,'slick-viewport')]//div[contains(@class,'slick-cell-checkboxsel selected')]`,
-    checkedRows2: `//div[contains(@class,'slick-viewport')]//div[contains(@class,'slick-row') and descendant::div[contains(@class,'slick-cell') and contains(@class,'slick-cell-checkboxsel selected')]]`,
+    highlightedRow: `//div[contains(@class,'checkbox-left selected') and not(contains(@class,'checked')) ]`,
+    checkedRowLi: `//div[contains(@class,'checkbox-left selected checked')]`,
     searchButton: "//button[contains(@class, 'icon-search')]",
     hideSearchPanelButton: "//span[contains(@class, 'hide-filter-panel-button')]",
     showIssuesListButton: "//button[contains(@id,'ShowIssuesDialogButton')]",
@@ -29,35 +29,15 @@ const XPATH = {
     markAsReadyMenuItem: "//ul[contains(@id,'Menu')]//li[contains(@id,'MenuItem') and text()='Mark as ready']",
     requestPublishMenuItem: "//ul[contains(@id,'Menu')]//li[contains(@id,'MenuItem') and text()='Request Publish']",
     contentPublishMenuButton: `//div[contains(@id,'ContentBrowsePublishMenuButton')]`,
+    selectionControllerCheckBox: `//div[contains(@id,'ListSelectionController')]`,
+    contentActionMenuButton: `//div[contains(@id,'ContentActionMenuButton')]`,
     selectionControllerCheckBox: `//div[contains(@id,'SelectionController')]`,
     numberInSelectionToggler: `//button[contains(@id,'SelectionPanelToggler')]/span`,
-    moreFoldButton: "//div[contains(@id,'FoldButton')]",
-    editButton: `//button[contains(@id, 'ActionButton') and child::span[text()='Edit']]`,
-    newButton: `//button[contains(@id, 'ActionButton') and child::span[text()='New...']]`,
-
     contentSummaryListViewerByName(name) {
         return `//div[contains(@id,'ContentSummaryListViewer') and descendant::p[contains(@class,'sub-name') and contains(.,'${name}')]]`
     },
-    contentSummaryByName(name) {
-        return `//div[contains(@id,'ContentSummaryListViewer') and descendant::p[contains(@class,'sub-name') and contains(.,'${name}')]]`
-    },
-    contentSummaryByDisplayName(displayName) {
-        return `//div[contains(@id,'ContentSummaryListViewer') and descendant::h6[contains(@class,'main-name') and contains(.,'${displayName}')]]`
-    },
     publishMenuItemByName(name) {
         return `//ul[contains(@id,'Menu')]//li[contains(@id,'MenuItem') and contains(.,'${name}')]`
-    },
-    rowByDisplayName:
-        displayName => `//div[contains(@id,'NamesView') and child::h6[contains(@class,'main-name') and contains(.,'${displayName}')]]`,
-
-    checkboxByName(name) {
-        return `${lib.itemByName(
-            name)}/ancestor::div[contains(@class,'slick-row')]/div[contains(@class,'slick-cell-checkboxsel')]/label`
-    },
-
-    expanderIconByName(name) {
-        return lib.itemByName(name) +
-               `/ancestor::div[contains(@class,'slick-cell')]/span[contains(@class,'collapse') or contains(@class,'expand')]`;
     },
     defaultActionByName: name => `//button[contains(@id, 'ActionButton') and child::span[contains(.,'${name}')]]`,
     foldButtonByName: name => `//div[contains(@id,'ContentBrowseToolbar')]//span[text()='${name}']`,
@@ -69,40 +49,44 @@ class ContentBrowsePanel extends BaseBrowsePanel {
         return XPATH.treeGridToolbar;
     }
 
+    get toolbar() {
+        return XPATH.toolbarDiv;
+    }
+
     get archiveButton() {
-        return XPATH.toolbar + lib.actionButton('Archive...');
+        return XPATH.toolbarDiv + lib.actionButton('Archive...');
     }
 
     get moreButton() {
-        return XPATH.toolbar + XPATH.moreFoldButton;
+        return XPATH.toolbarDiv + lib.BUTTONS.MORE_BUTTON;
     }
 
     get moveButton() {
-        return XPATH.toolbar + lib.actionButton('Move...');
+        return XPATH.toolbarDiv + lib.actionButton('Move...');
     }
 
     get duplicateButton() {
-        return XPATH.toolbar + lib.actionButton('Duplicate...');
+        return XPATH.toolbarDiv + lib.actionButton('Duplicate...');
     }
 
     get previewButton() {
-        return XPATH.toolbar + lib.actionButton('Preview');
+        return XPATH.toolbarDiv + lib.actionButton('Preview');
     }
 
     get sortButton() {
-        return XPATH.toolbar + lib.actionButton('Sort...');
+        return XPATH.toolbarDiv + lib.actionButton('Sort...');
     }
 
     get localizeButton() {
-        return XPATH.toolbar + lib.actionButton('Localize');
+        return XPATH.toolbarDiv + lib.actionButton('Localize');
     }
 
     get openButton() {
-        return XPATH.toolbar + lib.actionButton('Open');
+        return XPATH.toolbarDiv + lib.actionButton('Open');
     }
 
     get searchButton() {
-        return XPATH.toolbar + XPATH.searchButton;
+        return XPATH.toolbarDiv + XPATH.searchButton;
     }
 
     get hideSearchPanelButton() {
@@ -114,23 +98,23 @@ class ContentBrowsePanel extends BaseBrowsePanel {
     }
 
     get showPublishMenuButton() {
-        return XPATH.toolbar + XPATH.contentPublishMenuButton + lib.DROP_DOWN_HANDLE;
+        return XPATH.toolbarDiv + XPATH.contentActionMenuButton + lib.DROP_DOWN_HANDLE;
     }
 
     get createIssueMenuItem() {
-        return XPATH.toolbar + XPATH.createIssueMenuItem;
+        return XPATH.toolbarDiv + XPATH.createIssueMenuItem;
     }
 
     get requestPublishMenuItem() {
-        return XPATH.toolbar + XPATH.requestPublishMenuItem;
+        return XPATH.toolbarDiv + XPATH.requestPublishMenuItem;
     }
 
     get markAsReadyMenuItem() {
-        return XPATH.toolbar + XPATH.markAsReadyMenuItem;
+        return XPATH.toolbarDiv + XPATH.markAsReadyMenuItem;
     }
 
     get createIssueButton() {
-        return XPATH.toolbar + lib.actionButton('Create Issue...');
+        return XPATH.toolbarDiv + lib.actionButton('Create Issue...');
     }
 
     get showIssuesListButton() {
@@ -146,11 +130,11 @@ class ContentBrowsePanel extends BaseBrowsePanel {
     }
 
     get newButton() {
-        return `${XPATH.toolbar}/*[contains(@id, 'ActionButton') and child::span[contains(.,'New...')]]`
+        return `${XPATH.toolbarDiv}/*[contains(@id, 'ActionButton') and child::span[contains(.,'New...')]]`
     }
 
     get editButton() {
-        return `${XPATH.toolbar}/*[contains(@id, 'ActionButton') and child::span[text()='Edit']]`;
+        return `${XPATH.toolbarDiv}/*[contains(@id, 'ActionButton') and child::span[text()='Edit']]`;
     }
 
     get numberInSelectionToggler() {
@@ -158,32 +142,36 @@ class ContentBrowsePanel extends BaseBrowsePanel {
     }
 
     get publishButton() {
-        return XPATH.contentPublishMenuButton + lib.actionButton('Publish...');
+        return XPATH.contentActionMenuButton + lib.actionButton('Publish...');
     }
 
     get unpublishButton() {
 
-        return XPATH.contentPublishMenuButton + lib.actionButton('Unpublish...');
+        return XPATH.contentActionMenuButton + lib.actionButton('Unpublish...');
     }
 
     get publishTreeButton() {
-        return XPATH.contentPublishMenuButton + lib.actionButton('Publish Tree...');
+        return XPATH.contentActionMenuButton + lib.actionButton('Publish Tree...');
     }
 
     get markAsReadyButton() {
-        return XPATH.contentPublishMenuButton + lib.actionButton('Mark as ready');
+        return XPATH.contentActionMenuButton + lib.actionButton('Mark as ready');
     }
 
     get displayNames() {
-        return XPATH.treeGrid + lib.H6_DISPLAY_NAME;
+        return XPATH.contentsTreeGridRootUL + lib.H6_DISPLAY_NAME;
     }
 
     get treeGrid() {
-        return XPATH.container + XPATH.treeGrid;
+        return XPATH.container + XPATH.contentsTreeGridRootUL;
+    }
+
+    get browseToolbar() {
+        return XPATH.container + XPATH.toolbarDiv;
     }
 
     get projectViewerButton() {
-        return "//div[contains(@id,'ContentAppBar')]" + XPATH.projectViewerButton;
+        return lib.DIV.CONTENT_APP_BAR_DIV + XPATH.projectViewerButton;
     }
 
     async clickOnProjectViewerButton() {
@@ -213,7 +201,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
         })
     }
 
-    //Wait for `Publish Menu` Button gets `Publish...`
+    // Wait for `Publish Menu` Button gets `Publish...`
     async waitForPublishButtonVisible() {
         try {
             return await this.waitForElementDisplayed(this.publishButton, appConst.mediumTimeout);
@@ -223,21 +211,15 @@ class ContentBrowsePanel extends BaseBrowsePanel {
         }
     }
 
-    waitForStateIconNotDisplayed(displayName) {
-        let xpath = XPATH.contentSummaryByDisplayName(displayName);
-        return this.getBrowser().waitUntil(() => {
-            return this.getAttribute(xpath, 'class').then(result => {
-                return (!result.includes('in-progress') && !result.includes('ready'));
-            });
-        }, {timeout: appConst.mediumTimeout, timeoutMsg: "Workflow icon is still visible in content: " + displayName});
-    }
-
     // Wait for `Publish Menu` Button gets 'Mark as ready'
-    waitForMarkAsReadyButtonVisible() {
-        return this.waitForElementDisplayed(this.markAsReadyButton, appConst.mediumTimeout).catch(err => {
-            this.saveScreenshot("err_publish_button_mark_as_ready");
-            throw new Error("Mark as Ready button is not visible! " + err);
-        })
+    async waitForMarkAsReadyButtonVisible() {
+        try {
+            await this.waitForElementDisplayed(this.markAsReadyButton, appConst.mediumTimeout);
+            await this.pause(300);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_mark_as_ready_button');
+            throw new Error(`Mark as Ready button is not visible! screenshot:  ${screenshot} ` + err);
+        }
     }
 
     // Wait for `Publish Menu` Button gets 'Unpublish'
@@ -265,8 +247,8 @@ class ContentBrowsePanel extends BaseBrowsePanel {
             await unpublishDialog.pause(1000);
             return unpublishDialog;
         } catch (err) {
-            await this.saveScreenshot(appConst.generateRandomName("err_unpublish_button"));
-            throw new Error("Browse Panel toolbar - Unpublish button: " + err);
+            let screenshot = await this.saveScreenshotUniqueName("err_unpublish_button");
+            throw new Error(`Browse Panel toolbar - Unpublish button screenshot: ${screenshot} ` + err);
         }
     }
 
@@ -288,7 +270,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
     async clickOnMarkAsReadyButton() {
         await this.waitForMarkAsReadyButtonVisible();
         await this.clickOnElement(this.markAsReadyButton);
-        return await this.pause(500);
+        return await this.pause(300);
     }
 
     async clickOnMoveButton() {
@@ -296,8 +278,8 @@ class ContentBrowsePanel extends BaseBrowsePanel {
             await this.waitForMoveButtonEnabled();
             return await this.clickOnElement(this.moveButton);
         } catch (err) {
-            await this.saveScreenshot(appConst.generateRandomName("err_move"));
-            throw new Error('error when clicking on the Move button ' + err);
+            let screenshot = await this.saveScreenshotUniqueName("err_move_btn");
+            throw new Error(`error when clicking on the Move button, screenshot: ${screenshot} ` + err);
         }
     }
 
@@ -335,17 +317,6 @@ class ContentBrowsePanel extends BaseBrowsePanel {
         return this.waitForElementDisplayed(XPATH.container + lib.SHOW_CONTEXT_PANEL_BUTTON, appConst.mediumTimeout);
     }
 
-    async clickOnExpanderIcon(name) {
-        try {
-            let expanderIcon = XPATH.treeGrid + XPATH.expanderIconByName(name);
-            await this.clickOnElement(expanderIcon);
-            return await this.pause(900);
-        } catch (err) {
-            await this.saveScreenshot('err_click_on_expander');
-            throw new Error('error when clicking on expander-icon ' + err);
-        }
-    }
-
     async clickOnShowIssuesListButton() {
         try {
             await this.waitForElementDisplayed(this.showIssuesListButton, appConst.shortTimeout);
@@ -355,9 +326,10 @@ class ContentBrowsePanel extends BaseBrowsePanel {
         }
     }
 
-    //Opens Filter Panel:
-    clickOnSearchButton() {
-        return this.clickOnElement(this.searchButton);
+    // Opens Filter Panel:
+    async clickOnSearchButton() {
+        await this.waitForSearchButtonDisplayed();
+        return await this.clickOnElement(this.searchButton);
     }
 
     async clickOnHideSearchPanelButton() {
@@ -374,9 +346,11 @@ class ContentBrowsePanel extends BaseBrowsePanel {
             let contentDuplicateDialog = new ContentDuplicateDialog();
             await contentDuplicateDialog.waitForDialogOpened();
             await contentDuplicateDialog.waitForSpinnerNotVisible(appConst.mediumTimeout);
+            await contentDuplicateDialog.pause(700);
             return contentDuplicateDialog;
         } catch (err) {
-            throw new Error('error when clicking on the Duplicate button ' + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_duplicate_btn_toolbar');
+            throw new Error("Error after clicking on the 'Duplicate' button, screenshot: " + screenshot + ' ' + err);
         }
     }
 
@@ -384,20 +358,19 @@ class ContentBrowsePanel extends BaseBrowsePanel {
         try {
             let timeout = ms ? ms : appConst.mediumTimeout;
             console.log("waitForContentDisplayed, timeout is:" + timeout);
-            return await this.waitForElementDisplayed(XPATH.treeGrid + lib.itemByName(contentName), timeout);
+            return await this.waitForElementDisplayed(XPATH.contentsTreeGridRootUL + lib.TREE_GRID.itemByName(contentName), timeout);
         } catch (err) {
-            await this.saveScreenshot(appConst.generateRandomName('err_find'));
-            throw new Error('content is not displayed ! ' + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_content_displayed');
+            throw new Error(`content is not displayed ! screenshot: ${screenshot} ` + err);
         }
     }
 
     async waitForContentNotDisplayed(contentName) {
-        let locator = XPATH.treeGrid + lib.itemByName(contentName)
+        let locator = XPATH.contentsTreeGridRootUL + lib.itemByName(contentName)
         try {
             await this.waitForElementNotDisplayed(locator, appConst.mediumTimeout);
         } catch (err) {
-            let screenshot = appConst.generateRandomName('err_content_should_not_be_displayed');
-            await this.saveScreenshot(screenshot);
+            let screenshot = await this.saveScreenshotUniqueName('err_content_should_not_be_displayed');
             throw new Error("Content is still displayed, screenshot :" + screenshot + "  " + err);
         }
     }
@@ -408,22 +381,21 @@ class ContentBrowsePanel extends BaseBrowsePanel {
             await this.clickOnElement(this.previewButton);
             return await this.pause(2000);
         } catch (err) {
-            await this.saveScreenshot(appConst.generateRandomName("err_browsepanel_preview"));
-            throw new Error('Error when clicking on Preview button ' + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_browsepanel_preview');
+            throw new Error(`Error occured after clicking on 'Preview' button, screenshot: ${screenshot} ` + err);
         }
     }
 
-    isSearchButtonDisplayed() {
-        return this.isElementDisplayed(this.searchButton);
+    waitForSearchButtonDisplayed() {
+        return this.waitForElementDisplayed(this.searchButton, appConst.mediumTimeout);
     }
 
     async waitForPreviewButtonDisabled() {
         try {
             await this.waitForElementDisabled(this.previewButton, appConst.mediumTimeout)
         } catch (err) {
-            let screenshot = appConst.generateRandomName("err_preview_btn_disabled");
-            await this.saveScreenshot(screenshot);
-            throw Error('Preview button should be disabled, screenshot  : ' + screenshot + "  " + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_preview_btn_disabled');
+            throw new Error('Preview button should be disabled, screenshot  : ' + screenshot + "  " + err);
         }
     }
 
@@ -431,24 +403,25 @@ class ContentBrowsePanel extends BaseBrowsePanel {
         try {
             await this.waitForElementEnabled(this.previewButton, appConst.mediumTimeout)
         } catch (err) {
-            let screenshot = appConst.generateRandomName("err_preview_btn_enabled");
-            await this.saveScreenshot(screenshot);
-            throw Error('Preview button should be enabled, screenshot  : ' + screenshot + "  " + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_preview_btn_enabled');
+            throw new Error('Preview button should be enabled, screenshot  : ' + screenshot + "  " + err);
         }
     }
 
     waitForDetailsPanelToggleButtonDisplayed() {
         return this.waitForElementDisplayed(this.detailsPanelToggleButton, appConst.mediumTimeout).catch(err => {
             this.saveScreenshot('err_details_panel_displayed');
-            throw Error('Details Panel toggle button should be displayed, timeout: ' + err);
+            throw new Error('Details Panel toggle button should be displayed, timeout: ' + err);
         })
     }
 
-    waitForSortButtonDisabled() {
-        return this.waitForElementDisabled(this.sortButton, appConst.mediumTimeout).catch(err => {
-            this.saveScreenshot('err_sort_disabled_button');
-            throw Error('Sort button should be disabled, timeout: ' + appConst.mediumTimeout + 'ms')
-        })
+    async waitForSortButtonDisabled() {
+        try {
+            return await this.waitForElementDisabled(this.sortButton, appConst.mediumTimeout)
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_sort_disabled_button');
+            throw new Error(`Sort button should be disabled, screenshot: ${screenshot} ` + err);
+        }
     }
 
     async waitForDuplicateButtonDisabled() {
@@ -457,7 +430,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
             return await this.waitForElementDisabled(this.duplicateButton, appConst.mediumTimeout);
         } catch (err) {
             await this.saveScreenshot('err_duplicate_disabled_button');
-            throw Error('Duplicate button should be disabled, timeout: ' + 3000 + 'ms')
+            throw new Error('Duplicate button should be disabled, timeout: ' + 3000 + 'ms')
         }
     }
 
@@ -467,7 +440,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
             return await this.waitForElementEnabled(this.duplicateButton, appConst.mediumTimeout);
         } catch (err) {
             await this.saveScreenshot('err_duplicate_should_be_enabled');
-            throw Error('Duplicate button should be enabled, timeout: ' + 3000 + 'ms')
+            throw new Error('Duplicate button should be enabled, timeout: ' + 3000 + 'ms')
         }
     }
 
@@ -477,7 +450,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
             return await this.waitForElementEnabled(this.localizeButton, appConst.mediumTimeout);
         } catch (err) {
             await this.saveScreenshot('err_localize_enabled_button');
-            throw Error('Localize button should be enabled, timeout: ' + 3000 + 'ms')
+            throw new Error('Localize button should be enabled, timeout: ' + 3000 + 'ms')
         }
     }
 
@@ -486,8 +459,8 @@ class ContentBrowsePanel extends BaseBrowsePanel {
             await this.waitForElementDisplayed(this.localizeButton, appConst.mediumTimeout);
             return await this.waitForElementDisabled(this.localizeButton, appConst.mediumTimeout);
         } catch (err) {
-            this.saveScreenshot('err_localize_disabled_button');
-            throw Error('Localize button should be disabled, timeout: ' + 3000 + 'ms')
+            await this.saveScreenshot('err_localize_disabled_button');
+            throw new Error('Localize button should be disabled, timeout: ' + 3000 + 'ms')
         }
     }
 
@@ -497,7 +470,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
             return await this.waitForElementEnabled(this.openButton, appConst.mediumTimeout);
         } catch (err) {
             await this.saveScreenshot('err_open_button_is_not_enabled');
-            throw Error('Open button should be disabled, timeout: ' + 3000 + 'ms')
+            throw new Error('Open button should be disabled, timeout: ' + 3000 + 'ms')
         }
     }
 
@@ -515,7 +488,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
     waitForMoveButtonDisabled() {
         return this.waitForElementDisabled(this.moveButton, appConst.mediumTimeout).catch(err => {
             this.saveScreenshot('err_move_disabled_button');
-            throw Error('Move button should be disabled, timeout: ' + err);
+            throw new Error('Move button should be disabled, timeout: ' + err);
         })
     }
 
@@ -523,120 +496,172 @@ class ContentBrowsePanel extends BaseBrowsePanel {
         try {
             await this.waitForElementEnabled(this.sortButton, appConst.mediumTimeout)
         } catch (err) {
-            let screenshot = appConst.generateRandomName('err_sort_enabled_button');
-            await this.saveScreenshot(screenshot);
-            throw Error('Sort button should be enabled, screenshot: ' + screenshot + ' ' + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_sort_enabled_button');
+            throw new Error('Sort button should be enabled, screenshot: ' + screenshot + ' ' + err);
         }
     }
 
     waitForMoveButtonEnabled() {
         return this.waitForElementEnabled(this.moveButton, appConst.mediumTimeout).catch(err => {
             this.saveScreenshot('err_move_enabled_button');
-            throw Error('Move button should be enabled, timeout: ' + err);
+            throw new Error('Move button should be enabled, timeout: ' + err);
         })
     }
 
     async clickOnRowByDisplayName(displayName) {
         try {
-            let nameXpath = XPATH.treeGrid + lib.itemByDisplayName(displayName);
+            let nameXpath = XPATH.contentsTreeGridRootUL + lib.itemByDisplayName(displayName);
             await this.waitForElementDisplayed(nameXpath, appConst.mediumTimeout);
             await this.clickOnElement(nameXpath);
             return await this.pause(500);
         } catch (err) {
-            await this.saveScreenshot(appConst.generateRandomName('err_not_found'));
-            throw Error('Content was not found:  ' + err);
+            await this.saveScreenshotUniqueName('err_not_found');
+            throw new Error('Content was not found:  ' + err);
         }
     }
 
     async waitForRowByNameVisible(name) {
         try {
-            let nameXpath = XPATH.treeGrid + lib.itemByName(name);
+            let nameXpath = XPATH.contentsTreeGridRootUL + lib.itemByName(name);
             await this.waitForElementDisplayed(nameXpath, appConst.longTimeout);
         } catch (err) {
-            await this.saveScreenshot(appConst.generateRandomName('err_content'));
-            throw Error("Content was not found: " + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_content');
+            throw new Error(`Content was not found: screenshot:${screenshot} ` + err);
         }
     }
 
     async waitForContentByDisplayNameVisible(displayName) {
         try {
-            let nameXpath = XPATH.treeGrid + lib.itemByDisplayName(displayName);
+            let nameXpath = XPATH.contentsTreeGridRootUL + lib.itemByDisplayName(displayName);
             await this.waitForElementDisplayed(nameXpath, 3000)
         } catch (err) {
-            let screenshot = appConst.generateRandomName('err_find_content');
-            await this.saveScreenshot(screenshot);
-            throw Error('Content was not found,screenshot ' + screenshot + "  " + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_find_content');
+            throw new Error(`Content was not found, screenshot :${screenshot}  ` + err);
         }
     }
 
     async clickOnCheckboxAndSelectRowByName(name) {
         try {
-            await this.clickOnCheckbox(name);
+            await this.clickOnCheckboxByName(name);
             await this.waitForRowCheckboxSelected(name);
         } catch (err) {
-            await this.saveScreenshot('err_select_item');
-            throw Error('Row with the name ' + name + ' was not selected ' + err)
+            let screenshot = await this.saveScreenshotUniqueName('err_select_item');
+            throw new Error('Row with the name ' + name + ' was not selected, screenshot: ' + screenshot + ' ' + err);
         }
     }
 
-    async clickOnCheckbox(name) {
-        let checkBox = XPATH.checkboxByName(name);
-        await this.waitForElementDisplayed(checkBox, appConst.mediumTimeout);
-        await this.clickOnElement(checkBox);
-        return await this.pause(300);
+    async clickCheckboxAndSelectRowByDisplayName(displayName) {
+        try {
+            await this.clickOnCheckboxByDisplayName(displayName);
+            return await this.pause(200);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_find_item');
+            throw new Error(`Row with the displayName ${displayName} was not found. Screenshot: :${screenshot}` + err);
+        }
     }
 
-    getNumberOfSelectedRows() {
-        return this.findElements(XPATH.highlightedRow).then(result => {
-            return result.length;
-        }).catch(err => {
-            throw new Error(`Error when getting highlighted rows ` + err);
-        });
-    }
-
-    getNameInHighlightedRow() {
-        return this.waitForElementDisplayed(XPATH.highlightedRow, appConst.shortTimeout).then(() => {
-            return this.getText(XPATH.highlightedRow + lib.H6_DISPLAY_NAME);
-        }).catch(err => {
+    async getNameInHighlightedRow() {
+        try {
+            await this.waitForElementDisplayed(XPATH.highlightedRow, appConst.shortTimeout);
+            return await this.getText(XPATH.highlightedRow + lib.H6_DISPLAY_NAME);
+        } catch (err) {
             throw new Error(`Error when getting name in the highlighted row ` + err);
-        });
+        }
     }
 
-    async getSortingIcon(name) {
-        let selector = lib.slickRowByDisplayName(XPATH.treeGrid, name) + "//div[contains(@class,'r2')]/span/div";
+    async getSortingIcon(contentName) {
+
+        let selector = this.treeGrid + lib.TREE_GRID.itemTreeGridListElementByName(contentName) +
+                       "//div[contains(@class,'content-tree-grid-sort')]";
         let elems = await this.findElements(selector);
+        let sort;
         if (elems.length === 0) {
-            return "Default";
+            return 'Default';
         }
-        let classAttr = await elems[0].getAttribute("class");
+        let classAttr = await elems[0].getAttribute('class');
         if (classAttr.includes('num-asc')) {
-            return "Date ascending";
+            sort = appConst.GRID_SORTING.DATE_ASC;
         } else if (classAttr.includes('num-desc')) {
-            return "Date descending";
-        } else if (classAttr === 'sort-dialog-trigger icon-menu') {
-            return appConst.sortMenuItem.MANUALLY_SORTED;
+            sort = appConst.GRID_SORTING.DATE_DESC
+        } else if (classAttr.includes('alpha-asc')) {
+            sort = appConst.GRID_SORTING.NAME_ASC;
+        } else if (classAttr.includes('alpha-desc')) {
+            sort = appConst.GRID_SORTING.NAME_DESC;
+        } else if (classAttr.includes('icon-menu')) {
+            sort = appConst.SORT_DIALOG.MENU_ITEM.MANUALLY_SORTED;
+        }
+        return sort;
+    }
+
+    // returns number of rows with selected checkbox:
+    async getNumberOfCheckedRows() {
+        try {
+            let locator = XPATH.contentsTreeGridRootUL + XPATH.checkedRowLi;
+            let result = await this.findElements(locator);
+            return result.length;
+        } catch (err) {
+            throw new Error(`Error occurred during getting the number of rows with selected checkbox ` + err);
         }
     }
 
-    getNumberOfCheckedRows() {
-        return this.findElements(XPATH.checkedRows).then(result => {
+    // One or zero highlighted rows:
+    async getNumberOfSelectedRows() {
+        try {
+            let locator = XPATH.contentsTreeGridRootUL + XPATH.highlightedRow;
+            let result = await this.findElements(locator);
             return result.length;
-        }).catch(err => {
-            throw new Error(`Error when getting checked rows ` + err);
-        });
+        } catch (err) {
+            throw new Error(`Error when getting highlighted rows ` + err);
+        }
     }
 
-    getDisplayNameInCheckedRows() {
-        let locator = XPATH.checkedRows2 + lib.H6_DISPLAY_NAME;
-        return this.getTextInDisplayedElements(locator);
+    async waitForExpandToggleDisplayed(contentName) {
+        try {
+            let expanderIcon = this.treeGrid + lib.TREE_GRID.itemTreeGridListElementByName(contentName) + lib.TREE_GRID.EXPANDER_ICON_DIV;
+            let res = await this.findElements(expanderIcon);
+            if (res.length === 0) {
+                throw new Error('Expander icon was not found!');
+            }
+            // check only the last element:
+            return await res[res.length - 1].waitForDisplayed();
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_expand_toggle');
+            throw new Error(`Expand toggle should be displayed! screenshot: ${screenshot} ` + err);
+        }
     }
 
-    isExpanderIconPresent(name) {
-        let expanderIcon = XPATH.treeGrid + XPATH.expanderIconByName(name);
-        return this.waitForElementDisplayed(expanderIcon, appConst.shortTimeout).catch(err => {
-            this.saveScreenshot('expander_not_exists ' + name);
-            return false;
-        })
+    async waitForExpandToggleNotDisplayed(contentName) {
+        try {
+            let expanderIcon = this.treeGrid + lib.TREE_GRID.itemTreeGridListElementByName(contentName) + lib.TREE_GRID.EXPANDER_ICON_DIV;
+            return await this.waitForElementNotDisplayed(expanderIcon, appConst.shortTimeout);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_expand_toggle');
+            throw new Error(`Expand toggle should not be displayed! screenshot: ${screenshot} ` + err);
+        }
+    }
+
+    async clickOnExpanderIcon(contentName) {
+        try {
+            let expanderIcon = this.treeGrid + lib.TREE_GRID.itemTreeGridListElementByName(contentName) + lib.TREE_GRID.EXPANDER_ICON_DIV;
+            await this.waitForExpandToggleDisplayed(contentName);
+            await this.clickOnElement(expanderIcon);
+            return await this.pause(900);
+        } catch (err) {
+            await this.saveScreenshot('err_click_on_expander');
+            throw new Error('Error occurred after clicking on expand-toggle ' + err);
+        }
+    }
+
+    async isContentExpanded(contentName) {
+        try {
+            let divEl = this.treeGrid + lib.TREE_GRID.itemTreeGridListElementByName(contentName) + lib.TREE_GRID.EXPANDER_ICON_DIV;
+            await this.waitForExpandToggleDisplayed(contentName);
+            let attr = await this.getAttribute(divEl, 'class');
+            return attr.includes('expanded');
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_expander_icon');
+            throw new Error(`Error occurred during checking the expand-toggle, screenshot: ${screenshot} ` + err);
+        }
     }
 
     // this method does not wait, it just checks the attribute
@@ -653,18 +678,31 @@ class ContentBrowsePanel extends BaseBrowsePanel {
         return this.waitUntilInvalid(xpath);
     }
 
-    getContentStatus(name) {
-        let selector = lib.slickRowByDisplayName(XPATH.treeGrid, name) + "//div[contains(@class,'r3')]";
-        return this.getText(selector);
+    async getContentStatus(name) {
+        try {
+            let selector = lib.TREE_GRID.itemTreeGridListElementByName(name) + lib.TREE_GRID.CONTENT_STATUS;
+            return await this.getText(selector);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_content_status');
+            throw new Error(`Error occurred during getting the status of the content, screenshot: ${screenshot}  ` + err);
+        }
     }
 
     async waitForStatus(name, expectedStatus) {
-        let locator = lib.slickRowByDisplayName(XPATH.treeGrid, name) + "//div[contains(@class,'r3')]";
+        let locator = XPATH.container + lib.TREE_GRID.itemTreeGridListElementByName(name) + lib.TREE_GRID.CONTENT_STATUS;
         await this.getBrowser().waitUntil(async () => {
             let actualStatus = await this.getText(locator);
             return actualStatus === expectedStatus;
         }, {timeout: appConst.mediumTimeout, timeoutMsg: "Expected status should be " + expectedStatus});
+    }
 
+    async waitForStatusByDisplayName(displayName, expectedStatus) {
+        let locator = lib.TREE_GRID.contentSummaryByDisplayName(XPATH.container, displayName) + "/.." + lib.TREE_GRID.CONTENT_STATUS;
+        let res = await this.findElements(locator);
+        await this.getBrowser().waitUntil(async () => {
+            let actualStatus = await this.getText(locator);
+            return actualStatus === expectedStatus;
+        }, {timeout: appConst.mediumTimeout, timeoutMsg: "Expected status should be " + expectedStatus});
     }
 
     waitForShowPublishMenuDropDownVisible() {
@@ -683,7 +721,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
             await this.waitForCreateIssueButtonDisplayed();
             return await this.clickOnElement(this.createIssueButton);
         } catch (err) {
-            this.saveScreenshot("err_click_create_issue_button");
+            await this.saveScreenshot("err_click_create_issue_button");
             throw new Error("Browse Panel. Error when click on Create Issue button in the toolbar! " + err);
         }
     }
@@ -698,16 +736,16 @@ class ContentBrowsePanel extends BaseBrowsePanel {
 
     async waitForPublishMenuItemDisabled(menuItem) {
         try {
-            let selector = XPATH.toolbar + XPATH.publishMenuItemByName(menuItem);
+            let selector = XPATH.toolbarDiv + XPATH.publishMenuItemByName(menuItem);
             return await this.waitForAttributeHasValue(selector, "class", "disabled");
         } catch (err) {
-            await this.saveScreenshot("err_publish_menuItem");
+            await this.saveScreenshot('err_publish_menuItem');
             throw new Error(menuItem + " should be disabled! " + err);
         }
     }
 
     async waitForPublishMenuItemEnabled(menuItem) {
-        let selector = XPATH.toolbar + XPATH.publishMenuItemByName(menuItem);
+        let selector = XPATH.toolbarDiv + XPATH.publishMenuItemByName(menuItem);
         return await this.waitForAttributeNotIncludesValue(selector, "class", "disabled");
     }
 
@@ -720,12 +758,12 @@ class ContentBrowsePanel extends BaseBrowsePanel {
         try {
             await this.waitForShowPublishMenuDropDownVisible();
             await this.clickOnElement(this.showPublishMenuButton);
-            let selector = XPATH.toolbar + XPATH.publishMenuItemByName(menuItem);
+            let selector = XPATH.toolbarDiv + XPATH.publishMenuItemByName(menuItem);
             await this.waitForPublishMenuItemEnabled(menuItem);
             await this.clickOnElement(selector);
             return await this.pause(300);
         } catch (err) {
-            await this.saveScreenshot("err_click_issue_menuItem");
+            await this.saveScreenshot('err_click_issue_menuItem');
             throw new Error('error when try to click on publish menu item, ' + err);
         }
     }
@@ -758,9 +796,9 @@ class ContentBrowsePanel extends BaseBrowsePanel {
         return await confirmationDialog.clickOnYesButton();
     }
 
-    // finds workflow state by the display name
-    async getWorkflowState(displayName) {
-        let xpath = XPATH.contentSummaryByDisplayName(displayName);
+    // finds workflow state by a display name
+    async getWorkflowStateByDisplayName(displayName) {
+        let xpath = XPATH.selectableListBoxPanelDiv + lib.TREE_GRID.contentSummaryByDisplayName(XPATH.container, displayName);
         await this.waitForElementDisplayed(xpath, appConst.shortTimeout);
         let result = await this.getAttribute(xpath, 'class');
         if (result.includes('in-progress')) {
@@ -775,9 +813,9 @@ class ContentBrowsePanel extends BaseBrowsePanel {
         }
     }
 
-    // finds workflow state by the name
+    // finds workflow state by a name
     async getWorkflowStateByName(name) {
-        let xpath = XPATH.contentSummaryListViewerByName(name);
+        let xpath = XPATH.selectableListBoxPanelDiv + lib.TREE_GRID.contentSummaryByName(name);
         await this.waitForElementDisplayed(xpath, appConst.shortTimeout);
         let result = await this.getAttribute(xpath, 'class');
         if (result.includes('in-progress')) {
@@ -786,7 +824,6 @@ class ContentBrowsePanel extends BaseBrowsePanel {
             return appConst.WORKFLOW_STATE.READY_FOR_PUBLISHING;
         } else if (result === 'viewer content-summary-and-compare-status-viewer') {
             return appConst.WORKFLOW_STATE.PUBLISHED;
-
         } else {
             throw new Error("Error when getting content's state, actual result is:" + result);
         }
@@ -794,10 +831,10 @@ class ContentBrowsePanel extends BaseBrowsePanel {
 
     async waitForDefaultAction(actionName) {
         try {
-            let selector = XPATH.contentPublishMenuButton + XPATH.defaultActionByName(actionName);
+            let selector = XPATH.contentActionMenuButton + XPATH.defaultActionByName(actionName);
             return await this.waitForElementDisplayed(selector, appConst.mediumTimeout);
         } catch (err) {
-            throw Error(`Publish Menu -  '${actionName}'  this default action should be visible!: ` + err);
+            throw new Error(`Publish Menu -  '${actionName}'  this default action should be visible!: ` + err);
         }
     }
 
@@ -841,33 +878,38 @@ class ContentBrowsePanel extends BaseBrowsePanel {
 
     async isContentInherited(contentName) {
         await this.waitForContentDisplayed(contentName, appConst.mediumTimeout);
-        let locator = lib.slickRowByName(XPATH.treeGrid, contentName);
+        let locator = lib.TREE_GRID.contentSummaryByName(contentName)
         let attr = await this.getAttribute(locator, 'class');
         return attr.includes('data-inherited');
     }
 
-    async isContentByDisplayNameInherited(contentName) {
-        await this.waitForContentDisplayed(contentName, appConst.mediumTimeout);
-        let locator = lib.slickRowByDisplayName(XPATH.treeGrid, contentName);
+    async isContentByDisplayNameInherited(contentDisplayName) {
+        await this.waitForContentDisplayed(contentDisplayName, appConst.mediumTimeout);
+        let locator = lib.TREE_GRID.contentSummaryByDisplayName(XPATH.container, contentDisplayName);
         let attr = await this.getAttribute(locator, 'class');
         return attr.includes('data-inherited');
     }
 
     async clickOnLocalizeButton() {
-        await this.waitForElementEnabled(this.localizeButton, appConst.mediumTimeout);
-        await this.clickOnElement(this.localizeButton);
-        return await this.pause(1000);
+        try {
+            await this.waitForElementEnabled(this.localizeButton, appConst.mediumTimeout);
+            await this.clickOnElement(this.localizeButton);
+            return await this.pause(1000);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_localize_btn');
+            throw new Error(`Content Browse Panel, Localize button, screenshot:${screenshot} ` + err);
+        }
     }
 
     async rightClickOnItemByDisplayName(displayName) {
         try {
-            const nameXpath = XPATH.container + XPATH.rowByDisplayName(displayName);
+            const nameXpath = XPATH.container + lib.itemByDisplayName(displayName);
             await this.waitForElementDisplayed(nameXpath, appConst.mediumTimeout);
             await this.doRightClick(nameXpath);
             return await this.waitForContextMenuDisplayed();
         } catch (err) {
-            await this.saveScreenshot(appConst.generateRandomName('err_context_menu'));
-            throw Error(`Error when do right click on the row:` + err);
+            await this.saveScreenshotUniqueName('err_context_menu');
+            throw new Error(`Error occurred after right click on the row:` + err);
         }
     }
 
@@ -881,7 +923,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
             await this.waitForElementEnabled(this.archiveButton, appConst.mediumTimeout);
         } catch (err) {
             await this.saveScreenshot('err_delete_button');
-            throw Error("Archive button should be enabled " + err);
+            throw new Error("Archive button should be enabled " + err);
         }
     }
 
@@ -894,28 +936,6 @@ class ContentBrowsePanel extends BaseBrowsePanel {
         await this.waitForArchiveButtonEnabled();
         await this.clickOnElement(this.archiveButton);
         return await this.pause(500);
-    }
-
-    async isContentExpanded(contentName) {
-        try {
-            let locator = XPATH.expanderIconByName(contentName);
-            await this.waitForExpanderIconDisplayed(contentName);
-            let attr = await this.getAttribute(locator, "class");
-            return attr.includes("collapse");
-        } catch (err) {
-            await this.saveScreenshot(appConst.generateRandomName('err_expander_icon'));
-            throw new Error("Toggle icon: " + err);
-        }
-    }
-
-    waitForExpanderIconDisplayed(contentName) {
-        let locator = XPATH.expanderIconByName(contentName);
-        return this.waitForElementDisplayed(locator, appConst.mediumTimeout);
-    }
-
-    waitForExpanderIconNotDisplayed(contentName) {
-        let locator = XPATH.expanderIconByName(contentName);
-        return this.waitForElementNotDisplayed(locator, appConst.mediumTimeout);
     }
 
     getDisplayNameInHighlightedRow() {
@@ -947,22 +967,44 @@ class ContentBrowsePanel extends BaseBrowsePanel {
         return await this.clickOnElement(XPATH.foldButtonByName(name));
     }
 
-    waitForSortIconNotDisplayed(name) {
-        let selector = lib.slickRowByDisplayName(XPATH.treeGrid, name) + "//div[contains(@class,'sort-dialog-trigger')]";
-        return this.waitForElementNotDisplayed(selector, appConst.mediumTimeout);
+    async waitForSortIconNotDisplayed(name) {
+        let selector = lib.TREE_GRID.itemTreeGridListElementByName(name) + lib.TREE_GRID.SORT_DIALOG_TOGGLE;
+        return await this.waitForElementNotDisplayed(selector, appConst.mediumTimeout);
     }
 
-    waitForSortIconDisplayed(name) {
-        let selector = lib.slickRowByDisplayName(XPATH.treeGrid, name) + "//div[contains(@class,'sort-dialog-trigger')]";
-        return this.waitForElementDisplayed(selector, appConst.mediumTimeout);
+    async waitForSortIconDisplayed(name) {
+        let selector = lib.TREE_GRID.itemTreeGridListElementByName(name) + lib.TREE_GRID.SORT_DIALOG_TOGGLE;
+        return await this.waitForElementDisplayed(selector, appConst.mediumTimeout);
+    }
+
+    async waitForGridRoleAttribute(expectedRole) {
+        let locator = XPATH.treeGrid;
+        await this.getBrowser().waitUntil(async () => {
+            let text = await this.getAttribute(locator, "role");
+            return text === expectedRole;
+        }, {timeout: appConst.shortTimeout, timeoutMsg: "Role attribute for Grid should set 'grid'"});
     }
 
     async waitForVariantIconDisplayed(name) {
-        let locator = lib.itemByName(name) + "/ancestor::div[contains(@id,'ContentSummaryListViewer')]";
-        await this.getBrowser().waitUntil(async () => {
-            let atr = await this.getAttribute(locator, 'class');
-            return atr.includes('icon-variant');
-        }, {timeout: appConst.mediumTimeout, timeoutMsg: 'Variant icon is not displayed in the grid'});
+        let listElements = lib.TREE_GRID.itemTreeGridListElementByName(name);
+        let result = await this.findElements(listElements);
+        if (result.length === 0) {
+            throw new Error('Content item was not found!');
+        }
+        // get the last element(skip the root element)
+        // let listElement = result[result.length - 1];
+        // let contentSummaryViewer = await listElement.$('.' + lib.DIV.CONTENT_SUMMARY_AND_STATUS_VIEWER);
+        // let class1 = await contentSummaryViewer.getAttribute("class")
+        // let id= await contentSummaryViewer.getAttribute("id")
+        // await this.getBrowser().waitUntil(async () => {
+        //     let atr = await contentSummaryViewer.getAttribute('class');
+        //     return atr.includes('icon-variant');
+        // }, {timeout: appConst.mediumTimeout, timeoutMsg: 'Variant icon is not displayed in the grid'});
+
+        let locator = lib.TREE_GRID.contentSummaryByName(name);// + lib.DIV.CONTENT_SUMMARY_AND_STATUS_VIEWER;
+        let element = await this.findElement(locator);
+        let atr = await element.getAttribute("class")
+        return atr.includes('icon-variant');
     }
 }
 

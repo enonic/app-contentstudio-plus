@@ -10,7 +10,7 @@ const ProjectWizardDialogPermissionsStep = require('../page_objects/project/proj
 const ProjectWizardDialogApplicationsStep = require('../page_objects/project/project-wizard-dialog/project.wizard.applications.step');
 const ProjectWizardDialogNameAndIdStep = require('../page_objects/project/project-wizard-dialog/project.wizard.name.id.step');
 const ProjectWizardDialogSummaryStep = require('../page_objects/project/project-wizard-dialog/project.wizard.summary.step');
-const appConst = require('./app_const');
+const appConst = require("./app_const");
 const path = require('path');
 const fs = require('fs');
 const webDriverHelper = require('./WebDriverHelper');
@@ -36,14 +36,48 @@ module.exports = {
         await summaryStep.waitForDialogClosed();
         return await settingsBrowsePanel.pause(500);
     },
-    async fillParentNameStep(parents) {
-        let parentProjectStep = new ProjectWizardDialogParentProjectStep();
-        parents = [].concat(parents);
-        for (let name of parents) {
-            await parentProjectStep.selectParentProject(name);
+    async selectParentProjectsByName(parents) {
+        try {
+            let parentProjectStep = new ProjectWizardDialogParentProjectStep();
+            parents = [].concat(parents);
+            let selectedItems = await parentProjectStep.getSelectedProjects();
+            for (let name of parents) {
+                if (selectedItems.length === 0 || this.isProjectSelected(selectedItems, name)) {
+                    // select a project and click on Apply button
+                    await parentProjectStep.selectParentProjectMulti(name);
+                }
+            }
+            await parentProjectStep.clickOnNextButton();
+            return new ProjectWizardDialogLanguageStep();
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_parent_proj_step');
+            throw new Error(`Error occurred in parent project step, screenshot:${screenshot} ` + err);
         }
-        await parentProjectStep.clickOnNextButton();
-        return new ProjectWizardDialogLanguageStep();
+    },
+    async selectSingleParentProjectsByName(parent) {
+        try {
+            let parentProjectStep = new ProjectWizardDialogParentProjectStep();
+            let selectedItems = await parentProjectStep.getSelectedProjects();
+
+            let isSelected = selectedItems.length > 0 && selectedItems[0].includes(parent);
+            if (!isSelected) {
+                await parentProjectStep.selectParentProject(parent);
+            }
+
+            await parentProjectStep.clickOnNextButton();
+            return new ProjectWizardDialogLanguageStep();
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_parent_proj_step');
+            throw new Error(`Error occurred in parent project step, screenshot:${screenshot} ` + err);
+        }
+    },
+    isProjectSelected(arr, text) {
+        arr.find((item) => {
+            if (item.includes(text)) {
+                return true;
+            }
+        });
+        return false;
     },
     async fillLanguageStep(language) {
         let languageStep = new ProjectWizardDialogLanguageStep();
@@ -61,7 +95,7 @@ module.exports = {
             await accessModeStep.clickOnAccessModeRadio(accessMode);
         } else {
             //set the default access mode for ui-tests:
-            await accessModeStep.clickOnAccessModeRadio('Private');
+            await accessModeStep.clickOnAccessModeRadio("Private");
         }
         await accessModeStep.clickOnNextButton();
         return new ProjectWizardDialogPermissionsStep();
@@ -115,7 +149,13 @@ module.exports = {
                 let parentProjectStep = new ProjectWizardDialogParentProjectStep();
                 await parentProjectStep.clickOnSkipButton();
             } else {
-                let languageStep = await this.fillParentNameStep(project.parents);
+                let languageStep;
+                if (Array.isArray(project.parents)) {
+                    languageStep = await this.selectParentProjectsByName(project.parents);
+                } else {
+                    languageStep = await this.selectSingleParentProjectsByName(project.parents);
+                }
+
                 await languageStep.waitForLoaded();
             }
             let accessModeStep = await this.fillLanguageStep(project.language);
@@ -139,10 +179,14 @@ module.exports = {
             await projectWizardDialogSummaryStep.pause(1000);
             await projectWizardDialogSummaryStep.waitForLoaded();
         } catch (err) {
-            let screenshot = appConst.generateRandomName('err_save_proj');
-            await this.saveScreenshot(screenshot);
-            throw new Error('Error when saving a project, screenshot:' + screenshot + '  ' + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_save_proj');
+            throw new Error("Error during creating the project, screenshot:" + screenshot + "  " + err);
         }
+    },
+    async saveScreenshotUniqueName(namePart) {
+        let screenshotName = appConst.generateRandomName(namePart);
+        await this.saveScreenshot(screenshotName);
+        return screenshotName;
     },
     async waitForElementDisplayed(locator, ms) {
         let element = await this.getBrowser().$(locator);
@@ -178,6 +222,14 @@ module.exports = {
     async selectParentAndOpenProjectWizardDialog(parentName) {
         let settingsBrowsePanel = new SettingsBrowsePanel();
         await settingsBrowsePanel.clickOnRowByDisplayName(parentName);
+        await settingsBrowsePanel.clickOnNewButton();
+        let parentProjectStep = new ProjectWizardDialogParentProjectStep();
+        await parentProjectStep.waitForLoaded();
+        return parentProjectStep;
+    },
+
+    async clickOnNewAndOpenProjectWizardDialog() {
+        let settingsBrowsePanel = new SettingsBrowsePanel();
         await settingsBrowsePanel.clickOnNewButton();
         let parentProjectStep = new ProjectWizardDialogParentProjectStep();
         await parentProjectStep.waitForLoaded();

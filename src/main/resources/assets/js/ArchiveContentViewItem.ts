@@ -1,33 +1,15 @@
-import {ArchiveViewItem, ArchiveViewItemBuilder} from './ArchiveViewItem';
-import {ContentIconUrlResolver} from 'lib-contentstudio/app/content/ContentIconUrlResolver';
 import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import {ContentPath} from 'lib-contentstudio/app/content/ContentPath';
 
 export class ArchiveContentViewItem
-    extends ArchiveViewItem {
+    extends ContentSummaryAndCompareStatus {
 
     private readonly originalParentPath: string;
 
-    constructor(builder: ArchiveContentViewItemBuilder) {
-        super(builder);
+    constructor(originalParentPath: string) {
+        super();
 
-        this.originalParentPath = builder.originalParentPath;
-    }
-
-    getDisplayName(): string {
-        return this.data.getContentSummary().getDisplayName();
-    }
-
-    getIconUrl(): string {
-        return new ContentIconUrlResolver().setContent(this.data.getContentSummary()).resolve();
-    }
-
-    getIconClass(): string {
-        return '';
-    }
-
-    hasChildren(): boolean {
-        return this.data.hasChildren();
+        this.originalParentPath = originalParentPath;
     }
 
     getOriginalParentPath(): string {
@@ -35,32 +17,11 @@ export class ArchiveContentViewItem
     }
 
     getOriginalFullPath(): string {
-        if (this.data.getPath().getLevel() === 1) {
+        if (this.getPath().getLevel() === 1) {
             return this.originalParentPath;
         }
 
         return this.originalParentPath + ContentPath.NODE_PATH_DIVIDER +
-               this.data.getPath().getElements().slice(1).join(ContentPath.NODE_PATH_DIVIDER);
+               this.getPath().getElements().slice(1).join(ContentPath.NODE_PATH_DIVIDER);
     }
-
-}
-
-export class ArchiveContentViewItemBuilder
-    extends ArchiveViewItemBuilder {
-
-    originalParentPath: string;
-
-    setOriginalParentPath(value: string): ArchiveContentViewItemBuilder {
-        this.originalParentPath = value;
-        return this;
-    }
-
-    setData(value: ContentSummaryAndCompareStatus): ArchiveContentViewItemBuilder {
-        return super.setData(value) as ArchiveContentViewItemBuilder;
-    }
-
-    build(): ArchiveContentViewItem {
-        return new ArchiveContentViewItem(this);
-    }
-
 }
