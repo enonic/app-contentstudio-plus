@@ -86,6 +86,8 @@ export class ArchiveBrowsePanel
                     return itemsToRemoveIds.some((id: string) => id === item.getId());
                 });
 
+                this.selectionWrapper.deselect(itemsFound);
+
                 itemsFound.forEach((item: ArchiveContentViewItem) => {
                    const listElement = this.treeListBox.getItemView(item) as ArchiveTreeListElement;
                    listElement.getParentList().removeItems(item);
