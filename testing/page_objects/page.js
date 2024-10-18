@@ -279,13 +279,19 @@ class Page {
         return await element.waitForDisplayed({timeout: ms});
     }
 
-    waitForSpinnerNotVisible(ms) {
-        let timeout1;
-        timeout1 = ms === undefined ? appConst.longTimeout : ms;
-        let message = 'Spinner still displayed! timeout is ' + timeout1;
-        return this.browser.waitUntil(() => {
-            return this.isElementNotDisplayed("//div[@class='spinner']");
-        }, {timeout: timeout1, timeoutMsg: message});
+    async waitForSpinnerNotVisible(ms) {
+        try {
+            let timeout1;
+            timeout1 = ms === undefined ? appConst.longTimeout : ms;
+            let message = 'Spinner still displayed! timeout is ' + timeout1;
+            return await this.browser.waitUntil(async () => {
+                let res = await this.isElementNotDisplayed("//div[@class='spinner']");
+                return res;
+            }, {timeout: timeout1, timeoutMsg: message});
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_spinner');
+            throw new Error(` Spinner error, screenshot :${screenshot}  ` + err);
+        }
     }
 
     waitUntilElementNotVisible(selector, ms) {
@@ -295,15 +301,21 @@ class Page {
         }, {timeout: ms, timeoutMsg: message});
     }
 
-    isElementNotDisplayed(selector) {
-        return this.getDisplayedElements(selector).then(result => {
-            return result.length === 0;
-        })
+    async isElementNotDisplayed(selector) {
+        let result = await this.getDisplayedElements(selector);
+        return result.length === 0;
     }
 
     async getAttribute(selector, attributeName) {
         let element = await this.findElement(selector);
         return await element.getAttribute(attributeName);
+    }
+
+    async waitForAttributeIsPresent(elementLocator, attribute) {
+        await this.getBrowser().waitUntil(async () => {
+            let text = await this.getAttribute(elementLocator, attribute);
+            return text != null;
+        }, {timeout: appConst.shortTimeout, timeoutMsg: `Expected attribute ${attribute}  is not set in the element ${elementLocator}`});
     }
 
     async removeNotificationMessage() {
@@ -549,6 +561,7 @@ class Page {
         }, {timeout: appConst.mediumTimeout, timeoutMsg: "Class should contain 'invalid' "});
     }
 
+    // checks the attribute value (actual value contains expected value)
     waitForAttributeHasValue(selector, attribute, value) {
         return this.getBrowser().waitUntil(() => {
             return this.getAttribute(selector, attribute).then(result => {
@@ -609,6 +622,22 @@ class Page {
 
     acceptAlert() {
         return this.getBrowser().acceptAlert();
+    }
+
+    async waitForLangAttribute(lang) {
+        let locator = "//html";
+        await this.getBrowser().waitUntil(async () => {
+            let text = await this.getAttribute(locator, "lang");
+            return text.includes(lang);
+        }, {timeout: appConst.shortTimeout, timeoutMsg: "Html tag should contain 'lang' attribute"});
+    }
+
+    // checks the attribute value (actual value === expected value)
+    async waitForAttributeValue(locator, attrName, expectedValue) {
+        await this.getBrowser().waitUntil(async () => {
+            let text = await this.getAttribute(locator, attrName);
+            return text === expectedValue;
+        }, {timeout: appConst.mediumTimeout, timeoutMsg: `Expected attribute ${attrName} is not set in the element ${locator}`});
     }
 }
 

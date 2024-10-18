@@ -166,22 +166,10 @@ class CompareContentVersionsDialog extends Page {
         return await this.findElements(locator);
     }
 
-    async getArchivedOptionsInDropdownList() {
-        let locator = XPATH.containerLeft + XPATH.listItemNameAndIconView + "//div[contains(@class, 'icon-archive')]";
-        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
-        return await this.findElements(locator);
-    }
-
     async clickOnRightDropdownHandle() {
-        try {
-            await this.waitForElementDisplayed(this.rightDropdownHandle, appConst.mediumTimeout);
-            await this.clickOnElement(this.rightDropdownHandle);
-            return await this.pause(300);
-        } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_compare_right_dropdown');
-            throw new Error("Compare Versions Dialog, error during clicking on Right Dropdown, screenshot: " + screenshot + ' ' + err);
-        }
-
+        await this.waitForElementDisplayed(this.rightDropdownHandle, appConst.mediumTimeout);
+        await this.clickOnElement(this.rightDropdownHandle);
+        return await this.pause(300);
     }
 
     async getSortedOptionsInLeftDropdownList() {
@@ -212,6 +200,24 @@ class CompareContentVersionsDialog extends Page {
         let checkBoxInput = XPATH.container + XPATH.showEntireContentCheckboxDiv + lib.CHECKBOX_INPUT;
         await this.waitForElementDisplayed(this.showEntireContentCheckbox, appConst.mediumTimeout);
         return await this.isSelected(checkBoxInput);
+    }
+
+    async getArchivedOptionsInDropdownList() {
+        let locator = XPATH.containerLeft + XPATH.listItemNameAndIconView + "//div[contains(@class, 'icon-archive')]";
+        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+        return await this.findElements(locator);
+    }
+
+    async clickOnRightDropdownHandle() {
+        try {
+            await this.waitForElementDisplayed(this.rightDropdownHandle, appConst.mediumTimeout);
+            await this.clickOnElement(this.rightDropdownHandle);
+            return await this.pause(300);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_compare_right_dropdown');
+            throw new Error("Compare Versions Dialog, error during clicking on Right Dropdown, screenshot: " + screenshot + ' ' + err);
+        }
+
     }
 }
 

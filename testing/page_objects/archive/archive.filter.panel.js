@@ -160,8 +160,8 @@ class ArchiveFilterPanel extends Page {
             await this.clickOnElement(selector);
             return await this.pause(1200);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName(filter_panel);
-            throw new Error('Filter Panel ,error after clicking on a checkbox in aggregation block, screenshot: ' + screenshot + ' ' + err);
+            let screenshot = await this.saveScreenshotUniqueName('filter_panel');
+            throw new Error(`Filter Panel ,error after clicking on a checkbox in aggregation block, screenshot: ${screenshot} ` + err);
         }
     }
 
@@ -220,8 +220,8 @@ class ArchiveFilterPanel extends Page {
             await this.clickOnElement(selector);
             return await this.pause(1200);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName("err_click_on_aggregation");
-            throw new Error("Error when click on the aggregation checkbox, screenshot: " + screenshot + ' ' + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_click_on_aggregation');
+            throw new Error(`Error when click on the aggregation checkbox, screenshot:${screenshot} ` + err);
         }
     }
 
@@ -240,7 +240,7 @@ class ArchiveFilterPanel extends Page {
             let endIndex = label.indexOf(')');
             return label.substring(startIndex + 1, endIndex);
         } catch (err) {
-            await this.saveScreenshot(appConst.generateRandomName('err_numb_in_aggregation'));
+            await this.saveScreenshotUniqueName('err_numb_in_aggregation');
             throw new Error("Error when get the number in aggregation checkbox: " + err);
         }
     }
@@ -294,7 +294,7 @@ class ArchiveFilterPanel extends Page {
             await this.pause(300);
         } catch (err) {
             let screenshot = await this.saveScreenshot('err_filter_owner');
-            throw new Error("Error when selecting an option in Owner Selector, screenshot " + screenshot + ' ' + err);
+            throw new Error(`Error when selecting an option in Owner Selector, screenshot ; ${screenshot} ` + err);
         }
     }
 

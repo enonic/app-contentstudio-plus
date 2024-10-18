@@ -15,7 +15,7 @@ const XPATH = {
 class PublishReportDialog extends Page {
 
     get showEntireContentCheckbox() {
-        return XPATH.container + XPATH.comparisonBlockDiv + lib.SHOW_ENTIRE_CONTENT_CHECKBOX_DIV;
+        return XPATH.container + XPATH.comparisonBlockDiv + lib.DIV.SHOW_ENTIRE_CONTENT_CHECKBOX_DIV;
     }
 
     get printButton() {
@@ -34,7 +34,7 @@ class PublishReportDialog extends Page {
             return await elements[index].getText();
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_publish_report_comparison_header');
-            throw new Error("PublishReport modal dialog, header block, screenshot:  " + screenshot + ' ' + err);
+            throw new Error(`PublishReport modal dialog, header block, screenshot: ${screenshot} ` + err);
         }
     }
 
@@ -46,7 +46,7 @@ class PublishReportDialog extends Page {
             return await elements[index].getText();
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_publish_report_date_subtitle');
-            throw new Error("PublishReport modal dialog, subtitle block, screenshot:  " + screenshot + ' ' + err);
+            throw new Error(`PublishReport modal dialog, subtitle block, screenshot: ${screenshot} ` + err);
         }
     }
 
@@ -58,7 +58,7 @@ class PublishReportDialog extends Page {
             return await elements[index].getText();
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_publish_report_date_header');
-            throw new Error("PublishReport modal dialog, date in the header block, screenshot:  " + screenshot + ' ' + err);
+            throw new Error(`PublishReport modal dialog, date in the header block, screenshot: ${screenshot} ` + err);
         }
     }
 
@@ -69,7 +69,7 @@ class PublishReportDialog extends Page {
             return await this.getText(locator);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_publish_report_dlg_header');
-            throw new Error("PublishReport modal dialog, text in  TextAndDate Block, screenshot:  " + screenshot + ' ' + err);
+            throw new Error(`PublishReport modal dialog, text in  TextAndDate Block, screenshot: ${screenshot} ` + err);
         }
     }
 
@@ -80,12 +80,12 @@ class PublishReportDialog extends Page {
             return await this.getText(locator);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_publish_report_dlg_date');
-            throw new Error("PublishReport modal dialog, date in Comparisons Block, screenshot:  " + screenshot + ' ' + err);
+            throw new Error(`PublishReport modal dialog, date in Comparisons Block, screenshot: ${screenshot} ` + err);
         }
     }
 
     async waitForShowEntireContentCheckboxNotDisplayed() {
-        let checkBoxInput = this.showEntireContentCheckbox + lib.CHECKBOX_INPUT;
+        let checkBoxInput = this.showEntireContentCheckbox + lib.INPUTS.CHECKBOX_INPUT;
         return await this.waitForElementNotDisplayed(checkBoxInput, appConst.mediumTimeout);
     }
 
@@ -100,7 +100,7 @@ class PublishReportDialog extends Page {
     }
 
     async isShowEntireContentCheckboxSelected(index) {
-        let checkBoxInput = this.showEntireContentCheckbox + lib.CHECKBOX_INPUT;
+        let checkBoxInput = this.showEntireContentCheckbox + lib.INPUTS.CHECKBOX_INPUT;
         await this.waitForElementDisplayed(this.showEntireContentCheckbox, appConst.mediumTimeout);
         let res = await this.findElements(checkBoxInput);
         if (index > res.length) {
@@ -122,7 +122,7 @@ class PublishReportDialog extends Page {
             return await this.waitForElementDisplayed(this.printButton, appConst.mediumTimeout)
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_load_publish_report_dlg');
-            throw new Error("PublishReport  dialog was not loaded! screenshot:  " + screenshot + ' ' + err);
+            throw new Error(`PublishReport  dialog was not loaded! screenshot: ${screenshot} ` + err);
         }
     }
 
@@ -132,7 +132,7 @@ class PublishReportDialog extends Page {
             await this.waitForElementEnabled(this.printButton, appConst.mediumTimeout);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_publish_report_print_btn');
-            throw new Error("PublishReport modal dialog - Print button, screenshot:  " + screenshot + ' ' + err);
+            throw new Error(`PublishReport modal dialog - Print button, screenshot: ${screenshot} ` + err);
         }
     }
 
