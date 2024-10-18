@@ -31,6 +31,10 @@ const getConfig = () => {
                 api: 'license',
             }),
         },
+        widgetApiUrl: portal.apiUrl({
+            application: 'admin',
+            api: 'widget',
+        }),
         toolUri: csToolUri,
     };
 }
