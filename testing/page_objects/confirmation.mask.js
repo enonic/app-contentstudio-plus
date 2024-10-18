@@ -13,8 +13,6 @@ const XPATH = {
 
 class ConfirmationMask extends Page {
 
-
-
     get cancelButton() {
         return XPATH.container + XPATH.cancelButton;
     }

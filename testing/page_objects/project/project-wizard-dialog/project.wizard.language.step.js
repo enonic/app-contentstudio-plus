@@ -41,7 +41,7 @@ class ProjectWizardDialogLanguageStep extends ProjectWizardDialog {
 
     async selectLanguage(language) {
         let localeComboBox = new LocaleComboBox();
-        await localeComboBox.clickOnFilteredLanguageAndClickOnOk(language, XPATH.localeStep);
+        await localeComboBox.clickOnFilteredLanguage(language, XPATH.localeStep);
         console.log("Project Wizard, language is selected: " + language);
         return await this.pause(300);
     }

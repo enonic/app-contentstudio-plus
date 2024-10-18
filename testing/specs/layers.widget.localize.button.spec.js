@@ -99,7 +99,7 @@ describe('layers.widget.localize.button.spec - checks Localize button in browse 
             let browseLayersWidget = await studioUtils.openLayersWidgetInBrowsePanel();
             // 2. Click on 'Localize' button:
             await browseLayersWidget.clickOnLocalizeButton(LAYER_DISPLAY_NAME);
-            await studioUtils.doSwitchToNextTab();
+            await studioUtils.switchToContentTabWindow(FOLDER_NAME);
             // 3. Verify that expected content is loaded in wizard page:
             await contentWizard.waitForOpened();
             await contentWizard.waitForSaveButtonDisabled();
@@ -179,6 +179,7 @@ describe('layers.widget.localize.button.spec - checks Localize button in browse 
             await contentWizardPanel.waitForOpened();
             // 3. Open Layers widget in the wizard:
             let wizardLayersWidget = await contentWizardPanel.openLayersWidget();
+            await studioUtils.saveScreenshot('layers_name_issue1');
             let layers = await wizardLayersWidget.getLayersName();
             // 4. Verify names of layers:
             assert.equal(layers[0], 'Default', 'Default layer should be present in the widget');

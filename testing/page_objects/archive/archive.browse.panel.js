@@ -33,9 +33,13 @@ const XPATH = {
 
 class ArchiveBrowsePanel extends BaseBrowsePanel {
 
+    get browseToolbar() {
+        return XPATH.toolbar;
+    }
     get container() {
         return XPATH.container;
     }
+
     get deleteButton() {
         return XPATH.toolbar + `/*[contains(@id, 'ActionButton') and child::span[text()='Delete...']]`;
     }
@@ -194,7 +198,7 @@ class ArchiveBrowsePanel extends BaseBrowsePanel {
             return await this.pause(200);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_find_item');
-            throw new Error(`Row with the displayName ${displayName} was not found. Screenshot:` + screenshot + ' ' + err);
+            throw new Error(`Row with the displayName ${displayName} was not found. Screenshot:${screenshot} ` + err);
         }
     }
 
@@ -219,7 +223,7 @@ class ArchiveBrowsePanel extends BaseBrowsePanel {
             await this.pause(200);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_select_item');
-            throw Error('Row with the name  was not selected, screenshot: ' + screenshot + ' ' + err)
+            throw Error(`Row with the name  was not selected, screenshot:${screenshot} ` + err)
         }
     }
 

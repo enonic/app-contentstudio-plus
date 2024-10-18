@@ -12,10 +12,6 @@ const XPATH = {
         return `//div[contains(@id,'NamesView') and child::p[contains(@class,'sub-name') and contains(.,'${name}')]]` +
                `//ancestor::li[contains(@id,'ContentListElement')]//div[contains(@class,'toggle icon-arrow_drop_up')]`;
     },
-    expanderIconByDisplayName: displayName => {
-        return `//div[contains(@id,'NamesView') and child::h6[contains(@class,'main-name') and contains(.,'${displayName}')]]` +
-               `//ancestor::li[contains(@id,'ContentListElement')]/div[contains(@class,'toggle icon-arrow_drop_up')]`;
-    },
     imageByDisplayNameInTreeMode: displayName => {
         return lib.DROPDOWN_SELECTOR.CONTENTS_TREE_LIST_UL + lib.DROPDOWN_SELECTOR.OPTIONS_LI_ELEMENT +
                `//h6[contains(@class,'main-name') and contains(text(),'${displayName}')]`;
@@ -35,10 +31,10 @@ class ImageSelectorDropdown extends BaseDropdown {
     async selectFilteredImageInFlatMode(imageDisplayName, parentLocator) {
         try {
             // parentLocator = modal dialog or wizard panel...
-            await this.clickOnFilteredItemAndClickOnOk(imageDisplayName, parentLocator);
+            await this.clickOnFilteredByDisplayNameItem(imageDisplayName, parentLocator);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_img_selector_flat');
-            throw new Error('Image selector - Error during selecting the option, screenshot: ' + screenshot + ' ' + err);
+            throw new Error(`Image selector - Error during selecting the option, screenshot: ${screenshot} ` + err);
         }
     }
 
@@ -66,12 +62,6 @@ class ImageSelectorDropdown extends BaseDropdown {
         await this.clickOnElement(locator);
     }
 
-    async clickOnOptionExpanderIcon(optionDisplayName) {
-        let locator = XPATH.expanderIconByName(optionDisplayName);
-        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
-        await this.clickOnElement(locator);
-        return await this.pause(300);
-    }
 
     // Gets all content-statuses in the expanded dropdown list
     async getImagesStatusInOptions() {

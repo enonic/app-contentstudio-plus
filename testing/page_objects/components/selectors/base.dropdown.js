@@ -4,9 +4,14 @@
 const lib = require('../../../libs/elements');
 const appConst = require('../../../libs/app_const');
 const Page = require('../../page');
+
 const XPATH = {
     rightCheckBoxDiv: "//li[contains(@class,'checkbox-right')]//div[contains(@id,'Checkbox')]",
     rightCheckboxByDisplayName: displayName => `//li[contains(@class,'checkbox-right') and descendant::h6[contains(@class,'main-name') and text()='${displayName}']]//div[contains(@id,'Checkbox')]`,
+    expanderIconByName: name => {
+        return `//div[contains(@id,'NamesView') and child::p[contains(@class,'sub-name') and contains(.,'${name}')]]` +
+               `//ancestor::li[contains(@id,'ContentListElement')]//div[contains(@class,'toggle icon-arrow_drop_up')]`;
+    },
 }
 
 class BaseDropdown extends Page {
@@ -62,7 +67,7 @@ class BaseDropdown extends Page {
         if (parentLocator === undefined) {
             parentLocator = '';
         }
-        await this.waitUntilDisplayed(parentLocator + this.applySelectionButton, appConst.mediumTimeout);
+        await this.waitUntilDisplayed(parentLocator + this.applySelectionButton, appConst.shortTimeout);
         await this.pause(200);
     }
 
@@ -86,6 +91,13 @@ class BaseDropdown extends Page {
         return await this.pause(300);
     }
 
+    async clickOnExpanderIconInOptionsList(listItemName) {
+        let locator = XPATH.expanderIconByName(listItemName);
+        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+        await this.clickOnElement(locator);
+        return await this.pause(300);
+    }
+
     async isOptionsFilterInputDisplayed(parentLocator) {
         if (parentLocator === undefined) {
             parentLocator = '';
@@ -99,17 +111,24 @@ class BaseDropdown extends Page {
 
     // 1. Insert a text in Filter input
     // 2. Click on the filtered by displayName item (h6[contains(@class,'main-name'))
-    // 3. Click on OK button and apply the selection.
-    async clickOnFilteredItemAndClickOnOk(optionDisplayName, parentLocator) {
+    // 3. Click on Apply button and apply the selection.
+    async clickOnFilteredByDisplayNameItemAndClickOnApply(optionDisplayName, parentLocator) {
+        // 1. Click on the filtered item:
+        await this.clickOnFilteredByDisplayNameItem(optionDisplayName, parentLocator);
+        // 3. Click on 'OK' button:
+        return await this.clickOnApplySelectionButton(parentLocator);
+    }
+
+    // Do filter by a display name then Click on the item
+    async clickOnFilteredByDisplayNameItem(optionDisplayName, parentLocator) {
         // parentLocator - modal dialog or wizard panel
         // 1. Insert the text in Options Filter Input:
         await this.filterItem(optionDisplayName, parentLocator);
         // 2. Wait for the required option is displayed then click on it:
         await this.clickOnOptionByDisplayName(optionDisplayName, parentLocator);
-        // 3. Click on 'OK' button:
-        return await this.clickOnApplySelectionButton(parentLocator);
     }
 
+    // Click on option-item by display name:
     async clickOnOptionByDisplayName(optionDisplayName, parentLocator) {
         let optionLocator = this.buildLocatorForOptionByDisplayName(optionDisplayName, parentLocator);
         //  Wait for the required option is displayed:
@@ -121,7 +140,7 @@ class BaseDropdown extends Page {
     // 1. Insert a text in Filter input
     // 2. Click on the filtered by name item (p[contains(@class,'sub-name'))
     // 3. Click on OK button and apply the selection.
-    async clickOnFilteredByNameItemAndClickOnOk(optionName, parentLocator) {
+    async clickOnFilteredByNameItemAndClickOnApply(optionName, parentLocator) {
         // parent locator - it is locator for parent modal dialog or wizard form,
         // 1. type the text in Options Filter Input:
         await this.filterItem(optionName, parentLocator);
@@ -129,6 +148,14 @@ class BaseDropdown extends Page {
         await this.clickOnOptionByName(optionName, parentLocator);
         // 4. Click on 'OK' button:
         return await this.clickOnApplySelectionButton(parentLocator);
+    }
+
+    async clickOnFilteredByNameItem(optionName, parentLocator) {
+        // parent locator - it is locator for parent modal dialog or wizard form,
+        // 1. type the text in Options Filter Input:
+        await this.filterItem(optionName, parentLocator);
+        // 3. Click on the row with the item:
+        await this.clickOnOptionByName(optionName, parentLocator);
     }
 
     async clickOnOptionByName(name, parentLocator) {
@@ -185,7 +212,6 @@ class BaseDropdown extends Page {
         //return attr.includes('active') ? 'tree' : 'flat';
         return attr.includes('folder-closed') ? 'flat' : 'tree';
     }
-
 }
 
 module.exports = BaseDropdown;

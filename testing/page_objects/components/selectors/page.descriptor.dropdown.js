@@ -16,10 +16,10 @@ class PageDescriptorDropdown extends BaseDropdown {
 
     async selectFilteredControllerAndClickOnOk(controllerDisplayName) {
         try {
-            await this.clickOnFilteredItemAndClickOnOk(controllerDisplayName);
+            await this.clickOnFilteredByDisplayNameItem(controllerDisplayName);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_dropdown');
-            throw new Error('Page descriptor selector - Error during selecting the option, screenshot: ' + screenshot + ' ' + err);
+            throw new Error(`Page descriptor selector - Error during selecting the option, screenshot: ${screenshot} ` + err);
         }
     }
 }

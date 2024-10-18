@@ -29,7 +29,7 @@ class BaseBrowsePanel extends Page {
     async waitForGridLoaded(ms) {
         try {
             let timeout = typeof ms !== 'undefined' ? ms : appConst.mediumTimeout;
-            await this.waitForElementDisplayed(this.treeGrid, timeout);
+            await this.waitForElementDisplayed(this.browseToolbar, timeout);
             await this.waitForSpinnerNotVisible(timeout);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_switch');
@@ -115,11 +115,13 @@ class BaseBrowsePanel extends Page {
     }
 
     // gets list of content display names
-    getDisplayNamesInGrid() {
-        return this.getTextInElements(this.displayNames).catch(err => {
-            this.saveScreenshot('err_get_display_name_grid');
-            throw new Error(`Error when getting display names in grid` + err);
-        });
+    async getDisplayNamesInGrid() {
+        try {
+            return await this.getTextInElements(this.displayNames)
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_get_display_name_grid');
+            throw new Error(`Error occurred when getting display names in grid, screenshot:${screenshot} ` + err);
+        }
     }
 
     async waitForNewButtonDisabled() {
@@ -127,7 +129,7 @@ class BaseBrowsePanel extends Page {
             return await this.waitForElementDisabled(this.newButton, appConst.mediumTimeout);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_new_disabled_button');
-            throw Error('New... button should be disabled, timeout: ' + screenshot + ' ' + err);
+            throw Error(`New... button should be disabled, screenshot:${screenshot} ` + err);
         }
     }
 
@@ -145,7 +147,7 @@ class BaseBrowsePanel extends Page {
             await this.pause(400);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_new_button');
-            throw new Error('New button is not enabled , screenshot: ' + screenshot + ' ' + err);
+            throw new Error(`New button is not enabled , screenshot:${screenshot} ` + err);
         }
     }
 
@@ -203,7 +205,7 @@ class BaseBrowsePanel extends Page {
     async clickOnCheckboxByName(name) {
         let listElements = lib.TREE_GRID.itemTreeGridListElementByName(name);
         let result = await this.findElements(listElements);
-        if (result === 0) {
+        if (result.length === 0) {
             throw new Error('Checkbox was not found!');
         }
         let listElement = result[result.length - 1];
@@ -298,6 +300,39 @@ class BaseBrowsePanel extends Page {
         }
     }
 
+    // check for Accessibility attributes: toolbar role
+    async waitForBrowseToolbarRoleAttribute(expectedRole) {
+        let locator = this.toolbar;
+        await this.waitForAttributeValue(locator, appConst.ACCESSIBILITY_ATTRIBUTES.ROLE, expectedRole);
+    }
+
+    // check for Accessibility attributes: aria-label
+    async waitForBrowseToolbarAriaLabelAttribute() {
+        let locator = this.toolbar;
+        await this.waitForAttributeIsPresent(locator, appConst.ACCESSIBILITY_ATTRIBUTES.ARIA_LABEL);
+    }
+
+    // check for Accessibility attributes: ContentAppBar role
+    async waitForContentAppBarRoleAttribute(expectedRole) {
+        let locator = lib.DIV.CONTENT_APP_BAR_DIV;
+        await this.waitForAttributeValue(locator, appConst.ACCESSIBILITY_ATTRIBUTES.ROLE, expectedRole);
+    }
+
+    // check for Accessibility attributes: ContentAppBar aria-label:
+    async waitForContentAppBarAriaLabelAttribute() {
+        let locator = lib.DIV.CONTENT_APP_BAR_DIV;
+        await this.waitForAttributeIsPresent(locator, appConst.ACCESSIBILITY_ATTRIBUTES.ARIA_LABEL);
+    }
+
+    async waitForProjectViewerRoleAttribute(expectedValue) {
+        let locator = lib.DIV.CONTENT_APP_BAR_DIV + lib.DIV.PROJECT_VIEWER_DIV;
+        await this.waitForAttributeValue(locator, appConst.ACCESSIBILITY_ATTRIBUTES.ROLE, expectedValue);
+    }
+
+    async waitForProjectViewerAriaHasPopupAttribute(expectedValue) {
+        let locator = lib.DIV.CONTENT_APP_BAR_DIV + lib.DIV.PROJECT_VIEWER_DIV;
+        await this.waitForAttributeValue(locator, appConst.ACCESSIBILITY_ATTRIBUTES.ARIA_HAS_POPUP, expectedValue);
+    }
 }
 
 module.exports = BaseBrowsePanel;

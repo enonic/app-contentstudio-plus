@@ -5,8 +5,6 @@ const Page = require('../page');
 const appConst = require('../../libs/app_const');
 const lib = require('../../libs/elements');
 
-const xpath = {};
-
 class BasePublishReportWidget extends Page {
 
     get generateButton() {
@@ -44,7 +42,7 @@ class BasePublishReportWidget extends Page {
 
     async waitForWidgetLoaded() {
         try {
-            let locator = "//div[contains(@id,'WidgetSelectedOptionView')]" + lib.itemByName('Compare published versions');
+            let locator = "//div[contains(@id,'WidgetsSelectionRow')]" + lib.itemByName('Compare published versions');
             return await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_publish_report_load');
@@ -77,7 +75,7 @@ class BasePublishReportWidget extends Page {
             return await this.waitForElementDisabled(this.generateButton, appConst.mediumTimeout);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_generate_btn_widget');
-            throw new Error("Publish report widget - Error 'Generate' button should be disabled, screenshot: " + screenshot + ' ' + err);
+            throw new Error(`Publish report widget - Error 'Generate' button should be disabled, screenshot: ${screenshot} ` + err);
         }
     }
 
@@ -87,7 +85,7 @@ class BasePublishReportWidget extends Page {
             return await this.clickOnElement(this.generateButton);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_click_on_generate');
-            throw new Error("Error after clicking on Generate button, screenshot: " + screenshot + ' ' + err);
+            throw new Error(`Error after clicking on Generate button, screenshot:${screenshot} ` + err);
         }
     }
 
@@ -106,7 +104,7 @@ class BasePublishReportWidget extends Page {
             return await this.waitForElementDisplayed(this.fromDateInput, appConst.mediumTimeout);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_publish_rep_from_date');
-            throw new Error("PublishReport  From date text input should be displayed, screenshot:  " + screenshot + ' ' + err);
+            throw new Error(`PublishReport  From date text input should be displayed, screenshot: ${screenshot} ` + err);
         }
     }
 
@@ -115,7 +113,7 @@ class BasePublishReportWidget extends Page {
             return await this.waitForElementNotDisplayed(this.fromDateInput, appConst.mediumTimeout);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_publish_rep_from_date');
-            throw new Error("PublishReport  From date text input should not be displayed, screenshot:  " + screenshot + ' ' + err);
+            throw new Error(`PublishReport  From date text input should not be displayed, screenshot: ${screenshot} ` + err);
         }
     }
 

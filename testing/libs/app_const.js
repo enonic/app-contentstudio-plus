@@ -379,4 +379,20 @@ module.exports = Object.freeze({
         ARCHIVED: 'Archived',
         ARCHIVED_BY: 'Archived by',
     },
+    WIDGET_SELECTOR_OPTIONS: {
+        VERSION_HISTORY: 'Version history',
+        DEPENDENCIES: 'Dependencies',
+        LAYERS: 'Layers',
+        EMULATOR: 'Emulator',
+        DETAILS: 'Details'
+    },
+    BROWSER_TITLES: {
+        CONTENT_STUDIO: 'Content Studio - Enonic XP Admin',
+        XP_HOME: 'Enonic XP Home',
+    },
+    ACCESSIBILITY_ATTRIBUTES: {
+        ROLE: 'role',
+        ARIA_LABEL: 'aria-label',
+        ARIA_HAS_POPUP: 'aria-haspopup',
+    },
 });

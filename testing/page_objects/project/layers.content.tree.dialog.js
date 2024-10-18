@@ -26,19 +26,17 @@ class LayersContentTreeDialog extends Page {
             await this.clickOnElement(this.cancelButtonTop);
             return await this.waitForDialogClosed();
         } catch (err) {
-            await this.saveScreenshot('err_layers_tree_click_on_cancel_button');
+            this.saveScreenshot('err_layers_tree_click_on_cancel_button');
             throw new Error('Layers Content Tree dialog, error when clicking on Cancel(Top) button  ' + err);
         }
     }
 
-    async waitForDialogLoaded() {
-        try {
-            let selector = XPATH.container + XPATH.layersTreeList;
-            await this.waitForElementDisplayed(selector, appConst.shortTimeout)
-        } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_open_layers_tree_dialog');
-            throw new Error('Layers Content Tree dialog dialog should be opened!, screenshot:' + screenshot + ' ' + err);
-        }
+    waitForDialogLoaded() {
+        let selector = XPATH.container + XPATH.layersTreeList;
+        return this.waitForElementDisplayed(selector, appConst.shortTimeout).catch(err => {
+            this.saveScreenshot('err_open_layers_tree_dialog');
+            throw new Error('Layers Content Tree dialog dialog should be opened!' + err);
+        });
     }
 
     isDialogLoaded() {
@@ -49,8 +47,7 @@ class LayersContentTreeDialog extends Page {
         try {
             return await this.waitForElementNotDisplayed(XPATH.container, appConst.shortTimeout);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_dialog_close');
-            throw new Error("Layers Content Tree dialog should be closed , screenshot : " + screenshot + ' ' + err);
+            throw new Error("Layers Content Tree dialog should be closed " + err);
         }
     }
 
@@ -86,11 +83,6 @@ class LayersContentTreeDialog extends Page {
         await this.waitForElementDisplayed(buttonLocator, appConst.mediumTimeout);
         return await this.getText(buttonLocator + "//span");
     }
-
-    async clickOnLayerItem(layerName) {
-
-    }
 }
-
 module.exports = LayersContentTreeDialog;
 
