@@ -1,11 +1,11 @@
 import {Element} from '@enonic/lib-admin-ui/dom/Element';
 import {AppHelper} from '../../util/AppHelper';
 import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
-import {i18nAdd, i18nInit} from '@enonic/lib-admin-ui/util/MessagesInitializer';
 import {PublishReportWidget} from './PublishReportWidget';
 import {resolveConfig} from '../../util/WidgetConfigResolver';
+import {Messages} from '@enonic/lib-admin-ui/util/Messages';
 
-void (async () => {
+void (() => {
     const configScriptId = document.currentScript.getAttribute('data-config-script-id');
     if (!configScriptId) {
         throw Error('Missing \'data-config-script-id\' attribute');
@@ -17,8 +17,8 @@ void (async () => {
     const isArchived = Boolean(isArchivedAttrValue == 'true');
 
     CONFIG.setConfig(resolveConfig(configScriptId));
-    await i18nInit(CONFIG.getString('services.i18nUrlStudio'));
-    await i18nAdd(CONFIG.getString('services.i18nUrl'));
+    const phrases: object = JSON.parse(CONFIG.getString('phrases')) as object;
+    Messages.addMessages(phrases);
 
     const containerId = AppHelper.getPublishReportWidgetClass() + (isArchived ? '-archived' : '');
     const widgetContainer = document.getElementById(containerId);
