@@ -43,13 +43,13 @@ WebDriverHelper.prototype.setupBrowser = function setupBrowser(w, h) {
         console.log('browser name ##################### ' + browser_name);
         console.log('browser width ##################### ' + width);
         let options = {
-            logLevel: "error",
-            automationProtocol: "webdriver",
-            "wdio:enforceWebDriverClassic": true,
+            logLevel: 'error',
+            automationProtocol: 'webdriver',
             capabilities: {
                 "wdio:enforceWebDriverClassic": true,
                 browserName: browser_name,
                 browserVersion: browser_version,
+                "wdio:enforceWebDriverClassic": true,
                 'goog:chromeOptions': makeChromeOptions(isHeadless, width, height)
             }
         };

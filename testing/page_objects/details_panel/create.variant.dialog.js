@@ -60,8 +60,7 @@ class CreateVariantDialog extends Page {
         try {
             return await this.waitForElementDisplayed(XPATH.container, appConst.mediumTimeout)
         } catch (err) {
-            let screenshot = appConst.generateRandomName('err_variants_dlg');
-            await this.saveScreenshot(screenshot);
+            let screenshot = await this.saveScreenshotUniqueName('err_variants_dlg');
             throw new Error(`Create Variant Dialog is not loaded ${screenshot} ` + err);
         }
     }
@@ -70,8 +69,7 @@ class CreateVariantDialog extends Page {
         try {
             return await this.waitForElementNotDisplayed(XPATH.container, appConst.mediumTimeout)
         } catch (err) {
-            let screenshot = appConst.generateRandomName('err_variants_dlg');
-            await this.saveScreenshot(screenshot);
+            let screenshot = await this.saveScreenshotUniqueName('err_variants_dlg');
             throw new Error(`Create Variant Dialog is not closed ${screenshot} ` + err);
         }
     }

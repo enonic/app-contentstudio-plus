@@ -47,7 +47,7 @@ class ArchiveRestoreDialog extends Page {
             await this.waitForElementDisplayed(this.restoreButton, appConst.mediumTimeout)
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_restore_dlg');
-            throw new Error('Restore from Archive dialog was not loaded! screenshot: ' + screenshot + ' ' + err);
+            throw new Error(`Restore from Archive dialog was not loaded! screenshot:${screenshot} ` + err);
         }
     }
 
@@ -56,7 +56,7 @@ class ArchiveRestoreDialog extends Page {
             await this.waitForElementNotDisplayed(XPATH.container, appConst.longTimeout);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_restore_dlg_close');
-            throw new Error('Restore from Archive dialog was not closed, screenshot: ' + screenshot + ' ' + err);
+            throw new Error(`Restore from Archive dialog was not closed, screenshot: ${screenshot}` + err);
         }
     }
 

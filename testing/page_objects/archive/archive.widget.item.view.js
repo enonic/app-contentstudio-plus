@@ -33,7 +33,7 @@ class ArchiveContentWidgetItemView extends Page {
         try {
             return await this.waitForElementNotDisplayed(xpath.container, appConst.shortTimeout);
         } catch (err) {
-            await this.saveScreenshot("err_widget_item_is_visible");
+            await this.saveScreenshot('err_widget_item_is_visible');
             throw new Error("Widget Item should not be displayed " + err);
         }
     }
@@ -42,8 +42,8 @@ class ArchiveContentWidgetItemView extends Page {
         try {
             return await this.waitForElementNotDisplayed(xpath.workInProgressIcon, appConst.mediumTimeout);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName("err_widget_item_workflow");
-            throw new Error("Workflow state should not be displayed in the archive widget item, screenshot " + screenshot + ' ' + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_widget_item_workflow');
+            throw new Error(`Workflow state should not be displayed in the archive widget item, screenshot ${screenshot} ` + err);
         }
     }
 }
