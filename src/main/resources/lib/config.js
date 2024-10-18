@@ -30,14 +30,6 @@ const getConfig = () => {
         }),
         appId: app.name,
         services: {
-            // i18nUrl: portal.apiUrl({
-            //     application: app.name,
-            //     api: 'i18n',
-            // }),
-            // i18nUrlStudio: portal.apiUrl({
-            //     application: csAppName,
-            //     api: 'i18n',
-            // }),
             contentUrl: portal.apiUrl({
                 application: csAppName,
                 api: 'content',
@@ -47,6 +39,10 @@ const getConfig = () => {
                 api: 'license',
             }),
         },
+        widgetApiUrl: portal.apiUrl({
+            application: 'admin',
+            api: 'widget',
+        }),
         toolUri: csToolUri,
         phrases: JSON.stringify(getPhrases(), null, 4),
     };
