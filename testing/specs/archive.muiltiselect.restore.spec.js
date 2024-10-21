@@ -96,6 +96,7 @@ describe('archive.muiltiselect.restore.spec: tests for restore several items', f
             let confirmValueDialog = new ConfirmValueDialog();
             // 1. Navigate to 'Archive Browse Panel':
             await studioUtils.openArchivePanel();
+            await studioUtils.saveScreenshot('2_items_to_check');
             // 2. Select two folders
             await archiveBrowsePanel.clickOnCheckboxAndSelectRowByName(FOLDER1.displayName);
             await archiveBrowsePanel.clickOnCheckboxAndSelectRowByName(FOLDER2.displayName);
