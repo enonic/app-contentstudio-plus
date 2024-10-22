@@ -67,11 +67,13 @@ describe('archive.restore.content.dependant.items.spec: tests for archive/restor
             await archiveBrowsePanel.clickOnSearchButton();
             await archiveFilterPanel.waitForOpened();
             // 2. Verify the number in 'hits'
+            await studioUtils.saveScreenshot('issue_arch_filter_panel_hits');
             let hitsCounter1 = await archiveFilterPanel.getTextInHitsCounter();
             await studioUtils.saveScreenshot('filter_panel_hits_counter1');
             assert.equal(hitsCounter1, '12 hits', 'Expected hits counter should be displayed');
             // 3. Click on 'Executable' checkbox:
             await archiveFilterPanel.clickOnCheckboxInContentTypesBlock('Executable');
+            await studioUtils.saveScreenshot('issue_arch_filter_panel_hits_2');
             let result = await archiveBrowsePanel.getDisplayNamesInGrid();
             assert.equal(result.length, 4, 'Four items should be present in the grid');
             // 4. Verify that number in 'hits' is updated
@@ -80,6 +82,7 @@ describe('archive.restore.content.dependant.items.spec: tests for archive/restor
             // 5. Click on 'Clear' button:
             await archiveFilterPanel.clickOnClearButton();
             await archiveFilterPanel.waitForClearLinkNotDisplayed();
+            await studioUtils.saveScreenshot('issue_arch_filter_panel_hits_3');
             let result2 = await archiveBrowsePanel.getDisplayNamesInGrid();
             assert.equal(result2.length, 1, 'Grid returns to the initial state');
             assert.equal(result2[0], FOLDER_DISPLAY_NAME, 'Expected item should be present in the grid');

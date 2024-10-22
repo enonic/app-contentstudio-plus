@@ -76,8 +76,9 @@ class ArchiveFilterPanel extends Page {
         }
     }
 
-    waitForOpened() {
-        return this.waitForElementDisplayed(XPATH.container, appConst.mediumTimeout);
+    async waitForOpened() {
+        await this.waitForElementDisplayed(XPATH.container, appConst.mediumTimeout);
+        await this.pause(500);
     }
 
     waitForShowResultsButtonDisplayed() {
@@ -137,7 +138,7 @@ class ArchiveFilterPanel extends Page {
             return await this.waitForElementDisplayed(XPATH.container + lib.FILTER_PANEL.dependenciesSection, timeout)
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_load_dependencies_section');
-            throw new Error("Filter Panel: Dependencies section should be visible! screenshot: " + screenshot + ' ' + err);
+            throw new Error(`Filter Panel: Dependencies section should be visible! screenshot:${screenshot} ` + err);
         }
     }
 
@@ -207,7 +208,7 @@ class ArchiveFilterPanel extends Page {
             await this.clickOnElement(selector);
             return await this.pause(1200);
         } catch (err) {
-            await this.saveScreenshot(appConst.generateRandomName("err_click_on_aggregation"));
+            await this.saveScreenshotUniqueName("err_click_on_aggregation");
             throw new Error("Error when click on the aggregation checkbox: " + err);
         }
     }
@@ -293,7 +294,7 @@ class ArchiveFilterPanel extends Page {
             await this.clickOnElement(okButton);
             await this.pause(300);
         } catch (err) {
-            let screenshot = await this.saveScreenshot('err_filter_owner');
+            let screenshot = await this.saveScreenshotUniqueName('err_filter_owner');
             throw new Error(`Error when selecting an option in Owner Selector, screenshot ; ${screenshot} ` + err);
         }
     }
