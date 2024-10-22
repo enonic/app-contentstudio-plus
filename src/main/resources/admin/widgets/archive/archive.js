@@ -14,10 +14,6 @@ function handleGet() {
         stylesUri: portal.assetUrl({
             path: 'styles/main.css'
         }),
-        i18nServiceUrl: portal.apiUrl({
-            application: app.name,
-            api: 'i18n',
-        }),
         configScriptId: 'archive-widget-config-json',
         configAsJson: JSON.stringify(configLib.getConfig(), null, 4).replace(/<(\/?script|!--)/gi, "\\u003C$1"),
     };
