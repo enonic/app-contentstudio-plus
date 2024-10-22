@@ -1,11 +1,11 @@
 import {Element} from '@enonic/lib-admin-ui/dom/Element';
 import {AppHelper} from '../../util/AppHelper';
 import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
-import {i18nAdd, i18nInit} from '@enonic/lib-admin-ui/util/MessagesInitializer';
 import {VariantsWidget} from './VariantsWidget';
 import {resolveConfig} from '../../util/WidgetConfigResolver';
+import {Messages} from '@enonic/lib-admin-ui/util/Messages';
 
-void (async () => {
+void (() => {
     const contentId = document.currentScript.getAttribute('data-content-id');
     const configScriptId = document.currentScript.getAttribute('data-config-script-id');
     if (!configScriptId) {
@@ -13,8 +13,7 @@ void (async () => {
     }
 
     CONFIG.setConfig(resolveConfig(configScriptId));
-    await i18nInit(CONFIG.getString('services.i18nUrlStudio'));
-    await i18nAdd(CONFIG.getString('services.i18nUrl'));
+    Messages.addMessages(JSON.parse(CONFIG.getString('phrasesAsJson')) as object);
 
     const widgetContainer = document.getElementById(AppHelper.getVariantsWidgetClass());
 
