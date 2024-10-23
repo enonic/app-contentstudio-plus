@@ -68,6 +68,7 @@ describe('archive.restore.content.dependant.items.spec: tests for archive/restor
             await archiveFilterPanel.waitForOpened();
             // 2. Verify the number in 'hits'
             let hitsCounter1 = await archiveFilterPanel.getTextInHitsCounter();
+            await studioUtils.saveScreenshot('filter_panel_hits_counter1');
             assert.equal(hitsCounter1, '12 hits', 'Expected hits counter should be displayed');
             // 3. Click on 'Executable' checkbox:
             await archiveFilterPanel.clickOnCheckboxInContentTypesBlock('Executable');
@@ -127,6 +128,7 @@ describe('archive.restore.content.dependant.items.spec: tests for archive/restor
             assert.equal(filteredItem[0], TEST_DISPLAY_NAME, 'One item should be present in the filtered grid');
             // 6. Click on 'Clear' button:
             await archiveFilterPanel.clickOnClearButton();
+            await studioUtils.saveScreenshot('filter_panel_clear_button_clicked');
             // 7. Verify that grid returns to the initial state:
             let result = await archiveBrowsePanel.getDisplayNamesInGrid();
             assert.equal(result.length, 1, 'One item should be present in the filtered grid');
@@ -159,6 +161,7 @@ describe('archive.restore.content.dependant.items.spec: tests for archive/restor
             await confirmValueDialog.clickOnConfirmButton();
             // 6. Verify the notification message
             let message = await archiveBrowsePanel.waitForNotificationMessage();
+            await studioUtils.saveScreenshot('restore_confirmed');
             assert.equal(message, '12 items are restored', 'Expected notification message should appear');
             let hitsCounter = await archiveFilterPanel.getTextInHitsCounter();
             assert.equal(hitsCounter, '0 hits', 'Expected hits counter should be displayed');
