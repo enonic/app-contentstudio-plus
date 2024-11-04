@@ -8,7 +8,7 @@ const i18n = require('/lib/xp/i18n');
 const getPhrases = function () {
     const locales = admin.getLocales();
     const phrases = {};
-    const bundles = ['i18n/common', 'i18n/common_wcag', 'i18n/phrases', 'i18n/dialogs', 'i18n/wcag', 'i18n/messages'];
+    const bundles = ['i18n/cs-plus'];
 
     for (const bundleIndex in bundles) {
         const bundlePhrases = i18n.getPhrases(locales, [bundles[bundleIndex]]);
