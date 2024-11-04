@@ -36,7 +36,7 @@ export class Widget
 
     protected handleNoSelectedItem(): void {
         if (!this.noItemsBlock) {
-            this.noItemsBlock = new SpanEl('error').setHtml(i18n('notify.archive.widget.noselection'));
+            this.noItemsBlock = new SpanEl('error').setHtml(i18n('field.contextPanel.empty'));
             this.appendChild(this.noItemsBlock);
         }
 
