@@ -1,8 +1,5 @@
 import {AppContainer} from 'lib-contentstudio/app/AppContainer';
-import {Application} from '@enonic/lib-admin-ui/app/Application';
-import {AppBar} from '@enonic/lib-admin-ui/app/bar/AppBar';
 import {AppPanel} from '@enonic/lib-admin-ui/app/AppPanel';
-import {ArchiveAppBar} from './ArchiveAppBar';
 import {ArchiveAppPanel} from './ArchiveAppPanel';
 import {Body} from '@enonic/lib-admin-ui/dom/Body';
 import {HasValidLicenseRequest} from './resource/HasValidLicenseRequest';
@@ -34,10 +31,6 @@ export class ArchiveAppContainer
 
     protected appendElements(): void {
         //
-    }
-
-    protected createAppBar(application: Application): AppBar {
-        return new ArchiveAppBar(application);
     }
 
     protected createAppPanel(): AppPanel {
