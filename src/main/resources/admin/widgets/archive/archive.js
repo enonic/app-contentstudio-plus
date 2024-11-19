@@ -14,7 +14,7 @@ function handleGet() {
         stylesUri: portal.assetUrl({
             path: 'styles/main.css'
         }),
-        configScriptId: 'archive-widget-config-json',
+        configScriptId: 'widget-archive-config-json',
         configAsJson: JSON.stringify(configLib.getConfig(), null, 4).replace(/<(\/?script|!--)/gi, "\\u003C$1"),
     };
 
