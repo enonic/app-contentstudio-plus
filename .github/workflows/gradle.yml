@@ -60,7 +60,7 @@ jobs:
           name: contentstudio.plus
           path: build/libs/contentstudio.plus.jar
 
-      - uses: codecov/codecov-action@v4
+      - uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
