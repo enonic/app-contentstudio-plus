@@ -4,9 +4,8 @@ import {ActionButton} from '@enonic/lib-admin-ui/ui/button/ActionButton';
 import {Action} from '@enonic/lib-admin-ui/ui/Action';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {LayerContent} from './LayerContent';
-import {ContentsLocalizer} from 'lib-contentstudio/app/browse/action/ContentsLocalizer';
+import {ContentLocalizer} from 'lib-contentstudio/app/browse/action/ContentLocalizer';
 import {ContentEventsProcessor} from 'lib-contentstudio/app/ContentEventsProcessor';
-import {AppHelper} from '../../util/AppHelper';
 import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 
 enum Mode {
@@ -67,7 +66,7 @@ export class LayersContentActionButton extends ActionButton {
     }
 
     private localize(): void {
-        new ContentsLocalizer().localizeAndEdit([this.item.getItem()]).catch(DefaultErrorHandler.handle);
+        new ContentLocalizer().localizeAndEdit([this.item.getItem()]).catch(DefaultErrorHandler.handle);
     }
 
     private edit(): void {
