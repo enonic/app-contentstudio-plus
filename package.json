@@ -47,7 +47,7 @@
     "postcss-normalize": "^10.0.1",
     "postcss-sort-media-queries": "^5.2.0",
     "prettier": "^3.3.3",
-    "swc-loader": "^0.2.3",
+    "swc-loader": "^0.2.6",
     "terser-webpack-plugin": "^5.3.9",
     "typescript": "^5.2.2",
     "typescript-eslint": "^8.4.0",
@@ -58,7 +58,7 @@
     "extends browserslist-config-enonic"
   ],
   "engines": {
-    "node": ">= 20.13.1",
-    "npm": ">= 10.5.2"
+    "node": ">= 20.18.0",
+    "npm": ">= 10.8.2"
   }
 }

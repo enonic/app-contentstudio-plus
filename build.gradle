@@ -79,7 +79,7 @@ configurations.all {
 
 node {
     download = true
-    version = '20.13.1'
+    version = '20.18.0'
 }
 
 tasks.register('copyDevResources') {
