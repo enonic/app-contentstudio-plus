@@ -7,8 +7,6 @@ import {ContentQuery} from 'lib-contentstudio/app/content/ContentQuery';
 import {ArchiveResourceRequest} from './resource/ArchiveResourceRequest';
 import * as Q from 'q';
 import {Aggregation} from '@enonic/lib-admin-ui/aggregation/Aggregation';
-import {LoginResult} from '@enonic/lib-admin-ui/security/auth/LoginResult';
-import {IsAuthenticatedRequest} from '@enonic/lib-admin-ui/security/auth/IsAuthenticatedRequest';
 import {BucketAggregation} from '@enonic/lib-admin-ui/aggregation/BucketAggregation';
 import {Bucket} from '@enonic/lib-admin-ui/aggregation/Bucket';
 import {ArchiveAggregation} from './ArchiveAggregation';
@@ -21,6 +19,7 @@ import {ProjectContext} from 'lib-contentstudio/app/project/ProjectContext';
 import {ArchiveServerEvent} from 'lib-contentstudio/app/event/ArchiveServerEvent';
 import {NodeServerChangeType} from '@enonic/lib-admin-ui/event/NodeServerChange';
 import {ArchiveContentViewItem} from './ArchiveContentViewItem';
+import {AuthContext} from '@enonic/lib-admin-ui/auth/AuthContext';
 
 
 export class ArchiveFilterPanel
@@ -33,8 +32,6 @@ export class ArchiveFilterPanel
     private aggregationsFetcher: ArchiveAggregationsFetcher;
 
     private searchEventListeners: ((query?: ContentQuery) => void)[] = [];
-
-    private userInfo: LoginResult;
 
     constructor() {
         super();
@@ -123,19 +120,16 @@ export class ArchiveFilterPanel
    }
 
     private initAggregationGroupView(): void {
-        new IsAuthenticatedRequest().sendAndParse().then((loginResult: LoginResult) => {
-            this.userInfo = loginResult;
-            (this.aggregations.get(ContentAggregation.OWNER) as FilterableAggregationGroupView).setIdsToKeepOnToTop(
-                [this.getCurrentUserKeyAsString()]);
-            (this.aggregations.get(ArchiveAggregation.ARCHIVED_BY) as FilterableAggregationGroupView).setIdsToKeepOnToTop(
-                [this.getCurrentUserKeyAsString()]);
+        (this.aggregations.get(ContentAggregation.OWNER) as FilterableAggregationGroupView).setIdsToKeepOnToTop(
+            [this.getCurrentUserKeyAsString()]);
+        (this.aggregations.get(ArchiveAggregation.ARCHIVED_BY) as FilterableAggregationGroupView).setIdsToKeepOnToTop(
+            [this.getCurrentUserKeyAsString()]);
 
-            return this.getAndUpdateAggregations();
-       }).catch(DefaultErrorHandler.handle);
-   }
+        this.getAndUpdateAggregations().catch(DefaultErrorHandler.handle);
+    }
 
     private getCurrentUserKeyAsString(): string {
-        return this.userInfo.getUser().getKey().toString();
+        return AuthContext.get().getUser().getKey().toString();
    }
 
     private notifySearchEvent(query?: ContentQuery): void {

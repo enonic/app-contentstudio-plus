@@ -3,6 +3,7 @@
 const admin = require('/lib/xp/admin');
 const portal = require('/lib/xp/portal');
 const contextLib = require('/lib/xp/context');
+const authLib = require('/lib/xp/auth');
 const i18n = require('/lib/xp/i18n');
 
 const getPhrases = function () {
@@ -24,6 +25,7 @@ const getConfig = () => {
     const csAppName = 'com.enonic.app.contentstudio';
     const csToolUri = admin.getToolUrl(csAppName, 'main');
     const context = contextLib.get();
+    const user = authLib.getUser();
 
     return {
         adminUrl: admin.getBaseUri(),
@@ -48,6 +50,8 @@ const getConfig = () => {
         }),
         toolUri: csToolUri,
         phrasesAsJson: JSON.stringify(getPhrases()),
+        user,
+        principals: authLib.getMemberships(user.key, true)
     };
 }
 
