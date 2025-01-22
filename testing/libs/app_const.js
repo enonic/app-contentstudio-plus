@@ -395,4 +395,10 @@ module.exports = Object.freeze({
         ARIA_LABEL: 'aria-label',
         ARIA_HAS_POPUP: 'aria-haspopup',
     },
+    PREVIEW_WIDGET: {
+        AUTOMATIC: 'Automatic',
+        SITE_ENGINE: 'Site engine',
+        MEDIA: 'Media',
+        JSON: 'JSON'
+    },
 });
