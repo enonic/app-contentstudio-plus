@@ -21,6 +21,7 @@ import {ContentServerChangeItem} from 'lib-contentstudio/app/event/ContentServer
 import {ContentServerEventsHandler} from 'lib-contentstudio/app/event/ContentServerEventsHandler';
 import {ArchiveHelper} from './ArchiveHelper';
 import {ArchiveTreeListElement} from './ArchiveTreeList';
+import {ProjectContext} from 'lib-contentstudio/app/project/ProjectContext';
 
 export class ArchiveBrowsePanel
     extends ResponsiveBrowsePanel {
@@ -97,14 +98,26 @@ export class ArchiveBrowsePanel
 
         let isRefreshTriggered = false;
 
-        ContentServerEventsHandler.getInstance().onContentArchived(() => {
+        const refreshHandler = (): void => {
+            isRefreshTriggered = false;
+            this.selectionWrapper.deselectAll();
+            void this.treeListBox.load();
+        };
+
+        ContentServerEventsHandler.getInstance().onContentArchived((items: ContentServerChangeItem[]) => {
+            if (items.some((item) => item.getRepo()?.split('.').pop() === ProjectContext.get().getProject().getName())) {
+                if (!isRefreshTriggered) {
+                    isRefreshTriggered = true;
+
+                    this.whenShown(refreshHandler);
+                }
+            }
+        });
+
+        ProjectContext.get().onProjectChanged(() => {
             if (!isRefreshTriggered) {
                 isRefreshTriggered = true;
-
-                this.whenShown(() => {
-                    this.treeListBox.load();
-                    isRefreshTriggered = false;
-                });
+                this.whenShown(refreshHandler);
             }
         });
     }
