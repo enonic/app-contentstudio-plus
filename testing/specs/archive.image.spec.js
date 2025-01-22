@@ -54,6 +54,7 @@ describe('archive.image.spec: tests for PreviewWidgetDropdown', function () {
             await archiveBrowsePanel.clickCheckboxAndSelectRowByDisplayName(TEST_IMAGE);
             await studioUtils.saveScreenshot('archive_image_selected');
             await archiveItemStatisticsPanel.waitForPreviewWidgetDropdownDisplayed();
+            await archiveItemStatisticsPanel.pause(3000);
             await studioUtils.saveScreenshot('archive_image_selected_2');
             let actualOption = await archiveItemStatisticsPanel.getSelectedOptionInPreviewWidget();
 
