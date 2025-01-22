@@ -1,18 +1,15 @@
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {ContentItemPreviewToolbar} from 'lib-contentstudio/app/view/ContentItemPreviewToolbar';
 import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
+import {PreviewActionHelper} from 'lib-contentstudio/app/action/PreviewActionHelper';
 
 export class ArchiveItemPreviewToolbar
     extends ContentItemPreviewToolbar {
 
-    constructor() {
-        super();
+    constructor(previewHelper: PreviewActionHelper) {
+        super(previewHelper);
 
         this.addClass('archive-item-preview-toolbar');
-    }
-
-    isArchive(): boolean {
-        return true;
     }
 
     protected updateStatus(content: ContentSummaryAndCompareStatus): void {
