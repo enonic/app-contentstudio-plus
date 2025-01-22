@@ -9,6 +9,7 @@ const studioUtils = require('../libs/studio.utils.js');
 const DeleteContentDialog = require('../page_objects/delete.content.dialog');
 const ArchiveBrowsePanel = require('../page_objects/archive/archive.browse.panel');
 const ArchiveItemStatisticsPanel = require('../page_objects/archive/archive.item.statistics.panel');
+const ArchiveRestoreDialog = require('../page_objects/archive/archive.restore.dialog');
 
 describe('archive.image.spec: tests for PreviewWidgetDropdown', function () {
     this.timeout(appConst.SUITE_TIMEOUT);
@@ -53,11 +54,37 @@ describe('archive.image.spec: tests for PreviewWidgetDropdown', function () {
             await archiveBrowsePanel.clickCheckboxAndSelectRowByDisplayName(TEST_IMAGE);
             await studioUtils.saveScreenshot('archive_image_selected');
             await archiveItemStatisticsPanel.waitForPreviewWidgetDropdownDisplayed();
+            await studioUtils.saveScreenshot('archive_image_selected_2');
             let actualOption = await archiveItemStatisticsPanel.getSelectedOptionInPreviewWidget();
 
             assert.equal(actualOption, appConst.PREVIEW_WIDGET.AUTOMATIC,
                 'Automatic option should be selected in preview widget by default');
         });
+
+    it(`GIVEN existing archived image is selected AND 'Restore...' context menu item has been clicked WHEN Archive button has been pressed in the modal dialog THEN the image should be present only in the Content Grid`,
+        async () => {
+            let contentBrowsePanel = new ContentBrowsePanel();
+            let archiveRestoreDialog = new ArchiveRestoreDialog();
+            let archiveBrowsePanel = new ArchiveBrowsePanel();
+            // 1. Navigate to 'Archive Browse Panel':
+            await studioUtils.openArchivePanel();
+            // 2. Do 'rightClick' on the folder and Click on 'Restore...' menu item in the Context menu
+            await archiveBrowsePanel.rightClickOnItemByDisplayName(TEST_IMAGE);
+            await studioUtils.saveScreenshot('context-menu-restore');
+            await archiveBrowsePanel.clickOnMenuItem(appConst.GRID_CONTEXT_MENU.RESTORE);
+            await archiveRestoreDialog.waitForOpened();
+            await studioUtils.saveScreenshot('img_to_restore1');
+            // 3. Click on 'Restore' button in the modal dialog:
+            await archiveRestoreDialog.clickOnRestoreButton();
+            // 4. Verify that the content is not displayed in Archive Browse Panel:
+            let message = await contentBrowsePanel.waitForNotificationMessage();
+            await archiveBrowsePanel.waitForContentNotDisplayed(TEST_IMAGE);
+            // 5. Verify the content is present in Content Browse Panel
+            await studioUtils.switchToContentMode();
+            await studioUtils.saveScreenshot('image_is_restored');
+            await studioUtils.findContentAndClickCheckBox(TEST_IMAGE);
+        });
+
 
     beforeEach(async () => {
         return await studioUtils.navigateToContentStudioCloseProjectSelectionDialog();
