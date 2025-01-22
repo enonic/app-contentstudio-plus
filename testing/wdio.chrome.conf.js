@@ -5,6 +5,7 @@ const properties = PropertiesReader(file);
 const browser_version = properties.get('browser.version');
 const width = properties.get('browser.width');
 const height = properties.get('browser.height');
+const baseURL = properties.get('base.url');
 
 exports.config = {
 
@@ -23,7 +24,7 @@ exports.config = {
                 "--headless", "--disable-gpu", "--no-sandbox",
                 "--lang=en",
                 '--disable-extensions',
-                'window-size=1970,1000'
+                `--window-size=${width},${height}`
             ]
         }
     }],
@@ -32,7 +33,7 @@ exports.config = {
     // Enables colors for log output.
     coloredLogs: true,
 
-    baseUrl: 'http://localhost:8080/admin',
+    baseUrl: baseURL,
     //
     // Default timeout for all waitForXXX commands.
     waitforTimeout: 3000,

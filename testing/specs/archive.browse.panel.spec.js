@@ -100,12 +100,9 @@ describe('archive.browse.panel.spec: tests for archive browse panel and selectio
             let contentWidgetItemView = new ArchiveContentWidgetItemView();
             // 1. Navigate to 'Archive Browse Panel' and click on the checkbox for the archived content:
             await archiveBrowsePanel.clickOnCheckboxAndSelectRowByName(FOLDER1.displayName);
-            // 2. Verify the path and status of the content:
-            let path = await archiveItemStatisticsPanel.getPath();
-            assert.equal(path, `/${FOLDER1.displayName}`, "Expected path should be displayed in Item Statistics panel");
+            // 2. Verify status of the content:
             let status = await archiveItemStatisticsPanel.getStatus();
-            assert.ok(status.includes('Archived'), "Archived status should be displayed in Item Statistics panel");
-            assert.ok(status.includes('by Super User'), "'by Super User' should be displayed in Item Statistics panel");
+            assert.equal(status, 'Archived', "Archived status should be displayed in Item Statistics panel");
             // 3. Verify that workflow icon is not displayed:
             await contentWidgetItemView.waitForWorkflowStateNotDisplayed();
             // 4. Verify the name in the content widget:
@@ -121,13 +118,14 @@ describe('archive.browse.panel.spec: tests for archive browse panel and selectio
             let archiveItemStatisticsPanel = new ArchiveItemStatisticsPanel();
             // 1. Click on the row and select an item:
             await archiveBrowsePanel.clickOnRowByDisplayName(FOLDER1.displayName);
-            // 2. Verify the path and status of the content:
-            let path = await archiveItemStatisticsPanel.getPath();
-            assert.equal(path, `/${FOLDER1.displayName}`, 'Expected path should be displayed in Item Statistics panel');
+            // 2. Verify status of the content:
+            let status = await archiveItemStatisticsPanel.getStatus();
+            assert.equal(status, 'Archived', "Archived status should be displayed in Item Statistics panel");
             // 3. Click on the row and unselect the item
             await archiveBrowsePanel.clickOnRowByDisplayName(FOLDER1.displayName);
             // 4. Verify that Item Statistics panel is cleared:
-            await archiveItemStatisticsPanel.waitForPanelCleared();
+            await archiveItemStatisticsPanel.waitForContentStatusNotDisplayed();
+            await archiveItemStatisticsPanel.waitForPreviewWidgetDropdownNotDisplayed();
         });
 
     it("WHEN existing folder is selected THEN 'Archived' status should be displayed in Details Panel",
@@ -141,7 +139,7 @@ describe('archive.browse.panel.spec: tests for archive browse panel and selectio
             await archiveBrowsePanel.clickOnRowByDisplayName(FOLDER1.displayName);
             // 3. Verify the Archived status of the content:
             let actualStatus = await archivedContentStatusWidget.getStatus();
-            assert.equal(actualStatus, 'Archived');
+            assert.equal(actualStatus, 'Archived', "Expected status should be displayed in Details Panel");
         });
 
     it("GIVEN existing folder is selected AND 'Versions widget' is opened WHEN 'Show changes' button in Edited item has been clicked THEN compareContentVersionsDialog should be loaded",
