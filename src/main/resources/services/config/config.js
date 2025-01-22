@@ -2,8 +2,10 @@
 
 const portal = require('/lib/xp/portal');
 const admin = require('/lib/xp/admin');
+const contextLib = require('/lib/xp/context');
 
 function handleGet() {
+    const context = contextLib.get();
     return {
         status: 200,
         contentType: 'application/json',
@@ -13,6 +15,7 @@ function handleGet() {
                 path: ''
             }),
             appId: app.name,
+            branch: context.branch,
             services: {
                 i18nUrl: portal.serviceUrl({service: 'i18n'}),
                 i18nUrlStudio: portal.serviceUrl({service: 'i18n', application: 'com.enonic.app.contentstudio'}),
