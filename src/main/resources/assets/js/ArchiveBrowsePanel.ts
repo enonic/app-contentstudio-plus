@@ -120,6 +120,10 @@ export class ArchiveBrowsePanel
                 this.whenShown(refreshHandler);
             }
         });
+
+        this.selectionWrapper.whenRendered(() => {
+            this.treeListBox.load();
+        });
     }
 
     protected updateContextView(item: ArchiveContentViewItem): Q.Promise<void> {
