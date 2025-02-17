@@ -38,9 +38,13 @@
 
     .versions-widget.internal-widget {
       .version-list-item {
-        .version-viewer {
-          .version-action-button {
-            display: none;
+        .version-viewer.interactable {
+          pointer-events: none;
+          cursor: default;
+
+          .action-button.compare {
+            pointer-events: all;
+            cursor: pointer;
           }
         }
       }

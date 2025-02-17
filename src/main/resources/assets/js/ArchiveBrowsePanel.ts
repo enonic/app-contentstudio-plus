@@ -53,6 +53,7 @@ export class ArchiveBrowsePanel
     protected initElements(): void {
         super.initElements();
 
+        this.browseToolbar.addClass('content-browse-toolbar');
         this.browseToolbar.addActions(this.getBrowseActions().getAllActions());
         this.browseToolbar.appendChild(new NonMobileContextPanelToggleButton());
     }
