@@ -55,7 +55,7 @@ export class ArchiveBrowsePanel
 
         this.browseToolbar.addClass('content-browse-toolbar');
         this.browseToolbar.addActions(this.getBrowseActions().getAllActions());
-        this.browseToolbar.appendChild(new NonMobileContextPanelToggleButton());
+        this.browseToolbar.appendChild(this.contextSplitPanelToggler);
     }
 
     protected initListeners(): void {
