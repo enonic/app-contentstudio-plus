@@ -40,7 +40,6 @@ const getConfig = () => {
                 api: 'content',
             }),
             licenseUrl: portal.apiUrl({
-                application: csAppName,
                 api: 'license',
             }),
         },

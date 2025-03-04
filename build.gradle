@@ -56,6 +56,7 @@ app {
 dependencies {
     implementation "com.enonic.xp:core-api:${xpVersion}"
     include "com.enonic.xp:lib-portal:${xpVersion}"
+    include "com.enonic.xp:lib-io:${xpVersion}"
     include "com.enonic.xp:lib-content:${xpVersion}"
     include "com.enonic.xp:lib-context:${xpVersion}"
     include "com.enonic.xp:lib-i18n:${xpVersion}"
@@ -64,6 +65,7 @@ dependencies {
     include "com.enonic.lib:lib-admin-ui:${libAdminUiVersion}"
     include "com.enonic.lib:lib-contentstudio:${libContentStudioVersion}"
     include "com.enonic.lib:lib-mustache:${libMustacheVersion}"
+    include "com.enonic.lib:lib-license:3.1.0"
     devResources "com.enonic.lib:lib-admin-ui:${libAdminUiVersion}"
     devResources "com.enonic.lib:lib-contentstudio:${libContentStudioVersion}"
 }
