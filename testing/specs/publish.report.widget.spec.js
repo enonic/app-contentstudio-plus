@@ -83,7 +83,7 @@ describe('publish.report.widget.spec: tests for publish report widget', function
             await contentWizard.openPublishReportWidget();
             await wizardPublishReportWidget.waitForWidgetLoaded();
             // 3. Enter a date in the future:
-            await wizardPublishReportWidget.typeInFromDateInput(DATE_IN_FUTURE)
+            await wizardPublishReportWidget.typeInFromDateInput(DATE_IN_FUTURE);
             // 4. Verify that 'Generate' button gets disabled:
             await wizardPublishReportWidget.waitForGenerateButtonDisabled();
             // 5. Expected validation message should appear:
