@@ -158,6 +158,15 @@ module.exports = Object.freeze({
         SMALL_PHONE: 'Small Phone',
         NOTEBOOK_15: "15\" Notebook",
     },
+    EMULATOR_RESOLUTION_VALUE: {
+        FULL_SIZE: '100%',
+        MEDIUM_PHONE: '375px',
+        LARGE_PHONE: '414px',
+        TABLET: '768px',
+        NOTEBOOK_13: '1280px',
+        SMALL_PHONE: '320px',
+        NOTEBOOK_15: '1356px',
+    },
     ACCESS_MENU_ITEM: {
         CUSTOM: 'Custom...',
         CAN_PUBLISH: 'Can Publish',
@@ -397,7 +406,7 @@ module.exports = Object.freeze({
     },
     PREVIEW_WIDGET: {
         AUTOMATIC: 'Automatic',
-        SITE_ENGINE: 'Site engine',
+        ENONIC_RENDERING: 'Enonic rendering',
         MEDIA: 'Media',
         JSON: 'JSON'
     },

@@ -25,6 +25,8 @@ describe('archive.restore.content.dependant.items.spec: tests for archive/restor
 
     const DEPENDENT_ITEM_NAME = 'circles';
     const TEST_DISPLAY_NAME = 'presentation';
+    const ITEMS_TO_ARCHIVE = 12;
+    const NUMBER_DEPENDANT_ITEMS = 11;
 
     it(`GIVEN existing folder is archived WHEN 'Delete from Archive' dialog is opened THEN expected dependent items should be present in the dialog`,
         async () => {
@@ -40,7 +42,7 @@ describe('archive.restore.content.dependant.items.spec: tests for archive/restor
             await deleteContentDialog.waitForDialogOpened();
             await deleteContentDialog.clickOnArchiveButton();
             await confirmValueDialog.waitForDialogOpened();
-            await confirmValueDialog.typeNumberOrName(12);
+            await confirmValueDialog.typeNumberOrName(ITEMS_TO_ARCHIVE);
             await confirmValueDialog.clickOnConfirmButton();
             // 3. Verify the notification message:
             let message = await contentBrowsePanel.waitForNotificationMessage();
@@ -55,7 +57,7 @@ describe('archive.restore.content.dependant.items.spec: tests for archive/restor
             // 6. Verify the dependent items
             let result = await archiveDeleteDialog.getChildItemsToDeletePath();
             assert.ok(result[0].includes(DEPENDENT_ITEM_NAME), 'Expected dependent items should be present in the dialog');
-            assert.equal(result.length, 11, 'Expected number of dependent items should be present in the dialog');
+            assert.equal(result.length, NUMBER_DEPENDANT_ITEMS, 'Expected number of dependent items should be present in the dialog');
         });
 
     it(`'Filter Panel' has been opened WHEN 'Executable' checkbox has been clicked THEN '4 hits' should be displayed in the panel`,
@@ -155,12 +157,12 @@ describe('archive.restore.content.dependant.items.spec: tests for archive/restor
             // 3. Verify the dependent items
             let result = await archiveRestoreDialog.getChildItemsToRestorePath();
             assert.ok(result[0].includes(DEPENDENT_ITEM_NAME), "Expected dependent items should be present in the dialog");
-            assert.equal(result.length, 11, "Expected number of dependent items should be present in the dialog");
+            assert.equal(result.length, NUMBER_DEPENDANT_ITEMS, "Expected number of dependent items should be present in the dialog");
             // 4. Click on 'Restore' button:
             await archiveRestoreDialog.clickOnRestoreButton();
             // 5. Confirm the number of items to restore:
             await confirmValueDialog.waitForDialogOpened();
-            await confirmValueDialog.typeNumberOrName(12);
+            await confirmValueDialog.typeNumberOrName(ITEMS_TO_ARCHIVE);
             await confirmValueDialog.clickOnConfirmButton();
             // 6. Verify the notification message
             let message = await archiveBrowsePanel.waitForNotificationMessage();

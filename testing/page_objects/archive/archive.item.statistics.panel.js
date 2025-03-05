@@ -27,6 +27,10 @@ class ArchiveItemStatisticsPanel extends Page {
         return XPATH.archiveItemPreviewToolbar + XPATH.divPreviewWidgetDropdown;
     }
 
+    get previewButton() {
+        return XPATH.archiveItemPreviewToolbar  + "//button[contains(@id, 'ActionButton') and contains(@aria-label,'Preview')]";
+    }
+
     async getStatus() {
         try {
             await this.waitForElementDisplayed(this.contentStatus, appConst.mediumTimeout);
@@ -96,6 +100,68 @@ class ArchiveItemStatisticsPanel extends Page {
             throw new Error(`Preview widget dropdown - is displayed, screenshot: ${screenshot} ` + err);
         }
     }
+    // Waits for the image to be displayed in the iframe(Live View)
+    async waitForImageElementDisplayed() {
+        try {
+            let locator = "//img";
+            await this.switchToFrame(XPATH.container + "//iframe[@class='image']");
+            return await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_image_element');
+            throw new Error(`Image element should be displayed in the iframe, screenshot: ${screenshot} ` + err);
+        }
+    }
+
+    async waitForPreviewButtonEnabled() {
+        try {
+            await this.waitForPreviewButtonDisplayed();
+            await this.waitForElementEnabled(this.previewButton, appConst.mediumTimeout);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_preview_btn_disabled');
+            throw new Error(`Preview button should be enabled, screenshot : ${screenshot} ` + err);
+        }
+    }
+
+    async waitForPreviewButtonNotDisplayed() {
+        try {
+            return await this.waitForElementNotDisplayed(this.previewButton, appConst.mediumTimeout);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_preview_btn');
+            throw new Error(`Preview button should not be displayed, screenshot: ${screenshot} ` + err);
+        }
+    }
+
+    // Waits for the 'Preview' button to be displayed in the Preview Toolbar
+    async waitForPreviewButtonDisplayed() {
+        try {
+            return await this.waitForElementDisplayed(this.previewButton, appConst.mediumTimeout);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_preview_btn');
+            throw new Error(`Preview button should be displayed, screenshot: ${screenshot} ` + err);
+        }
+    }
+
+    async clickOnPreviewButton() {
+        try {
+            await this.waitForPreviewButtonEnabled();
+            await this.clickOnElement(this.previewButton);
+            return await this.pause(2000);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_preview_btn');
+            throw new Error(`Error occurred after clicking on 'Preview' button, screenshot: ${screenshot} ` + err);
+        }
+    }
+
+    async waitForPreviewButtonDisabled() {
+        try {
+            await this.waitForPreviewButtonDisplayed();
+            await this.waitForElementDisabled(this.previewButton, appConst.mediumTimeout)
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_preview_btn_disabled');
+            throw new Error(`Preview button should be displayed and disabled, screenshot  : ${screenshot} ` + err);
+        }
+    }
+
 }
 
 module.exports = ArchiveItemStatisticsPanel;
