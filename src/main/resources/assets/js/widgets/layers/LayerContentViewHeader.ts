@@ -47,8 +47,9 @@ export class LayerContentViewHeader extends DivEl {
 
         if (this.layerContent.hasItem()) {
             this.itemStatusBlock = new DivEl('status');
-            this.itemStatusBlock.setHtml(CompareStatusFormatter.formatStatusText(this.layerContent.getItem().getCompareStatus()));
-            this.itemStatusBlock.addClass(CompareStatusFormatter.formatStatusClass(this.layerContent.getItem().getCompareStatus()));
+
+            this.itemStatusBlock.setHtml(this.layerContent.getItem().getStatusText());
+            this.itemStatusBlock.addClass(this.layerContent.getItem().getStatusClass());
         }
     }
 }
