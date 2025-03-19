@@ -20,7 +20,7 @@ export class ArchiveTreeList
     }
 
     protected createItemView(item: ArchiveContentViewItem, readOnly: boolean): ArchiveTreeListElement {
-        return new ArchiveTreeListElement(item, {scrollParent: this.scrollParent, level: this.level, parentList: this});
+        return new ArchiveTreeListElement(item, {scrollParent: this.scrollParent, parentList: this});
     }
 
     protected getItemId(item: ArchiveContentViewItem): string {
