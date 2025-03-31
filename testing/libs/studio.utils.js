@@ -87,16 +87,6 @@ module.exports = {
         return this.getBrowser().getPageSource();
     },
 
-    async switchToFrameBySrc(src) {
-        try {
-            let selector = `//iframe[contains(@src,'${src}')]`;
-            let el = await this.getBrowser().$(selector);
-            await el.waitForDisplayed({timeout: 2000});
-            await this.getBrowser().switchToFrame(el);
-        } catch (err) {
-            throw new Error('Error when switch to frame  ' + err);
-        }
-    },
     getTitle() {
         return this.getBrowser().getTitle();
     },
