@@ -8,8 +8,8 @@ const appConst = require('../../libs/app_const');
 
 const XPATH = {
     container: `//div[contains(@id,'ProjectSelectionDialog')]`,
-    title: "//h2[@class='title']",
-    projectList: "//ul[contains(@id,'ProjectList')]",
+    title: `//h2[@class='title']`,
+    projectList: `//ul[contains(@id,'ProjectList')]`,
 };
 
 class ProjectSelectionDialog extends Page {
@@ -23,17 +23,19 @@ class ProjectSelectionDialog extends Page {
             await this.clickOnElement(this.cancelButtonTop);
             return await this.waitForDialogClosed();
         } catch (err) {
-            this.saveScreenshot('err_click_on_cancel_button');
-            throw new Error('Project Selection dialog, error when clicking on Cancel(Top) button  ' + err);
+            let screenshot = await this.saveScreenshot('err_click_on_cancel_button');
+            throw new Error(`Project Selection dialog, error when clicking on Cancel(Top) button , screenshot:${screenshot} ` + err);
         }
     }
 
-    waitForDialogLoaded() {
-        let selector = XPATH.container + XPATH.projectList + lib.itemByDisplayName("Default");
-        return this.waitForElementDisplayed(selector, appConst.shortTimeout).catch(err => {
-            this.saveScreenshot('err_open_project_selection_dialog');
-            throw new Error('Project Selection dialog should be opened!' + err);
-        });
+    async waitForDialogLoaded() {
+        try {
+            let selector = XPATH.container + XPATH.projectList + lib.itemByDisplayName('Default');
+            await this.waitForElementDisplayed(selector, appConst.shortTimeout)
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_open_project_selection_dialog');
+            throw new Error(`Project Selection dialog should be opened! screenshot:${screenshot} ` + err);
+        }
     }
 
     async isDialogLoaded() {
@@ -48,7 +50,7 @@ class ProjectSelectionDialog extends Page {
         try {
             return await this.waitForElementNotDisplayed(XPATH.container, appConst.shortTimeout);
         } catch (err) {
-            throw new Error("Dialog should be closed " + err);
+            throw new Error('Dialog should be closed ' + err);
         }
     }
 
@@ -60,12 +62,12 @@ class ProjectSelectionDialog extends Page {
         try {
             return await this.waitForElementDisplayed(this.cancelButtonTop, appConst.shortTimeout);
         } catch (err) {
-            throw new Error("Project Selection dialog - Cancel button is not displayed :" + err);
+            throw new Error('Project Selection dialog - Cancel button is not displayed :' + err);
         }
     }
 
     async selectContext(projectDisplayName) {
-        let selector = XPATH.container + XPATH.projectList + lib.itemByDisplayName(projectDisplayName);
+        let selector = XPATH.container + XPATH.projectList + lib.TREE_GRID.projectItemByDisplayName(projectDisplayName);
         await this.waitForElementDisplayed(selector, appConst.longTimeout);
         await this.scrollAndClickOnElement(selector);
     }

@@ -179,6 +179,12 @@ module.exports = Object.freeze({
         archiveItemTreeGridListElementByName: name => {
             return `(//li[contains(@id,'ArchiveTreeListElement') and descendant::p[contains(@class,'sub-name') and contains(.,'${name}')]])[last()]`
         },
+        projectItemByDisplayName: displayName => {
+            return `//a[contains(@id,'ProjectListItem') and descendant::h6[contains(@class,'main-name') and contains(.,'${displayName}')]]`
+        },
+        itemByDisplayName: displayName => {
+            return `//div[contains(@id,'NamesView') and child::h6[contains(@class,'main-name') and contains(.,'${displayName}')]]`
+        },
     },
     checkBoxDiv: label => `//div[contains(@id,'Checkbox') and child::label[contains(.,'${label}')]]`,
     actionButton: (label) => `//button[contains(@id,'ActionButton') and child::span[contains(.,'${label}')]]`,
