@@ -16,6 +16,7 @@ exports.config = {
             "args": [
                 "--headless", "--disable-gpu", "--no-sandbox",
                 "--lang=en",
+                "guest",
                 '--disable-extensions',
                 'window-size=1970,1000'
             ]
