@@ -410,4 +410,11 @@ module.exports = Object.freeze({
         MEDIA: 'Media',
         JSON: 'JSON'
     },
+    PREVIEW_JSON_KEY: {
+        NAME: '_name',
+        DISPLAY_NAME: 'displayName',
+        PATH: '_path',
+        CREATOR: 'creator',
+        MODIFIER: 'modifier',
+    },
 });

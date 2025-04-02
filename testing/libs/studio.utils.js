@@ -5,12 +5,12 @@ const LauncherPanel = require('../page_objects/launcher.panel');
 const HomePage = require('../page_objects/home.page');
 const LoginPage = require('../page_objects/login.page');
 const BrowsePanel = require('../page_objects/browsepanel/content.browse.panel');
-const FilterPanel = require("../page_objects/browsepanel/content.filter.panel");
-const appConst = require("./app_const");
-const lib = require("./elements");
+const FilterPanel = require('../page_objects/browsepanel/content.filter.panel');
+const appConst = require('./app_const');
+const lib = require('./elements');
 const NewContentDialog = require('../page_objects/browsepanel/new.content.dialog');
 const ContentWizardPanel = require('../page_objects/wizardpanel/content.wizard.panel');
-const webDriverHelper = require("./WebDriverHelper");
+const webDriverHelper = require('./WebDriverHelper');
 const IssueListDialog = require('../page_objects/issue/issue.list.dialog');
 const CreateIssueDialog = require('../page_objects/issue/create.issue.dialog');
 const DeleteContentDialog = require('../page_objects/delete.content.dialog');
@@ -96,7 +96,7 @@ module.exports = {
         return this.getBrowser().execute(script);
     },
     scrollViewPort(viewportElement, step) {
-        return this.getBrowser().execute("arguments[0].scrollTop=arguments[1]", viewportElement, step);
+        return this.getBrowser().execute('arguments[0].scrollTop=arguments[1]', viewportElement, step);
     },
 
     async doCloseCurrentBrowserTab() {
@@ -112,19 +112,7 @@ module.exports = {
         await issueListDialog.waitForDialogOpened();
         return await issueListDialog.pause(300);
     },
-    async openCreateIssueDialog() {
-        try {
-            let browsePanel = new BrowsePanel();
-            let createIssueDialog = new CreateIssueDialog();
-            let issueListDialog = new IssueListDialog();
-            await browsePanel.clickOnShowIssuesListButton();
-            await issueListDialog.waitForDialogOpened();
-            await issueListDialog.clickOnNewIssueButton();
-            return await createIssueDialog.waitForDialogLoaded();
-        } catch (err) {
-            throw new Error("Error when opening 'Create Issue Dialog' " + err);
-        }
-    },
+
     async createPublishRequest(text) {
         try {
             let browsePanel = new BrowsePanel();
@@ -428,7 +416,7 @@ module.exports = {
             return await browsePanel.pause(300);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_select_item');
-            throw new Error("Select a item, error screenshot:" + screenshot + ' ' + err);
+            throw new Error(`Select a item, error screenshot:${screenshot} ` + err);
         }
     },
     async saveScreenshotUniqueName(namePart) {
@@ -447,7 +435,7 @@ module.exports = {
             return await browsePanel.pause(300);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_select_item');
-            throw new Error("Select a item, error screenshot:" + screenshot + ' ' + err);
+            throw new Error(`Select a item, error screenshot, screenshot: ${screenshot} ` + err);
         }
     },
 
@@ -569,7 +557,7 @@ module.exports = {
             return await browsePanel.selectContext(context);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_select_context');
-            throw new Error('Error during selecting a context, screenshot: ' + screenshot + "  " + err);
+            throw new Error(`Error during selecting a context, screenshot:${screenshot} `  + err);
         }
     },
 
@@ -601,11 +589,11 @@ module.exports = {
             await this.clickOnContentStudioLink(userName, password);
             console.log('testUtils:switching to Content Browse panel...');
             let browsePanel = new BrowsePanel();
-            await this.getBrowser().switchWindow("Content Studio - Enonic XP Admin");
+            await this.getBrowser().switchWindow('Content Studio - Enonic XP Admin');
             return await browsePanel.pause(1500);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_navigate_to_studio');
-            throw new Error('error when navigate to Content Studio, screenshot: ' + screenshot + ' ' + err);
+            throw new Error(`error when navigate to Content Studio, screenshot: ${screenshot} `  + err);
         }
     },
     async clickOnContentStudioLink(userName, password) {
@@ -615,7 +603,7 @@ module.exports = {
         if (result) {
             await launcherPanel.clickOnContentStudioLink();
         } else {
-            console.log("Login Page is opened, type a password and name...");
+            console.log('Login Page is opened, type a password and name...');
             return await this.doLoginAndClickOnContentStudio(userName, password);
         }
     },
@@ -626,7 +614,7 @@ module.exports = {
             await this.closeProjectSelectionDialog();
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_navigate_to_studio');
-            throw new Error('Error when navigate to Content Studio app. Screenshot: ' + screenshot + "  " + err);
+            throw new Error(`Error when navigate to Content Studio app. Screenshot: ${screenshot} `  + err);
         }
     },
     //Clicks on Cancel button and switches to Default project
@@ -644,6 +632,10 @@ module.exports = {
         let loginPage = new LoginPage();
         await loginPage.doLogin(userName, password);
         let launcherPanel = new LauncherPanel();
+        const isAlertOpen = await this.getBrowser().isAlertOpen();
+        if(isAlertOpen){
+            await this.getBrowser().acceptAlert();
+        }
         return await launcherPanel.clickOnContentStudioLink();
 
     },
@@ -740,8 +732,13 @@ module.exports = {
         await this.getBrowser().switchToWindow(tabs[index]);
     },
     async doSwitchToNextTab() {
-        let tabs = await this.getBrowser().getWindowHandles();
-        return await this.getBrowser().switchToWindow(tabs[tabs.length - 1]);
+        try {
+            console.log('testUtils:switching to the new wizard tab...');
+            let tabs = await this.getBrowser().getWindowHandles();
+            await this.getBrowser().switchToWindow(tabs[tabs.length - 1]);
+        } catch (err) {
+            throw new Error('Error occurred during switching to the new browser tab ' + err);
+        }
     },
     async doSwitchToPrevTab() {
         let tabs = await this.getBrowser().getWindowHandles();
@@ -760,7 +757,7 @@ module.exports = {
     async doCloseAllWindowTabsAndSwitchToHome() {
         let handles = await this.getBrowser().getWindowHandles();
         for (const item of handles) {
-            let result = await this.switchAndCheckTitle(item, "Enonic XP Home");
+            let result = await this.switchAndCheckTitle(item, 'Enonic XP Home');
             if (!result) {
                 await this.getBrowser().closeWindow();
             }
@@ -773,7 +770,7 @@ module.exports = {
                 return title.includes(reqTitle);
             }).catch(err => {
                 console.log('Error when getting Title' + err);
-                throw new Error("Error  " + err);
+                throw new Error('Error  ' + err);
             })
         });
     },
@@ -819,7 +816,7 @@ module.exports = {
     },
     async isContentStudioMenuOpened() {
         let element = await this.getBrowser().$("//div[contains(@id,'AppWrapper')]");
-        let atrValue = await element.getAttribute("class");
+        let atrValue = await element.getAttribute('class');
         return atrValue.includes('sidebar-expanded');
     },
     async openSettingsPanel() {
@@ -1049,8 +1046,8 @@ module.exports = {
             await this.getBrowser().pause(300);
             await archiveBrowsePanel.waitForGridLoaded(appConst.mediumTimeout);
         } catch (err) {
-            await this.saveScreenshot(appConst.generateRandomName("err_open_settings"));
-            throw new Error("Error Open Archive Panel: " + err);
+            let screenshot =  await this.saveScreenshotUniqueName('err_open_settings');
+            throw new Error(`Error Open Archive Panel:${screenshot} ` + err);
         }
     },
     async openLayersWidgetInBrowsePanel() {
@@ -1071,4 +1068,9 @@ module.exports = {
         await browseVariantsWidget.waitForWidgetLoaded();
         return browseVariantsWidget;
     },
+    async getJSON_info(keyText) {
+        let locator = `//span[@class='key' and contains(.,'${keyText}')]/following-sibling::span[@class='string'][1]`;
+        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+        return await this.getText(locator);
+    }
 };
