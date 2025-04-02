@@ -48,7 +48,7 @@ describe('archive.image.spec: tests for PreviewWidgetDropdown', function () {
 
     // Verify the bug https://github.com/enonic/app-contentstudio/issues/8431
     // Emulator's value changes in both Studio and Archive #8431
-    it(`GIVEN existing image in CS has been selected WHEN an image in Archive has been selected AND Small Phone option has been selected THEN 100% option remains selected in Content Browse Panel`,
+    it(`GIVEN existing image in CS has been selected WHEN an image in Archive has been selected AND 'Small Phone' option has been selected THEN 100% option remains selected in Content Browse Panel`,
         async () => {
             let archiveItemStatisticsPanel = new ArchiveItemStatisticsPanel();
             let archiveBrowsePanel = new ArchiveBrowsePanel();
@@ -94,7 +94,24 @@ describe('archive.image.spec: tests for PreviewWidgetDropdown', function () {
             await archiveItemStatisticsPanel.waitForImageElementDisplayed();
         });
 
-    it(`GIVEN existing archived image is selected WHEN 'Media' is selected THEN Preview button should be enabled`,
+    it(`GIVEN existing archived image is selected WHEN 'Json' is selected THEN 'Preview' button should be enabled`,
+        async () => {
+            let archiveItemStatisticsPanel = new ArchiveItemStatisticsPanel();
+            let archiveBrowsePanel = new ArchiveBrowsePanel();
+            // 1. Navigate to 'Archive Browse Panel' :
+            await studioUtils.openArchivePanel();
+            await archiveBrowsePanel.clickCheckboxAndSelectRowByDisplayName(TEST_IMAGE);
+            await archiveItemStatisticsPanel.selectOptionInPreviewWidget(appConst.PREVIEW_WIDGET.JSON);
+            await studioUtils.saveScreenshot('archive_image_json');
+            // 2. Click on 'Preview' button
+            await archiveItemStatisticsPanel.clickOnPreviewButton();
+            // 3. Switch to the new opened browser tab and verify that img element is displayed in the page:
+            await studioUtils.doSwitchToNextTab();
+            let actualName = await studioUtils.getJSON_info(appConst.PREVIEW_JSON_KEY.NAME);
+            assert.equal(actualName, `"${TEST_IMAGE}.jpeg"`, 'expected name should be displayed in JSON preview');
+        });
+
+    it(`GIVEN existing archived image is selected WHEN 'Media' is selected THEN 'Preview' button should be enabled`,
         async () => {
             let archiveItemStatisticsPanel = new ArchiveItemStatisticsPanel();
             let archiveBrowsePanel = new ArchiveBrowsePanel();
@@ -103,9 +120,24 @@ describe('archive.image.spec: tests for PreviewWidgetDropdown', function () {
             await archiveBrowsePanel.clickCheckboxAndSelectRowByDisplayName(TEST_IMAGE);
             await archiveItemStatisticsPanel.selectOptionInPreviewWidget(appConst.PREVIEW_WIDGET.MEDIA);
             await studioUtils.saveScreenshot('archive_image_media');
-            // 2. Verify that 'Preview' button should be enabled when an image and 'Media' is selected
-            await archiveItemStatisticsPanel.waitForPreviewButtonEnabled();
-            await archiveItemStatisticsPanel.waitForImageElementDisplayed();
+            // 2. Click on 'Preview' button
+            await archiveItemStatisticsPanel.clickOnPreviewButton();
+            // 3. Switch to the new opened browser tab and verify that img element is displayed in the page:
+            await studioUtils.doSwitchToNextTab();
+            await studioUtils.waitForElementDisplayed('//img', appConst.mediumTimeout);
+        });
+
+    it(`GIVEN existing archived image is selected WHEN 'Enonic Rendering' is selected THEN 'Preview' button should be disabled`,
+        async () => {
+            let archiveItemStatisticsPanel = new ArchiveItemStatisticsPanel();
+            let archiveBrowsePanel = new ArchiveBrowsePanel();
+            // 1. Navigate to 'Archive Browse Panel' :
+            await studioUtils.openArchivePanel();
+            await archiveBrowsePanel.clickCheckboxAndSelectRowByDisplayName(TEST_IMAGE);
+            await archiveItemStatisticsPanel.selectOptionInPreviewWidget(appConst.PREVIEW_WIDGET.ENONIC_RENDERING);
+            await studioUtils.saveScreenshot('archive_image_rendering');
+            // 2. Verify that 'Preview' button is disabled
+            await archiveItemStatisticsPanel.waitForPreviewButtonDisabled();
         });
 
     it(`GIVEN existing archived image is selected AND 'Restore...' context menu item has been clicked WHEN Archive button has been pressed in the modal dialog THEN the image should be present only in the Content Grid`,
