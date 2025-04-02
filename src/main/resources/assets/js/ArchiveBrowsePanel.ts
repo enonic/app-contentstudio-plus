@@ -3,7 +3,6 @@ import {ArchiveBrowseItemPanel} from './ArchiveBrowseItemPanel';
 import * as Q from 'q';
 import {ArchiveContextView} from './ArchiveContextView';
 import {ArchiveContentViewItem} from './ArchiveContentViewItem';
-import {NonMobileContextPanelToggleButton} from 'lib-contentstudio/app/view/context/button/NonMobileContextPanelToggleButton';
 import {ResponsiveBrowsePanel} from 'lib-contentstudio/app/browse/ResponsiveBrowsePanel';
 import {ArchiveFilterPanel} from './ArchiveFilterPanel';
 import {ContentQuery} from 'lib-contentstudio/app/content/ContentQuery';
@@ -35,8 +34,6 @@ export class ArchiveBrowsePanel
     protected contextMenu: TreeGridContextMenu;
 
     protected selectionWrapper: SelectableListBoxWrapper<ArchiveContentViewItem>;
-
-    protected keyNavigator: SelectableTreeListBoxKeyNavigator<ArchiveContentViewItem>;
 
     protected contextView: ArchiveContextView;
 
@@ -152,7 +149,6 @@ export class ArchiveBrowsePanel
 
         this.treeActions = new ArchiveTreeGridActions();
         this.contextMenu = new TreeGridContextMenu(this.treeActions);
-        this.keyNavigator = new SelectableTreeListBoxKeyNavigator(this.selectionWrapper);
 
         const panel =  new SelectableListBoxPanel(this.selectionWrapper, this.toolbar);
         panel.addClass('content-selectable-list-box-panel');
@@ -162,6 +158,10 @@ export class ArchiveBrowsePanel
 
     protected togglePreviewPanelDependingOnScreenSize(): void {
         //
+    }
+
+    protected createKeyNavigator() {
+        return new SelectableTreeListBoxKeyNavigator(this.selectionWrapper);
     }
 
     protected createContextView(): ArchiveContextView {
