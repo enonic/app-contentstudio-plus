@@ -6,8 +6,7 @@ const contextLib = require('/lib/xp/context');
 const authLib = require('/lib/xp/auth');
 const i18n = require('/lib/xp/i18n');
 
-const getPhrases = function () {
-    const locales = admin.getLocales();
+const getPhrases = function (locales) {
     const phrases = {};
     const bundles = ['i18n/cs-plus'];
 
@@ -21,14 +20,14 @@ const getPhrases = function () {
     return phrases;
 };
 
-const getConfig = () => {
+const getConfig = (locales) => {
     const csAppName = 'com.enonic.app.contentstudio';
     const csToolUri = admin.getToolUrl(csAppName, 'main');
     const context = contextLib.get();
     const user = authLib.getUser();
 
     return {
-        adminUrl: admin.getBaseUri(),
+        adminUrl: admin.getHomeToolUrl(),
         assetsUri: portal.assetUrl({
             path: ''
         }),
@@ -48,7 +47,7 @@ const getConfig = () => {
             api: 'widget',
         }),
         toolUri: csToolUri,
-        phrasesAsJson: JSON.stringify(getPhrases()),
+        phrasesAsJson: JSON.stringify(getPhrases(locales)),
         user,
         principals: authLib.getMemberships(user.key, true)
     };

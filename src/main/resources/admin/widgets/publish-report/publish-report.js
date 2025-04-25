@@ -29,7 +29,7 @@ const makeParamsNoContentId = () => {
     }
 }
 
-const makeParams = (content, isArchived) => {
+const makeParams = (content, isArchived, locales) => {
     return {
         contentId: content._id || '',
         stylesUri: portal.assetUrl({
@@ -39,7 +39,7 @@ const makeParams = (content, isArchived) => {
             path: 'js/widgets/publish-report.js'
         }),
         configScriptId: 'pr-widget-config-json',
-        configAsJson: JSON.stringify(configLib.getConfig(), null, 4).replace(/<(\/?script|!--)/gi, "\\u003C$1"),
+        configAsJson: JSON.stringify(configLib.getConfig(locales), null, 4).replace(/<(\/?script|!--)/gi, "\\u003C$1"),
         isNoIdMode: false,
         publishFirst: content.publish.first,
         isNormalMode: !!content.publish.first,
@@ -86,7 +86,7 @@ const getViewParams = (req) => {
         }
 
         if (content) {
-            return makeParams(content, isArchived);
+            return makeParams(content, isArchived, req.locales);
         }
     }
 
