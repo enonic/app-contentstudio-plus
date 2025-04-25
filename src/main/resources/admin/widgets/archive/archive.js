@@ -4,7 +4,7 @@ const portal = require('/lib/xp/portal');
 const mustache = require('/lib/mustache');
 const configLib = require('/lib/config');
 
-function handleGet() {
+function handleGet(req) {
     const view = resolve('./archive.html');
 
     const params = {
@@ -15,7 +15,7 @@ function handleGet() {
             path: 'styles/main.css'
         }),
         configScriptId: 'widget-archive-config-json',
-        configAsJson: JSON.stringify(configLib.getConfig(), null, 4).replace(/<(\/?script|!--)/gi, "\\u003C$1"),
+        configAsJson: JSON.stringify(configLib.getConfig(req.locales), null, 4).replace(/<(\/?script|!--)/gi, "\\u003C$1"),
     };
 
     return {

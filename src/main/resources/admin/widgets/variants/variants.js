@@ -22,7 +22,7 @@ function renderWidgetView(req) {
             path: ''
         }),
         configScriptId: 'variants-widget-config-json',
-        configAsJson: JSON.stringify(configLib.getConfig(), null, 4).replace(/<(\/?script|!--)/gi, "\\u003C$1"),
+        configAsJson: JSON.stringify(configLib.getConfig(req.locales), null, 4).replace(/<(\/?script|!--)/gi, "\\u003C$1"),
     };
 
     return {
