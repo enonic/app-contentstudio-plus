@@ -35,16 +35,14 @@ const getConfig = (locales) => {
         appId: app.name,
         services: {
             contentUrl: portal.apiUrl({
-                application: csAppName,
-                api: 'content',
+                api: `${csAppName}:content`,
             }),
             licenseUrl: portal.apiUrl({
                 api: 'license',
             }),
         },
         widgetApiUrl: portal.apiUrl({
-            application: 'admin',
-            api: 'widget',
+            api: 'admin:widget',
         }),
         toolUri: csToolUri,
         phrasesAsJson: JSON.stringify(getPhrases(locales)),
