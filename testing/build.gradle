@@ -10,6 +10,7 @@ group = 'com.enonic.app.contentstudio.js_testing'
 configurations {
     distro
     deploy
+    apps
 }
 
 def unpackDir = layout.buildDirectory.dir("install").get()
@@ -25,6 +26,7 @@ def contentStudioPlusAppUrl = project.hasProperty('contentStudioPlusAppUrl') ? c
 dependencies {
     distro "com.enonic.xp:enonic-xp-generic:$xpVersion@zip"
     deploy "com.enonic.app:contentstudio:$libContentStudioVersion@jar"
+    apps "com.enonic.uitest:contenttypes:1.0.0-SNAPSHOT"
 }
 
 tasks.register( 'unpackDistro', Copy ) {
@@ -52,6 +54,13 @@ tasks.register('copyConfig', Copy) {
     include '**.*.cfg'
     include '*.properties'
     into configDir
+    mustRunAfter unpackDistro
+}
+tasks.register( 'downloadApps', Copy ) {
+    from {
+        configurations.apps
+    }
+    into deployDir
     mustRunAfter unpackDistro
 }
 
@@ -102,7 +111,7 @@ tasks.register('deployContentStudioPlus', DefaultTask) {
 
 def process
 tasks.register( 'startServer' ) {
-    dependsOn( unpackDistro, copyConfig, copyLicense, deployContentStudio, deployContentStudioPlus, copyApps )
+    dependsOn( unpackDistro, copyConfig, copyLicense, deployContentStudio, deployContentStudioPlus, downloadApps )
     doLast {
         def pb
         if (DefaultNativePlatform.getCurrentOperatingSystem().windows) {
