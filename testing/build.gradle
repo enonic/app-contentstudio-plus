@@ -10,7 +10,9 @@ group = 'com.enonic.app.contentstudio.js_testing'
 configurations {
     distro
     deploy
-    apps
+    apps {
+        transitive false
+    }
 }
 
 def unpackDir = layout.buildDirectory.dir("install").get()
