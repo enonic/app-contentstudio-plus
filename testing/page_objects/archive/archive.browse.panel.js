@@ -36,6 +36,7 @@ class ArchiveBrowsePanel extends BaseBrowsePanel {
     get browseToolbar() {
         return XPATH.toolbar;
     }
+
     get container() {
         return XPATH.container;
     }
@@ -86,8 +87,7 @@ class ArchiveBrowsePanel extends BaseBrowsePanel {
             await this.clickOnElement(this.restoreButton);
             return await this.pause(1100);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_restore_btn');
-            throw new Error('error when click on expander-icon, screenshot ' + screenshot + ' ' + err);
+            await this.handleError(`Archive Browse Panel - click on restore button`, 'err_restore_btn', err);
         }
     }
 
@@ -112,8 +112,7 @@ class ArchiveBrowsePanel extends BaseBrowsePanel {
             console.log("waitForContentDisplayed, timeout is:" + timeout);
             return await this.waitForElementDisplayed(this.treeGrid + lib.itemByName(contentName), timeout);
         } catch (err) {
-            let screenshot = this.saveScreenshotUniqueName('err_content');
-            throw new Error('content is not displayed ! ' + screenshot + "  " + err);
+            await this.handleError(`Archive Panel - wait for content displayed: ${contentName}`, 'err_wait_for_content_displayed', err);
         }
     }
 
@@ -124,19 +123,7 @@ class ArchiveBrowsePanel extends BaseBrowsePanel {
             await this.clickOnElement(nameXpath);
             return await this.pause(600);
         } catch (err) {
-            let screenshot = this.saveScreenshotUniqueName('err_content');
-            throw Error('Row with the content was not found' + screenshot + '  ' + err)
-        }
-    }
-
-
-    async waitForContentByDisplayNamePresent(displayName) {
-        try {
-            let selector = this.treeGrid + lib.itemByDisplayName(displayName);
-            return await this.waitForElementDisplayed(selector, appConst.longTimeout);
-        } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_find');
-            throw new Error('Settings: item was not found ! screenshot ' + screenshot + ' ' + err);
+            await this.handleError(`Archive Panel - click on row by displayName: ${displayName}`, 'err_click_on_row_by_display_name', err);
         }
     }
 
@@ -155,7 +142,7 @@ class ArchiveBrowsePanel extends BaseBrowsePanel {
             await this.waitForElementDisplayed(XPATH.selectedRow, appConst.mediumTimeout);
             return await this.getText(XPATH.selectedRow + lib.H6_DISPLAY_NAME);
         } catch (err) {
-            throw new Error(`Error when getting name in the selected row ` + err);
+            await this.handleError(`Archive Browse Panel - get name in highlighted rows`, 'err_get_name_highlighted_row', err)
         }
     }
 
@@ -197,8 +184,7 @@ class ArchiveBrowsePanel extends BaseBrowsePanel {
             await this.clickOnElement(checkboxElement);
             return await this.pause(200);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_find_item');
-            throw new Error(`Row with the displayName ${displayName} was not found. Screenshot:${screenshot} ` + err);
+            await this.handleError(`Archive Panel - click on checkbox and select row by displayName: ${displayName}`, 'err_select_item', err);
         }
     }
 
@@ -222,8 +208,7 @@ class ArchiveBrowsePanel extends BaseBrowsePanel {
             await this.waitForRowCheckboxSelected(name);
             await this.pause(200);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_select_item');
-            throw Error(`Row with the name  was not selected, screenshot:${screenshot} ` + err)
+            await this.handleError(`Archive Browse Panel - click on checkbox and select row by name: ${name}`, 'err_select_item', err);
         }
     }
 
@@ -241,7 +226,7 @@ class ArchiveBrowsePanel extends BaseBrowsePanel {
         await this.getBrowser().waitUntil(async () => {
             let isSelected = await checkboxElement.isSelected();
             return isSelected;
-        }, {timeout: appConst.mediumTimeout, timeoutMsg: "Checkbox is not selected"});
+        }, {timeout: appConst.mediumTimeout, timeoutMsg: 'Checkbox is not selected'});
     }
 }
 
