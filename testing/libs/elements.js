@@ -59,7 +59,7 @@ module.exports = Object.freeze({
         CONTENT_APP_BAR_DIV: "//div[contains(@id,'ContentAppBar')]",
         PROJECT_VIEWER_DIV: "//div[contains(@id,'ProjectViewer')]",
         CONTENT_SUMMARY_AND_STATUS_VIEWER: "//div[contains(@id,'ContentSummaryAndCompareStatusViewer')]",
-        SHOW_ENTIRE_CONTENT_CHECKBOX_DIV: "//div[contains(@id,'Checkbox') and descendant::span[text()='Show entire content']]",
+        SHOW_ENTIRE_CONTENT_CHECKBOX_DIV: "//div[contains(@id,'Checkbox') and descendant::span[text()='Show the entire content']]",
     },
     DATE_PICKER: {
         fromDateInput: "//div[contains(@id,'DatePicker') and preceding-sibling::label[child::span[text()='From']]]//input[contains(@id,'TextInput')]",
