@@ -26,14 +26,14 @@ def contentStudioPlusFile = "$deployDir/contentstudio.plus-${version}.jar"
 def contentStudioPlusAppUrl = project.hasProperty('contentStudioPlusAppUrl') ? contentStudioPlusAppUrl : "file:///$projectDir/../build/libs/contentstudio.plus.jar"
 
 dependencies {
-    distro "com.enonic.xp:enonic-xp-generic:$xpVersion@zip"
+    distro "com.enonic.xp:enonic-xp-generic:$xpVersion@tgz"
     deploy "com.enonic.app:contentstudio:$libContentStudioVersion@jar"
     apps "com.enonic.uitest:contenttypes:1.0.0-SNAPSHOT"
 }
 
 tasks.register( 'unpackDistro', Copy ) {
     from {
-        configurations.distro.collect { zipTree( it ) }
+        configurations.distro.collect { tarTree( it ) }
     }
     into unpackDir
 }
