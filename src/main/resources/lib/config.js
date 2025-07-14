@@ -2,7 +2,6 @@
 
 const admin = require('/lib/xp/admin');
 const portal = require('/lib/xp/portal');
-const contextLib = require('/lib/xp/context');
 const authLib = require('/lib/xp/auth');
 const i18n = require('/lib/xp/i18n');
 
@@ -23,7 +22,6 @@ const getPhrases = function (locales) {
 const getConfig = (locales) => {
     const csAppName = 'com.enonic.app.contentstudio';
     const csToolUri = admin.getToolUrl(csAppName, 'main');
-    const context = contextLib.get();
     const user = authLib.getUser();
 
     return {
@@ -31,7 +29,7 @@ const getConfig = (locales) => {
         assetsUri: portal.assetUrl({
             path: ''
         }),
-        branch: context.branch,
+        branch: 'draft',
         appId: app.name,
         services: {
             contentUrl: portal.apiUrl({
