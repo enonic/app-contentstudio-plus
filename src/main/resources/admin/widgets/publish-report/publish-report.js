@@ -57,7 +57,8 @@ const doGetContent = (contentId) => {
 
 const getContent = (contentId, repository) => {
     return contextLib.run({
-            repository: repository
+            repository: repository,
+            branch: 'draft'
         }, () => doGetContent(contentId)
     );
 }
@@ -65,6 +66,7 @@ const getContent = (contentId, repository) => {
 const getContentFromArchive = (contentId, repository) => {
     return contextLib.run({
             repository: repository,
+            branch: 'draft',
             attributes: {
                 contentRootPath: __.newBean('com.enonic.xp.app.contentstudio.plus.AdminBean').getArchiveRootPath()
             }
