@@ -53,8 +53,7 @@ class ArchiveDeleteDialog extends Page {
         try {
             await this.waitForElementDisplayed(this.deleteButton, appConst.mediumTimeout)
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_restore_dlg');
-            throw new Error('Archive Delete dialog was not loaded! screenshot: ' + screenshot + ' ' + err);
+            await this.handleError('Archive Delete dialog', 'err_archive_delete_dlg_opened', err);
         }
     }
 
@@ -62,8 +61,7 @@ class ArchiveDeleteDialog extends Page {
         try {
             await this.waitForElementNotDisplayed(XPATH.container, appConst.mediumTimeout)
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_delete_dlg_close');
-            throw new Error("Archive Delete dialog was not closed, screenshot:  " + screenshot + ' ' + err);
+            await this.handleError('Archive Delete dialog', 'err_archive_delete_dlg_close', err);
         }
     }
 

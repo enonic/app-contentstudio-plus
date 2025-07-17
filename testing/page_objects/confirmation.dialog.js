@@ -30,9 +30,14 @@ class ConfirmationDialog extends Page {
     }
 
     async clickOnYesButton() {
-        await this.waitForElementDisplayed(this.yesButton, appConst.shortTimeout);
-        await this.clickOnElement(this.yesButton);
-        return await this.waitForElementNotDisplayed(XPATH.container, appConst.shortTimeout)
+        try {
+            await this.waitForElementDisplayed(this.yesButton, appConst.shortTimeout);
+            await this.clickOnElement(this.yesButton);
+            await this.waitForElementNotDisplayed(XPATH.container, appConst.shortTimeout)
+            await this.pause(300);
+        } catch (err) {
+            await this.handleError('Confirmation dialog Yes button', 'err_confirmation_dlg_yes', err);
+        }
     }
 
     async clickOnCancelTopButton() {
@@ -47,8 +52,7 @@ class ConfirmationDialog extends Page {
             await this.waitForElementDisplayed(XPATH.container, appConst.mediumTimeout);
             await this.pause(700);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_confirmation_dlg');
-            throw new Error("Confirmation dialog is not loaded! screenshot: " + screenshot + ' ' + err);
+            await this.handleError('Confirmation dialog', 'err_confirmation_dlg_opened', err);
         }
     }
 
@@ -61,8 +65,7 @@ class ConfirmationDialog extends Page {
             await this.waitForElementNotDisplayed(XPATH.container, appConst.shortTimeout);
             return await this.pause(400);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_confirmation_dlg_closing');
-            throw new Error("Confirmation dialog should be closed! screenshot:" + screenshot + ' ' + err);
+            await this.handleError('Confirmation dialog should be closed', 'err_confirmation_dlg_closed', err);
         }
     }
 

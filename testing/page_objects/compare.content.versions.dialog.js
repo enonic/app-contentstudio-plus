@@ -35,7 +35,6 @@ class CompareContentVersionsDialog extends Page {
         return XPATH.container + XPATH.containerRight + lib.DROP_DOWN_HANDLE;
     }
 
-
     get olderVersionDropdownHandle() {
         return XPATH.container + XPATH.containerLeft + lib.DROP_DOWN_HANDLE;
     }
@@ -79,8 +78,7 @@ class CompareContentVersionsDialog extends Page {
             let selector = XPATH.container + XPATH.containerLeft + XPATH.revertMenuItem;
             return await this.waitForElementDisplayed(selector, appConst.mediumTimeout);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_left_revert_menu_item');
-            throw new Error("Compare content versions dialog, menu item is not displayed, screenshot:" + screenshot + ' ' + err);
+            await this.handleError('Compare Content Versions Dialog', 'err_left_revert_menu_item', err);
         }
     }
 
@@ -214,10 +212,8 @@ class CompareContentVersionsDialog extends Page {
             await this.clickOnElement(this.rightDropdownHandle);
             return await this.pause(300);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_compare_right_dropdown');
-            throw new Error("Compare Versions Dialog, error during clicking on Right Dropdown, screenshot: " + screenshot + ' ' + err);
+            await this.handleError('Compare Content Versions Dialog', 'err_compare_right_dropdown', err);
         }
-
     }
 }
 

@@ -289,8 +289,7 @@ class Page {
                 return res;
             }, {timeout: timeout1, timeoutMsg: message});
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_spinner');
-            throw new Error(` Spinner error, screenshot :${screenshot}  ` + err);
+            await this.handleError(`Timeout exceeded` , 'err_spinner', err);
         }
     }
 
@@ -637,6 +636,15 @@ class Page {
             let text = await this.getAttribute(locator, attrName);
             return text === expectedValue;
         }, {timeout: appConst.mediumTimeout, timeoutMsg: `Expected attribute ${attrName} is not set in the element ${locator}`});
+    }
+    // Utility method for error handling
+    async handleError(errorMessage, screenshotName, error) {
+        let screenshot = await this.saveScreenshotUniqueName(screenshotName);
+        throw new Error(`${errorMessage}, screenshot: ${screenshot} ` + error);
+    }
+    async getWindowWidth(){
+        let result =  await this.getBrowser().getWindowSize();
+        return result.width;
     }
 }
 

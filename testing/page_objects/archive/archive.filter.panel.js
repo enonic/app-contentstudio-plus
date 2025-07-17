@@ -72,7 +72,7 @@ class ArchiveFilterPanel extends Page {
             await this.typeTextInInput(this.searchTextInput, text);
             return await this.pause(500);
         } catch (err) {
-            throw new Error("Filter Panel, Error when type text in Search Input " + err);
+            await this.handleError('Filter Panel, Search Input', 'err_filter_panel_search_input', err);
         }
     }
 
@@ -161,8 +161,7 @@ class ArchiveFilterPanel extends Page {
             await this.clickOnElement(selector);
             return await this.pause(1200);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('filter_panel');
-            throw new Error(`Filter Panel ,error after clicking on a checkbox in aggregation block, screenshot: ${screenshot} ` + err);
+            await this.handleError('Filter Panel, aggregation checkbox', 'err_filter_panel_checkbox', err);
         }
     }
 
@@ -184,8 +183,7 @@ class ArchiveFilterPanel extends Page {
             await this.waitForElementDisplayed(locator, appConst.shortTimeout);
             return await this.isSelected(locator);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_filter_panel_checkbox');
-            throw new Error("Filter Panel, Error during checking the checkbox , screenshot:" + screenshot + ' ' + err);
+            await this.handleError('Filter Panel', 'err_filter_panel_checkbox', err);
         }
     }
 
