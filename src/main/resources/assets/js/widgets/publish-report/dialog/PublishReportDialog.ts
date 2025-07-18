@@ -4,7 +4,7 @@ import * as Q from 'q';
 import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import {ContentId} from 'lib-contentstudio/app/content/ContentId';
 import {GetContentVersionsRequest} from 'lib-contentstudio/app/resource/GetContentVersionsRequest';
-import {ContentVersions} from 'lib-contentstudio/app/ContentVersions';
+import {GetContentVersionsResult} from 'lib-contentstudio/app/resource/GetContentVersionsResult';
 import {ComparisonsContainer} from './ComparisonsContainer';
 import {Action} from '@enonic/lib-admin-ui/ui/Action';
 import {Body} from '@enonic/lib-admin-ui/dom/Body';
@@ -29,7 +29,7 @@ export class PublishReportDialog
 
     private contentPromise: Q.Promise<ContentSummary> | Q.Promise<ContentSummaryAndCompareStatus>;
 
-    private versionsPromise: Q.Promise<ContentVersions>;
+    private versionsPromise: Q.Promise<GetContentVersionsResult>;
 
     private fromDate: Date;
 
@@ -108,10 +108,10 @@ export class PublishReportDialog
         this.comparisonsContainer.setContentId(this.contentId);
         this.loadMask.show();
 
-        return Q.all([this.fetchContent(), this.fetchVersions()]).spread((content: ContentSummary, versions: ContentVersions) => {
+        return Q.all([this.fetchContent(), this.fetchVersions()]).spread((content: ContentSummary, versions: GetContentVersionsResult) => {
             this.content = content;
             this.comparisonsContainer.clean();
-            this.comparisonsContainer.setFromTo(this.fromDate, this.toDate).setAllVersions(versions.get());
+            this.comparisonsContainer.setFromTo(this.fromDate, this.toDate).setAllVersions(versions.getContentVersions());
             this.subTitleEl.setHtml(this.content.getPath().toString());
         }).finally(() => {
             this.loadMask.hide();
@@ -125,7 +125,7 @@ export class PublishReportDialog
         return this.contentPromise;
     }
 
-    private fetchVersions(): Q.Promise<ContentVersions> {
+    private fetchVersions(): Q.Promise<GetContentVersionsResult> {
         this.versionsPromise = this.versionsPromise ?? new GetContentVersionsRequest(this.contentId).sendAndParse();
         return this.versionsPromise;
     }
