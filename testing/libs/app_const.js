@@ -377,7 +377,7 @@ module.exports = Object.freeze({
         OWNER: 'Owner',
         LANGUAGE: 'Language',
         ARCHIVED: 'Archived',
-        ARCHIVED_BY: 'Archived by',
+        ARCHIVED_BY: 'Archived By',
     },
     WIDGET_SELECTOR_OPTIONS: {
         VERSION_HISTORY: 'Version history',
