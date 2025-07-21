@@ -28,7 +28,7 @@ class ArchiveItemStatisticsPanel extends Page {
     }
 
     get previewButton() {
-        return XPATH.archiveItemPreviewToolbar + "//button[contains(@id, 'ActionButton') and contains(@aria-label,'Open in new tab')]";
+        return XPATH.archiveItemPreviewToolbar  + "//button[contains(@id, 'ActionButton') and contains(@aria-label,'Open in new tab')]";
     }
 
     async getStatus() {
@@ -95,10 +95,10 @@ class ArchiveItemStatisticsPanel extends Page {
         try {
             return await this.waitForElementNotDisplayed(this.previewWidgetDropdown, appConst.mediumTimeout);
         } catch (err) {
-            await this.handleError(`Preview widget - dropdown - should not be displayed`, 'err_preview_widget_dropdown', err);
+            let screenshot = await this.saveScreenshotUniqueName('err_preview_widget_dropdown');
+            throw new Error(`Preview widget dropdown - is displayed, screenshot: ${screenshot} ` + err);
         }
     }
-
     // Waits for the image to be displayed in the iframe(Live View)
     async waitForImageElementDisplayed() {
         try {
@@ -106,7 +106,8 @@ class ArchiveItemStatisticsPanel extends Page {
             await this.switchToFrame(XPATH.container + "//iframe[@class='image']");
             return await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
         } catch (err) {
-            await this.handleError(`Image element - should be displayed in the iframe`, 'err_image_element', err);
+            let screenshot = await this.saveScreenshotUniqueName('err_image_element');
+            throw new Error(`Image element should be displayed in the iframe, screenshot: ${screenshot} ` + err);
         }
     }
 
@@ -115,7 +116,8 @@ class ArchiveItemStatisticsPanel extends Page {
             await this.waitForPreviewButtonDisplayed();
             await this.waitForElementEnabled(this.previewButton, appConst.mediumTimeout);
         } catch (err) {
-            await this.handleError(`Preview button - should be displayed and enabled`, 'err_preview_btn_enabled', err);
+            let screenshot = await this.saveScreenshotUniqueName('err_preview_btn_disabled');
+            throw new Error(`Preview button should be enabled, screenshot : ${screenshot} ` + err);
         }
     }
 
@@ -132,7 +134,8 @@ class ArchiveItemStatisticsPanel extends Page {
         try {
             return await this.waitForElementDisplayed(this.previewButton, appConst.mediumTimeout);
         } catch (err) {
-            await this.handleError(`Preview button - should be displayed`, 'err_preview_btn', err);
+            let screenshot = await this.saveScreenshotUniqueName('err_preview_btn');
+            throw new Error(`Preview button should be displayed, screenshot: ${screenshot} ` + err);
         }
     }
 
@@ -142,7 +145,8 @@ class ArchiveItemStatisticsPanel extends Page {
             await this.clickOnElement(this.previewButton);
             return await this.pause(2000);
         } catch (err) {
-            await this.handleError(`Tried to click on 'Preview' button`, 'err_preview_btn', err);
+            let screenshot = await this.saveScreenshotUniqueName('err_preview_btn');
+            throw new Error(`Error occurred after clicking on 'Preview' button, screenshot: ${screenshot} ` + err);
         }
     }
 
@@ -151,7 +155,8 @@ class ArchiveItemStatisticsPanel extends Page {
             await this.waitForPreviewButtonDisplayed();
             await this.waitForElementDisabled(this.previewButton, appConst.mediumTimeout)
         } catch (err) {
-            await this.handleError(`Preview button - should be displayed and disabled`, 'err_preview_btn_disabled', err);
+            let screenshot = await this.saveScreenshotUniqueName('err_preview_btn_disabled');
+            throw new Error(`Preview button should be displayed and disabled, screenshot  : ${screenshot} ` + err);
         }
     }
 }

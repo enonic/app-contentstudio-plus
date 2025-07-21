@@ -158,6 +158,18 @@ class BaseVersionsWidget extends Page {
         return await this.getTextInDisplayedElements(locator);
     }
 
+    async getLogMessageFromArchivedItems() {
+        try {
+            await this.waitForElementDisplayed(this.versionItems, appConst.mediumTimeout);
+            //get all version items with the header:
+            let locator = this.versionsWidget + xpath.anyItemByHeader(appConst.VERSIONS_ITEM_HEADER.ARCHIVED) + xpath.publishMessageDiv;
+            await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+            return await this.getTextInDisplayedElements(locator);
+        } catch (err) {
+            await this.handleError('The message when archiving content ', 'err_log_message_archived_items', err)
+        }
+    }
+
     async clickAndExpandVersionItemByHeader(versionHeader, index) {
         try {
             let i = index === undefined ? 0 : index;

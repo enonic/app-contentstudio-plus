@@ -11,6 +11,8 @@ const XPATH = {
     itemViewer: `//div[contains(@id,'DeleteItemViewer']`,
     dependantListUl: "//ul[contains(@id,'DialogWithRefsDependantList')]",
     dependantsHeader: "//div[@class='dependants-header']/span[@class='dependants-title']",
+    logMessageLink: "//div[contains(@class,'content-dialog-sub-title')]/a",
+    archiveLogInput: "//input[contains(@id,'AutosizeTextInput')]",
     itemToDeleteByDisplayName: displayName => {
         return `//div[contains(@id,'NamesAndIconView') and descendant::span[contains(@class,'display-name') and contains(.,'${displayName}')]]`
     },
@@ -25,6 +27,14 @@ const XPATH = {
 
 // it appears when select a content and click on  'Delete' button on the toolbar
 class DeleteContentDialog extends Page {
+
+    get logMessageLink() {
+        return XPATH.container + XPATH.logMessageLink;
+    }
+
+    get archiveLogInput() {
+        return XPATH.container + XPATH.archiveLogInput;
+    }
 
     get dependentsHeader() {
         return XPATH.container + XPATH.dependantsHeader;
@@ -58,15 +68,32 @@ class DeleteContentDialog extends Page {
         return XPATH.container + lib.actionButton('Ignore inbound references');
     }
 
+    async clickOnLogMessageLinkAndShowInput() {
+        try {
+            await this.waitForElementDisplayed(this.logMessageLink, appConst.mediumTimeout);
+            return await this.clickOnElement(this.logMessageLink);
+        } catch (err) {
+            await this.handleError(`Delete Content Dialog, log message input `, 'err_log_message_input', err);
+        }
+    }
+
+    async typeTextInArchiveMessageInput(text) {
+        try {
+            return await this.typeTextInInput(this.archiveLogInput, text);
+        } catch (err) {
+            await this.handleError('Archive Content Dialog', 'err_archive_log_input', err);
+        }
+    }
+
     async waitForDialogOpened() {
         try {
             await this.waitForElementDisplayed(this.archiveButton, appConst.mediumTimeout);
             return await this.pause(500);
         } catch (err) {
-            await this.saveScreenshot(appConst.generateRandomName('err_archive_dialog'));
-            throw new Error('Archive or delete dialog is not loaded ' + err)
+            await this.handleError('Delete Content Dialog', 'err_archive_dialog_opened', err);
         }
     }
+
 
     waitForDialogClosed() {
         return this.waitForElementNotDisplayed(XPATH.container, appConst.mediumTimeout).catch(err => {
@@ -91,8 +118,7 @@ class DeleteContentDialog extends Page {
             await this.clickOnElement(this.archiveButton);
             return await this.pause(500);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_click_on_delete_dialog');
-            throw new Error("Delete Content Dialog, Archive button, screenshot:" + screenshot + ' ' + err);
+            await this.handleError('Delete Content Dialog', 'err_click_on_archive_button', err);
         }
     }
 
@@ -110,8 +136,7 @@ class DeleteContentDialog extends Page {
             await this.clickOnDeleteMenuItem();
             return await this.waitForDialogClosed();
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_click_on_delete_dialog');
-            throw new Error("Delete Content Dialog, Delete menu item, screenshot:" + screenshot + ' ' + err);
+            await this.handleError('Delete Content Dialog', 'err_click_on_delete_menu_item', err);
         }
     }
 

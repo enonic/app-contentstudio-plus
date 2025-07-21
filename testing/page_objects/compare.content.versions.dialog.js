@@ -214,6 +214,7 @@ class CompareContentVersionsDialog extends Page {
         } catch (err) {
             await this.handleError('Compare Content Versions Dialog', 'err_compare_right_dropdown', err);
         }
+
     }
 }
 

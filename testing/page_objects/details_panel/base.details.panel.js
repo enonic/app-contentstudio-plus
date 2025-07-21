@@ -152,6 +152,11 @@ class BaseDetailsPanel extends Page {
         }
     }
 
+    async isPanelVisible() {
+        let width = await this.getWindowWidth();
+        return width > 1920;
+    }
+
 }
 
 module.exports = BaseDetailsPanel;

@@ -4,6 +4,7 @@
 const Page = require('./page');
 const appConst = require('../libs/app_const');
 const lib = require('../libs/elements');
+const {Key} = require('webdriverio');
 
 const XPATH = {
     enabledContextMenuButton: name => {
@@ -32,8 +33,7 @@ class BaseBrowsePanel extends Page {
             await this.waitForElementDisplayed(this.browseToolbar, timeout);
             await this.waitForSpinnerNotVisible(timeout);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_switch');
-            throw new Error(`Error occurred in grid,  screenshot: ${screenshot} ` + err);
+            await this.handleError('Browse Panel, grid loading. ', 'err_grid', err);
         }
     }
 
@@ -41,14 +41,19 @@ class BaseBrowsePanel extends Page {
         return this.getBrowser().keys(['Alt', 'n']);
     }
 
-    hotKeyDelete() {
-        return this.getBrowser().keys(['Control', 'Delete']);
+    async hotKeyDelete() {
+        const isMacOS = (await this.getBrowserStatus()).os.name.includes('Mac');
+        const keyCombination = isMacOS ? [Key.Command, Key.Delete] : [Key.Ctrl, Key.Delete];
+        return await this.getBrowser().keys(keyCombination);
     }
 
     async hotKeyEdit() {
-        let status = await this.getBrowser().status();
-        await this.getBrowser().keys(['Control', 'e']);
-        return await this.pause(500);
+        let status = await this.getBrowserStatus();
+        if (status.os.name.includes('Mac')) {
+            return await this.getBrowser().keys([Key.Command, 'e']);
+        } else {
+            return await this.getBrowser().keys([Key.Ctrl, 'e']);
+        }
     }
 
     async clickOnSelectionControllerCheckbox() {
@@ -68,7 +73,7 @@ class BaseBrowsePanel extends Page {
             let attr = await this.getAttribute(this.selectionPanelToggler, 'class');
             return attr.includes('any-selected');
         } catch (err) {
-            return false
+            return false;
         }
     }
 
@@ -76,21 +81,16 @@ class BaseBrowsePanel extends Page {
         try {
             await this.waitForElementNotDisplayed(this.selectionPanelToggler, appConst.mediumTimeout);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName("err_selection_toggler_should_not_visible");
-            throw new Error(`Selection toggler should not be visible, screenshot: ${screenshot} ` + err);
+            await this.handleError('Selection toggle should not be visible. ', 'err_selection_toggler_should_not_visible', err);
         }
     }
 
     //Clicks on 'circle' (Show Selection tooltip)with a number and filters items in the grid:
     async clickOnSelectionToggler() {
-        try {
-            await this.waitForSelectionTogglerVisible();
-            await this.clickOnElement(this.selectionPanelToggler);
-            return await this.pause(400);
-        } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName("err_clicking_on_selection_toggler");
-            throw new Error("Selection Toggler, screenshot: " + screenshot + '' + err);
-        }
+        await this.waitForSelectionTogglerVisible();
+        await this.clickOnElement(this.selectionPanelToggler)
+            .catch(err => this.handleError('Try to click on Selection Toggle...', 'err_clicking_selection_toggle', err));
+        return await this.pause(400);
     }
 
     //Wait for Selection Controller checkBox gets 'partial', then returns true, otherwise exception will be thrown
@@ -151,11 +151,13 @@ class BaseBrowsePanel extends Page {
         }
     }
 
-    waitForEditButtonDisabled() {
-        return this.waitForElementDisabled(this.editButton, appConst.mediumTimeout).catch(err => {
-            this.saveScreenshot('err_edit_disabled_button');
-            throw Error('Edit button should be disabled, timeout: ' + appConst.mediumTimeout + 'ms' + ' ' + err)
-        })
+    async waitForEditButtonDisabled() {
+        try {
+            await this.waitForElementDisabled(this.editButton, appConst.mediumTimeout)
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_edit_disabled_button');
+            throw Error(`Edit button should be disabled screenshot: ${screenshot} ` + err);
+        }
     }
 
     async waitForEditButtonEnabled() {
@@ -164,7 +166,7 @@ class BaseBrowsePanel extends Page {
             return await this.pause(300);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_edit_button');
-            throw Error('Edit button is not enabled, screenshot: ' + screenshot + " " + err);
+            throw Error(`Edit button is not enabled, screenshot: ${screenshot} ` + err);
         }
     }
 
@@ -182,10 +184,9 @@ class BaseBrowsePanel extends Page {
         try {
             await this.waitForElementEnabled(this.editButton, appConst.mediumTimeout);
             await this.clickOnElement(this.editButton);
-            return await this.pause(500);
+            return await this.pause(1500);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_browse_panel_edit_button');
-            throw new Error('Browse Panel: Edit button is not enabled! screenshot:  ' + screenshot + ' ' + err);
+            await this.handleError('Browse toolbar, try to click on Edit button', 'err_browse_panel_edit_button', err);
         }
     }
 
@@ -295,8 +296,7 @@ class BaseBrowsePanel extends Page {
             await this.doDoubleClick(nameXpath);
             return await this.pause(1000);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_find_');
-            throw Error('Browse Panel - Row with the displayName was not found, screenshot: ' + screenshot + ' ' + err)
+            await this.handleError('Try to double click on the row by displayName: ', 'err_double_click_on_row', err)
         }
     }
 
@@ -332,6 +332,16 @@ class BaseBrowsePanel extends Page {
     async waitForProjectViewerAriaHasPopupAttribute(expectedValue) {
         let locator = lib.DIV.CONTENT_APP_BAR_DIV + lib.DIV.PROJECT_VIEWER_DIV;
         await this.waitForAttributeValue(locator, appConst.ACCESSIBILITY_ATTRIBUTES.ARIA_HAS_POPUP, expectedValue);
+    }
+
+    async clickOnDetailsPanelToggleButton() {
+        try {
+            await this.waitForElementDisplayed(this.detailsPanelToggleButton, appConst.mediumTimeout);
+            await this.clickOnElement(this.detailsPanelToggleButton);
+            return await this.pause(400);
+        } catch (err) {
+            await this.handleError('Try to click on Details Panel Toggle', 'err_click_on_details_panel_toggle', err);
+        }
     }
 }
 
