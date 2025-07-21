@@ -4,6 +4,7 @@
 const lib = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
 const BaseBrowsePanel = require('../../page_objects/base.browse.panel');
+const ArchiveContextPanel = require('../browsepanel/detailspanel/archive.context.panel');
 
 const XPATH = {
     container: "//div[contains(@id,'ArchiveBrowsePanel')]",
@@ -52,6 +53,10 @@ class ArchiveBrowsePanel extends BaseBrowsePanel {
         return XPATH.container + XPATH.archiveTreeRootListUL;
     }
 
+    get detailsPanelToggleButton() {
+        return XPATH.container + lib.DETAILS_PANEL_TOGGLE_BUTTON;
+    }
+
     get selectionControllerCheckBox() {
         return XPATH.container + XPATH.listBoxToolbar + XPATH.selectionControllerCheckBox;
     }
@@ -86,8 +91,7 @@ class ArchiveBrowsePanel extends BaseBrowsePanel {
             await this.clickOnElement(this.restoreButton);
             return await this.pause(1100);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_restore_btn');
-            throw new Error('error when click on expander-icon, screenshot ' + screenshot + ' ' + err);
+            await this.handleError('Archive Browse Panel', 'err_restore_btn', err);
         }
     }
 
@@ -112,8 +116,7 @@ class ArchiveBrowsePanel extends BaseBrowsePanel {
             console.log("waitForContentDisplayed, timeout is:" + timeout);
             return await this.waitForElementDisplayed(this.treeGrid + lib.itemByName(contentName), timeout);
         } catch (err) {
-            let screenshot = this.saveScreenshotUniqueName('err_content');
-            throw new Error('content is not displayed ! ' + screenshot + "  " + err);
+            await this.handleError('Archive Browse Panel', 'err_wait_for_content_displayed', err);
         }
     }
 
@@ -124,11 +127,9 @@ class ArchiveBrowsePanel extends BaseBrowsePanel {
             await this.clickOnElement(nameXpath);
             return await this.pause(600);
         } catch (err) {
-            let screenshot = this.saveScreenshotUniqueName('err_content');
-            throw Error('Row with the content was not found' + screenshot + '  ' + err)
+            await this.handleError('Archive Browse Panel', 'err_click_on_row_by_display_name', err);
         }
     }
-
 
     async waitForContentByDisplayNamePresent(displayName) {
         try {
@@ -145,8 +146,7 @@ class ArchiveBrowsePanel extends BaseBrowsePanel {
             let selector = this.treeGrid + lib.itemByName(contentName);
             return await this.waitForElementNotDisplayed(selector, appConst.mediumTimeout);
         } catch (err) {
-            let screenshot = this.saveScreenshotUniqueName('err_content');
-            throw new Error("The content is still displayed, screenshot :" + screenshot + ' ' + err);
+            await this.handleError('Archive Browse Panel', 'err_wait_for_content_not_displayed', err);
         }
     }
 
@@ -174,8 +174,7 @@ class ArchiveBrowsePanel extends BaseBrowsePanel {
             await this.doRightClick(nameXpath);
             return await this.waitForContextMenuDisplayed();
         } catch (err) {
-            await this.saveScreenshotUniqueName('err_context_menu');
-            throw new Error(`Error occurred after right click on the row:` + err);
+            await this.handleError('Archive Browse Panel', 'err_right_click_on_item', err);
         }
     }
 
@@ -197,8 +196,7 @@ class ArchiveBrowsePanel extends BaseBrowsePanel {
             await this.clickOnElement(checkboxElement);
             return await this.pause(200);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_find_item');
-            throw new Error(`Row with the displayName ${displayName} was not found. Screenshot:${screenshot} ` + err);
+            await this.handleError('Archive Browse Panel', 'err_checkbox_select_item', err);
         }
     }
 
@@ -222,8 +220,7 @@ class ArchiveBrowsePanel extends BaseBrowsePanel {
             await this.waitForRowCheckboxSelected(name);
             await this.pause(200);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_select_item');
-            throw Error(`Row with the name  was not selected, screenshot:${screenshot} ` + err)
+            await this.handleError('Archive Browse Panel', 'err_select_item', err);
         }
     }
 
@@ -242,6 +239,17 @@ class ArchiveBrowsePanel extends BaseBrowsePanel {
             let isSelected = await checkboxElement.isSelected();
             return isSelected;
         }, {timeout: appConst.mediumTimeout, timeoutMsg: "Checkbox is not selected"});
+    }
+
+    async openDetailsPanel() {
+        let archiveContextPanel = new ArchiveContextPanel();
+        let result = await archiveContextPanel.isPanelVisible();
+        if (!result) {
+            await this.clickOnDetailsPanelToggleButton();
+        }
+        await archiveContextPanel.waitForDetailsPanelLoaded();
+        await archiveContextPanel.waitForSpinnerNotVisible(appConst.TIMEOUT_5);
+        await this.pause(500);
     }
 }
 

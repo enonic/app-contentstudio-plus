@@ -11,6 +11,8 @@ const DeleteContentDialog = require('../page_objects/delete.content.dialog');
 const ArchiveBrowsePanel = require('../page_objects/archive/archive.browse.panel');
 const ArchiveRestoreDialog = require('../page_objects/archive/archive.restore.dialog');
 const ArchiveDeleteDialog = require('../page_objects/archive/archive.delete.dialog');
+const ArchiveBrowseContextPanel = require('../page_objects/archive/archive.browse.context.panel');
+const ArchivedContentVersionsWidget = require('../page_objects/archive/archived.content.versions.widget');
 
 describe('archive.content.spec: tests for archiving content', function () {
     this.timeout(appConst.SUITE_TIMEOUT);
@@ -23,6 +25,7 @@ describe('archive.content.spec: tests for archiving content', function () {
     let FOLDER2;
     const ARCHIVE_DELETE_TITLE = 'Delete from Archive';
     const ARCHIVE_RESTORE_TITLE = 'Restore from Archive';
+    const TEST_ARCHIVE_LOG_MSG= 'test';
 
     it(`Precondition: new folder should be added`,
         async () => {
@@ -45,6 +48,8 @@ describe('archive.content.spec: tests for archiving content', function () {
             await contentBrowsePanel.clickOnArchiveButton();
             await deleteContentDialog.waitForDialogOpened();
             await studioUtils.saveScreenshot('folder_to_archive1');
+            await deleteContentDialog.clickOnLogMessageLinkAndShowInput();
+            await deleteContentDialog.typeTextInArchiveMessageInput(TEST_ARCHIVE_LOG_MSG);
             // 3. Click on 'Archive' button in the modal dialog:
             await deleteContentDialog.clickOnArchiveButton();
             // 4. Verify that the content is not displayed in Content Browse Panel:
@@ -105,7 +110,7 @@ describe('archive.content.spec: tests for archiving content', function () {
             let message = await contentBrowsePanel.waitForNotificationMessage();
             await studioUtils.saveScreenshot('folder_to_restore_notification');
             let expectedMessage = appConst.itemIsRestored(FOLDER2.displayName);
-            assert.equal(message, expectedMessage, "Expected notification message should appear");
+            assert.equal(message, expectedMessage, 'Expected notification message should appear');
             await archiveBrowsePanel.waitForContentNotDisplayed(FOLDER2.displayName);
             // 5. Verify the content is present in Content Browse Panel
             await studioUtils.switchToContentMode();
@@ -113,7 +118,26 @@ describe('archive.content.spec: tests for archiving content', function () {
             await studioUtils.findContentAndClickCheckBox(FOLDER2.displayName);
         });
 
-    it(`GIVEN existing archived folder is selected  WHEN 'Delete Archive Dialog' button has been opened THEN expected title and items should be displayed on the dialog`,
+    // Enable providing a message when archiving content #8878
+    it(`GIVEN existing archived folder is selected WHEN 'Versions Widget' has been opened THEN the log message should be displayed in the archived-item in the Versions Widget`,
+        async () => {
+            let archiveDeleteDialog = new ArchiveDeleteDialog();
+            let archiveBrowsePanel = new ArchiveBrowsePanel();
+            let archiveBrowseContextPanel = new ArchiveBrowseContextPanel()
+            let archivedContentVersionsWidget = new ArchivedContentVersionsWidget();
+            // 1. Go to 'Archive Browse Panel' :
+            await studioUtils.openArchivePanel();
+            await archiveBrowsePanel.clickCheckboxAndSelectRowByDisplayName(FOLDER1.displayName);
+            await archiveBrowsePanel.openDetailsPanel();
+            // 2. Open Versions widget:
+            await archiveBrowseContextPanel.openVersionHistory();
+            await studioUtils.saveScreenshot('archived_message_versions_widget');
+            // 3. Verify that the log message is displayed in the archived item in the Versions Widget:
+            let result = await archivedContentVersionsWidget.getLogMessageFromArchivedItems();
+            assert.strictEqual(result[0], TEST_ARCHIVE_LOG_MSG, 'Expected log message should be displayed in the archived item in the Versions Widget');
+        });
+
+    it(`GIVEN existing archived folder is selected WHEN 'Delete Archive Dialog' button has been opened THEN expected title and items should be displayed on the dialog`,
         async () => {
             let archiveDeleteDialog = new ArchiveDeleteDialog();
             let archiveBrowsePanel = new ArchiveBrowsePanel();
