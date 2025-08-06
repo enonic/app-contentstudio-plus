@@ -1,5 +1,5 @@
 /**
- * Created on 05.01.2023
+ * Created on 05.01.2023 updated 06.08.2025
  */
 const assert = require('node:assert');
 const webDriverHelper = require('../libs/WebDriverHelper');
@@ -12,7 +12,7 @@ const appConst = require('../libs/app_const');
 const ConfirmValueDialog = require('../page_objects/confirm.content.delete.dialog');
 const ContentPublishDialog = require('../page_objects/content.publish.dialog');
 
-describe('layers.content.tree.dialog.spec - tests for Layers Content Tree modal dialog', function () {
+describe('layers.content.tree.widget.spec - tests for Layers  Tree  in the widget', function () {
     this.timeout(appConst.SUITE_TIMEOUT);
     // setup standalone mode if WDIO is not defined:
     if (typeof browser === 'undefined') {
@@ -55,28 +55,25 @@ describe('layers.content.tree.dialog.spec - tests for Layers Content Tree modal 
             await settingsBrowsePanel.waitForNotificationMessage();
         });
 
-    it(`GIVEN existing folder is selected in the layer WHEN 'Show All' button has been clicked THEN 'Layers Tree' dialog should be loaded`,
+    it(`GIVEN existing folder is selected in the layer WHEN Layers widget has been opened THEN 3 layers should be displayed`,
         async () => {
             let contentBrowsePanel = new ContentBrowsePanel();
             await studioUtils.switchToContentMode();
-            // 1. Open modal dialog and select the layer's context:
+            // 1. select the layer's context:
             await contentBrowsePanel.selectContext(LAYER1_DISPLAY_NAME);
             // 2. Select the folder and open Layers widget:
             await studioUtils.findAndSelectItem(TEST_FOLDER_DISPLAY_NAME);
             let browseLayersWidget = await studioUtils.openLayersWidgetInBrowsePanel();
-            let layersContentTreeDialog = await browseLayersWidget.clickOnShowAllButton();
-            await studioUtils.saveScreenshot('layers_tree_dialog_1');
-            // 3. Verify the title:
-            let title = await layersContentTreeDialog.getTitle();
-            assert.equal(TEST_FOLDER_DISPLAY_NAME, title, 'Expected title should be in the modal dialog');
-            let layers = await layersContentTreeDialog.getLayersName();
-            // 4. Verify that all items are present in the Layers Tree:
+            await studioUtils.saveScreenshot('layers_widget_1');
+            // 3. Verify  all items in the widget:
+            let layers = await browseLayersWidget.getLayersName();
+            // 4. Verify that parent project and 2 its layers are displayed in the Layers Tree:
             assert.equal(layers[0], PROJECT_DISPLAY_NAME, 'Expected project should be present in the tree layers');
             assert.equal(layers[1], LAYER1_DISPLAY_NAME, 'The first layer should be present in the tree layers');
             assert.equal(layers[2], LAYER2_DISPLAY_NAME, 'The second layer should be present in the tree layers');
         });
 
-    it(`GIVEN 'Layers Tree' modal dialog is opened WHEN site layer-item has been clicked in the modal dialog THEN 'Localize' button gets visible`,
+    it(`GIVEN layer1 context is selected WHEN inherited folder has been selected AND parent project item has been clicked in the widget THEN 'Open' button gets visible in the widget`,
         async () => {
             let contentBrowsePanel = new ContentBrowsePanel();
             await studioUtils.switchToContentMode();
@@ -84,14 +81,14 @@ describe('layers.content.tree.dialog.spec - tests for Layers Content Tree modal 
             // 1. Select the folder and open Layers widget:
             await studioUtils.findAndSelectItem(TEST_FOLDER_DISPLAY_NAME);
             let browseLayersWidget = await studioUtils.openLayersWidgetInBrowsePanel();
-            let layersContentTreeDialog = await browseLayersWidget.clickOnShowAllButton();
-            await layersContentTreeDialog.clickOnLayerByName(PROJECT_DISPLAY_NAME);
-            await studioUtils.saveScreenshot('layers_tree_dialog_2');
-            let buttonLabel = await layersContentTreeDialog.getButtonLabelInItemView(PROJECT_DISPLAY_NAME);
-            assert.equal(buttonLabel, 'Open', `'Open' button gets visible in the modal dialog`);
+            // 2. Click on parent project-item in the widget:
+            await browseLayersWidget.clickOnWidgetItem(PROJECT_DISPLAY_NAME);
+            await studioUtils.saveScreenshot('layers_tree_widget_2');
+            // 3. Verify that 'Open' button should be displayed for its parent project-item:
+            await browseLayersWidget.waitForOpenButtonEnabled(PROJECT_DISPLAY_NAME);
         });
 
-    it(`GIVEN inherited content is selected AND 'Layers Tree dialog' is opened WHEN layer-item for the current layer has been clicked in the dialog THEN 'Localise' button gets visible in the tree list item`,
+    it(`GIVEN layer1 context is selected WHEN inherited folder has been selected THEN layer-item for the current layer gets expanded in the widgets AND 'Localise' button gets visible for the layer-item`,
         async () => {
             let contentBrowsePanel = new ContentBrowsePanel();
             await studioUtils.switchToContentMode();
@@ -100,46 +97,36 @@ describe('layers.content.tree.dialog.spec - tests for Layers Content Tree modal 
             // 2. Select the folder and open Layers widget:
             await studioUtils.findAndSelectItem(TEST_FOLDER_DISPLAY_NAME);
             let browseLayersWidget = await studioUtils.openLayersWidgetInBrowsePanel();
-            let layersContentTreeDialog = await browseLayersWidget.clickOnShowAllButton();
-            // 3. Click and expand the list item:
-            await layersContentTreeDialog.clickOnLayerByName(LAYER1_DISPLAY_NAME);
-            await studioUtils.saveScreenshot('layers_tree_dialog_2');
-            // 4. Verify that 'Localize' button is present in the tree item:
-            let buttonLabel = await layersContentTreeDialog.getButtonLabelInItemView(LAYER1_DISPLAY_NAME);
-            assert.equal(buttonLabel, 'Localize', `'Localize' button gets visible in the tree list item`);
+            await studioUtils.saveScreenshot('layers_tree_widget_3');
+            // 3. Verify that 'Localize' button should be displayed after selecting the folder in the current layer's context:
+            await browseLayersWidget.waitForLocalizeButtonEnabled(LAYER1_DISPLAY_NAME);
         });
 
-    // Verify the bug - Layers widget shows incorrect content status in parent project #8425
-    // https://github.com/enonic/app-contentstudio/issues/8425
-    // https://github.com/enonic/app-contentstudio-plus/issues/1414
-    it(`GIVEN inherited content has been published WHEN 'Layers Tree dialog' has been opened THEN the only inherited content should be displayed as published`,
+    it(`WHEN layer1 context is selected AND inherited content has been published THEN only inherited content should be displayed as published in the widget`,
         async () => {
             let contentBrowsePanel = new ContentBrowsePanel();
             let contentPublishDialog = new ContentPublishDialog();
             await studioUtils.switchToContentMode();
-            // 1. Open modal dialog and select the layer's context:
+            // 1. Go to layer1:
             await contentBrowsePanel.selectContext(LAYER1_DISPLAY_NAME);
+            // 2. Publish  the inherited content:
             await studioUtils.findAndSelectItem(TEST_FOLDER_DISPLAY_NAME);
             await contentBrowsePanel.clickOnMarkAsReadyButton();
-
             await contentPublishDialog.waitForDialogOpened();
             await contentPublishDialog.clickOnPublishNowButton();
             await contentBrowsePanel.waitForNotificationMessage();
-            // 2. open Layers widget:
+            // 3. open Layers widget:
             let browseLayersWidget = await studioUtils.openLayersWidgetInBrowsePanel();
-            let layersContentTreeDialog = await browseLayersWidget.clickOnShowAllButton();
-            // 3. Click and expand the list item:
-            await layersContentTreeDialog.clickOnLayerByName(LAYER1_DISPLAY_NAME);
-            await studioUtils.saveScreenshot('layers_tree_dialog_published_inherited_content');
-            // 4. Verify the statuses for the content in the layer and parent project:
-            let actualStatus = await layersContentTreeDialog.getContentStatus(LAYER1_DISPLAY_NAME);
-            assert.equal(actualStatus[0], 'Published', `'Published' status should be displayed for content in the layer`);
+            // 4. Verify that 'Published' status should be displayed for the inherited content in the layer-item:
+            let actualStatus = await browseLayersWidget.getContentStatus(LAYER1_DISPLAY_NAME);
+            assert.equal(actualStatus, 'Published', `'Published' status should be displayed for inherited content in layer-item`);
+            // 5. Verify that 'New' status should be displayed for the content in parent project-item:
+            let actualStatusParent = await browseLayersWidget.getContentStatus(PROJECT_DISPLAY_NAME);
+            assert.equal(actualStatusParent, 'New', `'New' status should be displayed for content in parent project-item`);
 
-            let actualStatusParent = await layersContentTreeDialog.getContentStatus(PROJECT_DISPLAY_NAME);
-            assert.equal(actualStatusParent[0], 'New', `'New' status should be displayed for parent content`);
         });
 
-    it(`GIVEN the local copy of inherited folder is selected WHEN Layers widget has been opened THEN only one item with button 'Edit' should be present in the widget`,
+    it(`GIVEN the local copy of inherited folder is selected WHEN Layers widget has been opened THEN 2 layer-items should be displayed in the widget AND current layer should be selected in the widget AND 'Edit' button should be visible`,
         async () => {
             let contentBrowsePanel = new ContentBrowsePanel();
             await studioUtils.switchToContentMode();
@@ -154,12 +141,11 @@ describe('layers.content.tree.dialog.spec - tests for Layers Content Tree modal 
             await studioUtils.findAndSelectItem(TEST_FOLDER_DISPLAY_NAME + '-copy');
             let browseLayersWidget = await studioUtils.openLayersWidgetInBrowsePanel();
             await studioUtils.saveScreenshot('layers_widget_local_copy_of_folder');
-            // 4.Verify that only one item with button 'Edit' should be present in the widget:
+            // 4.Verify that 2 layers items with button 'Edit' should be present in the widget:
             let layers = await browseLayersWidget.getLayersName();
-            assert.equal(layers.length, 1, 'Only one widget-item should be present in the widget');
+            assert.equal(layers.length, 2, '2  layers-items should be present in the widget');
+            // 5. Verify that the current layer is selected in the widget and 'Edit' button gets visible:
             await browseLayersWidget.waitForEditButtonEnabled(LAYER1_DISPLAY_NAME);
-            // 5. Verify that 'Show All' button is displayed in the widget, because one more layer was created
-            await browseLayersWidget.waitForShowAllButtonDisplayed();
         });
 
     it('WHEN children layers have been sequentially removed THEN parent project can be deleted',

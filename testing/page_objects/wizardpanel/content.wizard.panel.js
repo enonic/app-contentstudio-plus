@@ -19,7 +19,7 @@ const PropertiesWidget = require('../browsepanel/detailspanel/properties.widget.
 const EditSettingsDialog = require('../details_panel/edit.settings.dialog');
 const PageDescriptorDropdown = require('../components/selectors/page.descriptor.dropdown');
 const WizardLayersWidget = require('../wizardpanel/details/wizard.layers.widget');
-const WizardDetailsPanel = require('../wizardpanel/details/wizard.details.panel');
+
 
 const XPATH = {
     container: `//div[contains(@id,'ContentWizardPanel')]`,
