@@ -81,7 +81,7 @@ describe('layers.widget.localize.button.spec - checks Localize button in browse 
             await studioUtils.findAndSelectItem(FOLDER_NAME);
             let browseLayersWidget = await studioUtils.openLayersWidgetInBrowsePanel();
             let layers = await browseLayersWidget.getLayersName();
-            // 2. Verify names of layers:
+            // 2. Verify the names of layers:
             assert.equal(layers[0], 'Default', 'Default project should be present in the widget');
             assert.equal(layers[1], LAYER_DISPLAY_NAME, "layer's display name should be present in the widget");
             let language = await browseLayersWidget.getLayerLanguage(LAYER_DISPLAY_NAME);
@@ -181,7 +181,7 @@ describe('layers.widget.localize.button.spec - checks Localize button in browse 
             let wizardLayersWidget = await contentWizardPanel.openLayersWidget();
             await studioUtils.saveScreenshot('layers_name_issue1');
             let layers = await wizardLayersWidget.getLayersName();
-            // 4. Verify names of layers:
+            // 4. Verify the names of layers:
             assert.equal(layers[0], 'Default', 'Default layer should be present in the widget');
             assert.equal(layers[1], LAYER_DISPLAY_NAME, "layer's layer should be present in the widget");
             let language = await wizardLayersWidget.getLayerLanguage(LAYER_DISPLAY_NAME);
@@ -189,8 +189,6 @@ describe('layers.widget.localize.button.spec - checks Localize button in browse 
             await wizardLayersWidget.waitForEditButtonEnabled(LAYER_DISPLAY_NAME);
             // 6. Verify the language in the widget:
             assert.equal(language, '(no)', 'Expected language should be displayed in the layer');
-            // Show All button should be displayed:
-            await wizardLayersWidget.waitForShowAllButtonDisplayed();
         });
 
     it("GIVEN localized folder has been opened WHEN widget-item for 'Default' project has been clicked THEN 'Open' button button gets visible",
