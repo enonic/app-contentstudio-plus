@@ -1,4 +1,5 @@
 import {ListBox} from '@enonic/lib-admin-ui/ui/selector/list/ListBox';
+import {ProjectContext} from 'lib-contentstudio/app/project/ProjectContext';
 import {LayerContent} from './LayerContent';
 import {LayerContentViewDataBlock} from './LayerContentViewDataBlock';
 import {LayerContentView} from './LayerContentView';
@@ -46,6 +47,11 @@ export class LayersContentTreeList
             this.activeItemView = itemView;
             this.activeItemView.addClass('expanded');
         });
+
+        if (item.getProject().getName() === ProjectContext.get().getProject().getName()) {
+            this.activeItemView = itemView;
+            this.activeItemView.addClass('expanded');
+        }
 
         return itemView;
     }
