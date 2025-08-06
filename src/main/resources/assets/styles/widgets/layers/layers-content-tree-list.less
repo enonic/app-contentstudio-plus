@@ -1,0 +1,39 @@
+.layers-content-tree-list {
+  .level(@level: 0) {
+    margin-left: 15px * @level;
+  }
+
+  margin: 4px 8px;
+
+  .layers-item-view-data {
+    margin-bottom: 10px;
+
+    &.level-1 {
+      .level(1);
+    }
+
+    &.level-2 {
+      .level(2);
+    }
+
+    &.level-3 {
+      .level(3);
+    }
+
+    &.level-4 {
+      .level(4);
+    }
+
+    &.level-5 {
+      .level(5);
+    }
+
+    &.level-6 {
+      .level(6);
+    }
+
+    &.level-7 {
+      .level(7);
+    }
+  }
+}
