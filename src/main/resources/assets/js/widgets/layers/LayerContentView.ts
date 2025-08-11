@@ -7,24 +7,28 @@ import {LayerContentViewRelation} from './LayerContentViewRelation';
 
 export class LayerContentView extends LiEl {
 
-    static VIEW_CLASS = 'layers-item-view';
+    private static VIEW_CLASS = 'layers-item-view';
 
     private readonly item: LayerContent;
+
+    private readonly level: number;
 
     private dataBlock: LayerContentViewDataBlock;
 
     private relationBlock: LayerContentViewRelation;
 
-    constructor(layerContent: LayerContent) {
+    constructor(layerContent: LayerContent, level: number) {
         super(LayerContentView.VIEW_CLASS);
 
         this.item = layerContent;
+        this.level = level;
 
         this.initElements();
     }
 
     doRender(): Q.Promise<boolean> {
         return super.doRender().then((rendered) => {
+            this.addClass(`level-${this.level}`);
             this.appendChild(this.relationBlock);
             this.appendChild(this.dataBlock);
 
@@ -38,6 +42,10 @@ export class LayerContentView extends LiEl {
 
     hasItem(): boolean {
         return this.item.hasItem();
+    }
+
+    getLevel(): number {
+        return this.level;
     }
 
     getRelationBlock(): DivEl {
