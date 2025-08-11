@@ -1,11 +1,28 @@
+import {ProjectContext} from 'lib-contentstudio/app/project/ProjectContext';
+import {Project} from 'lib-contentstudio/app/settings/data/project/Project';
 import {LayerContent} from './LayerContent';
+import {ProjectsChainBlock} from 'lib-contentstudio/app/settings/wizard/panel/form/element/ProjectsChainBlock';
 
 export class LayersContentTreeListHelper {
 
     private layerContents: LayerContent[];
 
+    private projects: Project[];
+
+    private currentProjectChain: Project[];
+
+    private currentProject: string;
+
     setItems(items: LayerContent[]): void {
         this.layerContents = items;
+        this.projects = this.layerContents.map(lc => lc.getProject());
+
+        const currentProjectName = ProjectContext.get().getProject().getName();
+
+        if (currentProjectName !== this.currentProject) {
+            this.currentProject = currentProjectName;
+            this.currentProjectChain = ProjectsChainBlock.buildProjectsChain(this.currentProject, items.map(lc => lc.getProject()));
+        }
     }
 
     toFlatTree(): LayerContent[] {
@@ -66,6 +83,18 @@ export class LayersContentTreeListHelper {
 
     private getRootItems(): LayerContent[] {
         return this.layerContents.filter((item: LayerContent) => this.calcLevel(item) === 0);
+    }
+
+    isCurrentProject(item: LayerContent): boolean {
+        return item.getProject().getName() === ProjectContext.get().getProject().getName();
+    }
+
+    isFromCurrentProjectTree(item: LayerContent): boolean {
+        const itemProjectName = item.getProject().getName();
+
+        const projChain = ProjectsChainBlock.buildProjectsChain(item.getProject().getName(), this.projects);
+        return projChain.some((p) => p.getName() === this.currentProject) ||
+               this.currentProjectChain.some((p) => p.getName() === itemProjectName);
     }
 
 }
