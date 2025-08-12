@@ -1,41 +1,39 @@
-import org.codehaus.groovy.runtime.MethodClosure
-
-def isLibAdminUiIncluded()
-{
-    return new File( "$rootDir/../lib-admin-ui" ).exists()
+// Cache expensive file system check
+def libAdminUiExists = providers.provider {
+    new File("$rootDir/../lib-admin-ui").exists()
 }
 
-def hasLibAdminUi()
-{
-    return hasEnvironment() && isLibAdminUiIncluded()
-}
+def applyResourcesTaskDependencies() {
+    def libAdminBuild = gradle.includedBuild('lib-admin-ui')
+    def libAdminDevJarTask = libAdminBuild.task(':devJar')
+    def libAdminBuildTask = libAdminBuild.task(':build')
+    def libAdminCleanTask = libAdminBuild.task(':clean')
 
-def hasFlushTask()
-{
-    return project.tasks.hasProperty( 'flush' )
-}
+    tasks.matching { it.name == 'copyDevResources' }.configureEach {
+        dependsOn libAdminDevJarTask
+    }
 
-if ( hasLibAdminUi() )
-{
-    def libAdminUi = gradle.includedBuild( 'lib-admin-ui' )
+    tasks.named('build').configure {
+        dependsOn libAdminBuildTask
+    }
 
-    ext {
-        libAdminBuildTask = libAdminUi.task( ':build' )
-        libAdminCleanTask = libAdminUi.task( ':clean' )
-        libAdminFlushTask = libAdminUi.task( ':flush' )
+    tasks.named('clean').configure {
+        dependsOn libAdminCleanTask
     }
 }
 
-ext {
-    hasLibAdminUi = this.&hasLibAdminUi as MethodClosure
-    isLibAdminUiIncluded = this.&isLibAdminUiIncluded as MethodClosure
+println "hasEnvironment: ${hasEnvironment()}"
+if ( hasEnvironment() && libAdminUiExists.get() )
+{
+    println "after evaluate"
+    afterEvaluate {
+        applyResourcesTaskDependencies()
+    }
 }
 
-if ( !hasFlushTask() )
-{
-    tasks.register('flush', Delete) {
-        dependsOn( 'clean' )
-        description = 'Clean the project from built sources and dependencies'
+// Configure clean task to also remove .xp directory
+afterEvaluate {
+    tasks.matching { it.name == 'clean' }.configureEach {
         delete '.xp'
     }
 }

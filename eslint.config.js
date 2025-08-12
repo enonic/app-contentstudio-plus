@@ -13,7 +13,7 @@ module.exports = [
             },
             globals: {
                 ...globals.browser,
-                ...globals.es6,
+                ...globals.es2023,
             },
         },
         plugins: {

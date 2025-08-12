@@ -8,18 +8,26 @@
     "url": "https://github.com/enonic/app-contentstudio-plus"
   },
   "scripts": {
+    "_build": "pnpm build:dev",
+    "_build:prod": "pnpm --color /^build:prod:.*$/",
+    "_build:prod:js": "tsc --pretty",
+    "_build:prod:lib": "cross-env BUILD_TARGET=js vite build --mode production",
+    "_build:prod:css": "cross-env BUILD_TARGET=css vite build --mode production",
+    "_build:dev": "pnpm --color /^build:dev:.*$/",
+    "_build:dev:lib": "cross-env BUILD_TARGET=js vite build --mode development",
+    "_build:dev:css": "cross-env BUILD_TARGET=css vite build --mode development",
+    "_build:dev:js": "tsc --pretty --inlineSourceMap --inlineSources",
     "build": "webpack --color",
-    "lint": "eslint src/**/*.ts --cache",
-    "lint:quiet": "eslint --quiet src/**/*.ts --cache",
-    "fix": "eslint --fix **/*.ts",
-    "postinstall": "cd node_modules/lib-contentstudio && npm install"
+    "check": "pnpm /^check:*$/",
+    "check:type": "tsc --noEmit",
+    "check:lint": "eslint . --quiet --cache",
+    "fix": "eslint --fix **/*.ts"
   },
   "dependencies": {
     "@enonic/lib-admin-ui": "file:.xp/dev/lib-admin-ui",
     "jquery": "^3.7.1",
     "jquery-ui": "^1.14.1",
     "lib-contentstudio": "file:.xp/dev/lib-contentstudio",
-    "normalize-url": "^8.0.2",
     "q": "^1.5.1"
   },
   "devDependencies": {
@@ -55,8 +63,14 @@
   "browserslist": [
     "extends browserslist-config-enonic"
   ],
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@swc/core"
+    ]
+  },
   "engines": {
-    "node": ">= 22.16.0",
-    "npm": ">= 10.9.2"
+    "node": ">=22.18.0",
+    "pnpm": ">= 10.14.0",
+    "npm": ">=10.9.3"
   }
 }

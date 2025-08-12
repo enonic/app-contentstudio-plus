@@ -1,9 +1,9 @@
 plugins {
     id 'java'
     id 'maven-publish'
-    id 'com.enonic.defaults' version '2.1.5'
-    id 'com.enonic.xp.app' version '3.6.1'
-    id "com.github.node-gradle.node" version '7.1.0'
+    alias(libs.plugins.enonic.defaults)
+    alias(libs.plugins.enonic.xp.app)
+    alias(libs.plugins.node.gradle)
 }
 
 apply from: "$rootDir/gradle/env.gradle"
@@ -23,10 +23,10 @@ subprojects {
         toolchain {
             languageVersion = JavaLanguageVersion.of(21)
         }
-    }
 
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = sourceCompatibility
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = sourceCompatibility
+    }
 
     repositories {
         mavenLocal()
@@ -44,7 +44,7 @@ configurations {
 }
 
 app {
-    name = project.appName
+    name = 'com.enonic.app.contentstudio.plus'
     displayName = 'Content Studio +'
     vendorName = 'Enonic AS'
     vendorUrl = 'https://enonic.com'
@@ -55,17 +55,19 @@ app {
 
 dependencies {
     implementation "com.enonic.xp:core-api:${xpVersion}"
-    include "com.enonic.xp:lib-portal:${xpVersion}"
-    include "com.enonic.xp:lib-io:${xpVersion}"
+    include "com.enonic.xp:lib-admin:${xpVersion}"
+    include "com.enonic.xp:lib-auth:${xpVersion}"
     include "com.enonic.xp:lib-content:${xpVersion}"
     include "com.enonic.xp:lib-context:${xpVersion}"
     include "com.enonic.xp:lib-i18n:${xpVersion}"
-    include "com.enonic.xp:lib-admin:${xpVersion}"
-    include "com.enonic.xp:lib-auth:${xpVersion}"
+    include "com.enonic.xp:lib-io:${xpVersion}"
+    include "com.enonic.xp:lib-portal:${xpVersion}"
+    include libs.lib.mustache
+    include libs.lib.license
+
     include "com.enonic.lib:lib-admin-ui:${libAdminUiVersion}"
     include "com.enonic.lib:lib-contentstudio:${libContentStudioVersion}"
-    include "com.enonic.lib:lib-mustache:${libMustacheVersion}"
-    include "com.enonic.lib:lib-license:3.2.0-SNAPSHOT"
+
     devResources "com.enonic.lib:lib-admin-ui:${libAdminUiVersion}"
     devResources "com.enonic.lib:lib-contentstudio:${libContentStudioVersion}"
 }
@@ -76,42 +78,22 @@ repositories {
     xp.enonicRepo('dev')
 }
 
-configurations.all {
-    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
-}
-
-node {
-    download = true
-    version = '22.16.0'
-}
-
-tasks.register('copyDevResources') {
-    doLast {
-        copy {
-            from configurations.devResources.files.collect { zipTree( it ) }
-            include 'dev/**'
-            into '.xp'
-        }
-    }
-}
-
-npmInstall.dependsOn copyDevResources
-
-tasks.register('lint', NpmTask) {
-    dependsOn npmInstall
+tasks.register('lint', PnpmTask) {
+    dependsOn tasks.named('pnpmInstall')
     args = [ 'run', 'lint:quiet' ]
     inputs.files fileTree( dir: 'modules', include: '**/src/main/**.*' )
     outputs.dir file('gradle')
     outputs.upToDateWhen { false }
 }
 
-check.configure {
-    dependsOn( 'lint' )
+tasks.named('check').configure {
+    // dependsOn tasks.named('typecheck')
+    dependsOn tasks.named('lint')
 }
 
-tasks.register('webpack', NpmTask) {
-    dependsOn( 'npmInstall', 'javadoc' )
-    environment = [ 'NODE_ENV': nodeEnvironment() ]
+tasks.register('webpack', PnpmTask) {
+    dependsOn tasks.named('pnpmInstall')
+    dependsOn tasks.named('javadoc')
     description = 'Build UI resources (ts, css, etc).'
     args = [ 'run', 'build' ]
     inputs.dir '.xp/dev'
@@ -120,39 +102,12 @@ tasks.register('webpack', NpmTask) {
     outputs.dir "${buildDir}/resources/main"
 }
 
-jar {
+tasks.named('jar').configure {
     exclude 'assets/**/*.ts'
     exclude 'assets/**/*.less'
     exclude 'assets/img/**'
     exclude 'assets/styles/html-editor.*'
     exclude 'assets/styles/contentlib.*'
 
-    if (isProd()) {
-        exclude 'assets/**/*.map'
-    }
-
-    dependsOn( 'webpack' )
-}
-
-if ( hasEnvironment() )
-{
-    addBuildDependency()
-}
-
-def addBuildDependency() {
-    if ( isLibAdminUiIncluded() )
-    {
-        copyDevResources.dependsOn += libAdminBuildTask
-        build.dependsOn += libAdminBuildTask
-        clean.dependsOn += libAdminCleanTask
-        flush.dependsOn += libAdminFlushTask
-    }
-
-    if ( isLibContentStudioIncluded() )
-    {
-        copyDevResources.dependsOn += libContentStudioBuildTask
-        build.dependsOn += libContentStudioBuildTask
-        clean.dependsOn += libContentStudioCleanTask
-        flush.dependsOn += libContentStudioFlushTask
-    }
+    dependsOn tasks.named('webpack')
 }

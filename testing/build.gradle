@@ -32,6 +32,8 @@ dependencies {
 }
 
 tasks.register( 'unpackDistro', Copy ) {
+    description = 'Unpacks the XP distribution for testing'
+    group = 'setup'
     from {
         configurations.distro.collect { tarTree( it ) }
     }
@@ -39,6 +41,8 @@ tasks.register( 'unpackDistro', Copy ) {
 }
 
 tasks.register('copyLicense', Copy) {
+    description = 'Copies license file to the test environment'
+    group = 'setup'
     doLast {
         println "Copy license"
     }
@@ -49,6 +53,8 @@ tasks.register('copyLicense', Copy) {
 }
 
 tasks.register('copyConfig', Copy) {
+    description = 'Copies configuration files to the test environment'
+    group = 'setup'
     doLast {
         println "$appDir${File.separator}common-config"
     }
@@ -59,14 +65,18 @@ tasks.register('copyConfig', Copy) {
     mustRunAfter unpackDistro
 }
 tasks.register( 'downloadApps', Copy ) {
+    description = 'Downloads required apps for testing'
+    group = 'setup'
     from {
         configurations.apps
     }
     into deployDir
-    mustRunAfter unpackDistro
+    mustRunAfter tasks.named('unpackDistro')
 }
 
 tasks.register('copyApps', Copy) {
+    description = 'Copies application JAR files to deploy directory'
+    group = 'setup'
     doLast {
         println '*********************************************************'
         println '* task started:copyApps  *'
@@ -81,14 +91,18 @@ tasks.register('copyApps', Copy) {
 }
 
 tasks.register('deployContentStudio', Copy) {
+    description = 'Deploys Content Studio application'
+    group = 'deployment'
     from {
         configurations.deploy
     }
     into deployDir
-    mustRunAfter unpackDistro
+    mustRunAfter tasks.named('unpackDistro')
 }
 
 tasks.register('deployContentStudioPlus', DefaultTask) {
+    description = 'Deploys Content Studio Plus application'
+    group = 'deployment'
     outputs.files( contentStudioPlusFile )
     doLast {
         println 'Retrieving Content Studio Plus App from:'
@@ -113,7 +127,9 @@ tasks.register('deployContentStudioPlus', DefaultTask) {
 
 def process
 tasks.register( 'startServer' ) {
-    dependsOn( unpackDistro, copyConfig, copyLicense, deployContentStudio, deployContentStudioPlus, downloadApps )
+    description = 'Starts the XP server for testing'
+    group = 'testing'
+    dependsOn( tasks.named('unpackDistro'), tasks.named('copyConfig'), tasks.named('copyLicense'), tasks.named('deployContentStudio'), tasks.named('deployContentStudioPlus'), tasks.named('downloadApps') )
     doLast {
         def pb
         if (DefaultNativePlatform.getCurrentOperatingSystem().windows) {
@@ -136,6 +152,8 @@ tasks.register( 'startServer' ) {
 
 
 tasks.register( 'stopServer' ) {
+    description = 'Stops the XP server'
+    group = 'testing'
     doLast {
         if (DefaultNativePlatform.getCurrentOperatingSystem().windows) {
             Runtime.getRuntime().exec("taskkill /F /T /PID " + process.pid());
@@ -146,22 +164,30 @@ tasks.register( 'stopServer' ) {
 }
 
 tasks.register('cleanup', Delete) {
+    description = 'Cleans up test reports'
+    group = 'cleanup'
     delete './build/reports/allure'
 }
 
-tasks.register('generateReportAndStopServer', NpmTask ) {
+tasks.register('generateReportAndStopServer', PnpmTask ) {
+    description = 'Generates test report and stops server'
+    group = 'reporting'
     args = ['run-script', 'allure-report']
-    finalizedBy cleanup
-    finalizedBy stopServer
+    finalizedBy tasks.named('cleanup')
+    finalizedBy tasks.named('stopServer')
 }
 
-tasks.register('w_testCSPlusChrome', NpmTask) {
-    dependsOn( npmInstall, startServer )
+tasks.register('w_testCSPlusChrome', PnpmTask) {
+    description = 'Runs Content Studio Plus tests in Chrome'
+    group = 'testing'
+    dependsOn( tasks.named('pnpmInstall'), tasks.named('startServer') )
     args = ['run-script', 'test_cs_plus:wdio_chrome']
-    finalizedBy generateReportAndStopServer
+    finalizedBy tasks.named('generateReportAndStopServer')
 }
 
-tasks.register('w_testAdminHomeChromeLocal', NpmTask) {
-    dependsOn( npmInstall )
+tasks.register('w_testAdminHomeChromeLocal', PnpmTask) {
+    description = 'Runs local admin home tests in Chrome'
+    group = 'testing'
+    dependsOn( tasks.named('pnpmInstall') )
     args = ['run-script', 'test_cs_plus:wdio_chrome']
 }
