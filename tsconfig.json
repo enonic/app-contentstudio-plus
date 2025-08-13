@@ -1,27 +1,22 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
-    "target": "es5",
-    "sourceMap": true,
-    "types": [
-      "jquery",
-      "jqueryui",
-      "q"
-    ],
-    "lib": [
-      "es2015",
-      "es2015.promise",
-      "dom"
-    ]
+    "module": "ES2022",
+    "moduleResolution": "bundler",
+    "target": "ES2023",
+    "lib": ["ES2023", "DOM"],
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "useDefineForClassFields": false,
+    "allowJs": false,
+    "noImplicitReturns": false,
+    "noImplicitThis": true,
+    "strictNullChecks": false,
+    "skipLibCheck": true,
+    "incremental": true,
+    "types": ["jquery", "jqueryui", "q"]
   },
-  "files": [
-    "./src/main/resources/assets/js/widgets/layers/main.ts"
-  ],
-  "include": [
-    "src/**/*",
-    "../lib-admin-ui/src/main/resources/assets/admin/common/js/**/*.ts",
-    "../app-contentstudio/src/main/resources/assets/js/**/*.ts",
-    ".xp/dev/lib-admin-ui/**/*.ts",
-    ".xp/dev/lib-contentstudio/**/*.ts"
-  ]
+  "files": ["./src/main/resources/assets/js/widgets/layers/main.ts"],
+  "include": ["src/**/*"],
+  "compileOnSave": false,
+  "buildOnSave": false
 }

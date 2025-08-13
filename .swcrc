@@ -7,17 +7,13 @@
       "dynamicImport": true
     },
     "transform": {
-      "legacyDecorator": true,
-      "decoratorMetadata": true
+      "useDefineForClassFields": false
     },
-    "target": "es5",
+    "target": "ES2023",
     "keepClassNames": true,
     "loose": true
   },
-  "exclude": [
-    ".*\\.d\\.ts$",
-    "/lib/"
-  ],
+  "exclude": [".*\\.d\\.ts$", "/lib/"],
   "module": {
     "type": "commonjs",
     "strict": true,
