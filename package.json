@@ -16,14 +16,19 @@
     "build:dev": "pnpm --color /^build:dev:.*$/",
     "build:dev:js": "cross-env BUILD_TARGET=js vite build --mode development",
     "build:dev:css": "cross-env BUILD_TARGET=css vite build --mode development",
-    "check": "pnpm /^check:*$/",
+    "check": "pnpm /^check:.*$/",
     "check:types": "tsc --noEmit",
     "check:lint": "eslint . --quiet --cache",
     "fix": "eslint --fix **/*.ts"
   },
   "dependencies": {
-    "@enonic/lib-admin-ui": "file:.xp/dev/lib-admin-ui",
-    "lib-contentstudio": "file:.xp/dev/lib-contentstudio",
+    "@enonic/lib-admin-ui": "workspace:*",
+    "dompurify": "^3.2.6",
+    "jquery": "^3.7.1",
+    "jquery-simulate": "^1.0.2",
+    "jquery-ui": "^1.14.1",
+    "lib-contentstudio": "workspace:*",
+    "mousetrap": "^1.6.5",
     "q": "^1.5.1"
   },
   "devDependencies": {
@@ -50,12 +55,6 @@
   "browserslist": [
     "extends browserslist-config-enonic"
   ],
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "@swc/core",
-      "esbuild"
-    ]
-  },
   "engines": {
     "node": ">=22.18.0",
     "pnpm": ">=10.14.0",

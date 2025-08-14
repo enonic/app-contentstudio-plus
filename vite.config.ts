@@ -42,19 +42,18 @@ export default defineConfig(({mode}) => {
           chunkSizeWarningLimit: 1000
         }),
         rollupOptions: {
+          plugins: [
+            inject({
+              $: 'jquery',
+              jQuery: 'jquery',
+            }),
+          ],
           input: {
             'js/archive': path.join(IN_PATH, 'js/archive.ts'),
             'js/widgets/layers': path.join(IN_PATH, 'js/widgets/layers/main.ts'),
             'js/widgets/variants': path.join(IN_PATH, 'js/widgets/variants/main.ts'),
             'js/widgets/publish-report': path.join(IN_PATH, 'js/widgets/publish-report/main.ts'),
           },
-          plugins: [
-            inject({
-              $: 'jquery',
-              jQuery: 'jquery',
-              'window.jQuery': 'jquery',
-            }),
-          ],
           output: {
             format: 'es',
             entryFileNames: '[name].js',
@@ -67,19 +66,7 @@ export default defineConfig(({mode}) => {
               }
             })
           },
-          external: [
-            'jquery',
-            // 'jquery-simulate/jquery.simulate.js',
-            'jquery-ui',
-            'jquery-ui/ui/tabbable',
-            'jquery-ui/ui/widget',
-            'jquery-ui/ui/widgets/mouse',
-            'jquery-ui/ui/widgets/sortable',
-            'q',
-            // 'jsondiffpatch',
-            // 'dompurify',
-            // 'mousetrap',
-          ]
+          external: []
         }
       },
       esbuild: {
@@ -136,6 +123,7 @@ export default defineConfig(({mode}) => {
                 return 'images/[name][extname]';
               }
               if (/\.(woff|woff2|ttf|eot)$/.test(assetName)) {
+
                 return 'fonts/[name][extname]';
               }
               return '[name][extname]';
@@ -144,6 +132,9 @@ export default defineConfig(({mode}) => {
         }
       },
       resolve: {
+        alias: {
+          '~enonic-admin-artifacts': 'enonic-admin-artifacts/index.less'
+        },
         extensions: ['.less', '.css']
       },
       css: {
@@ -157,7 +148,7 @@ export default defineConfig(({mode}) => {
             postcssNormalize(),
             autoprefixer(),
             postcssSortMediaQueries({sort: 'desktop-first'}),
-            ...(isProduction ? [cssnano()] : [])
+            ...(isProduction ? [cssnano({preset: ['default', {normalizeUrl: false}]})] : [])
           ]
         }
       }

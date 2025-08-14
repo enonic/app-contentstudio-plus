@@ -1,0 +1,9 @@
+packages:
+  - .
+  - .xp/dev/*
+
+onlyBuiltDependencies:
+  - '@swc/core'
+  - esbuild
+
+ignore-workspace-root-check: true

@@ -153,11 +153,30 @@ tasks.register( 'stopServer' ) {
     description = 'Stops the XP server'
     group = 'testing'
     doLast {
-        if ( DefaultNativePlatform.getCurrentOperatingSystem().windows ) {
-            Runtime.getRuntime().exec( "taskkill /F /T /PID " + process.pid() )
-        } else {
-            process.destroy()
+        if (!project.hasProperty('process')) {
+            println "Server process not found. It might already be stopped."
+            return
         }
+
+        def os = DefaultNativePlatform.currentOperatingSystem
+        def pid = process.pid()
+
+        if (os.isWindows()) {
+            println "Stopping process with PID ${pid} on Windows..."
+            exec {
+                commandLine 'taskkill', '/F', '/T', '/PID', pid.toString()
+                ignoreExitValue = true // Don't fail if the process is already gone
+            }
+        } else { // For macOS, Linux, and other Unix-like systems
+            println "Stopping process with PID ${pid} on ${os.displayName}..."
+            exec {
+                commandLine 'kill', '-9', pid.toString()
+                ignoreExitValue = true // Don't fail if the process is already gone
+            }
+        }
+
+        // Clean up the process property
+        project.ext.process = null
     }
 }
 
@@ -170,7 +189,7 @@ tasks.register( 'cleanup', Delete ) {
 tasks.register('generateReportAndStopServer', PnpmTask ) {
     description = 'Generates test report and stops server'
     group = 'reporting'
-    args = ['run-script', 'allure-report']
+    args = ['run', 'allure-report']
     finalizedBy tasks.named( 'cleanup' )
     finalizedBy tasks.named( 'stopServer' )
 }
@@ -179,7 +198,7 @@ tasks.register( 'w_testCSPlusChrome', PnpmTask ) {
     description = 'Runs Content Studio Plus tests in Chrome'
     group = 'testing'
     dependsOn( tasks.named( 'pnpmInstall' ), tasks.named( 'startServer' ) )
-    args = ['run-script', 'test_cs_plus:wdio_chrome']
+    args = ['run', 'test_cs_plus:wdio_chrome']
     finalizedBy tasks.named( 'generateReportAndStopServer' )
 }
 
@@ -187,5 +206,9 @@ tasks.register( 'w_testAdminHomeChromeLocal', PnpmTask ) {
     description = 'Runs local admin home tests in Chrome'
     group = 'testing'
     dependsOn( tasks.named( 'pnpmInstall' ) )
-    args = ['run-script', 'test_cs_plus:wdio_chrome']
+    args = ['run', 'test_cs_plus:wdio_chrome']
+}
+
+tasks.register( 'yolo' ) {
+    dependsOn tasks.named( 'build' )
 }

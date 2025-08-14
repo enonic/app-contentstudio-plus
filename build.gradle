@@ -65,9 +65,6 @@ dependencies {
     include libs.lib.mustache
     include libs.lib.license
 
-    // include "com.enonic.lib:lib-admin-ui:${libAdminUiVersion}"
-    // include "com.enonic.lib:lib-contentstudio:${libContentStudioVersion}"
-
     devResources "com.enonic.lib:lib-admin-ui:${libAdminUiVersion}"
     devResources "com.enonic.lib:lib-contentstudio:${libContentStudioVersion}"
 }
@@ -78,30 +75,36 @@ repositories {
     xp.enonicRepo( 'dev' )
 }
 
-tasks.register( 'typecheck', NpmTask ) {
+tasks.register( 'checkTypes', PnpmTask ) {
     dependsOn tasks.named( 'pnpmInstall' )
     group = 'verification'
     args = ['run', 'check:types']
     outputs.cacheIf { false }
 }
 
-tasks.register( 'lint', NpmTask ) {
+tasks.register( 'checkLint', PnpmTask ) {
     dependsOn tasks.named( 'pnpmInstall' )
     group = 'verification'
     args = ['run', 'check:lint']
     outputs.cacheIf { false }
 }
 
-tasks.named( 'check' ).configure {
-    dependsOn tasks.named( 'typecheck' )
-    dependsOn tasks.named( 'lint' )
+tasks.register( 'pnpmCheck', PnpmTask ) {
+    dependsOn tasks.named( 'pnpmInstall' )
+    group = 'verification'
+    args = ['run', 'check']
+    outputs.cacheIf { false }
 }
 
-tasks.register( 'buildResources', PnpmTask ) {
+tasks.named( 'check' ).configure {
+    dependsOn tasks.named( 'pnpmCheck' )
+}
+
+tasks.register( 'pnpmBuild', PnpmTask ) {
     dependsOn tasks.named( 'pnpmInstall' )
     dependsOn tasks.named( 'javadoc' )
     description = 'Build UI resources (ts, css, etc) with Vite.'
-    args = ['run', 'build']
+    args = ['run', "build:${environmentShort()}"]
     inputs.dir '.xp/dev'
     inputs.dir 'src/main'
     inputs.file 'vite.config.ts'
@@ -110,44 +113,40 @@ tasks.register( 'buildResources', PnpmTask ) {
 }
 
 tasks.named( 'processResources' ).configure {
+    // Don't need source files
     exclude 'assets/js/**'
     exclude 'assets/styles/**'
 
     // Inlined by the Vite into CSS
     exclude 'assets/fonts/**'
-    // Icons (icomoon) are bundled with the fonts
-    // exclude 'assets/admin/common/icons/**'
-    // Images are inlined to the CSS
     exclude 'assets/img/**'
-    // Bundled into lib.js
-    // exclude 'assets/admin/common/lib/**'
-    // Don't need to copy CSS files
-    // exclude 'assets/admin/common/styles/**'
 
     includeEmptyDirs = false
 }
 
 tasks.named( 'jar' ).configure {
-    exclude 'assets/admin/**'
-    exclude 'assets/images/**'
-    exclude 'assets/lib/**'
-
-    exclude 'assets/**/*.ts'
-    exclude 'assets/**/*.less'
-    // exclude 'assets/img/**'
-    exclude 'assets/admin/**'
-    exclude 'assets/images/**'
-    exclude 'assets/styles/html-editor.*'
-    exclude 'assets/styles/contentlib.*'
-    exclude 'assets/styles/**/*.js'
+    exclude 'assets/**/tsconfig.tsbuildinfo'
 
     if ( isProd() ) {
         exclude 'assets/**/*.map'
     }
 
-    exclude 'assets/*.woff*'
-
     includeEmptyDirs = false
 
-    dependsOn tasks.named( 'buildResources' )
+    dependsOn tasks.named( 'pnpmBuild' )
+}
+
+tasks.register( 'yolo' ) {
+    description = 'Build without running install, check, or test tasks'
+
+    dependsOn tasks.named( 'deploy' )
+    dependsOn tasks.named( 'checkTypes' )
+
+    nodeSetup.enabled = false
+    npmSetup.enabled = false
+    pnpmSetup.enabled = false
+    pnpmCheck.enabled = false
+    checkLint.enabled = false
+    check.enabled = false
+    test.enabled = false
 }

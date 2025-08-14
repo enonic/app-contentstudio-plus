@@ -3,6 +3,7 @@ import type {Element} from '@enonic/lib-admin-ui/dom/Element';
 import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
 import {ArchiveAppContainer} from './ArchiveAppContainer';
 import {resolveConfig} from './util/WidgetConfigResolver';
+import {getModuleScript, getRequiredAttribute} from './util/ModuleScriptHelper';
 import {Messages} from '@enonic/lib-admin-ui/util/Messages';
 import {AuthContext} from '@enonic/lib-admin-ui/auth/AuthContext';
 import {Principal} from '@enonic/lib-admin-ui/security/Principal';
@@ -20,17 +21,11 @@ const init = (configScriptId: string): void => {
         (CONFIG.get('principals') as PrincipalJson[]).map(Principal.fromJson));
 };
 
-void ((currentScript: HTMLOrSVGScriptElement) => {
-    if (!currentScript) {
-        throw Error('Legacy browsers are not supported');
-    }
+void (() => {
+    const currentScript = getModuleScript('archive');
 
-    const configScriptId = currentScript.getAttribute('data-config-script-id');
-    const elemId: string = currentScript.getAttribute('data-widget-id');
-
-    if (!configScriptId || !elemId) {
-        throw Error('Missing attributes on inject script');
-    }
+    const configScriptId = getRequiredAttribute(currentScript, 'data-config-script-id');
+    const elemId = getRequiredAttribute(currentScript, 'data-widget-id');
 
     init(configScriptId);
 
@@ -42,4 +37,4 @@ void ((currentScript: HTMLOrSVGScriptElement) => {
         body.unRendered(renderListener);
     };
     body.whenRendered(renderListener);
-})(document.currentScript);
+})();

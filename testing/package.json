@@ -4,7 +4,7 @@
   "author": "Hauruseu Siarhei",
   "license": "ISC",
   "scripts": {
-    "test_cs_plus:wdio_chrome": "npx wdio ./wdio.chrome.conf.js",
+    "test_cs_plus:wdio_chrome": "wdio ./wdio.chrome.conf.js",
     "allure-report": "allure generate ./build/reports/allure --output ./build/reports/allure-report --clean --single-file"
   },
   "devDependencies": {
