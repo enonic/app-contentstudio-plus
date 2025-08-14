@@ -1,5 +1,5 @@
 import {Body} from '@enonic/lib-admin-ui/dom/Body';
-import {Element} from '@enonic/lib-admin-ui/dom/Element';
+import type {Element} from '@enonic/lib-admin-ui/dom/Element';
 import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
 import {ArchiveAppContainer} from './ArchiveAppContainer';
 import {resolveConfig} from './util/WidgetConfigResolver';
@@ -9,7 +9,7 @@ import {Principal} from '@enonic/lib-admin-ui/security/Principal';
 import {PrincipalJson} from '@enonic/lib-admin-ui/security/PrincipalJson';
 
 const injectApp = (widgetElem: Element): void => {
-    const archiveAppContainer: ArchiveAppContainer = new ArchiveAppContainer();
+    const archiveAppContainer = new ArchiveAppContainer();
     widgetElem.appendChild(archiveAppContainer);
 };
 

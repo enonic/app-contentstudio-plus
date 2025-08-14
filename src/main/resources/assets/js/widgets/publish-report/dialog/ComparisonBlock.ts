@@ -1,5 +1,6 @@
 import {DivEl} from '@enonic/lib-admin-ui/dom/DivEl';
-import {Delta, DiffPatcher, formatters, HtmlFormatter} from 'jsondiffpatch';
+import {Delta, DiffPatcher} from 'jsondiffpatch';
+import {format, showUnchanged} from 'jsondiffpatch/formatters/html';
 import Q from 'q';
 import {ContentVersion} from 'lib-contentstudio/app/ContentVersion';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
@@ -11,7 +12,6 @@ import {DateHelper} from '@enonic/lib-admin-ui/util/DateHelper';
 import {LoadMask} from '@enonic/lib-admin-ui/ui/mask/LoadMask';
 import {ComparisonHelper} from './ComparisonHelper';
 import {TextAndDateBlock} from './TextAndDateBlock';
-import {SpanEl} from '@enonic/lib-admin-ui/dom/SpanEl';
 
 export class ComparisonBlock
     extends DivEl {
@@ -28,11 +28,7 @@ export class ComparisonBlock
 
     private readonly loadMask: LoadMask;
 
-
     private readonly diffPatcher: DiffPatcher;
-
-    private readonly htmlFormatter: HtmlFormatter;
-
 
     private contentId: ContentId;
 
@@ -46,7 +42,6 @@ export class ComparisonBlock
         super('comparison-block');
 
         this.diffPatcher = new DiffPatcher();
-        this.htmlFormatter = formatters.html;
 
         this.diffElement = new DivEl('compare-element jsondiffpatch-delta');
         this.headerElement = new DivEl('header');
@@ -96,7 +91,7 @@ export class ComparisonBlock
     }
 
     load(): Q.Promise<void> {
-        this.htmlFormatter.showUnchanged(!this.olderVersion, this.diffElement.getHTMLElement(), 0);
+        showUnchanged(!this.olderVersion, this.diffElement.getHTMLElement(), 0);
 
         const promises = [
             this.fetchVersionPromise(this.newerVersion),
@@ -122,19 +117,19 @@ export class ComparisonBlock
 
     private displayDiff(newerVersionJson: object, olderVersionJson: object): void {
         const delta: Delta = this.diffPatcher.diff(olderVersionJson, newerVersionJson);
-        const text = !!delta ? formatters.html.format(delta, newerVersionJson) :
+        const text = !!delta ? format(delta, newerVersionJson) :
             `<h3>${i18n('dialog.compareVersions.versionsIdentical')}</h3>`;
         this.diffElement.setHtml(text, false).toggleClass('empty', !delta);
     }
 
     private displaySingleVersion(versionJson: object): void {
-        const text = formatters.html.format({}, versionJson);
+        const text = format({}, versionJson);
         this.diffElement.setHtml(text, false);
     }
 
     private initListeners(): void {
         this.changesCheckbox.onValueChanged(event => {
-            this.htmlFormatter.showUnchanged(event.getNewValue() === 'true', this.diffElement.getHTMLElement(), 0);
+            showUnchanged(event.getNewValue() === 'true', this.diffElement.getHTMLElement(), 0);
         });
     }
 

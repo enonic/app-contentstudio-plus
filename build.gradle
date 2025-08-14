@@ -65,8 +65,8 @@ dependencies {
     include libs.lib.mustache
     include libs.lib.license
 
-    include "com.enonic.lib:lib-admin-ui:${libAdminUiVersion}"
-    include "com.enonic.lib:lib-contentstudio:${libContentStudioVersion}"
+    // include "com.enonic.lib:lib-admin-ui:${libAdminUiVersion}"
+    // include "com.enonic.lib:lib-contentstudio:${libContentStudioVersion}"
 
     devResources "com.enonic.lib:lib-admin-ui:${libAdminUiVersion}"
     devResources "com.enonic.lib:lib-contentstudio:${libContentStudioVersion}"
@@ -109,12 +109,45 @@ tasks.register( 'buildResources', PnpmTask ) {
     outputs.dir "${buildDir}/resources/main"
 }
 
+tasks.named( 'processResources' ).configure {
+    exclude 'assets/js/**'
+    exclude 'assets/styles/**'
+
+    // Inlined by the Vite into CSS
+    exclude 'assets/fonts/**'
+    // Icons (icomoon) are bundled with the fonts
+    // exclude 'assets/admin/common/icons/**'
+    // Images are inlined to the CSS
+    exclude 'assets/img/**'
+    // Bundled into lib.js
+    // exclude 'assets/admin/common/lib/**'
+    // Don't need to copy CSS files
+    // exclude 'assets/admin/common/styles/**'
+
+    includeEmptyDirs = false
+}
+
 tasks.named( 'jar' ).configure {
+    exclude 'assets/admin/**'
+    exclude 'assets/images/**'
+    exclude 'assets/lib/**'
+
     exclude 'assets/**/*.ts'
     exclude 'assets/**/*.less'
-    exclude 'assets/img/**'
+    // exclude 'assets/img/**'
+    exclude 'assets/admin/**'
+    exclude 'assets/images/**'
     exclude 'assets/styles/html-editor.*'
     exclude 'assets/styles/contentlib.*'
+    exclude 'assets/styles/**/*.js'
+
+    if ( isProd() ) {
+        exclude 'assets/**/*.map'
+    }
+
+    exclude 'assets/*.woff*'
+
+    includeEmptyDirs = false
 
     dependsOn tasks.named( 'buildResources' )
 }

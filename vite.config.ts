@@ -69,14 +69,16 @@ export default defineConfig(({mode}) => {
           },
           external: [
             'jquery',
+            // 'jquery-simulate/jquery.simulate.js',
             'jquery-ui',
             'jquery-ui/ui/tabbable',
             'jquery-ui/ui/widget',
             'jquery-ui/ui/widgets/mouse',
             'jquery-ui/ui/widgets/sortable',
             'q',
-            'jsondiffpatch',
-            'dompurify',
+            // 'jsondiffpatch',
+            // 'dompurify',
+            // 'mousetrap',
           ]
         }
       },
@@ -90,10 +92,10 @@ export default defineConfig(({mode}) => {
         })
       },
       resolve: {
-        // alias: {
-        //   '@enonic/lib-admin-ui': path.join(__dirname, '.xp/dev/lib-admin-ui'),
-        //   'lib-contentstudio': path.join(__dirname, '.xp/dev/lib-contentstudio'),
-        // },
+        alias: {
+          '@enonic/lib-admin-ui': path.join(__dirname, '.xp/dev/lib-admin-ui'),
+          'lib-contentstudio': path.join(__dirname, '.xp/dev/lib-contentstudio'),
+        },
         extensions: ['.ts', '.js']
       },
       ...(isDevelopment && {
