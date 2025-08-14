@@ -10,7 +10,7 @@ import {Form} from '@enonic/lib-admin-ui/ui/form/Form';
 import {FormView} from '@enonic/lib-admin-ui/form/FormView';
 import {Fieldset} from '@enonic/lib-admin-ui/ui/form/Fieldset';
 import {ValidationResult} from '@enonic/lib-admin-ui/ui/form/ValidationResult';
-import * as Q from 'q';
+import Q from 'q';
 
 export class PublishReportWidget
     extends Widget {

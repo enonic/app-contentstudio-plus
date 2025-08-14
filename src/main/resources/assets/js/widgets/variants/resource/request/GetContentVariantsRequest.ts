@@ -5,7 +5,7 @@ import {ContentSummaryJson} from 'lib-contentstudio/app/content/ContentSummaryJs
 import {CmsContentResourceRequest} from 'lib-contentstudio/app/resource/CmsContentResourceRequest';
 import {ContentSummaryAndCompareStatusFetcher} from 'lib-contentstudio/app/resource/ContentSummaryAndCompareStatusFetcher';
 import {ListContentResult} from 'lib-contentstudio/app/resource/ListContentResult';
-import * as Q from 'q';
+import Q from 'q';
 
 export class GetContentVariantsRequest extends CmsContentResourceRequest<ContentSummary[]> {
 

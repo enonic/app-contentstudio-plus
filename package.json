@@ -7,70 +7,58 @@
     "type": "git",
     "url": "https://github.com/enonic/app-contentstudio-plus"
   },
+  "type": "module",
   "scripts": {
-    "_build": "pnpm build:dev",
-    "_build:prod": "pnpm --color /^build:prod:.*$/",
-    "_build:prod:js": "tsc --pretty",
-    "_build:prod:lib": "cross-env BUILD_TARGET=js vite build --mode production",
-    "_build:prod:css": "cross-env BUILD_TARGET=css vite build --mode production",
-    "_build:dev": "pnpm --color /^build:dev:.*$/",
-    "_build:dev:lib": "cross-env BUILD_TARGET=js vite build --mode development",
-    "_build:dev:css": "cross-env BUILD_TARGET=css vite build --mode development",
-    "_build:dev:js": "tsc --pretty --inlineSourceMap --inlineSources",
-    "build": "webpack --color",
+    "build": "pnpm build:dev",
+    "build:prod": "pnpm --color /^build:prod:.*$/",
+    "build:prod:js": "cross-env BUILD_TARGET=js vite build --mode production",
+    "build:prod:css": "cross-env BUILD_TARGET=css vite build --mode production",
+    "build:dev": "pnpm --color /^build:dev:.*$/",
+    "build:dev:js": "cross-env BUILD_TARGET=js vite build --mode development",
+    "build:dev:css": "cross-env BUILD_TARGET=css vite build --mode development",
     "check": "pnpm /^check:*$/",
-    "check:type": "tsc --noEmit",
+    "check:types": "tsc --noEmit",
     "check:lint": "eslint . --quiet --cache",
     "fix": "eslint --fix **/*.ts"
   },
   "dependencies": {
     "@enonic/lib-admin-ui": "file:.xp/dev/lib-admin-ui",
-    "jquery": "^3.7.1",
-    "jquery-ui": "^1.14.1",
     "lib-contentstudio": "file:.xp/dev/lib-contentstudio",
     "q": "^1.5.1"
   },
   "devDependencies": {
-    "@enonic/eslint-config": "^2.0.1",
-    "@types/jquery": "^3.5.32",
-    "@types/jqueryui": "^1.12.24",
-    "@types/normalize-url": "^4.2.0",
+    "@enonic/eslint-config": "^2.1.0",
+    "@rollup/plugin-inject": "^5.0.5",
+    "@types/postcss-normalize": "^9.0.4",
     "@types/q": "^1.5.8",
     "autoprefixer": "^10.4.21",
-    "browserslist": "^4.25.0",
     "browserslist-config-enonic": "^1.0.8",
-    "circular-dependency-plugin": "^5.2.2",
-    "css-loader": "^6.11.0",
-    "cssnano": "^6.1.2",
-    "enonic-admin-artifacts": "^1.11.2",
-    "eslint": "^9.29.0",
-    "globals": "^15.15.0",
-    "less": "^4.3.0",
-    "less-loader": "^11.1.4",
-    "mini-css-extract-plugin": "^2.9.2",
+    "cross-env": "^10.0.0",
+    "cssnano": "^7.1.0",
+    "enonic-admin-artifacts": "^2.3.2",
+    "eslint": "^9.33.0",
+    "globals": "^16.3.0",
+    "jiti": "^2.5.1",
+    "jsondiffpatch": "^0.7.3",
     "postcss": "^8.5.6",
-    "postcss-loader": "^7.3.4",
-    "postcss-normalize": "^10.0.1",
+    "postcss-normalize": "^13.0.1",
     "postcss-sort-media-queries": "^5.2.0",
-    "prettier": "^3.6.0",
-    "swc-loader": "^0.2.6",
-    "terser-webpack-plugin": "^5.3.14",
-    "typescript": "^5.8.3",
-    "typescript-eslint": "^8.35.0",
-    "webpack": "^5.99.9",
-    "webpack-cli": "^6.0.1"
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.39.1",
+    "vite": "^7.1.2"
   },
   "browserslist": [
     "extends browserslist-config-enonic"
   ],
   "pnpm": {
     "onlyBuiltDependencies": [
-      "@swc/core"
+      "@swc/core",
+      "esbuild"
     ]
   },
   "engines": {
     "node": ">=22.18.0",
-    "pnpm": ">= 10.14.0",
+    "pnpm": ">=10.14.0",
     "npm": ">=10.9.3"
   }
 }

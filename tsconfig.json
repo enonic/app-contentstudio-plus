@@ -15,7 +15,8 @@
     "strictNullChecks": false,
     "skipLibCheck": true,
     "incremental": true,
-    "types": ["jquery", "jqueryui", "q"]
+    "isolatedModules": true,
+    "types": ["q"]
   },
   "files": ["./src/main/resources/assets/js/widgets/layers/main.ts"],
   "include": [

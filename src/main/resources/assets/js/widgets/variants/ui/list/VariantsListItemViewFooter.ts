@@ -1,6 +1,6 @@
 import {DivEl} from '@enonic/lib-admin-ui/dom/DivEl';
 import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
-import * as Q from 'q';
+import Q from 'q';
 import {VariantsListItemViewMenuButton} from './VariantsListItemViewMenuButton';
 
 export class VariantsListItemViewFooter extends DivEl {

@@ -1,6 +1,6 @@
 import {DivEl} from '@enonic/lib-admin-ui/dom/DivEl';
 import {Delta, DiffPatcher, formatters, HtmlFormatter} from 'jsondiffpatch';
-import * as Q from 'q';
+import Q from 'q';
 import {ContentVersion} from 'lib-contentstudio/app/ContentVersion';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {GetContentVersionRequest} from 'lib-contentstudio/app/resource/GetContentVersionRequest';
@@ -123,7 +123,7 @@ export class ComparisonBlock
     private displayDiff(newerVersionJson: object, olderVersionJson: object): void {
         const delta: Delta = this.diffPatcher.diff(olderVersionJson, newerVersionJson);
         const text = !!delta ? formatters.html.format(delta, newerVersionJson) :
-                     `<h3>${i18n('dialog.compareVersions.versionsIdentical')}</h3>`;
+            `<h3>${i18n('dialog.compareVersions.versionsIdentical')}</h3>`;
         this.diffElement.setHtml(text, false).toggleClass('empty', !delta);
     }
 

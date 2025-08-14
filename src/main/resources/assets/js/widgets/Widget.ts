@@ -3,7 +3,7 @@ import {LoadMask} from '@enonic/lib-admin-ui/ui/mask/LoadMask';
 import {AppHelper} from '../util/AppHelper';
 import {SpanEl} from '@enonic/lib-admin-ui/dom/SpanEl';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
-import * as Q from 'q';
+import Q from 'q';
 import {HasValidLicenseRequest} from '../resource/HasValidLicenseRequest';
 import {Element} from '@enonic/lib-admin-ui/dom/Element';
 

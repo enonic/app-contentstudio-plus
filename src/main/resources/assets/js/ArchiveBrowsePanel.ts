@@ -1,6 +1,6 @@
 import {BrowseItemPanel} from '@enonic/lib-admin-ui/app/browse/BrowseItemPanel';
 import {ArchiveBrowseItemPanel} from './ArchiveBrowseItemPanel';
-import * as Q from 'q';
+import Q from 'q';
 import {ArchiveContextView} from './ArchiveContextView';
 import {ArchiveContentViewItem} from './ArchiveContentViewItem';
 import {ResponsiveBrowsePanel} from 'lib-contentstudio/app/browse/ResponsiveBrowsePanel';
@@ -88,8 +88,8 @@ export class ArchiveBrowsePanel
                 this.selectionWrapper.deselect(itemsFound);
 
                 itemsFound.forEach((item: ArchiveContentViewItem) => {
-                   const listElement = this.treeListBox.getItemView(item) as ArchiveTreeListElement;
-                   listElement.getParentList().removeItems(item);
+                    const listElement = this.treeListBox.getItemView(item) as ArchiveTreeListElement;
+                    listElement.getParentList().removeItems(item);
                 });
             }
         });
@@ -150,7 +150,7 @@ export class ArchiveBrowsePanel
         this.treeActions = new ArchiveTreeGridActions();
         this.contextMenu = new TreeGridContextMenu(this.treeActions);
 
-        const panel =  new SelectableListBoxPanel(this.selectionWrapper, this.toolbar);
+        const panel = new SelectableListBoxPanel(this.selectionWrapper, this.toolbar);
         panel.addClass('content-selectable-list-box-panel');
 
         return panel;

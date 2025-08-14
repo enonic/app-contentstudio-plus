@@ -4,28 +4,26 @@ def libAdminUiExists = providers.provider {
 }
 
 def applyResourcesTaskDependencies() {
-    def libAdminBuild = gradle.includedBuild('lib-admin-ui')
-    def libAdminDevJarTask = libAdminBuild.task(':devJar')
-    def libAdminBuildTask = libAdminBuild.task(':build')
-    def libAdminCleanTask = libAdminBuild.task(':clean')
+    def libAdminBuild = gradle.includedBuild( 'lib-admin-ui' )
+    def libAdminDevJarTask = libAdminBuild.task( ':devJar' )
+    def libAdminBuildTask = libAdminBuild.task( ':build' )
+    def libAdminCleanTask = libAdminBuild.task( ':clean' )
 
     tasks.matching { it.name == 'copyDevResources' }.configureEach {
         dependsOn libAdminDevJarTask
     }
 
-    tasks.named('build').configure {
+    tasks.named( 'build' ).configure {
         dependsOn libAdminBuildTask
     }
 
-    tasks.named('clean').configure {
+    tasks.named( 'clean' ).configure {
         dependsOn libAdminCleanTask
     }
 }
 
-println "hasEnvironment: ${hasEnvironment()}"
 if ( hasEnvironment() && libAdminUiExists.get() )
 {
-    println "after evaluate"
     afterEvaluate {
         applyResourcesTaskDependencies()
     }

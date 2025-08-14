@@ -1,6 +1,6 @@
 import {DivEl} from '@enonic/lib-admin-ui/dom/DivEl';
 import {LiEl} from '@enonic/lib-admin-ui/dom/LiEl';
-import * as Q from 'q';
+import Q from 'q';
 import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import {VariantsListItemViewBody} from './VariantsListItemViewBody';
 import {VariantsListItemViewFooter} from './VariantsListItemViewFooter';

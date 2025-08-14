@@ -1,4 +1,4 @@
-import * as Q from 'q';
+import Q from 'q';
 import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import {TreeListBox, TreeListBoxParams, TreeListElement, TreeListElementParams} from '@enonic/lib-admin-ui/ui/selector/list/TreeListBox';
 import {ArchiveContentViewItem} from './ArchiveContentViewItem';

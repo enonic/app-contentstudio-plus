@@ -3,7 +3,7 @@ import {ModalDialog} from '@enonic/lib-admin-ui/ui/dialog/ModalDialog';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import {OriginalContentBlock} from './OriginalContentBlock';
-import * as Q from 'q';
+import Q from 'q';
 import {VariableNameHelper} from './VariableNameHelper';
 import {DuplicateContentRequest} from 'lib-contentstudio/app/resource/DuplicateContentRequest';
 import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
@@ -53,7 +53,7 @@ export class CreateVariantDialog
         super.initListeners();
 
         this.createAction.onExecuted(() => {
-           this.createVariant();
+            this.createVariant();
         });
 
         this.variantNameInput.onValueCheckInProgress(() => {
