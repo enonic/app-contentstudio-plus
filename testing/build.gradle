@@ -17,7 +17,7 @@ configurations {
 
 def unpackDir = layout.buildDirectory.dir("install").get()
 def distroDir = unpackDir.dir("enonic-xp-generic-$xpVersion")
-def appDir = "$projectDir/test-applications"
+def testConfDir = "$projectDir/test-config"
 def xpHome = "$distroDir/home"
 def deployDir = distroDir.dir("home/deploy")
 def licenseDir = distroDir.dir("home/license")
@@ -32,6 +32,9 @@ dependencies {
 }
 
 tasks.register( 'unpackDistro', Copy ) {
+    println '*********************************************************'
+    println '* download and unpack Distro  *'
+    println '*********************************************************'
     from {
         configurations.distro.collect { tarTree( it ) }
     }
@@ -39,56 +42,72 @@ tasks.register( 'unpackDistro', Copy ) {
 }
 
 tasks.register('copyLicense', Copy) {
+    description = 'Copy license file to the home dir'
+    group = 'setup'
+
     doLast {
         println "Copy license"
     }
     from file (rootProject.projectDir)
     include 'enonic.platform.subscription.lic'
     into licenseDir
-    mustRunAfter unpackDistro
+    mustRunAfter tasks.named('unpackDistro')
 }
 
 tasks.register('copyConfig', Copy) {
+
+    description = 'Copy custom configuration files'
+    group = 'setup'
+
     doLast {
-        println "$appDir${File.separator}common-config"
+        println "$testConfDir${File.separator}common-config"
     }
-    from "$appDir${File.separator}common-config"
+    from "$testConfDir${File.separator}common-config"
     include '**.*.cfg'
     include '*.properties'
     into configDir
-    mustRunAfter unpackDistro
+    mustRunAfter tasks.named('unpackDistro')
 }
+
 tasks.register( 'downloadApps', Copy ) {
     from {
         configurations.apps
     }
     into deployDir
-    mustRunAfter unpackDistro
-}
+    mustRunAfter tasks.named('startServer')
 
-tasks.register('copyApps', Copy) {
     doLast {
-        println '*********************************************************'
-        println '* task started:copyApps  *'
-        println '*********************************************************'
-        println appDir
-        println deployDir
-    }
-    from file( appDir )
-    include '*.jar'
-    into deployDir
-    mustRunAfter unpackDistro
+        println 'Task downloadApps completed successfully.'
+        println 'Downloaded artifacts:'
+        configurations.apps.files.each { file ->
+            println "- ${file.name}"
+        }
 }
 
 tasks.register('deployContentStudio', Copy) {
+
+    println '*********************************************************'
+    println '* deployContentStudio  *'
+    println '*********************************************************'
+
+    description = 'Deploy Content Studio application'
+    group = 'setup'
+
     from {
         configurations.deploy
     }
     into deployDir
-    mustRunAfter unpackDistro
+    mustRunAfter tasks.named('unpackDistro')
 }
 
 tasks.register('deployContentStudioPlus', DefaultTask) {
+    println '*********************************************************'
+    println '* deployContentStudio Plus *'
+    println '*********************************************************'
+
+    description = 'Deploy Content Studio Plus application'
+    group = 'setup'
+
     outputs.files( contentStudioPlusFile )
     doLast {
         println 'Retrieving Content Studio Plus App from:'
@@ -107,14 +126,24 @@ tasks.register('deployContentStudioPlus', DefaultTask) {
             println 'Content Studio Plus App already exists.'
         }
     }
-    mustRunAfter unpackDistro
+    mustRunAfter tasks.named('unpackDistro')
 }
 
 
 def process
 tasks.register( 'startServer' ) {
-    dependsOn( unpackDistro, copyConfig, copyLicense, deployContentStudio, deployContentStudioPlus, downloadApps )
+    println '*********************************************************'
+    println '* startServer  *'
+    println '*********************************************************'
+
+    description = 'Start XP server'
+    group = 'server'
+
+    dependsOn(tasks.named('unpackDistro'))
+
     doLast {
+        sleep(5000)
+        println 'Starting XP Server...'
         def pb
         if (DefaultNativePlatform.getCurrentOperatingSystem().windows) {
             pb = new ProcessBuilder('cmd', '/c', "${distroDir}\\bin\\server.bat")
@@ -130,12 +159,14 @@ tasks.register( 'startServer' ) {
         pb.redirectOutput(logsPath.file("xp.log").asFile)
         pb.redirectErrorStream(true)
         process = pb.start()
-        sleep(90000)
+        sleep(60000)
     }
 }
 
 
 tasks.register( 'stopServer' ) {
+    description = 'Stop XP server'
+    group = 'server'
     doLast {
         if (DefaultNativePlatform.getCurrentOperatingSystem().windows) {
             Runtime.getRuntime().exec("taskkill /F /T /PID " + process.pid());
@@ -146,22 +177,38 @@ tasks.register( 'stopServer' ) {
 }
 
 tasks.register('cleanup', Delete) {
+    description = 'Clean up Allure reports'
+    group = 'verification'
+
     delete './build/reports/allure'
 }
 
 tasks.register('generateReportAndStopServer', NpmTask ) {
+    description = 'Generate Allure report and stop server'
+    group = 'verification'
+
     args = ['run-script', 'allure-report']
-    finalizedBy cleanup
-    finalizedBy stopServer
+    finalizedBy tasks.named('cleanup')
+    finalizedBy tasks.named('stopServer')
 }
 
 tasks.register('w_testCSPlusChrome', NpmTask) {
-    dependsOn( npmInstall, startServer )
+    dependsOn tasks.named('pnpmInstall')
+    dependsOn tasks.named('downloadApps')
+    dependsOn tasks.named('copyConfig')
+    dependsOn tasks.named('startServer')
+
+    group = 'verification'
+    description = 'Run ui-tests for CS+ '
+
     args = ['run-script', 'test_cs_plus:wdio_chrome']
-    finalizedBy generateReportAndStopServer
+    finalizedBy tasks.named('generateReportAndStopServer')
 }
 
 tasks.register('w_testAdminHomeChromeLocal', NpmTask) {
-    dependsOn( npmInstall )
+    dependsOn tasks.named('pnpmInstall')
+    group = 'verification'
+    description = 'Run input types tests locally'
+
     args = ['run-script', 'test_cs_plus:wdio_chrome']
 }
