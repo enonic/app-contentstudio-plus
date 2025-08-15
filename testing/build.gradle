@@ -186,26 +186,78 @@ tasks.register( 'cleanup', Delete ) {
     delete './build/reports/allure'
 }
 
-tasks.register('generateReportAndStopServer', PnpmTask ) {
+tasks.register('generateReportAndStopServer', NpmTask ) {
     description = 'Generates test report and stops server'
     group = 'reporting'
+    doFirst {
+        println '🔍 [DEBUG] Starting generateReportAndStopServer task'
+        println '🔍 [DEBUG] Working directory: ' + projectDir
+        println '🔍 [DEBUG] Node modules path: ' + file('node_modules').absolutePath
+        println '🔍 [DEBUG] Allure executable check:'
+        def allureCmd = file('node_modules/.bin/allure')
+        def allureCmdWin = file('node_modules/.bin/allure.cmd')
+        println '   - allure (unix): ' + allureCmd.exists() + ' at ' + allureCmd.absolutePath
+        println '   - allure.cmd (win): ' + allureCmdWin.exists() + ' at ' + allureCmdWin.absolutePath
+        println '🔍 [DEBUG] PATH: ' + System.getenv('PATH')
+        println '🔍 [DEBUG] PNPM executable: ' + node.pnpmWorkDir.get().file('pnpm-v' + node.pnpmVersion.get() + '/bin/pnpm').asFile.absolutePath
+
+        // List contents of node_modules/.bin for debugging
+        def binDir = file('node_modules/.bin')
+        if (binDir.exists()) {
+            println '🔍 [DEBUG] Contents of node_modules/.bin:'
+            binDir.listFiles().each { f ->
+                println '   - ' + f.name + (f.canExecute() ? ' (executable)' : '')
+            }
+        } else {
+            println '🔍 [DEBUG] node_modules/.bin does not exist'
+        }
+    }
     args = ['run', 'allure-report']
+    doLast {
+        println '✅ [DEBUG] generateReportAndStopServer task completed'
+    }
     finalizedBy tasks.named( 'cleanup' )
     finalizedBy tasks.named( 'stopServer' )
 }
 
-tasks.register( 'w_testCSPlusChrome', PnpmTask ) {
+tasks.register( 'w_testCSPlusChrome', NpmTask ) {
     description = 'Runs Content Studio Plus tests in Chrome'
     group = 'testing'
-    dependsOn( tasks.named( 'pnpmInstall' ), tasks.named( 'startServer' ) )
+    dependsOn( tasks.named( 'npmInstall' ), tasks.named( 'startServer' ) )
+    doFirst {
+        println '🔍 [DEBUG] Starting w_testCSPlusChrome task'
+        println '🔍 [DEBUG] Working directory: ' + projectDir
+        println '🔍 [DEBUG] Node modules path: ' + file('node_modules').absolutePath
+        println '🔍 [DEBUG] WDIO executable check:'
+        def wdioCmd = file('node_modules/.bin/wdio')
+        def wdioCmdWin = file('node_modules/.bin/wdio.cmd')
+        println '   - wdio (unix): ' + wdioCmd.exists() + ' at ' + wdioCmd.absolutePath
+        println '   - wdio.cmd (win): ' + wdioCmdWin.exists() + ' at ' + wdioCmdWin.absolutePath
+        println '🔍 [DEBUG] PATH: ' + System.getenv('PATH')
+        println '🔍 [DEBUG] PNPM executable: ' + node.pnpmWorkDir.get().file('pnpm-v' + node.pnpmVersion.get() + '/bin/pnpm').asFile.absolutePath
+
+        // List contents of node_modules/.bin for debugging
+        def binDir = file('node_modules/.bin')
+        if (binDir.exists()) {
+            println '🔍 [DEBUG] Contents of node_modules/.bin:'
+            binDir.listFiles().each { f ->
+                println '   - ' + f.name + (f.canExecute() ? ' (executable)' : '')
+            }
+        } else {
+            println '🔍 [DEBUG] node_modules/.bin does not exist'
+        }
+    }
     args = ['run', 'test_cs_plus:wdio_chrome']
+    doLast {
+        println '✅ [DEBUG] w_testCSPlusChrome task completed'
+    }
     finalizedBy tasks.named( 'generateReportAndStopServer' )
 }
 
-tasks.register( 'w_testAdminHomeChromeLocal', PnpmTask ) {
+tasks.register( 'w_testAdminHomeChromeLocal', NpmTask ) {
     description = 'Runs local admin home tests in Chrome'
     group = 'testing'
-    dependsOn( tasks.named( 'pnpmInstall' ) )
+    dependsOn( tasks.named( 'npmInstall' ) )
     args = ['run', 'test_cs_plus:wdio_chrome']
 }
 
