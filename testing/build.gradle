@@ -69,7 +69,15 @@ tasks.register('copyConfig', Copy) {
     mustRunAfter tasks.named('unpackDistro')
 }
 
-tasks.register( 'downloadApps', Copy ) {
+tasks.register('downloadApps', Copy) {
+    println '*********************************************************'
+    println '* downloadApps  *'
+    println '*********************************************************'
+    println 'Downloading test data to ' + deployDir
+
+    description = 'Download test applications'
+    group = 'setup'
+
     from {
         configurations.apps
     }
@@ -82,6 +90,7 @@ tasks.register( 'downloadApps', Copy ) {
         configurations.apps.files.each { file ->
             println "- ${file.name}"
         }
+    }
 }
 
 tasks.register('deployContentStudio', Copy) {
