@@ -2,7 +2,7 @@ import {Action} from '@enonic/lib-admin-ui/ui/Action';
 import {MenuButton} from '@enonic/lib-admin-ui/ui/button/MenuButton';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
-import * as Q from 'q';
+import Q from 'q';
 import {DuplicateVariantDialog} from '../../dialog/DuplicateVariantDialog';
 import {CreateVariantDialog} from '../../dialog/CreateVariantDialog';
 import {GetContentVariantsRequest} from '../../resource/request/GetContentVariantsRequest';

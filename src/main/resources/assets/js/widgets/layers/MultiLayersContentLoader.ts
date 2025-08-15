@@ -1,5 +1,5 @@
 import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
-import * as Q from 'q';
+import Q from 'q';
 import {Project} from 'lib-contentstudio/app/settings/data/project/Project';
 import {ProjectListRequest} from 'lib-contentstudio/app/settings/resource/ProjectListRequest';
 import {ContentSummaryAndCompareStatusFetcher} from 'lib-contentstudio/app/resource/ContentSummaryAndCompareStatusFetcher';

@@ -13,7 +13,7 @@
 
     {{#isNormalMode}}
     <script type="application/json" id="{{configScriptId}}">{{{configAsJson}}}</script>
-    <script src="{{jsUri}}" data-config-script-id="{{configScriptId}}" data-content-id="{{contentId}}" data-publish-first="{{publishFirst}}" data-archived="{{isArchived}}"></script>
+    <script type="module" src="{{jsUri}}" data-config-script-id="{{configScriptId}}" data-content-id="{{contentId}}" data-publish-first="{{publishFirst}}" data-archived="{{isArchived}}"></script>
     {{/isNormalMode}}
 
 </widget>

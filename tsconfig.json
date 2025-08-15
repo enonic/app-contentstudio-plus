@@ -4,6 +4,8 @@
     "moduleResolution": "bundler",
     "target": "ES2023",
     "lib": ["ES2023", "DOM"],
+    "baseUrl": ".",
+    "outDir": "build/resources/main/assets/js/",
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "useDefineForClassFields": false,
@@ -13,10 +15,15 @@
     "strictNullChecks": false,
     "skipLibCheck": true,
     "incremental": true,
-    "types": ["jquery", "jqueryui", "q"]
+    "isolatedModules": true,
+    "types": ["q"]
   },
   "files": ["./src/main/resources/assets/js/widgets/layers/main.ts"],
-  "include": ["src/**/*"],
+  "include": [
+    "src/**/*",
+    ".xp/dev/lib-admin-ui/**/*.ts",
+    ".xp/dev/lib-contentstudio/**/*.ts"
+  ],
   "compileOnSave": false,
   "buildOnSave": false
 }

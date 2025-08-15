@@ -5,7 +5,7 @@ import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {ContentAggregation} from 'lib-contentstudio/app/browse/filter/ContentAggregation';
 import {ContentQuery} from 'lib-contentstudio/app/content/ContentQuery';
 import {ArchiveResourceRequest} from './resource/ArchiveResourceRequest';
-import * as Q from 'q';
+import Q from 'q';
 import {Aggregation} from '@enonic/lib-admin-ui/aggregation/Aggregation';
 import {BucketAggregation} from '@enonic/lib-admin-ui/aggregation/BucketAggregation';
 import {Bucket} from '@enonic/lib-admin-ui/aggregation/Bucket';
@@ -42,35 +42,35 @@ export class ArchiveFilterPanel
         this.initAggregationGroupView();
 
         this.initListeners();
-   }
+    }
 
     onSearchEvent(listener: (query?: ContentQuery) => void): void {
         this.searchEventListeners.push(listener);
-   }
+    }
 
     unSearchEvent(listener: (query?: ContentQuery) => void): void {
         this.searchEventListeners = this.searchEventListeners.filter((curr: (query?: ContentQuery) => void) => {
             return curr !== listener;
-       });
-   }
+        });
+    }
 
     doSearch(): Q.Promise<void> {
         if (this.hasFilterSet()) {
             return this.getAndUpdateAggregations().then(() => {
                 this.notifySearchEvent(this.aggregationsFetcher.createContentQuery(this.getSearchInputValues()));
                 return Q.resolve();
-           });
-       }
+            });
+        }
 
         return this.resetFacets();
-   }
+    }
 
     protected resetFacets(_suppressEvent?: boolean, _doResetAll?: boolean): Q.Promise<void> {
         return this.getAndUpdateAggregations().then(() => {
             this.notifySearchEvent();
             return Q.resolve();
-       });
-   }
+        });
+    }
 
     protected getGroupViews(): AggregationGroupView[] {
         this.aggregations = new Map<string, AggregationGroupView>();
@@ -91,16 +91,16 @@ export class ArchiveFilterPanel
             new AggregationGroupView(ContentAggregation.LANGUAGE, i18n(`field.${ContentAggregation.LANGUAGE as string}`)));
 
         return Array.from(this.aggregations.values());
-   }
+    }
 
     private getAndUpdateAggregations(): Q.Promise<AggregationsQueryResult> {
         return this.getAggregations().then((aggregationsQueryResult: AggregationsQueryResult) => {
             this.updateHitsCounter(aggregationsQueryResult.getMetadata().getTotalHits());
             return this.processAggregations(aggregationsQueryResult.getAggregations()).then(() => {
                 return aggregationsQueryResult;
-           });
-       });
-   }
+            });
+        });
+    }
 
     private processAggregations(aggregations: Aggregation[]): Q.Promise<void> {
         this.toggleAggregationsVisibility(aggregations);
@@ -109,15 +109,15 @@ export class ArchiveFilterPanel
             () => {
                 this.updateAggregations(aggregations);
                 return Q.resolve();
-           });
-   }
+            });
+    }
 
     private getAggregations(): Q.Promise<AggregationsQueryResult> {
         this.aggregationsFetcher.setSearchInputValues(this.getSearchInputValues());
         this.aggregationsFetcher.setConstraintItemsIds(this.hasConstraint() ? this.getSelectionItems() : null);
 
         return this.aggregationsFetcher.getAggregations();
-   }
+    }
 
     private initAggregationGroupView(): void {
         (this.aggregations.get(ContentAggregation.OWNER) as FilterableAggregationGroupView).setIdsToKeepOnToTop(
@@ -130,24 +130,24 @@ export class ArchiveFilterPanel
 
     private getCurrentUserKeyAsString(): string {
         return AuthContext.get().getUser().getKey().toString();
-   }
+    }
 
     private notifySearchEvent(query?: ContentQuery): void {
         this.searchEventListeners.forEach((listener: (q?: ContentQuery) => void) => {
             listener(query);
-       });
-   }
+        });
+    }
 
     private toggleAggregationsVisibility(aggregations: Aggregation[]): void {
         aggregations.forEach((aggregation: BucketAggregation) => {
             const isAggregationVisible: boolean = aggregation.getBuckets().some((bucket: Bucket) => bucket.docCount > 0);
             this.aggregations.get(aggregation.getName()).setVisible(isAggregationVisible);
-       });
-   }
+        });
+    }
 
     private getAggregationsList(): string[] {
         return Array.from(this.aggregations.keys());
-   }
+    }
 
     private initListeners(): void {
         let isRefreshTriggered = false;
@@ -159,10 +159,10 @@ export class ArchiveFilterPanel
             if (isFullReset) {
                 isFullReset = false;
                 this.reset().catch(DefaultErrorHandler.handle);
-           } else {
+            } else {
                 this.resetFacets().catch(DefaultErrorHandler.handle);
-           }
-       }, 500);
+            }
+        }, 500);
 
         const refreshRequiredHandler = (): void => {
             if (!isRefreshTriggered) {
@@ -170,23 +170,23 @@ export class ArchiveFilterPanel
 
                 this.whenShown(() => {
                     debouncedReset();
-               });
-           }
-       };
+                });
+            }
+        };
 
         ProjectContext.get().onProjectChanged(() => {
             isFullReset = true;
             refreshRequiredHandler();
-       });
+        });
 
         ArchiveServerEvent.on((event) => {
             const changeType = event.getNodeChange().getChangeType();
 
             if (changeType === NodeServerChangeType.MOVE || changeType === NodeServerChangeType.DELETE) {
                 isFullReset = true;
-           }
+            }
 
             refreshRequiredHandler();
-       });
-   }
+        });
+    }
 }

@@ -1,41 +1,35 @@
-import org.codehaus.groovy.runtime.MethodClosure
-
-def isLibContentStudioIncluded()
-{
-    return new File( "$rootDir/../app-contentstudio" ).exists()
+// Cache expensive file system check
+def libContentStudioExists = providers.provider {
+    new File("$rootDir/../app-contentstudio").exists()
 }
 
-def hasLibContentStudio()
-{
-    return hasEnvironment() && isLibContentStudioIncluded()
-}
+def applyResourcesTaskDependencies() {
+    def libContentStudioBuild = gradle.includedBuild('app-contentstudio')
+    def libContentStudioDevJarTask = libContentStudioBuild.task(':lib-contentstudio:devJar')
+    def libContentStudioBuildTask = libContentStudioBuild.task(':lib-contentstudio:build')
+    def libContentStudioCleanTask = libContentStudioBuild.task(':lib-contentstudio:clean')
+    def libContentStudioYoloTask = libContentStudioBuild.task(':lib-contentstudio:yolo')
 
-def hasFlushTask()
-{
-    return project.tasks.hasProperty( 'flush' )
-}
+    tasks.matching { it.name == 'copyDevResources' }.configureEach {
+        dependsOn libContentStudioDevJarTask
+    }
 
-if ( hasLibContentStudio() )
-{
-    def appContentStudio = gradle.includedBuild( 'app-contentstudio' )
+    tasks.named('build').configure {
+        dependsOn libContentStudioBuildTask
+    }
 
-    ext {
-        libContentStudioBuildTask = appContentStudio.task( ':lib-contentstudio:build' )
-        libContentStudioCleanTask = appContentStudio.task( ':lib-contentstudio:clean' )
-        libContentStudioFlushTask = appContentStudio.task( ':lib-contentstudio:flush' )
+    tasks.named('clean').configure {
+        dependsOn libContentStudioCleanTask
+    }
+
+    tasks.named('yolo').configure {
+        dependsOn libContentStudioYoloTask
     }
 }
 
-ext {
-    hasLibContentStudio = this.&hasLibContentStudio as MethodClosure
-    isLibContentStudioIncluded = this.&isLibContentStudioIncluded as MethodClosure
-}
-
-if ( !hasFlushTask() )
+if ( hasEnvironment() && libContentStudioExists.get() )
 {
-    tasks.register('flush', Delete) {
-        dependsOn( 'clean' )
-        description = 'Clean the project from built sources and dependencies'
-        delete '.xp'
+    afterEvaluate {
+        applyResourcesTaskDependencies()
     }
 }

@@ -1,5 +1,5 @@
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
-import * as Q from 'q';
+import Q from 'q';
 import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import {StringHelper} from '@enonic/lib-admin-ui/util/StringHelper';
 import {CheckedValueInput, ValidityStatus, ValueValidationState} from 'lib-contentstudio/app/inputtype/text/CheckedValueInput';

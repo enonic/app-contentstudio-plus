@@ -4,7 +4,7 @@ import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/Cont
 import {ContentSummaryAndCompareStatusFetcher} from 'lib-contentstudio/app/resource/ContentSummaryAndCompareStatusFetcher';
 import {ContentId} from 'lib-contentstudio/app/content/ContentId';
 import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
-import {Element} from '@enonic/lib-admin-ui/dom/Element';
+import type {Element} from '@enonic/lib-admin-ui/dom/Element';
 import {AppHelper} from '@enonic/lib-admin-ui/util/AppHelper';
 import {ArchiveResourceRequest} from './resource/ArchiveResourceRequest';
 import {ContentSummary} from 'lib-contentstudio/app/content/ContentSummary';

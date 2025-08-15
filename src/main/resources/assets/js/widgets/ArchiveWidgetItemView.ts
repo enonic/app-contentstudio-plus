@@ -1,4 +1,4 @@
-import * as Q from 'q';
+import Q from 'q';
 import {WidgetItemView} from 'lib-contentstudio/app/view/context/WidgetItemView';
 import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import {ArchiveContentViewer} from '../ArchiveContentViewer';

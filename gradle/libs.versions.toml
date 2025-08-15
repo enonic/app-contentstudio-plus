@@ -1,0 +1,20 @@
+[versions]
+
+enonicDefaults = "2.1.5"
+xpApp = "3.6.1"
+nodeGradle = "7.0.2"
+
+# App
+libMustache = "2.1.1"
+libLicense = "3.2.0-SNAPSHOT"
+
+[libraries]
+
+# App
+lib-mustache = { module = "com.enonic.lib:lib-mustache", version.ref = "libMustache" }
+lib-license = { module = "com.enonic.lib:lib-license", version.ref = "libLicense" }
+
+[plugins]
+enonic-defaults = { id = "com.enonic.defaults", version.ref = "enonicDefaults" }
+enonic-xp-app = { id = "com.enonic.xp.app", version.ref = "xpApp" }
+node-gradle = { id = "com.github.node-gradle.node", version.ref = "nodeGradle" }

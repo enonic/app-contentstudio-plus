@@ -1,6 +1,6 @@
 import {Widget} from '../Widget';
 import {AppHelper} from '../../util/AppHelper';
-import * as Q from 'q';
+import Q from 'q';
 import {GetContentVariantsRequest} from './resource/request/GetContentVariantsRequest';
 import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import {Button} from '@enonic/lib-admin-ui/ui/button/Button';
@@ -181,7 +181,7 @@ export class VariantsWidget
         button.addClass('variants-widget-button-create');
 
         button.onClicked(() => {
-           CreateVariantDialog.get().setContent(this.originalContent).setVariants(this.variants).open();
+            CreateVariantDialog.get().setContent(this.originalContent).setVariants(this.variants).open();
         });
 
         return button;
