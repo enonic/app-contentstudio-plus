@@ -34,6 +34,9 @@ dependencies {
 tasks.register( 'unpackDistro', Copy ) {
     description = 'Unpacks the XP distribution for testing'
     group = 'setup'
+    println '*********************************************************'
+    println '* download and unpack Distro  *'
+    println '*********************************************************'
     from {
         configurations.distro.collect { tarTree( it ) }
     }
@@ -49,21 +52,22 @@ tasks.register( 'copyLicense', Copy ) {
     from file( rootProject.projectDir )
     include 'enonic.platform.subscription.lic'
     into licenseDir
-    mustRunAfter unpackDistro
+    mustRunAfter tasks.named('unpackDistro')
 }
 
 tasks.register( 'copyConfig', Copy ) {
     description = 'Copies configuration files to the test environment'
     group = 'setup'
     doLast {
-        println "$appDir${File.separator}common-config"
+        println "$testConfDir${File.separator}common-config"
     }
-    from "$appDir${File.separator}common-config"
+    from "$testConfDir${File.separator}common-config"
     include '**.*.cfg'
     include '*.properties'
     into configDir
-    mustRunAfter unpackDistro
+    mustRunAfter tasks.named('unpackDistro')
 }
+
 tasks.register( 'downloadApps', Copy ) {
     description = 'Downloads required apps for testing'
     group = 'setup'
@@ -78,21 +82,24 @@ tasks.register( 'copyApps', Copy ) {
     description = 'Copies application JAR files to deploy directory'
     group = 'setup'
     doLast {
-        println '*********************************************************'
-        println '* task started:copyApps  *'
-        println '*********************************************************'
-        println appDir
-        println deployDir
-    }
-    from file( appDir )
-    include '*.jar'
-    into deployDir
-    mustRunAfter unpackDistro
+        println 'Task downloadApps completed successfully.'
+        println 'Downloaded artifacts:'
+        configurations.apps.files.each { file ->
+            println "- ${file.name}"
+        }
 }
 
 tasks.register( 'deployContentStudio', Copy ) {
     description = 'Deploys Content Studio application'
     group = 'deployment'
+
+    println '*********************************************************'
+    println '* deployContentStudio  *'
+    println '*********************************************************'
+
+    description = 'Deploy Content Studio application'
+    group = 'setup'
+
     from {
         configurations.deploy
     }
@@ -103,6 +110,14 @@ tasks.register( 'deployContentStudio', Copy ) {
 tasks.register( 'deployContentStudioPlus', DefaultTask ) {
     description = 'Deploys Content Studio Plus application'
     group = 'deployment'
+
+    println '*********************************************************'
+    println '* deployContentStudio Plus *'
+    println '*********************************************************'
+
+    description = 'Deploy Content Studio Plus application'
+    group = 'setup'
+
     outputs.files( contentStudioPlusFile )
     doLast {
         println 'Retrieving Content Studio Plus App from:'
@@ -119,7 +134,7 @@ tasks.register( 'deployContentStudioPlus', DefaultTask ) {
             println 'Content Studio Plus App already exists.'
         }
     }
-    mustRunAfter unpackDistro
+    mustRunAfter tasks.named('unpackDistro')
 }
 
 
@@ -128,7 +143,17 @@ tasks.register( 'startServer' ) {
     description = 'Starts the XP server for testing'
     group = 'testing'
     dependsOn( tasks.named( 'pnpmInstall' ), tasks.named( 'unpackDistro' ), tasks.named( 'copyConfig' ), tasks.named( 'copyLicense' ), tasks.named( 'deployContentStudio' ), tasks.named( 'deployContentStudioPlus' ), tasks.named( 'downloadApps' ) )
+
+    println '*********************************************************'
+    println '* startServer  *'
+    println '*********************************************************'
+
+    description = 'Start XP server'
+    group = 'server'
+
     doLast {
+        sleep(5000)
+        println 'Starting XP Server...'
         def pb
         if ( DefaultNativePlatform.getCurrentOperatingSystem().windows ) {
             pb = new ProcessBuilder( 'cmd', '/c', "${distroDir}\\bin\\server.bat" )
@@ -144,7 +169,7 @@ tasks.register( 'startServer' ) {
         pb.redirectOutput( logsPath.file( 'xp.log' ).asFile )
         pb.redirectErrorStream( true )
         process = pb.start()
-        sleep( 90000 )
+        sleep(60000)
     }
 }
 
@@ -197,7 +222,7 @@ tasks.register('generateReportAndStopServer', PnpmTask ) {
 tasks.register( 'w_testCSPlusChrome', PnpmTask ) {
     description = 'Runs Content Studio Plus tests in Chrome'
     group = 'testing'
-    dependsOn( tasks.named( 'pnpmInstall' ), tasks.named( 'startServer' ) )
+    dependsOn( tasks.named( 'pnpmInstall' ), tasks.named('downloadApps'), dependsOn tasks.named('copyConfig'), tasks.named( 'startServer' ) )
     args = ['run', 'test_cs_plus:wdio_chrome']
     finalizedBy tasks.named( 'generateReportAndStopServer' )
 }
