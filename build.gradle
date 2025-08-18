@@ -1,9 +1,9 @@
 plugins {
     id 'java'
     id 'maven-publish'
-    id 'com.enonic.defaults' version '2.1.5'
-    id 'com.enonic.xp.app' version '3.6.1'
-    id "com.github.node-gradle.node" version '7.1.0'
+    alias( libs.plugins.enonic.defaults )
+    alias( libs.plugins.enonic.xp.app )
+    alias( libs.plugins.node.gradle )
 }
 
 apply from: "$rootDir/gradle/env.gradle"
@@ -21,51 +21,50 @@ subprojects {
 
     java {
         toolchain {
-            languageVersion = JavaLanguageVersion.of(21)
+            languageVersion = JavaLanguageVersion.of( 21 )
         }
-    }
 
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = sourceCompatibility
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = sourceCompatibility
+    }
 
     repositories {
         mavenLocal()
         mavenCentral()
-        xp.enonicRepo('dev')
+        xp.enonicRepo( 'dev' )
     }
 }
 
 configurations {
     devResources {
         attributes {
-            attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named(LibraryElements, 'dev-resources'))
+            attribute( LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, objects.named( LibraryElements, 'dev-resources' ) )
         }
     }
 }
 
 app {
-    name = project.appName
+    name = 'com.enonic.app.contentstudio.plus'
     displayName = 'Content Studio +'
     vendorName = 'Enonic AS'
     vendorUrl = 'https://enonic.com'
     systemVersion = "${xpVersion}"
-    devSourcePaths += file("$rootDir/../lib-admin-ui/src/main/resources")
-    devSourcePaths += file("$rootDir/../app-contentstudio/modules/lib/src/main/resources")
+    devSourcePaths += file( "$rootDir/../lib-admin-ui/src/main/resources" )
+    devSourcePaths += file( "$rootDir/../app-contentstudio/modules/lib/src/main/resources" )
 }
 
 dependencies {
     implementation "com.enonic.xp:core-api:${xpVersion}"
-    include "com.enonic.xp:lib-portal:${xpVersion}"
-    include "com.enonic.xp:lib-io:${xpVersion}"
+    include "com.enonic.xp:lib-admin:${xpVersion}"
+    include "com.enonic.xp:lib-auth:${xpVersion}"
     include "com.enonic.xp:lib-content:${xpVersion}"
     include "com.enonic.xp:lib-context:${xpVersion}"
     include "com.enonic.xp:lib-i18n:${xpVersion}"
-    include "com.enonic.xp:lib-admin:${xpVersion}"
-    include "com.enonic.xp:lib-auth:${xpVersion}"
-    include "com.enonic.lib:lib-admin-ui:${libAdminUiVersion}"
-    include "com.enonic.lib:lib-contentstudio:${libContentStudioVersion}"
-    include "com.enonic.lib:lib-mustache:${libMustacheVersion}"
-    include "com.enonic.lib:lib-license:3.2.0-SNAPSHOT"
+    include "com.enonic.xp:lib-io:${xpVersion}"
+    include "com.enonic.xp:lib-portal:${xpVersion}"
+    include libs.lib.mustache
+    include libs.lib.license
+
     devResources "com.enonic.lib:lib-admin-ui:${libAdminUiVersion}"
     devResources "com.enonic.lib:lib-contentstudio:${libContentStudioVersion}"
 }
@@ -73,86 +72,81 @@ dependencies {
 repositories {
     mavenLocal()
     mavenCentral()
-    xp.enonicRepo('dev')
+    xp.enonicRepo( 'dev' )
 }
 
-configurations.all {
-    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+tasks.register( 'checkTypes', PnpmTask ) {
+    dependsOn tasks.named( 'pnpmInstall' )
+    group = 'verification'
+    args = ['run', 'check:types']
+    outputs.cacheIf { false }
 }
 
-node {
-    download = true
-    version = '22.16.0'
+tasks.register( 'checkLint', PnpmTask ) {
+    dependsOn tasks.named( 'pnpmInstall' )
+    group = 'verification'
+    args = ['run', 'check:lint']
+    outputs.cacheIf { false }
 }
 
-tasks.register('copyDevResources') {
-    doLast {
-        copy {
-            from configurations.devResources.files.collect { zipTree( it ) }
-            include 'dev/**'
-            into '.xp'
-        }
-    }
+tasks.register( 'pnpmCheck', PnpmTask ) {
+    dependsOn tasks.named( 'pnpmInstall' )
+    group = 'verification'
+    args = ['run', 'check']
+    outputs.cacheIf { false }
 }
 
-npmInstall.dependsOn copyDevResources
-
-tasks.register('lint', NpmTask) {
-    dependsOn npmInstall
-    args = [ 'run', 'lint:quiet' ]
-    inputs.files fileTree( dir: 'modules', include: '**/src/main/**.*' )
-    outputs.dir file('gradle')
-    outputs.upToDateWhen { false }
+tasks.named( 'check' ).configure {
+    dependsOn tasks.named( 'pnpmCheck' )
 }
 
-check.configure {
-    dependsOn( 'lint' )
-}
-
-tasks.register('webpack', NpmTask) {
-    dependsOn( 'npmInstall', 'javadoc' )
-    environment = [ 'NODE_ENV': nodeEnvironment() ]
-    description = 'Build UI resources (ts, css, etc).'
-    args = [ 'run', 'build' ]
+tasks.register( 'pnpmBuild', PnpmTask ) {
+    dependsOn tasks.named( 'pnpmInstall' )
+    dependsOn tasks.named( 'javadoc' )
+    description = 'Build UI resources (ts, css, etc) with Vite.'
+    args = ['run', "build:${environmentShort()}"]
     inputs.dir '.xp/dev'
     inputs.dir 'src/main'
-    inputs.file 'webpack.config.js'
+    inputs.file 'vite.config.ts'
+    inputs.file 'tsconfig.json'
     outputs.dir "${buildDir}/resources/main"
 }
 
-jar {
-    exclude 'assets/**/*.ts'
-    exclude 'assets/**/*.less'
-    exclude 'assets/img/**'
-    exclude 'assets/styles/html-editor.*'
-    exclude 'assets/styles/contentlib.*'
+tasks.named( 'processResources' ).configure {
+    // Don't need source files
+    exclude 'assets/js/**'
+    exclude 'assets/styles/**'
 
-    if (isProd()) {
+    // Inlined by the Vite into CSS
+    exclude 'assets/fonts/**'
+    exclude 'assets/img/**'
+
+    includeEmptyDirs = false
+}
+
+tasks.named( 'jar' ).configure {
+    exclude 'assets/**/tsconfig.tsbuildinfo'
+
+    if ( isProd() ) {
         exclude 'assets/**/*.map'
     }
 
-    dependsOn( 'webpack' )
+    includeEmptyDirs = false
+
+    dependsOn tasks.named( 'pnpmBuild' )
 }
 
-if ( hasEnvironment() )
-{
-    addBuildDependency()
-}
+tasks.register( 'yolo' ) {
+    description = 'Build without running install, check, or test tasks'
 
-def addBuildDependency() {
-    if ( isLibAdminUiIncluded() )
-    {
-        copyDevResources.dependsOn += libAdminBuildTask
-        build.dependsOn += libAdminBuildTask
-        clean.dependsOn += libAdminCleanTask
-        flush.dependsOn += libAdminFlushTask
-    }
+    dependsOn tasks.named( 'deploy' )
+    dependsOn tasks.named( 'checkTypes' )
 
-    if ( isLibContentStudioIncluded() )
-    {
-        copyDevResources.dependsOn += libContentStudioBuildTask
-        build.dependsOn += libContentStudioBuildTask
-        clean.dependsOn += libContentStudioCleanTask
-        flush.dependsOn += libContentStudioFlushTask
-    }
+    nodeSetup.enabled = false
+    npmSetup.enabled = false
+    pnpmSetup.enabled = false
+    pnpmCheck.enabled = false
+    checkLint.enabled = false
+    check.enabled = false
+    test.enabled = false
 }

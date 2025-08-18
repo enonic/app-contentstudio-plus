@@ -1,7 +1,7 @@
 import {ArchiveTreeList} from './ArchiveTreeList';
 import {ContentQuery} from 'lib-contentstudio/app/content/ContentQuery';
 import {ArchiveContentFetcher} from './ArchiveContentFetcher';
-import * as Q from 'q';
+import Q from 'q';
 import {FetchResponse} from './FetchResponse';
 
 export class ArchiveTreeRootList extends ArchiveTreeList {

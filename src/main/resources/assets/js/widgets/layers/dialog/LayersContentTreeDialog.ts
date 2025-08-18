@@ -1,6 +1,6 @@
 import {ModalDialog} from '@enonic/lib-admin-ui/ui/dialog/ModalDialog';
 import {H6El} from '@enonic/lib-admin-ui/dom/H6El';
-import * as Q from 'q';
+import Q from 'q';
 import {ProjectContext} from 'lib-contentstudio/app/project/ProjectContext';
 import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import {LayerContent} from '../LayerContent';

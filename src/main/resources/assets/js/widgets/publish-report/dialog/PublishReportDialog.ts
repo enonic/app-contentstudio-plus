@@ -1,6 +1,6 @@
 import {ModalDialog} from '@enonic/lib-admin-ui/ui/dialog/ModalDialog';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
-import * as Q from 'q';
+import Q from 'q';
 import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import {ContentId} from 'lib-contentstudio/app/content/ContentId';
 import {GetContentVersionsRequest} from 'lib-contentstudio/app/resource/GetContentVersionsRequest';
@@ -120,7 +120,7 @@ export class PublishReportDialog
 
     private fetchContent(): Q.Promise<ContentSummary> | Q.Promise<ContentSummaryAndCompareStatus> {
         this.contentPromise = this.contentPromise ??
-                              (this.isContentArchived ? new ArchiveContentFetcher().fetch(this.contentId) : new GetContentSummaryByIdRequest(this.contentId).sendAndParse());
+            (this.isContentArchived ? new ArchiveContentFetcher().fetch(this.contentId) : new GetContentSummaryByIdRequest(this.contentId).sendAndParse());
 
         return this.contentPromise;
     }

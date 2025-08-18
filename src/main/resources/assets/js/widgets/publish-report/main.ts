@@ -3,17 +3,16 @@ import {AppHelper} from '../../util/AppHelper';
 import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
 import {PublishReportWidget} from './PublishReportWidget';
 import {resolveConfig} from '../../util/WidgetConfigResolver';
+import {getModuleScript, getRequiredAttribute, getOptionalAttribute} from '../../util/ModuleScriptHelper';
 import {Messages} from '@enonic/lib-admin-ui/util/Messages';
 
 void (() => {
-    const configScriptId = document.currentScript.getAttribute('data-config-script-id');
-    if (!configScriptId) {
-        throw Error('Missing \'data-config-script-id\' attribute');
-    }
-
-    const contentId = document.currentScript.getAttribute('data-content-id');
-    const publishFirstAsString = document.currentScript.getAttribute('data-publish-first');
-    const isArchivedAttrValue = document.currentScript.getAttribute('data-archived');
+    const currentScript = getModuleScript('publish-report');
+    
+    const configScriptId = getRequiredAttribute(currentScript, 'data-config-script-id');
+    const contentId = getOptionalAttribute(currentScript, 'data-content-id');
+    const publishFirstAsString = getOptionalAttribute(currentScript, 'data-publish-first');
+    const isArchivedAttrValue = getOptionalAttribute(currentScript, 'data-archived');
     const isArchived = Boolean(isArchivedAttrValue == 'true');
 
     CONFIG.setConfig(resolveConfig(configScriptId));

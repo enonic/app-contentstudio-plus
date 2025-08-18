@@ -5,7 +5,7 @@ import {ContentSummaryAndCompareStatusFetcher} from 'lib-contentstudio/app/resou
 import {ContentId} from 'lib-contentstudio/app/content/ContentId';
 import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
-import * as Q from 'q';
+import Q from 'q';
 import {ArchiveNoLicenseBlock} from '../../ArchiveNoLicenseBlock';
 
 export class LayersWidget

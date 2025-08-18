@@ -1,4 +1,4 @@
-import * as Q from 'q';
+import Q from 'q';
 import {TaskIdJson} from '@enonic/lib-admin-ui/task/TaskIdJson';
 import {TaskState} from '@enonic/lib-admin-ui/task/TaskState';
 import {TaskId} from '@enonic/lib-admin-ui/task/TaskId';
@@ -26,14 +26,14 @@ export class TaskArchiveResourceRequest extends ArchiveResourceRequest<TaskId> {
                         const progress = task.getProgress();
 
                         switch (state) {
-                        case TaskState.FINISHED:
-                            deferred.resolve(progress.getInfo());
-                            break;
-                        case TaskState.FAILED:
-                            deferred.reject(progress.getInfo());
-                            break;
-                        default:
-                            poll();
+                            case TaskState.FINISHED:
+                                deferred.resolve(progress.getInfo());
+                                break;
+                            case TaskState.FAILED:
+                                deferred.reject(progress.getInfo());
+                                break;
+                            default:
+                                poll();
                         }
                     }).catch((reason) => {
                         DefaultErrorHandler.handle(reason);

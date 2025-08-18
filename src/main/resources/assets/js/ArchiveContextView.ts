@@ -1,5 +1,5 @@
 import {ContextView} from 'lib-contentstudio/app/view/context/ContextView';
-import * as Q from 'q';
+import Q from 'q';
 import {Widget} from '@enonic/lib-admin-ui/content/Widget';
 import {WidgetView} from 'lib-contentstudio/app/view/context/WidgetView';
 import {WidgetItemView} from 'lib-contentstudio/app/view/context/WidgetItemView';

@@ -1,5 +1,5 @@
 import {DivEl} from '@enonic/lib-admin-ui/dom/DivEl';
-import * as Q from 'q';
+import Q from 'q';
 import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import {ContentSummaryAndCompareStatusViewer} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatusViewer';
 import {SpanEl} from '@enonic/lib-admin-ui/dom/SpanEl';

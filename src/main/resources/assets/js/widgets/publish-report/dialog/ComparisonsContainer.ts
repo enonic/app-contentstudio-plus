@@ -4,7 +4,7 @@ import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {ContentId} from 'lib-contentstudio/app/content/ContentId';
 import {ComparisonBlock} from './ComparisonBlock';
 import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
-import * as Q from 'q';
+import Q from 'q';
 import {DateHelper} from '@enonic/lib-admin-ui/util/DateHelper';
 import {TextAndDateBlock} from './TextAndDateBlock';
 

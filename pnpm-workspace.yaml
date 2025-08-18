@@ -1,0 +1,12 @@
+packages:
+  - .
+  - testing
+  - .xp/dev/*
+
+onlyBuiltDependencies:
+  - '@swc/core'
+  - esbuild
+  - edgedriver
+  - geckodriver
+
+ignore-workspace-root-check: true

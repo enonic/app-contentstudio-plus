@@ -1,5 +1,5 @@
 import {LayersView} from './LayersView';
-import * as Q from 'q';
+import Q from 'q';
 import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import {ShowAllContentLayersButton} from './ShowAllContentLayersButton';
 import {MultiLayersContentLoader} from './MultiLayersContentLoader';

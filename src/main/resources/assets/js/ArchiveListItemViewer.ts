@@ -1,6 +1,6 @@
 import {DivEl} from '@enonic/lib-admin-ui/dom/DivEl';
 import {ArchiveContentViewer} from './ArchiveContentViewer';
-import * as Q from 'q';
+import Q from 'q';
 import {ArchiveContentViewItem} from './ArchiveContentViewItem';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {SpanEl} from '@enonic/lib-admin-ui/dom/SpanEl';

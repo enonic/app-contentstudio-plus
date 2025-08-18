@@ -2,8 +2,8 @@ import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 
 plugins {
     id 'java'
-    id 'com.enonic.defaults'
-    id 'com.github.node-gradle.node'
+    alias( libs.plugins.enonic.defaults )
+    alias( libs.plugins.node.gradle )
 }
 group = 'com.enonic.app.contentstudio.js_testing'
 
@@ -15,15 +15,15 @@ configurations {
     }
 }
 
-def unpackDir = layout.buildDirectory.dir("install").get()
-def distroDir = unpackDir.dir("enonic-xp-generic-$xpVersion")
+def unpackDir = layout.buildDirectory.dir( 'install' ).get()
+def distroDir = unpackDir.dir( "enonic-xp-generic-$xpVersion" )
 def appDir = "$projectDir/test-applications"
 def xpHome = "$distroDir/home"
-def deployDir = distroDir.dir("home/deploy")
-def licenseDir = distroDir.dir("home/license")
+def deployDir = distroDir.dir( 'home/deploy' )
+def licenseDir = distroDir.dir( 'home/license' )
 def configDir = "$xpHome/config"
 def contentStudioPlusFile = "$deployDir/contentstudio.plus-${version}.jar"
-def contentStudioPlusAppUrl = project.hasProperty('contentStudioPlusAppUrl') ? contentStudioPlusAppUrl : "file:///$projectDir/../build/libs/contentstudio.plus.jar"
+def contentStudioPlusAppUrl = project.hasProperty( 'contentStudioPlusAppUrl' ) ? contentStudioPlusAppUrl : "file:///$projectDir/../build/libs/contentstudio.plus.jar"
 
 dependencies {
     distro "com.enonic.xp:enonic-xp-generic:$xpVersion@tgz"
@@ -32,23 +32,29 @@ dependencies {
 }
 
 tasks.register( 'unpackDistro', Copy ) {
+    description = 'Unpacks the XP distribution for testing'
+    group = 'setup'
     from {
         configurations.distro.collect { tarTree( it ) }
     }
     into unpackDir
 }
 
-tasks.register('copyLicense', Copy) {
+tasks.register( 'copyLicense', Copy ) {
+    description = 'Copies license file to the test environment'
+    group = 'setup'
     doLast {
-        println "Copy license"
+        println 'Copy license'
     }
-    from file (rootProject.projectDir)
+    from file( rootProject.projectDir )
     include 'enonic.platform.subscription.lic'
     into licenseDir
     mustRunAfter unpackDistro
 }
 
-tasks.register('copyConfig', Copy) {
+tasks.register( 'copyConfig', Copy ) {
+    description = 'Copies configuration files to the test environment'
+    group = 'setup'
     doLast {
         println "$appDir${File.separator}common-config"
     }
@@ -59,14 +65,18 @@ tasks.register('copyConfig', Copy) {
     mustRunAfter unpackDistro
 }
 tasks.register( 'downloadApps', Copy ) {
+    description = 'Downloads required apps for testing'
+    group = 'setup'
     from {
         configurations.apps
     }
     into deployDir
-    mustRunAfter unpackDistro
+    mustRunAfter tasks.named( 'unpackDistro' )
 }
 
-tasks.register('copyApps', Copy) {
+tasks.register( 'copyApps', Copy ) {
+    description = 'Copies application JAR files to deploy directory'
+    group = 'setup'
     doLast {
         println '*********************************************************'
         println '* task started:copyApps  *'
@@ -80,15 +90,19 @@ tasks.register('copyApps', Copy) {
     mustRunAfter unpackDistro
 }
 
-tasks.register('deployContentStudio', Copy) {
+tasks.register( 'deployContentStudio', Copy ) {
+    description = 'Deploys Content Studio application'
+    group = 'deployment'
     from {
         configurations.deploy
     }
     into deployDir
-    mustRunAfter unpackDistro
+    mustRunAfter tasks.named( 'unpackDistro' )
 }
 
-tasks.register('deployContentStudioPlus', DefaultTask) {
+tasks.register( 'deployContentStudioPlus', DefaultTask ) {
+    description = 'Deploys Content Studio Plus application'
+    group = 'deployment'
     outputs.files( contentStudioPlusFile )
     doLast {
         println 'Retrieving Content Studio Plus App from:'
@@ -97,13 +111,11 @@ tasks.register('deployContentStudioPlus', DefaultTask) {
         println contentStudioPlusFile
 
         def f = new File( contentStudioPlusFile )
-        if ( !f.exists() )
-        {
+        if ( !f.exists() ) {
             new URL( contentStudioPlusAppUrl ).withInputStream { i -> f.withOutputStream { it << i } }
             println 'Content Studio Plus App is downloaded.'
         }
-        else
-        {
+        else {
             println 'Content Studio Plus App already exists.'
         }
     }
@@ -113,55 +125,90 @@ tasks.register('deployContentStudioPlus', DefaultTask) {
 
 def process
 tasks.register( 'startServer' ) {
-    dependsOn( unpackDistro, copyConfig, copyLicense, deployContentStudio, deployContentStudioPlus, downloadApps )
+    description = 'Starts the XP server for testing'
+    group = 'testing'
+    dependsOn( tasks.named( 'pnpmInstall' ), tasks.named( 'unpackDistro' ), tasks.named( 'copyConfig' ), tasks.named( 'copyLicense' ), tasks.named( 'deployContentStudio' ), tasks.named( 'deployContentStudioPlus' ), tasks.named( 'downloadApps' ) )
     doLast {
         def pb
-        if (DefaultNativePlatform.getCurrentOperatingSystem().windows) {
-            pb = new ProcessBuilder('cmd', '/c', "${distroDir}\\bin\\server.bat")
+        if ( DefaultNativePlatform.getCurrentOperatingSystem().windows ) {
+            pb = new ProcessBuilder( 'cmd', '/c', "${distroDir}\\bin\\server.bat" )
         }
         else {
-            pb = new ProcessBuilder("${distroDir}/bin/server.sh")
+            pb = new ProcessBuilder( "${distroDir}/bin/server.sh" )
         }
         Map<String, String> env = pb.environment()
-        env.put("XP_HOME", "${xpHome}".toString())
+        env.put( 'XP_HOME', "${xpHome}".toString() )
 
-        def logsPath = layout.buildDirectory.dir("reports/logs").get()
+        def logsPath = layout.buildDirectory.dir( 'reports/logs' ).get()
         mkdir logsPath.asFile
-        pb.redirectOutput(logsPath.file("xp.log").asFile)
-        pb.redirectErrorStream(true)
+        pb.redirectOutput( logsPath.file( 'xp.log' ).asFile )
+        pb.redirectErrorStream( true )
         process = pb.start()
-        sleep(90000)
+        sleep( 90000 )
     }
 }
 
 
 tasks.register( 'stopServer' ) {
+    description = 'Stops the XP server'
+    group = 'testing'
     doLast {
-        if (DefaultNativePlatform.getCurrentOperatingSystem().windows) {
-            Runtime.getRuntime().exec("taskkill /F /T /PID " + process.pid());
-        } else {
-            process.destroy()
+        if (!project.hasProperty('process')) {
+            println "Server process not found. It might already be stopped."
+            return
         }
+
+        def os = DefaultNativePlatform.currentOperatingSystem
+        def pid = process.pid()
+
+        if (os.isWindows()) {
+            println "Stopping process with PID ${pid} on Windows..."
+            exec {
+                commandLine 'taskkill', '/F', '/T', '/PID', pid.toString()
+                ignoreExitValue = true // Don't fail if the process is already gone
+            }
+        } else { // For macOS, Linux, and other Unix-like systems
+            println "Stopping process with PID ${pid} on ${os.displayName}..."
+            exec {
+                commandLine 'kill', '-9', pid.toString()
+                ignoreExitValue = true // Don't fail if the process is already gone
+            }
+        }
+
+        // Clean up the process property
+        project.ext.process = null
     }
 }
 
-tasks.register('cleanup', Delete) {
+tasks.register( 'cleanup', Delete ) {
+    description = 'Cleans up test reports'
+    group = 'cleanup'
     delete './build/reports/allure'
 }
 
-tasks.register('generateReportAndStopServer', NpmTask ) {
-    args = ['run-script', 'allure-report']
-    finalizedBy cleanup
-    finalizedBy stopServer
+tasks.register('generateReportAndStopServer', PnpmTask ) {
+    description = 'Generates test report and stops server'
+    group = 'reporting'
+    args = ['run', 'allure-report']
+    finalizedBy tasks.named( 'cleanup' )
+    finalizedBy tasks.named( 'stopServer' )
 }
 
-tasks.register('w_testCSPlusChrome', NpmTask) {
-    dependsOn( npmInstall, startServer )
-    args = ['run-script', 'test_cs_plus:wdio_chrome']
-    finalizedBy generateReportAndStopServer
+tasks.register( 'w_testCSPlusChrome', PnpmTask ) {
+    description = 'Runs Content Studio Plus tests in Chrome'
+    group = 'testing'
+    dependsOn( tasks.named( 'pnpmInstall' ), tasks.named( 'startServer' ) )
+    args = ['run', 'test_cs_plus:wdio_chrome']
+    finalizedBy tasks.named( 'generateReportAndStopServer' )
 }
 
-tasks.register('w_testAdminHomeChromeLocal', NpmTask) {
-    dependsOn( npmInstall )
-    args = ['run-script', 'test_cs_plus:wdio_chrome']
+tasks.register( 'w_testAdminHomeChromeLocal', PnpmTask ) {
+    description = 'Runs local admin home tests in Chrome'
+    group = 'testing'
+    dependsOn( tasks.named( 'pnpmInstall' ) )
+    args = ['run', 'test_cs_plus:wdio_chrome']
+}
+
+tasks.register( 'yolo' ) {
+    dependsOn tasks.named( 'build' )
 }
