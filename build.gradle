@@ -44,7 +44,7 @@ configurations {
 }
 
 app {
-    name = 'com.enonic.app.contentstudio.plus'
+    name = "${group}.${projectName}"
     displayName = 'Content Studio +'
     vendorName = 'Enonic AS'
     vendorUrl = 'https://enonic.com'
