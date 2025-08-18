@@ -127,7 +127,7 @@ def process
 tasks.register( 'startServer' ) {
     description = 'Starts the XP server for testing'
     group = 'testing'
-    dependsOn( tasks.named( 'unpackDistro' ), tasks.named( 'copyConfig' ), tasks.named( 'copyLicense' ), tasks.named( 'deployContentStudio' ), tasks.named( 'deployContentStudioPlus' ), tasks.named( 'downloadApps' ) )
+    dependsOn( tasks.named( 'pnpmInstall' ), tasks.named( 'unpackDistro' ), tasks.named( 'copyConfig' ), tasks.named( 'copyLicense' ), tasks.named( 'deployContentStudio' ), tasks.named( 'deployContentStudioPlus' ), tasks.named( 'downloadApps' ) )
     doLast {
         def pb
         if ( DefaultNativePlatform.getCurrentOperatingSystem().windows ) {
