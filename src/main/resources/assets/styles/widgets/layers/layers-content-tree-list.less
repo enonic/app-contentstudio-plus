@@ -1,0 +1,128 @@
+.layers-content-tree-list {
+  .level(@level: 0) {
+    margin-left: 20px * @level;
+  }
+
+  margin: 4px 8px;
+
+  .layers-content-tree-list-item {
+    margin-bottom: 10px;
+
+    &.level-1 {
+      .level(1);
+    }
+
+    &.level-2 {
+      .level(2);
+    }
+
+    &.level-3 {
+      .level(3);
+    }
+
+    &.level-4 {
+      .level(4);
+    }
+
+    &.level-5 {
+      .level(5);
+    }
+
+    &.level-6 {
+      .level(6);
+    }
+
+    &.level-7 {
+      .level(7);
+    }
+  }
+
+  .layers-item-view {
+    margin: 0 10px;
+    position: relative;
+
+    .layers-item-view-relation {
+      display: none; // hidden for now
+      // display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+
+      .layers-item-view-relation-line {
+        width: 3px;
+        background: @admin-font-gray1;
+        height: 10px;
+      }
+
+      .layers-item-view-relation-arrow {
+        width: 0;
+        height: 0;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-top: 10px solid @admin-font-gray1;
+        display: none;
+      }
+    }
+
+    .layers-item-view-data {
+      &-header {
+        .layer-details {
+          .layer-name {
+            max-width: 100px;
+          }
+        }
+      }
+    }
+
+    &-expanded .layers-item-view-data {
+      &-footer {
+        display: flex;
+        justify-content: center;
+      }
+    }
+
+    &.item-inherited {
+      .layers-item-view-data {
+        &-body {
+          opacity: 0.5;
+        }
+      }
+
+      &.layer-current:not(.readonly) {
+        .layers-item-view-data-footer {
+          .action-button {
+            background-color: @admin-button-blue2;
+
+            &:hover {
+              background-color: @admin-button-blue1;
+            }
+          }
+        }
+      }
+    }
+
+    &.layer-current {
+      .layers-item-view-data {
+        border: 2px solid @admin-blue;
+      }
+
+      .layers-item-view-relation {
+        .layers-item-view-relation-arrow {
+          display: block;
+        }
+      }
+    }
+
+    &:not(.item-inherited) {
+      .layers-item-view-relation {
+        .layers-item-view-relation-arrow {
+          display: block;
+        }
+      }
+    }
+
+    &:not(:first-child) {
+      margin-top: 20px;
+    }
+  }
+}
