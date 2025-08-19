@@ -4,32 +4,30 @@
 const Page = require('../page');
 const appConst = require('../../libs/app_const');
 const lib = require('../../libs/elements');
-const LayersContentTreeDialog = require('../project/layers.content.tree.dialog');
 
 const xpath = {
-    showAllButton: "//button[contains(@id,'ShowAllContentLayersButton')]",
-    layerViewByName:
-        layerName => `//div[contains(@id,'LayerContentViewHeader') and descendant::div[@class='layer-name' and text()='${layerName}']]`,
+    layersItemViewDiv: "//div[contains(@class,'layers-item-view-data')]",
+    localizeButton: "//div[contains(@class,'data-footer')]//button[child::span[text()='Localize']]",
+    editButton: "//div[contains(@class,'data-footer')]//button[child::span[text()='Edit']]",
+    openButton: "//div[contains(@class,'data-footer')]//button[child::span[text()='Open']]",
     layerDetailsDiv: "//div[contains(@id,'LayerContentViewHeader')]/div[contains(@class,'layer-details')]",
     layerLanguageDiv: "//div[@class='layer-language']",
     layerNameDiv: "//div[@class='layer-name']",
-    openButton: "/following-sibling::div[contains(@id,'LayerContentViewFooter')]/button[child::span[text()='Open']]",
+    layerViewByName: layerName => `//div[contains(@class,'layers-item-view-data') and descendant::div[@class='layer-name' and text()='${layerName}']]`,
 };
 
 class BaseLayersWidget extends Page {
-
-    get showAllButton() {
-        return this.layersWidget + xpath.showAllButton;
-    }
 
     isWidgetVisible() {
         return this.isElementDisplayed(this.layersWidget);
     }
 
-    waitForWidgetLoaded() {
-        return this.waitForElementDisplayed(this.layersWidget, appConst.shortTimeout).catch(err => {
-            throw new Error('Browse Panel: Layers Widget is not loaded in ' + appConst.shortTimeout + ' ' + err);
-        });
+    async waitForWidgetLoaded() {
+        try {
+            return await this.waitForElementDisplayed(this.layersWidget, appConst.shortTimeout)
+        } catch (err) {
+            await this.handleError('Layer Widget was not loaded', 'err_layer_widget_loaded', err);
+        }
     }
 
     async getLayersName() {
@@ -44,60 +42,48 @@ class BaseLayersWidget extends Page {
     }
 
     async waitForLocalizeButtonEnabled(layerName) {
-        let locator = this.widgetItemView + xpath.layerViewByName(layerName) +
-                      "/following-sibling::div[contains(@id,'LayerContentViewFooter')]/button[child::span[text()='Localize']]";
+        let locator = this.widgetItemView + xpath.layerViewByName(layerName) + xpath.localizeButton;
         await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
         return await this.waitForElementEnabled(locator, appConst.mediumTimeout);
     }
 
     async waitForLocalizeButtonDisabled(layerName) {
-        let locator = this.widgetItemView + xpath.layerViewByName(layerName) +
-                      "/following-sibling::div[contains(@id,'LayerContentViewFooter')]/button[child::span[text()='Localize']]";
+        let locator1 = this.widgetItemView + xpath.layerViewByName(layerName) +
+                       "/following-sibling::div[contains(@id,'LayerContentViewFooter')]/button[child::span[text()='Localize']]";
+        let locator = this.widgetItemView + xpath.layerViewByName(layerName) + xpath.localizeButton;
         await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
         return await this.waitForElementDisabled(locator, appConst.mediumTimeout);
     }
 
     async waitForEditButtonEnabled(layerName) {
         try {
-            let locator = this.widgetItemView + xpath.layerViewByName(layerName) +
-                          "/following-sibling::div[contains(@id,'LayerContentViewFooter')]/button[child::span[text()='Edit']]";
+            let locator = this.widgetItemView + xpath.layerViewByName(layerName) + xpath.editButton;
             await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
             return await this.waitForElementEnabled(locator, appConst.mediumTimeout);
         } catch (err) {
-            throw new Error("Error getting button in the layer view item: " + err);
+            await this.handleError(`Layers Widget - 'Edit' button should be enabled, layer: ${layerName}`, 'err_widget_edit_btn', err);
         }
     }
 
     async waitForOpenButtonEnabled(layerName) {
         try {
-            let locator = this.widgetItemView + xpath.layerViewByName(layerName) +
-                          "/following-sibling::div[contains(@id,'LayerContentViewFooter')]/button[child::span[text()='Open']]";
+            let locator = this.widgetItemView + xpath.layerViewByName(layerName) + xpath.openButton;
             await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
             return await this.waitForElementEnabled(locator, appConst.mediumTimeout);
         } catch (err) {
-            throw new Error("Error getting button in the layer view item: " + err);
+            await this.handleError(`Layers Widget - 'Open' button should be enabled,  layer: ${layerName}`, 'err_widget_item_open', err);
         }
     }
 
-
     async clickOnLocalizeButton(layerName) {
-        let locator = this.widgetItemView + xpath.layerViewByName(layerName) +
-                      "/following-sibling::div[contains(@id,'LayerContentViewFooter')]/button/span[text()='Localize']";
+        let locator = this.widgetItemView + xpath.layerViewByName(layerName) + xpath.localizeButton;
         await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
         return await this.clickOnElement(locator);
     }
 
-    async clickOnShowAllButton() {
-        let layersContentTreeDialog = new LayersContentTreeDialog();
-        await this.waitForElementDisplayed(this.showAllButton, appConst.mediumTimeout);
-        await this.clickOnElement(this.showAllButton);
-        await layersContentTreeDialog.waitForDialogLoaded();
-        return layersContentTreeDialog;
-    }
-
+    // Gets the string 'layer611610(en)' from the layer-item  for the current selected content
     async getContentNameWithLanguage(layerName) {
         let locator = this.widgetItemView + xpath.layerViewByName(layerName) +
-                      "/following-sibling::div[contains(@id,'LayerContentViewBody')]" +
                       "//div[contains(@id,'LangBasedContentSummaryViewer')]" + lib.H6_DISPLAY_NAME;
         let locatorName = locator + "//span[@class='display-name']";
         let locatorPostfix = locator + "//span[@class='display-name-postfix']";
@@ -108,14 +94,15 @@ class BaseLayersWidget extends Page {
         return displayName + postfix;
     }
 
-    async getContentStatus() {
-        let locator = this.widgetItemView + "//div[contains(@id,'LayerContentViewHeader')]//div[contains(@class,'status')]";
-        await this.waitForElementDisplayed(locator);
-        return await this.getText(locator);
-    }
-
-    async waitForShowAllButtonDisplayed() {
-        return await this.waitForElementDisplayed(this.showAllButton, appConst.mediumTimeout);
+    async getContentStatus(layerName) {
+        try {
+            let locator = this.widgetItemView + xpath.layerViewByName(layerName) +
+                          "//div[contains(@id,'LayerContentViewHeader')]//div[contains(@class,'status')]";
+            await this.waitForElementDisplayed(locator);
+            return await this.getText(locator);
+        } catch (err) {
+            await this.handleError(`Tried to get content status for layer: ${layerName}`, 'err_widget_content_status', err);
+        }
     }
 
     async clickOnWidgetItem(layerName) {
@@ -124,8 +111,7 @@ class BaseLayersWidget extends Page {
             await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
             return await this.clickOnElement(locator);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('widget_item');
-            throw new Error(`Error after clicking on the widget-item, screenshot: ${screenshot} ` + err);
+            await this.handleError(`Tried to click on widget item for layer: ${layerName}`, 'err_widget_item', err);
         }
     }
 
@@ -136,12 +122,9 @@ class BaseLayersWidget extends Page {
             await this.clickOnElement(locator);
             await this.pause(700);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('widget_item_open');
-            throw new Error("Error after clicking on the Open button, screenshot: " + screenshot + ' ' + err);
+            await this.handleError(`Tried to click on Open button for layer: ${layerName}`, 'err_widget_item_open', err);
         }
     }
-
-
 }
 
 module.exports = BaseLayersWidget;
