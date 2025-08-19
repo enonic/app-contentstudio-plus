@@ -74,7 +74,6 @@ tasks.register( 'downloadApps', Copy ) {
     }
     into deployDir
     mustRunAfter tasks.named( 'startServer' )
-
     doLast {
         println 'Task downloadApps completed successfully.'
         println 'Downloaded artifacts:'
@@ -121,7 +120,6 @@ tasks.register( 'startServer' ) {
     description = 'Starts the XP server for testing'
     group = 'Test Execution'
     dependsOn( tasks.named( 'pnpmInstall' ), tasks.named( 'unpackDistro' ), tasks.named( 'copyConfig' ), tasks.named( 'copyLicense' ), tasks.named( 'deployContentStudio' ), tasks.named( 'deployContentStudioPlus' ), tasks.named( 'downloadApps' ) )
-
     doLast {
         sleep(5000)
         logger.lifecycle('Starting XP Server at: {}', xpHome)
@@ -141,7 +139,7 @@ tasks.register( 'startServer' ) {
         pb.redirectOutput( logsPath.file( 'xp.log' ).asFile )
         pb.redirectErrorStream( true )
         process = pb.start()
-        sleep(60000)
+        sleep( 60000 )
     }
 }
 
@@ -194,7 +192,7 @@ tasks.register('generateReportAndStopServer', PnpmTask ) {
 tasks.register( 'w_testCSPlusChrome', PnpmTask ) {
     description = 'Runs Content Studio Plus tests in Chrome'
     group = 'Test Execution'
-    dependsOn( tasks.named( 'pnpmInstall' ), tasks.named('downloadApps'), dependsOn tasks.named('copyConfig'), tasks.named( 'startServer' ) )
+    dependsOn(  tasks.named( 'startServer' ) )
     args = ['--color', 'run', 'test_cs_plus:wdio_chrome']
     finalizedBy tasks.named( 'generateReportAndStopServer' )
 }
