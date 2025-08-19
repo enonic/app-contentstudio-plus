@@ -194,6 +194,7 @@ tasks.register( 'w_testCSPlusChrome', PnpmTask ) {
     group = 'Test Execution'
     dependsOn tasks.named('pnpmInstall')
     dependsOn tasks.named('downloadApps')
+    dependsOn tasks.named('deployContentStudio')
     dependsOn tasks.named( 'deployContentStudioPlus' )
     dependsOn tasks.named('copyConfig')
     dependsOn tasks.named('copyLicense')
