@@ -17,7 +17,7 @@ configurations {
 
 def unpackDir = layout.buildDirectory.dir( 'install' ).get()
 def distroDir = unpackDir.dir( "enonic-xp-generic-$xpVersion" )
-def appDir = "$projectDir/test-applications"
+def testConfDir = "$projectDir/test-config"
 def xpHome = "$distroDir/home"
 def deployDir = distroDir.dir( 'home/deploy' )
 def licenseDir = distroDir.dir( 'home/license' )
@@ -33,7 +33,7 @@ dependencies {
 
 tasks.register( 'unpackDistro', Copy ) {
     description = 'Unpacks the XP distribution for testing'
-    group = 'setup'
+    group = 'Test Setup'
     from {
         configurations.distro.collect { tarTree( it ) }
     }
@@ -42,57 +42,50 @@ tasks.register( 'unpackDistro', Copy ) {
 
 tasks.register( 'copyLicense', Copy ) {
     description = 'Copies license file to the test environment'
-    group = 'setup'
+    group = 'Test Setup'
     doLast {
-        println 'Copy license'
+        logger.info('License file copied to: {}', licenseDir)
     }
     from file( rootProject.projectDir )
     include 'enonic.platform.subscription.lic'
     into licenseDir
-    mustRunAfter unpackDistro
+    mustRunAfter tasks.named('unpackDistro')
 }
 
 tasks.register( 'copyConfig', Copy ) {
     description = 'Copies configuration files to the test environment'
-    group = 'setup'
+    group = 'Test Setup'
     doLast {
-        println "$appDir${File.separator}common-config"
+        logger.info('Configuration files copied from: {}', "$testConfDir${File.separator}common-config")
     }
-    from "$appDir${File.separator}common-config"
+    from "$testConfDir${File.separator}common-config"
     include '**.*.cfg'
     include '*.properties'
     into configDir
-    mustRunAfter unpackDistro
+    mustRunAfter tasks.named('unpackDistro')
 }
+
 tasks.register( 'downloadApps', Copy ) {
     description = 'Downloads required apps for testing'
-    group = 'setup'
+    group = 'Test Setup'
+
     from {
         configurations.apps
     }
     into deployDir
-    mustRunAfter tasks.named( 'unpackDistro' )
-}
-
-tasks.register( 'copyApps', Copy ) {
-    description = 'Copies application JAR files to deploy directory'
-    group = 'setup'
+    mustRunAfter tasks.named( 'startServer' )
     doLast {
-        println '*********************************************************'
-        println '* task started:copyApps  *'
-        println '*********************************************************'
-        println appDir
-        println deployDir
+        println 'Task downloadApps completed successfully.'
+        println 'Downloaded artifacts:'
+        configurations.apps.files.each { file -> println "- ${file.name}"
+        }
     }
-    from file( appDir )
-    include '*.jar'
-    into deployDir
-    mustRunAfter unpackDistro
 }
 
 tasks.register( 'deployContentStudio', Copy ) {
     description = 'Deploys Content Studio application'
-    group = 'deployment'
+    group = 'Test Deployment'
+
     from {
         configurations.deploy
     }
@@ -102,33 +95,35 @@ tasks.register( 'deployContentStudio', Copy ) {
 
 tasks.register( 'deployContentStudioPlus', DefaultTask ) {
     description = 'Deploys Content Studio Plus application'
-    group = 'deployment'
+    group = 'Test Deployment'
+
     outputs.files( contentStudioPlusFile )
     doLast {
-        println 'Retrieving Content Studio Plus App from:'
-        println contentStudioPlusAppUrl
-        println 'Deploying to:'
-        println contentStudioPlusFile
+        logger.lifecycle("Deploying Content Studio Plus from: ${contentStudioPlusAppUrl}")
+        logger.lifecycle("Target location: ${contentStudioPlusFile}")
 
         def f = new File( contentStudioPlusFile )
         if ( !f.exists() ) {
             new URL( contentStudioPlusAppUrl ).withInputStream { i -> f.withOutputStream { it << i } }
-            println 'Content Studio Plus App is downloaded.'
+            logger.lifecycle('Content Studio Plus successfully downloaded')
         }
         else {
-            println 'Content Studio Plus App already exists.'
+            logger.info('Content Studio Plus already exists, skipping download')
         }
     }
-    mustRunAfter unpackDistro
+    mustRunAfter tasks.named('unpackDistro')
 }
 
 
 def process
 tasks.register( 'startServer' ) {
     description = 'Starts the XP server for testing'
-    group = 'testing'
-    dependsOn( tasks.named( 'pnpmInstall' ), tasks.named( 'unpackDistro' ), tasks.named( 'copyConfig' ), tasks.named( 'copyLicense' ), tasks.named( 'deployContentStudio' ), tasks.named( 'deployContentStudioPlus' ), tasks.named( 'downloadApps' ) )
+    group = 'Test Execution'
+    dependsOn(  tasks.named( 'unpackDistro' ) )
     doLast {
+        sleep(5000)
+        logger.lifecycle('Starting XP Server at: {}', xpHome)
+        logger.lifecycle('Server logs will be written to: build/reports/logs/xp.log')
         def pb
         if ( DefaultNativePlatform.getCurrentOperatingSystem().windows ) {
             pb = new ProcessBuilder( 'cmd', '/c', "${distroDir}\\bin\\server.bat" )
@@ -144,17 +139,17 @@ tasks.register( 'startServer' ) {
         pb.redirectOutput( logsPath.file( 'xp.log' ).asFile )
         pb.redirectErrorStream( true )
         process = pb.start()
-        sleep( 90000 )
+        sleep( 60000 )
     }
 }
 
 
 tasks.register( 'stopServer' ) {
     description = 'Stops the XP server'
-    group = 'testing'
+    group = 'Test Execution'
     doLast {
         if (!project.hasProperty('process')) {
-            println "Server process not found. It might already be stopped."
+            logger.warn('Server process not found - it might already be stopped')
             return
         }
 
@@ -162,13 +157,13 @@ tasks.register( 'stopServer' ) {
         def pid = process.pid()
 
         if (os.isWindows()) {
-            println "Stopping process with PID ${pid} on Windows..."
+            logger.lifecycle("Stopping server process (PID: ${pid})...")
             exec {
                 commandLine 'taskkill', '/F', '/T', '/PID', pid.toString()
                 ignoreExitValue = true // Don't fail if the process is already gone
             }
         } else { // For macOS, Linux, and other Unix-like systems
-            println "Stopping process with PID ${pid} on ${os.displayName}..."
+            logger.lifecycle("Stopping server process (PID: ${pid})...")
             exec {
                 commandLine 'kill', '-9', pid.toString()
                 ignoreExitValue = true // Don't fail if the process is already gone
@@ -182,33 +177,40 @@ tasks.register( 'stopServer' ) {
 
 tasks.register( 'cleanup', Delete ) {
     description = 'Cleans up test reports'
-    group = 'cleanup'
+    group = 'Test Cleanup'
     delete './build/reports/allure'
 }
 
 tasks.register('generateReportAndStopServer', PnpmTask ) {
     description = 'Generates test report and stops server'
-    group = 'reporting'
-    args = ['run', 'allure-report']
+    group = 'Test Reporting'
+    args = ['--color', 'run', 'allure-report']
     finalizedBy tasks.named( 'cleanup' )
     finalizedBy tasks.named( 'stopServer' )
 }
 
 tasks.register( 'w_testCSPlusChrome', PnpmTask ) {
     description = 'Runs Content Studio Plus tests in Chrome'
-    group = 'testing'
-    dependsOn( tasks.named( 'pnpmInstall' ), tasks.named( 'startServer' ) )
-    args = ['run', 'test_cs_plus:wdio_chrome']
+    group = 'Test Execution'
+    dependsOn tasks.named('pnpmInstall')
+    dependsOn tasks.named('downloadApps')
+    dependsOn tasks.named('deployContentStudio')
+    dependsOn tasks.named( 'deployContentStudioPlus' )
+    dependsOn tasks.named('copyConfig')
+    dependsOn tasks.named('copyLicense')
+    dependsOn tasks.named('startServer')
+    args = ['--color', 'run', 'test_cs_plus:wdio_chrome']
     finalizedBy tasks.named( 'generateReportAndStopServer' )
 }
 
 tasks.register( 'w_testAdminHomeChromeLocal', PnpmTask ) {
     description = 'Runs local admin home tests in Chrome'
-    group = 'testing'
+    group = 'Test Execution'
     dependsOn( tasks.named( 'pnpmInstall' ) )
-    args = ['run', 'test_cs_plus:wdio_chrome']
+    args = ['--color', 'run', 'test_cs_plus:wdio_chrome']
 }
 
 tasks.register( 'yolo' ) {
+    group = 'Other'
     dependsOn tasks.named( 'build' )
 }
