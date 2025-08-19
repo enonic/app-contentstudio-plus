@@ -119,7 +119,7 @@ def process
 tasks.register( 'startServer' ) {
     description = 'Starts the XP server for testing'
     group = 'Test Execution'
-    dependsOn( tasks.named( 'pnpmInstall' ), tasks.named( 'unpackDistro' ), tasks.named( 'copyConfig' ), tasks.named( 'copyLicense' ), tasks.named( 'deployContentStudio' ), tasks.named( 'deployContentStudioPlus' ) )
+    dependsOn(  tasks.named( 'unpackDistro' ) )
     doLast {
         sleep(5000)
         logger.lifecycle('Starting XP Server at: {}', xpHome)
@@ -195,6 +195,7 @@ tasks.register( 'w_testCSPlusChrome', PnpmTask ) {
     dependsOn tasks.named('pnpmInstall')
     dependsOn tasks.named('downloadApps')
     dependsOn tasks.named('copyConfig')
+    dependsOn tasks.named('copyLicense')
     dependsOn tasks.named('startServer')
     args = ['--color', 'run', 'test_cs_plus:wdio_chrome']
     finalizedBy tasks.named( 'generateReportAndStopServer' )
