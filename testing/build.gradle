@@ -119,7 +119,7 @@ def process
 tasks.register( 'startServer' ) {
     description = 'Starts the XP server for testing'
     group = 'Test Execution'
-    dependsOn(tasks.named('unpackDistro'), tasks.named('deployContentStudio'))
+    dependsOn(tasks.named('unpackDistro'), tasks.named('deployContentStudio'), tasks.named('copyLicense'))
     doLast {
         sleep(5000)
         logger.lifecycle('Starting XP Server at: {}', xpHome)
