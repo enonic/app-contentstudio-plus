@@ -6,9 +6,9 @@ node {
     download = true
 }
 
-tasks.register('copyDevResources') {
+tasks.register( 'copyDevResources' ) {
     onlyIf {
-        configurations.hasProperty('devResources')
+        configurations.hasProperty( 'devResources' )
     }
     doLast {
         copy {
@@ -20,8 +20,10 @@ tasks.register('copyDevResources') {
 }
 
 // Configure pnpmInstall dependency lazily
-tasks.named('pnpmInstall').configure {
-    if (configurations.hasProperty('devResources')) {
-        dependsOn tasks.named('copyDevResources')
+tasks.named( 'pnpmInstall' ).configure {
+    dependsOn rootProject.tasks.named( 'copyDevResources' )
+    //! Temporary fix for CI environment, back to npm-like behavior
+    if ( System.getenv( 'CI' ) == 'true' || project.hasProperty( 'ci' ) ) {
+        pnpmCommand.set(['install', '--no-frozen-lockfile'])
     }
 }
