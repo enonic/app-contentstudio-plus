@@ -17,7 +17,7 @@ configurations {
 
 def unpackDir = layout.buildDirectory.dir( 'install' ).get()
 def distroDir = unpackDir.dir( "enonic-xp-generic-$xpVersion" )
-def appDir = "$projectDir/test-applications"
+def testConfDir = "$projectDir/test-config"
 def xpHome = "$distroDir/home"
 def deployDir = distroDir.dir( 'home/deploy' )
 def licenseDir = distroDir.dir( 'home/license' )
@@ -73,17 +73,12 @@ tasks.register( 'downloadApps', Copy ) {
         configurations.apps
     }
     into deployDir
-    mustRunAfter tasks.named( 'unpackDistro' )
-}
-
-tasks.register( 'copyApps', Copy ) {
-    description = 'Copies application JAR files to deploy directory'
-    group = 'Test Setup'
+    mustRunAfter tasks.named( 'startServer' )
 
     doLast {
-        logger.lifecycle('Downloaded test applications:')
-        configurations.apps.files.each { file ->
-            logger.lifecycle("  - ${file.name}")
+        println 'Task downloadApps completed successfully.'
+        println 'Downloaded artifacts:'
+        configurations.apps.files.each { file -> println "- ${file.name}"
         }
     }
 }
