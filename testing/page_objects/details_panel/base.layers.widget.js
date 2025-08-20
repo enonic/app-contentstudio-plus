@@ -55,7 +55,7 @@ class BaseLayersWidget extends Page {
             await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
             return await this.waitForElementEnabled(locator, appConst.mediumTimeout);
         } catch (err) {
-            await this.handleError(`Layers Widget - 'Localize' button should be enabled`, 'err_widget_localize_btn', err);
+            await this.handleError(`Layers Widget - 'Localize' button should be displayed and enabled`, 'err_widget_localize_btn', err);
         }
     }
 
