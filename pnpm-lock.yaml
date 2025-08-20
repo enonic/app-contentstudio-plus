@@ -33,6 +33,12 @@ importers:
         specifier: ^1.5.1
         version: 1.5.1
     devDependencies:
+      '@enonic-types/lib-content':
+        specifier: ^7.15.3
+        version: 7.15.3
+      '@enonic-types/lib-project':
+        specifier: ^7.15.3
+        version: 7.15.3
       '@enonic/eslint-config':
         specifier: ^2.1.0
         version: 2.1.0(@typescript-eslint/parser@8.39.1(eslint@9.33.0(jiti@2.5.1))(typescript@5.9.2))(typescript-eslint@8.39.1(eslint@9.33.0(jiti@2.5.1))(typescript@5.9.2))(typescript@5.9.2)
@@ -130,9 +136,6 @@ importers:
       '@types/mousetrap':
         specifier: ^1.6.15
         version: 1.6.15
-      '@types/postcss-normalize':
-        specifier: ~9.0.4
-        version: 9.0.4
       '@types/q':
         specifier: ^1.5.8
         version: 1.5.8
@@ -343,6 +346,15 @@ packages:
 
   '@dmsnell/diff-match-patch@1.1.0':
     resolution: {integrity: sha512-yejLPmM5pjsGvxS9gXablUSbInW7H976c/FJ4iQxWIm7/38xBySRemTPDe34lhg1gVLbJntX0+sH0jYfU+PN9A==}
+
+  '@enonic-types/core@7.15.3':
+    resolution: {integrity: sha512-c7fxoK6mp5tluTBlddxWIyFVR6BpJ191zyE32GrsfZb9b8+ikudWjU+h6+F+2QeIk4zKGdNnXV6M/Q5m4tX+mw==}
+
+  '@enonic-types/lib-content@7.15.3':
+    resolution: {integrity: sha512-eP2VCmuo+hSM2rA88VCboWyGhm2R9WXTzZDOFIE+K4sh06CcX6h+IRozykQGdriBQq3144a6PHbfa2WvzhAHjA==}
+
+  '@enonic-types/lib-project@7.15.3':
+    resolution: {integrity: sha512-l+XuHKqs/q1w1vsuz94V/ZlFOz8zK84pRZuLByP2MbOhWSReTDQBFoMGO+1vnGMgfq5Cn9ri2sT9k1gupeXAfQ==}
 
   '@enonic/eslint-config@2.1.0':
     resolution: {integrity: sha512-K/Qygr9fxiDa0wCp+HXtbJLNmaQHTPeFfaNlXjUWT7a2smLZw9a24i8+xKW8YhEjqfBUzXc6AoObcRVxFNz2Qg==}
@@ -4292,6 +4304,16 @@ snapshots:
   '@discoveryjs/json-ext@0.6.3': {}
 
   '@dmsnell/diff-match-patch@1.1.0': {}
+
+  '@enonic-types/core@7.15.3': {}
+
+  '@enonic-types/lib-content@7.15.3':
+    dependencies:
+      '@enonic-types/core': 7.15.3
+
+  '@enonic-types/lib-project@7.15.3':
+    dependencies:
+      '@enonic-types/core': 7.15.3
 
   '@enonic/eslint-config@2.1.0(@typescript-eslint/parser@8.39.1(eslint@9.33.0(jiti@2.5.1))(typescript@5.9.2))(typescript-eslint@8.39.1(eslint@9.33.0(jiti@2.5.1))(typescript@5.9.2))(typescript@5.9.2)':
     dependencies:

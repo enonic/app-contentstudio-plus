@@ -34,8 +34,7 @@ class BaseDetailsPanel extends Page {
             await this.clickOnElement(this.widgetSelectorDropdownHandle);
             await this.pause(700);
         } catch (err) {
-            await this.saveScreenshotUniqueName('err_widget_dropdown');
-            throw new Error('Error when clicking on Widget Selector dropdown handle  ' + err);
+            await this.handleError('Tried to click on Widget Selector dropdown handle.', 'err_widget_selector_dropdown_handle', err);
         }
     }
 
@@ -57,8 +56,7 @@ class BaseDetailsPanel extends Page {
             await widgetSelectorDropdown.clickOnOptionByDisplayName(appConst.WIDGET_TITLE.VERSION_HISTORY, this.container);
             await this.pause(900);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_open_versions');
-            throw new Error(`Error occurred in widget selector dropdown, Version History, screenshot ${screenshot}: ` + err);
+            await this.handleError('Tried to open Version History', 'err_open_versions', err);
         }
     }
 
@@ -98,7 +96,7 @@ class BaseDetailsPanel extends Page {
             await this.clickOnWidgetSelectorDropdownHandle();
             await widgetSelectorDropdown.clickOnOptionByDisplayName(appConst.WIDGET_SELECTOR_OPTIONS.LAYERS);
         } catch (err) {
-            throw new Error("Error during opening 'Layers widget'" + err);
+            await this.handleError('Tried to open Layers widget', 'err_open_layers_widget', err);
         }
     }
 
@@ -108,7 +106,7 @@ class BaseDetailsPanel extends Page {
             await this.clickOnWidgetSelectorDropdownHandle();
             await widgetSelectorDropdown.clickOnOptionByDisplayName(appConst.WIDGET_SELECTOR_OPTIONS.DETAILS);
         } catch (err) {
-            throw new Error("Error occurred during opening 'Details widget'" + err);
+            await this.handleError('Tried to open Details widget', 'err_open_details_widget', err);
         }
     }
 
@@ -130,6 +128,7 @@ class BaseDetailsPanel extends Page {
             await this.clickOnEmulatorOptionsItem();
         }
     }
+
     async openVariants() {
         try {
             let widgetSelectorDropdown = new WidgetSelectorDropdown();

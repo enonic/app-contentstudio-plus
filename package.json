@@ -32,6 +32,8 @@
     "q": "^1.5.1"
   },
   "devDependencies": {
+    "@enonic-types/lib-content": "^7.15.3",
+    "@enonic-types/lib-project": "^7.15.3",
     "@enonic/eslint-config": "^2.1.0",
     "@rollup/plugin-inject": "^5.0.5",
     "@types/postcss-normalize": "^9.0.4",

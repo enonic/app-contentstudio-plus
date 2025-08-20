@@ -1,13 +1,8 @@
 import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import Q from 'q';
-import {Project} from 'lib-contentstudio/app/settings/data/project/Project';
-import {ProjectListRequest} from 'lib-contentstudio/app/settings/resource/ProjectListRequest';
-import {ContentSummaryAndCompareStatusFetcher} from 'lib-contentstudio/app/resource/ContentSummaryAndCompareStatusFetcher';
-import {ContentsExistRequest} from 'lib-contentstudio/app/resource/ContentsExistRequest';
-import {ContentsExistResult} from 'lib-contentstudio/app/resource/ContentsExistResult';
+import {GetLayersRequest} from '../../resource/GetLayersRequest';
 import {LayerContent} from './LayerContent';
 import {MultiLayersContentFilter} from './MultiLayersContentFilter';
-import {ProjectHelper} from 'lib-contentstudio/app/settings/data/project/ProjectHelper';
 
 export class MultiLayersContentLoader {
 
@@ -26,36 +21,6 @@ export class MultiLayersContentLoader {
     }
 
     private loadSameContentInOtherProjects(): Q.Promise<LayerContent[]> {
-        return new ProjectListRequest(true).sendAndParse().then((projects: Project[]) => {
-            const loadPromises: Q.Promise<LayerContent>[] = [];
-
-            projects.forEach((project: Project) => {
-                loadPromises.push(this.doLoadContentFromProject(project));
-            });
-
-            return Q.all(loadPromises);
-        });
-    }
-
-    private doLoadContentFromProject(project: Project): Q.Promise<LayerContent> {
-        if (!ProjectHelper.isAvailable(project)) {
-            return Q(new LayerContent(null, project));
-        }
-
-        const id: string = this.item.getId();
-
-        return new ContentsExistRequest([id])
-            .setRequestProject(project)
-            .sendAndParse()
-            .then((result: ContentsExistResult) => {
-                if (result.getContentsExistMap()[id]) {
-                    return new ContentSummaryAndCompareStatusFetcher().fetch(this.item.getContentId(), project.getName())
-                        .then((item: ContentSummaryAndCompareStatus) => {
-                            return new LayerContent(item, project);
-                        });
-                } else {
-                    return new LayerContent(null, project);
-                }
-            });
+        return new GetLayersRequest(this.item.getContentId()).sendAndParse();
     }
 }
