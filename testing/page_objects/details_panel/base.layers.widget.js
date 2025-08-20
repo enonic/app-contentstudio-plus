@@ -31,20 +31,32 @@ class BaseLayersWidget extends Page {
     }
 
     async getLayersName() {
-        let locator = this.widgetItemView + xpath.layerDetailsDiv + xpath.layerNameDiv;
-        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
-        return await this.getTextInElements(locator);
+        try {
+            let locator = this.widgetItemView + xpath.layerDetailsDiv + xpath.layerNameDiv;
+            await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+            return await this.getTextInElements(locator);
+        } catch (err) {
+            await this.handleError('Tried to get layers names', 'err_widget_layers_names', err);
+        }
     }
 
-    getLayerLanguage(layerName) {
-        let locator = this.widgetItemView + xpath.layerViewByName(layerName) + xpath.layerLanguageDiv;
-        return this.getText(locator);
+    async getLayerLanguage(layerName) {
+        try {
+            let locator = this.widgetItemView + xpath.layerViewByName(layerName) + xpath.layerLanguageDiv;
+            return await this.getText(locator);
+        } catch (err) {
+            await this.handleError(`Tried to get layer language for layer: ${layerName}`, 'err_widget_layer_language', err);
+        }
     }
 
     async waitForLocalizeButtonEnabled(layerName) {
-        let locator = this.widgetItemView + xpath.layerViewByName(layerName) + xpath.localizeButton;
-        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
-        return await this.waitForElementEnabled(locator, appConst.mediumTimeout);
+        try {
+            let locator = this.widgetItemView + xpath.layerViewByName(layerName) + xpath.localizeButton;
+            await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+            return await this.waitForElementEnabled(locator, appConst.mediumTimeout);
+        } catch (err) {
+            await this.handleError(`Layers Widget - 'Localize' button should be enabled`, 'err_widget_localize_btn', err);
+        }
     }
 
     async waitForLocalizeButtonDisabled(layerName) {
@@ -76,9 +88,13 @@ class BaseLayersWidget extends Page {
     }
 
     async clickOnLocalizeButton(layerName) {
-        let locator = this.widgetItemView + xpath.layerViewByName(layerName) + xpath.localizeButton;
-        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
-        return await this.clickOnElement(locator);
+        try {
+            let locator = this.widgetItemView + xpath.layerViewByName(layerName) + xpath.localizeButton;
+            await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+            return await this.clickOnElement(locator);
+        } catch (err) {
+            await this.handleError(`Tried to click on Localize button for layer: ${layerName}`, 'err_widget_localize_btn', err);
+        }
     }
 
     // Gets the string 'layer611610(en)' from the layer-item  for the current selected content
