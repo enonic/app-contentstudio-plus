@@ -1,8 +1,9 @@
 import {Content as XPContent} from '@enonic-types/lib-content';
-import {Project as XPProject, ProjectPermission, SiteConfig} from '@enonic-types/lib-project';
-import {ApplicationConfig} from '@enonic/lib-admin-ui/application/ApplicationConfig';
+import {Project as XPProject, ProjectPermission} from '@enonic-types/lib-project';
 import {ContentTypeName} from '@enonic/lib-admin-ui/schema/content/ContentTypeName';
 import {PrincipalKey} from '@enonic/lib-admin-ui/security/PrincipalKey';
+import {ContentId} from 'lib-contentstudio/app/content/ContentId';
+import {ContentInheritType} from 'lib-contentstudio/app/content/ContentInheritType';
 import {ContentName} from 'lib-contentstudio/app/content/ContentName';
 import {ContentPath} from 'lib-contentstudio/app/content/ContentPath';
 import {ContentSummary, ContentSummaryBuilder} from 'lib-contentstudio/app/content/ContentSummary';
@@ -17,6 +18,7 @@ export class LibToStudioConverter {
     static convertXPContentToContentSummary(item: XPContent): ContentSummary {
         const contentSummaryBuilder = new ContentSummaryBuilder()
             .setId(item._id)
+            .setContentId(new ContentId(item._id))
             .setName(item._name.indexOf(ContentUnnamed.UNNAMED_PREFIX) === 0 ? new ContentUnnamed(item._name): new ContentName(item._name))
             .setPath(ContentPath.create().fromString(item._path).build())
             .setDisplayName(item.displayName)
@@ -27,7 +29,8 @@ export class LibToStudioConverter {
             .setValid(item.valid)
             .setPublishFirstTime(item.publish && item.publish.first ? new Date(Date.parse(item.publish.first)) : null)
             .setPublishFromTime(item.publish && item.publish.from ? new Date(Date.parse(item.publish.from)) : null)
-            .setPublishToTime(item.publish && item.publish.to ? new Date(Date.parse(item.publish.to)) : null);
+            .setPublishToTime(item.publish && item.publish.to ? new Date(Date.parse(item.publish.to)) : null)
+            .setInherit(item.inherit && item.inherit.length > 0 ? item.inherit.map((type: string) => ContentInheritType[type])  : []);
 
         //contentSummaryBuilder.childOrder = ChildOrder.fromJson(item.childOrder);
         contentSummaryBuilder.language = item.language;
