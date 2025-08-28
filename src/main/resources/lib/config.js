@@ -38,6 +38,9 @@ const getConfig = (locales) => {
             licenseUrl: portal.apiUrl({
                 api: 'license',
             }),
+            layersUrl: portal.apiUrl({
+                api: 'layers',
+            }),
         },
         widgetApiUrl: portal.apiUrl({
             api: 'admin:widget',

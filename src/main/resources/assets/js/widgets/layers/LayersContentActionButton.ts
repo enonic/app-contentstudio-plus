@@ -48,7 +48,7 @@ export class LayersContentActionButton extends ActionButton {
             return Mode.READONLY;
         }
 
-        const isToLocalize: boolean = this.item.getItem().isDataInherited() && !!this.item.getProject().getLanguage();
+        const isToLocalize: boolean = this.item.getItem().isDataInherited();
 
         return isToLocalize ? Mode.LOCALIZE : Mode.EDIT;
     }
