@@ -15,7 +15,7 @@ import {ContentServerEventsHandler} from 'lib-contentstudio/app/event/ContentSer
 import {ProjectCreatedEvent} from 'lib-contentstudio/app/settings/event/ProjectCreatedEvent';
 import {ProjectDeletedEvent} from 'lib-contentstudio/app/settings/event/ProjectDeletedEvent';
 import {ProjectUpdatedEvent} from 'lib-contentstudio/app/settings/event/ProjectUpdatedEvent';
-import * as Q from 'q';
+import Q from 'q';
 import {LayerContent} from './LayerContent';
 import {LayersContentTreeList} from './LayersContentTreeList';
 import {MultiLayersContentLoader} from './MultiLayersContentLoader';
@@ -56,7 +56,7 @@ export class LayersWidgetItemView
         this.item = item;
         this.loader.setItem(item);
 
-        return this.reload();
+        return this.reload().catch(DefaultErrorHandler.handle);
     }
 
     reload(): Q.Promise<void> {

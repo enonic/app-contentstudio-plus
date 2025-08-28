@@ -449,8 +449,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
             await this.waitForElementDisplayed(this.localizeButton, appConst.mediumTimeout);
             return await this.waitForElementEnabled(this.localizeButton, appConst.mediumTimeout);
         } catch (err) {
-            await this.saveScreenshot('err_localize_enabled_button');
-            throw new Error('Localize button should be enabled, timeout: ' + 3000 + 'ms')
+            await this.handleError(`Browse Panel - 'Localize' button should be enabled`, 'err_localize_button', err);
         }
     }
 
@@ -866,8 +865,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
         try {
             return await this.waitForAttributeHasValue(this.showIssuesListButton, "class", "has-assigned-issues");
         } catch (err) {
-            await this.saveScreenshot(appConst.generateRandomName("err_issues"));
-            throw new Error("'Assigned to Me' button should be displayed  " + err);
+            await this.handleError(`Browse Panel - 'Show Issues' button should have 'Assigned to Me' label`, 'err_assigned_issues', err);
         }
     }
 
@@ -896,8 +894,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
             await this.clickOnElement(this.localizeButton);
             return await this.pause(1000);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_localize_btn');
-            throw new Error(`Content Browse Panel, Localize button, screenshot:${screenshot} ` + err);
+            await this.handleError(`Browse Panel - 'Localize' button should be enabled, but it is not!` , 'err_localize_btn', err);
         }
     }
 
@@ -922,8 +919,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
             await this.waitForArchiveButtonDisplayed();
             await this.waitForElementEnabled(this.archiveButton, appConst.mediumTimeout);
         } catch (err) {
-            await this.saveScreenshot('err_delete_button');
-            throw new Error("Archive button should be enabled " + err);
+            await this.handleError(`Browse Panel - 'Archive' button should be enabled, but it is not!`, 'err_archive_button', err);
         }
     }
 
@@ -1003,7 +999,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
 
         let locator = lib.TREE_GRID.contentSummaryByName(name);// + lib.DIV.CONTENT_SUMMARY_AND_STATUS_VIEWER;
         let element = await this.findElement(locator);
-        let atr = await element.getAttribute("class")
+        let atr = await element.getAttribute('class')
         return atr.includes('icon-variant');
     }
 }

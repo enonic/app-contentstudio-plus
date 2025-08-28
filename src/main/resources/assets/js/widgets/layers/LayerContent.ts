@@ -1,8 +1,10 @@
-import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
-import {Project} from 'lib-contentstudio/app/settings/data/project/Project';
-import {ContentId} from 'lib-contentstudio/app/content/ContentId';
 import {Equitable} from '@enonic/lib-admin-ui/Equitable';
 import {ObjectHelper} from '@enonic/lib-admin-ui/ObjectHelper';
+import {ContentId} from 'lib-contentstudio/app/content/ContentId';
+import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
+import {Project} from 'lib-contentstudio/app/settings/data/project/Project';
+import {LayerContentJson} from '../../resource/json/LayerContentJson';
+import {LayerContentHelper} from './LayerContentHelper';
 
 export class LayerContent implements Equitable {
 
@@ -52,5 +54,9 @@ export class LayerContent implements Equitable {
     shallowEquals(other: LayerContent): boolean {
         return ObjectHelper.anyEquals(this.project?.getName(), other.project?.getName()) &&
                ObjectHelper.anyEquals(this.item?.getId(), other.item?.getId());
+    }
+
+    static fromJson(json: LayerContentJson): LayerContent {
+        return LayerContentHelper.jsonToLayerContent(json);
     }
 }
