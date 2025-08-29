@@ -3,6 +3,7 @@ import {Path} from '@enonic/lib-admin-ui/rest/Path';
 import {ResourceRequest} from '@enonic/lib-admin-ui/rest/ResourceRequest';
 import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
 import {ContentId} from 'lib-contentstudio/app/content/ContentId';
+import {ProjectContext} from 'lib-contentstudio/app/project/ProjectContext';
 import {LayerContent} from '../widgets/layers/LayerContent';
 import {LayerContentJson} from './json/LayerContentJson';
 
@@ -20,6 +21,7 @@ export class GetLayersRequest
     getParams(): object {
         return {
             contentId: this.contentId.toString(),
+            project: ProjectContext.get().getProject().getName(),
         };
     }
 
