@@ -99,6 +99,10 @@ export class ArchiveBrowsePanel
         const refreshHandler = (): void => {
             isRefreshTriggered = false;
             this.selectionWrapper.deselectAll();
+            this.filterPanel.reset().then(() => {
+                this.hideFilterPanel();
+                this.toggleFilterPanelButton.removeClass('filtered');
+            });
             void this.treeListBox.load();
         };
 
