@@ -1,9 +1,12 @@
+import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import {ContentAggregation} from 'lib-contentstudio/app/browse/filter/ContentAggregation';
+import {ArchiveServerEvent} from 'lib-contentstudio/app/event/ArchiveServerEvent';
 import {ArchiveResourceRequest} from './resource/ArchiveResourceRequest';
 import {ArchiveAggregation} from './ArchiveAggregation';
 import {ContentBrowseFilterPanel} from 'lib-contentstudio/app/browse/filter/ContentBrowseFilterPanel';
 import {ArchiveAggregationsFetcher} from './ArchiveAggregationsFetcher';
 import {ArchiveContentViewItem} from './ArchiveContentViewItem';
+import {AppHelper} from '@enonic/lib-admin-ui/util/AppHelper';
 
 export class ArchiveFilterPanel
     extends ContentBrowseFilterPanel<ArchiveContentViewItem> {
@@ -33,6 +36,30 @@ export class ArchiveFilterPanel
 
     protected isExportAllowed(): boolean {
         return false;
+    }
+
+    protected handleEvents(): void {
+        super.handleEvents();
+
+        let isRefreshTriggered = false;
+
+        const debouncedReset = AppHelper.debounce(() => {
+            isRefreshTriggered = false;
+
+            this.resetFacets().catch(DefaultErrorHandler.handle);
+        }, 500);
+
+        const refreshRequiredHandler = (): void => {
+            if (!isRefreshTriggered) {
+                isRefreshTriggered = true;
+
+                this.whenShown(() => {
+                    debouncedReset();
+                });
+            }
+        };
+
+        ArchiveServerEvent.on(() => refreshRequiredHandler());
     }
 
     private getAggregationsList(): string[] {

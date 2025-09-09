@@ -176,16 +176,14 @@ export class ArchiveBrowsePanel
         return new ArchiveFilterPanel();
     }
 
-    protected enableSelectionMode(): void {
-        this.treeListBox.setSelectionMode(true);
-        const selectedItems = this.selectableListBoxPanel.getSelectedItems() as ArchiveContentViewItem[];
-        this.treeListBox.setItems(selectedItems);
+    protected enableSelectionMode() {
+        const selectedItems = this.selectableListBoxPanel.getSelectedItems().map(item => item.getId());
+        this.filterPanel.setSelectedItems(selectedItems);
     }
 
-    protected disableSelectionMode(): void {
-        this.treeListBox.reset();
+    protected disableSelectionMode() {
         this.filterPanel.resetConstraints();
         this.hideFilterPanel();
-
+        this.treeListBox.setFilterQuery(null);
     }
 }
