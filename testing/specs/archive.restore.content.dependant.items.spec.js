@@ -71,6 +71,7 @@ describe('archive.restore.content.dependant.items.spec: tests for archive/restor
             assert.equal(hitsCounter1, '12 hits', 'Expected hits counter should be displayed');
             // 3. Click on 'Executable' checkbox:
             await archiveFilterPanel.clickOnCheckboxInContentTypesBlock('Executable');
+            await studioUtils.saveScreenshot('issue_executable_items');
             let result = await archiveBrowsePanel.getDisplayNamesInGrid();
             assert.equal(result.length, 4, 'Four items should be present in the grid');
             // 4. Verify that number in 'hits' is updated
@@ -159,6 +160,7 @@ describe('archive.restore.content.dependant.items.spec: tests for archive/restor
             await confirmValueDialog.clickOnConfirmButton();
             // 6. Verify the notification message
             let message = await archiveBrowsePanel.waitForNotificationMessage();
+            await studioUtils.saveScreenshot('issue_12_items_are_restored');
             assert.equal(message, '12 items are restored', 'Expected notification message should appear');
             let hitsCounter = await archiveFilterPanel.getTextInHitsCounter();
             assert.equal(hitsCounter, '0 hits', 'Expected hits counter should be displayed');

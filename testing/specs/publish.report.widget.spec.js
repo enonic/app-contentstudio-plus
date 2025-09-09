@@ -40,6 +40,7 @@ describe('publish.report.widget.spec: tests for publish report widget', function
             // 2. Open 'Publish Report' widget:
             await contentWizard.openPublishReportWidget();
             await wizardPublishReportWidget.waitForWidgetLoaded();
+            await studioUtils.saveScreenshot('publish_report_gen');
             // 3. Verify that 'Generate' button should not be displayed:
             await wizardPublishReportWidget.waitForGenerateButtonNotDisplayed();
             // 4. Verify that 'From' and 'to' date pickers are not displayed:
@@ -120,6 +121,7 @@ describe('publish.report.widget.spec: tests for publish report widget', function
             await wizardPublishReportWidget.waitForWidgetLoaded();
             // 3. Enter an invalid date in the future:
             await wizardPublishReportWidget.typeInFromDateInput(DATE_IN_PAST);
+            await studioUtils.saveScreenshot('publish_report_generate_disabled');
             // 4. Verify that 'Generate' button gets disabled:
             await wizardPublishReportWidget.waitForGenerateButtonDisabled();
             // 5. Expected validation message should appear:
