@@ -69,7 +69,7 @@ describe('archive.browse.panel.spec: tests for archive browse panel and selectio
             await archiveBrowsePanel.clickOnCheckboxByName(FOLDER1.displayName);
             await archiveBrowsePanel.pause(2000);
             await studioUtils.saveScreenshot('grid_returned_to_initial_state');
-            // 6. Verify that the selection toggler(circle in the toolbar) gets not visible :
+            // 6. Verify that the selection toggle(circle in the toolbar) gets not visible :
             await archiveBrowsePanel.waitForSelectionTogglerNotVisible();
             // 7. Verify that Grid returns to the initial state:
             displayNames = await archiveBrowsePanel.getDisplayNamesInGrid();

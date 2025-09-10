@@ -50,6 +50,7 @@ describe('publish.report.dialog.spec: tests for publish report dialog', function
             await wizardPublishReportWidget.waitForWidgetLoaded();
             // 3. Click on 'Generate' button:
             await wizardPublishReportWidget.clickOnGenerateButton();
+            await studioUtils.saveScreenshot('publish_report_print_button');
             // 4. Verify that 'Print' button is displayed:
             await publishReportDialog.waitForDialogLoaded();
             await publishReportDialog.waitForPrintButtonEnabled();
@@ -79,6 +80,7 @@ describe('publish.report.dialog.spec: tests for publish report dialog', function
             await wizardPublishReportWidget.waitForWidgetLoaded();
             // 4. Click on 'Generate' button:
             await wizardPublishReportWidget.clickOnGenerateButton();
+            await studioUtils.saveScreenshot('publish_report_generate_button');
             await publishReportDialog.waitForDialogLoaded();
             // 5. Verify that the Comparisons-block with 'Item went offline' text gets visible in the modal dialog:
             let actualText = await publishReportDialog.getAllComparisonsBlockHeader();
