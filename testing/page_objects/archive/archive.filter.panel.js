@@ -137,8 +137,7 @@ class ArchiveFilterPanel extends Page {
             timeout = ms === undefined ? appConst.mediumTimeout : ms;
             return await this.waitForElementDisplayed(XPATH.container + lib.FILTER_PANEL.dependenciesSection, timeout)
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_load_dependencies_section');
-            throw new Error(`Filter Panel: Dependencies section should be visible! screenshot:${screenshot} ` + err);
+            await this.handleError('Filter Panel: Dependencies section', 'err_wait_dependencies_section', err);
         }
     }
 
@@ -239,8 +238,7 @@ class ArchiveFilterPanel extends Page {
             let endIndex = label.indexOf(')');
             return label.substring(startIndex + 1, endIndex);
         } catch (err) {
-            await this.saveScreenshotUniqueName('err_numb_in_aggregation');
-            throw new Error("Error when get the number in aggregation checkbox: " + err);
+            await this.handleError('Filter Panel, number in aggregation checkbox', 'err_get_numb_in_aggregation', err);
         }
     }
 

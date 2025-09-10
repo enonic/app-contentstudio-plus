@@ -10,7 +10,7 @@ const XPATH = {
     itemListToRestore: "//ul[contains(@id,'ArchiveDialogItemList')]",
     childListToRestore: "//ul[contains(@id,'ArchiveItemsList')]",
     header: `//div[contains(@id,'DefaultModalDialogHeader')]`,
-    contentTypeByName: function (name) {
+    contentTypeByName (name) {
         return `//div[@class='content-types-content']//li[contains(@class,'content-types-list-item') and descendant::h6[contains(@class,'main-name') and contains(.,'${name}')]]`;
     },
 };
@@ -26,7 +26,7 @@ class ArchiveRestoreDialog extends Page {
     }
 
     get cancelButton() {
-        return XPATH.container + lib.CANCEL_BUTTON_DIALOG;
+        return XPATH.container + lib.dialogButton('Cancel');
     }
 
     get cancelButtonTop() {
@@ -46,8 +46,7 @@ class ArchiveRestoreDialog extends Page {
         try {
             await this.waitForElementDisplayed(this.restoreButton, appConst.mediumTimeout)
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_restore_dlg');
-            throw new Error(`Restore from Archive dialog was not loaded! screenshot:${screenshot} ` + err);
+            await this.handleError('Restore from Archive dialog','err_archive_restore_dlg_opened', err);
         }
     }
 
@@ -55,8 +54,7 @@ class ArchiveRestoreDialog extends Page {
         try {
             await this.waitForElementNotDisplayed(XPATH.container, appConst.longTimeout);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_restore_dlg_close');
-            throw new Error(`Restore from Archive dialog was not closed, screenshot: ${screenshot}` + err);
+            await this.handleError('Restore from Archive dialog was not closed','err_restore_dlg_close', err);
         }
     }
 
