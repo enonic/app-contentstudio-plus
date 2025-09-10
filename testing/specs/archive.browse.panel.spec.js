@@ -69,7 +69,7 @@ describe('archive.browse.panel.spec: tests for archive browse panel and selectio
             await archiveBrowsePanel.clickOnCheckboxByName(FOLDER1.displayName);
             await archiveBrowsePanel.pause(2000);
             await studioUtils.saveScreenshot('grid_returned_to_initial_state');
-            // 6. Verify that the selection toggler(circle in the toolbar) gets not visible :
+            // 6. Verify that the selection toggle (circle in the toolbar) gets not visible :
             await archiveBrowsePanel.waitForSelectionTogglerNotVisible();
             // 7. Verify that Grid returns to the initial state:
             displayNames = await archiveBrowsePanel.getDisplayNamesInGrid();
@@ -102,7 +102,7 @@ describe('archive.browse.panel.spec: tests for archive browse panel and selectio
             await archiveBrowsePanel.clickOnCheckboxAndSelectRowByName(FOLDER1.displayName);
             // 2. Verify status of the content:
             let status = await archiveItemStatisticsPanel.getStatus();
-            assert.equal(status, 'Archived', "Archived status should be displayed in Item Statistics panel");
+            assert.equal(status, 'Archived', 'Archived status should be displayed in Item Statistics panel');
             // 3. Verify that workflow icon is not displayed:
             await contentWidgetItemView.waitForWorkflowStateNotDisplayed();
             // 4. Verify the name in the content widget:
@@ -112,7 +112,7 @@ describe('archive.browse.panel.spec: tests for archive browse panel and selectio
 
     it("GIVEN a folder is selected WHEN the folder has been unselected THEN Item Statistics panel should be cleared",
         async () => {
-            // 1. Navigate to 'Archive Browse Panel' and click on a checkbox of a archived folder:
+            // 1. Navigate to 'Archive Browse Panel' and click on a checkbox of an archived folder:
             await studioUtils.openArchivePanel();
             let archiveBrowsePanel = new ArchiveBrowsePanel();
             let archiveItemStatisticsPanel = new ArchiveItemStatisticsPanel();
@@ -120,7 +120,7 @@ describe('archive.browse.panel.spec: tests for archive browse panel and selectio
             await archiveBrowsePanel.clickOnRowByDisplayName(FOLDER1.displayName);
             // 2. Verify status of the content:
             let status = await archiveItemStatisticsPanel.getStatus();
-            assert.equal(status, 'Archived', "Archived status should be displayed in Item Statistics panel");
+            assert.equal(status, 'Archived', 'Archived status should be displayed in Item Statistics panel');
             // 3. Click on the row and unselect the item
             await archiveBrowsePanel.clickOnRowByDisplayName(FOLDER1.displayName);
             // 4. Verify that Item Statistics panel is cleared:
@@ -139,10 +139,10 @@ describe('archive.browse.panel.spec: tests for archive browse panel and selectio
             await archiveBrowsePanel.clickOnRowByDisplayName(FOLDER1.displayName);
             // 3. Verify the Archived status of the content:
             let actualStatus = await archivedContentStatusWidget.getStatus();
-            assert.equal(actualStatus, 'Archived', "Expected status should be displayed in Details Panel");
+            assert.equal(actualStatus, 'Archived', 'Expected status should be displayed in Details Panel');
         });
 
-    it("GIVEN existing folder is selected AND 'Versions widget' is opened WHEN 'Show changes' button in Edited item has been clicked THEN compareContentVersionsDialog should be loaded",
+    it("GIVEN 'Edited' and 'Created' items have been checked in Versions Widget WHEN 'Compare Versions' button has been clicked THEN Compare Content Versions dialog should be loaded",
         async () => {
             let archiveBrowseContextPanel = new ArchiveBrowseContextPanel()
             let archivedContentVersionsWidget = new ArchivedContentVersionsWidget();
@@ -154,16 +154,38 @@ describe('archive.browse.panel.spec: tests for archive browse panel and selectio
             await archiveBrowsePanel.clickOnRowByDisplayName(FOLDER1.displayName);
             // 2. Open Versions widget:
             await archiveBrowseContextPanel.openVersionHistory();
-            // 3. Click on 'Show changes' button:
-            await archivedContentVersionsWidget.clickOnShowChangesButtonByHeader('Edited', 0);
-            // 4. The modal dialog should be loaded:
+            // 3. Check 'Edited' and 'Created' items:
+            await archivedContentVersionsWidget.clickOnVersionItemByHeader(appConst.VERSIONS_ITEM_HEADER.EDITED, 0);
+            await archivedContentVersionsWidget.clickOnCompareChangesCheckboxByHeader(appConst.VERSIONS_ITEM_HEADER.EDITED, 0);
+            await archivedContentVersionsWidget.clickOnVersionItemByHeader(appConst.VERSIONS_ITEM_HEADER.CREATED, 0);
+            await archivedContentVersionsWidget.clickOnCompareChangesCheckboxByHeader(appConst.VERSIONS_ITEM_HEADER.CREATED, 0);
+            // 4. Click on 'Compare Versions' button
+            await archivedContentVersionsWidget.clickOnCompareVersionsButton();
+            // 5. The modal dialog should be loaded:
             await compareContentVersionsDialog.waitForDialogOpened();
-            // 5. Click on Left dropdown handle:
+            // 6. Click on Left dropdown handle:
             await compareContentVersionsDialog.clickOnLeftDropdownHandle();
             await studioUtils.saveScreenshot('compare_versions_dlg_archived_options');
-            // 6. Verify that option with 'Archived' icon should be present in the dropdown list:
+            // 7. Verify that option with 'Archived' icon should be present in the dropdown list:
             let result = await compareContentVersionsDialog.getArchivedOptionsInDropdownList()
-            assert.equal(result.length, 1, "One item with 'archived-icon' should be present in the selector options");
+            assert.equal(result.length, 1, `One item with 'archived-icon' should be present in the selector options`);
+        });
+
+    it("WHEN 'Edited' item has been clicked in Versions Widget THEN Restore button should not be displayed in the Versions widget",
+        async () => {
+            let archiveBrowseContextPanel = new ArchiveBrowseContextPanel()
+            let archivedContentVersionsWidget = new ArchivedContentVersionsWidget();
+            // 1. Navigate to 'Archive Browse Panel' and click on a checkbox of a archived folder:
+            await studioUtils.openArchivePanel();
+            let archiveBrowsePanel = new ArchiveBrowsePanel();
+            // 1. Click on the row and select an item:
+            await archiveBrowsePanel.clickOnRowByDisplayName(FOLDER1.displayName);
+            // 2. Open Versions widget:
+            await archiveBrowseContextPanel.openVersionHistory();
+            // 3. Check 'Edited' item:
+            await archivedContentVersionsWidget.clickOnVersionItemByHeader(appConst.VERSIONS_ITEM_HEADER.EDITED, 0);
+            await archivedContentVersionsWidget.clickOnCompareChangesCheckboxByHeader(appConst.VERSIONS_ITEM_HEADER.EDITED, 0);
+            await archivedContentVersionsWidget.waitForRestoreButtonNotDisplayed();
         });
 
     it(`GIVEN 2 folders are selected AND selection controller has been clicked WHEN both folders have been deleted THEN selection controller(circle) gets not visible`,
