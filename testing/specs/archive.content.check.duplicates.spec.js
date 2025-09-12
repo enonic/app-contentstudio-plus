@@ -63,7 +63,7 @@ describe('archive.content.check.duplicates.spec: tests for archiving content', f
             await studioUtils.openArchivePanel();
             await studioUtils.saveScreenshot('archive_issue_duplicates');
             let items = await archiveBrowsePanel.getDisplayNamesInGrid();
-            const hasDuplicates2 = new Set(result).size !== items.length;
+            const hasDuplicates2 = new Set(items).size !== items.length;
             assert.ok(hasDuplicates2 === false, 'There should be no duplicates in the Archive Grid');
         });
 
