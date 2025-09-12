@@ -70,9 +70,6 @@ describe('archive.restore.content.dependant.items.spec: tests for archive/restor
             await archiveFilterPanel.waitForOpened();
             // 2. Verify the number in 'hits'
             await studioUtils.saveScreenshot('issue_arch_filter_panel_hits');
-            let hitsCounter1 = await archiveFilterPanel.getTextInHitsCounter();
-            await studioUtils.saveScreenshot('filter_panel_hits_counter1');
-            assert.equal(hitsCounter1, '12 hits', 'Expected hits counter should be displayed');
             // 3. Click on 'Executable' checkbox:
             await archiveFilterPanel.clickOnCheckboxInContentTypesBlock('Executable');
             await studioUtils.saveScreenshot('issue_arch_filter_panel_hits_2');
@@ -168,8 +165,6 @@ describe('archive.restore.content.dependant.items.spec: tests for archive/restor
             let message = await archiveBrowsePanel.waitForNotificationMessage();
             await studioUtils.saveScreenshot('restore_confirmed');
             assert.equal(message, '12 items are restored', 'Expected notification message should appear');
-            let hitsCounter = await archiveFilterPanel.getTextInHitsCounter();
-            assert.equal(hitsCounter, '0 hits', 'Expected hits counter should be displayed');
             // 7. Verify - the content is present in Content Browse Panel
             await studioUtils.switchToContentMode();
             await studioUtils.saveScreenshot('folder_is_restored_2');

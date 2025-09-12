@@ -1052,16 +1052,16 @@ module.exports = {
     },
     async openLayersWidgetInBrowsePanel() {
         let browsePanel = new BrowsePanel();
-        let browseDetailsPanel = new BrowseDetailsPanel();
+        let browseContextWindowPanel = new BrowseContextWindowPanel();
         let browseLayersWidget = new BrowseLayersWidget();
         await browsePanel.openDetailsPanel();
-        await browseDetailsPanel.openLayers();
+        await browseContextWindowPanel.openLayers();
         await browseLayersWidget.waitForWidgetLoaded();
         return browseLayersWidget;
     },
     async openVariantsWidget() {
         let browsePanel = new BrowsePanel();
-        let browseDetailsPanel = new BrowseDetailsPanel();
+        let browseDetailsPanel = new BrowseContextWindowPanel();
         let browseVariantsWidget = new BrowseVariantsWidget();
         await browsePanel.openDetailsPanel();
         await browseDetailsPanel.openVariants();
