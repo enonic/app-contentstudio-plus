@@ -1,7 +1,7 @@
 /**
  * Created on 30/07/2018.
  */
-const BaseDetailsPanel = require('../../details_panel/base.context.window.panel');
+const BaseContextWindowPanel = require('../../details_panel/base.context.window.panel');
 const lib = require('../../../libs/elements');
 const appConst = require('../../../libs/app_const');
 
@@ -10,7 +10,7 @@ const xpath = {
     widgetItem: `//div[contains(@id,'ContentWidgetItemView')]`
 };
 
-class WizardDetailsPanel extends BaseDetailsPanel {
+class WizardDetailsPanel extends BaseContextWindowPanel {
 
     get widgetSelectorDropdown() {
         return xpath.container + lib.DROPDOWN_SELECTOR.WIDGET_FILTER_DROPDOWN;
@@ -69,7 +69,7 @@ class WizardDetailsPanel extends BaseDetailsPanel {
             return await super.openDependencies();
         } catch (err) {
             //Workaround for issue with the empty selector:
-            await this.saveScreenshot(appConst.generateRandomName("err_dependencies"));
+            await this.saveScreenshot(appConst.generateRandomName('err_dependencies'));
             await this.refresh();
             await this.pause(4000);
             await super.openDependencies();

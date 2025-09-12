@@ -7,7 +7,7 @@ const lib = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
 const ConfirmationDialog = require('../confirmation.dialog');
 const CreateRequestPublishDialog = require('../issue/create.request.publish.dialog');
-const BrowseDetailsPanel = require('./detailspanel/browse.context.window.panel');
+const BrowseContextWindowPanel = require('./detailspanel/browse.context.window.panel');
 const BaseBrowsePanel = require('../base.browse.panel');
 const ProjectSelectionDialog = require('../../page_objects/project/project.selection.dialog');
 const ContentUnpublishDialog = require('../content.unpublish.dialog');
@@ -402,8 +402,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
         try {
             await this.waitForElementEnabled(this.previewButton, appConst.mediumTimeout)
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_preview_btn_enabled');
-            throw new Error('Preview button should be enabled, screenshot  : ' + screenshot + "  " + err);
+            await this.handleError('Preview button should be enabled', 'err_preview_enabled_button', err);
         }
     }
 
@@ -427,8 +426,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
             await this.waitForElementDisplayed(this.duplicateButton, appConst.mediumTimeout);
             return await this.waitForElementDisabled(this.duplicateButton, appConst.mediumTimeout);
         } catch (err) {
-            await this.saveScreenshot('err_duplicate_disabled_button');
-            throw new Error('Duplicate button should be disabled, timeout: ' + 3000 + 'ms')
+            await this.handleError(`Browse Panel - 'Duplicate' button should be disabled`, 'err_duplicate_disabled_button', err);
         }
     }
 
@@ -437,8 +435,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
             await this.waitForElementDisplayed(this.duplicateButton, appConst.mediumTimeout);
             return await this.waitForElementEnabled(this.duplicateButton, appConst.mediumTimeout);
         } catch (err) {
-            await this.saveScreenshot('err_duplicate_should_be_enabled');
-            throw new Error('Duplicate button should be enabled, timeout: ' + 3000 + 'ms')
+            await this.handleError(`Browse Panel - 'Duplicate' button should be enabled`, 'err_duplicate_button', err);
         }
     }
 
@@ -456,8 +453,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
             await this.waitForElementDisplayed(this.localizeButton, appConst.mediumTimeout);
             return await this.waitForElementDisabled(this.localizeButton, appConst.mediumTimeout);
         } catch (err) {
-            await this.saveScreenshot('err_localize_disabled_button');
-            throw new Error('Localize button should be disabled, timeout: ' + 3000 + 'ms')
+            await this.handleError(`Browse Panel - 'Localize' button should be disabled`, 'err_localize_disabled_button', err);
         }
     }
 
@@ -518,8 +514,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
             let nameXpath = XPATH.contentsTreeGridRootUL + lib.itemByName(name);
             await this.waitForElementDisplayed(nameXpath, appConst.longTimeout);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_content');
-            throw new Error(`Content was not found: screenshot:${screenshot} ` + err);
+            await this.handleError('Wait for row by name visible', 'err_row_by_name_visible', err);
         }
     }
 
@@ -679,7 +674,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
         await this.getBrowser().waitUntil(async () => {
             let actualStatus = await this.getText(locator);
             return actualStatus === expectedStatus;
-        }, {timeout: appConst.mediumTimeout, timeoutMsg: "Expected status should be " + expectedStatus});
+        }, {timeout: appConst.mediumTimeout, timeoutMsg: 'Expected status should be ' + expectedStatus});
     }
 
     async waitForStatusByDisplayName(displayName, expectedStatus) {
@@ -688,7 +683,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
         await this.getBrowser().waitUntil(async () => {
             let actualStatus = await this.getText(locator);
             return actualStatus === expectedStatus;
-        }, {timeout: appConst.mediumTimeout, timeoutMsg: "Expected status should be " + expectedStatus});
+        }, {timeout: appConst.mediumTimeout, timeoutMsg: 'Expected status should be ' + expectedStatus});
     }
 
     waitForShowPublishMenuDropDownVisible() {
@@ -822,16 +817,16 @@ class ContentBrowsePanel extends BaseBrowsePanel {
         }
     }
 
-    async openDetailsPanel() {
-        let browseDetailsPanel = new BrowseDetailsPanel();
-        let result = await browseDetailsPanel.isPanelVisible();
+    async openContextWindowPanel() {
+        let browseContextWindowPanel = new BrowseContextWindowPanel();
+        let result = await browseContextWindowPanel.isPanelVisible();
         if (!result) {
             await this.clickOnDetailsPanelToggleButton();
         }
-        await browseDetailsPanel.waitForLoaded();
-        await browseDetailsPanel.waitForSpinnerNotVisible(appConst.TIMEOUT_5);
+        await browseContextWindowPanel.waitForLoaded();
+        await browseContextWindowPanel.waitForSpinnerNotVisible(appConst.TIMEOUT_5);
         await this.pause(500);
-        return browseDetailsPanel;
+        return browseContextWindowPanel;
     }
 
     getSelectedProjectDisplayName() {
@@ -848,7 +843,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
     //Wait for 'Show Issues' button has 'Assigned to Me' label
     async hasAssignedIssues() {
         try {
-            return await this.waitForAttributeHasValue(this.showIssuesListButton, "class", "has-assigned-issues");
+            return await this.waitForAttributeHasValue(this.showIssuesListButton, 'class', 'has-assigned-issues');
         } catch (err) {
             await this.handleError(`Browse Panel - 'Show Issues' button should have 'Assigned to Me' label`, 'err_assigned_issues', err);
         }
@@ -961,7 +956,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
     async waitForGridRoleAttribute(expectedRole) {
         let locator = XPATH.treeGrid;
         await this.getBrowser().waitUntil(async () => {
-            let text = await this.getAttribute(locator, "role");
+            let text = await this.getAttribute(locator, 'role');
             return text === expectedRole;
         }, {timeout: appConst.shortTimeout, timeoutMsg: "Role attribute for Grid should set 'grid'"});
     }

@@ -4,7 +4,7 @@
 const lib = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
 const BaseBrowsePanel = require('../../page_objects/base.browse.panel');
-const ArchiveContextPanel = require('../browsepanel/detailspanel/archive.context.window.panel');
+const ArchiveContextWindowPanel = require('../browsepanel/detailspanel/archive.context.window.panel');
 
 const XPATH = {
     container: "//div[contains(@id,'ArchiveBrowsePanel')]",
@@ -113,7 +113,7 @@ class ArchiveBrowsePanel extends BaseBrowsePanel {
     async waitForContentDisplayed(contentName, ms) {
         try {
             let timeout = ms ? ms : appConst.mediumTimeout;
-            console.log("waitForContentDisplayed, timeout is:" + timeout);
+            console.log('waitForContentDisplayed, timeout is:' + timeout);
             return await this.waitForElementDisplayed(this.treeGrid + lib.itemByName(contentName), timeout);
         } catch (err) {
             await this.handleError('Archive Browse Panel', 'err_wait_for_content_displayed', err);
@@ -238,17 +238,17 @@ class ArchiveBrowsePanel extends BaseBrowsePanel {
         await this.getBrowser().waitUntil(async () => {
             let isSelected = await checkboxElement.isSelected();
             return isSelected;
-        }, {timeout: appConst.mediumTimeout, timeoutMsg: "Checkbox is not selected"});
+        }, {timeout: appConst.mediumTimeout, timeoutMsg: 'Checkbox is not selected'});
     }
 
-    async openDetailsPanel() {
-        let archiveContextPanel = new ArchiveContextPanel();
-        let result = await archiveContextPanel.isPanelVisible();
+    async openContextWindowPanel() {
+        let archiveContextWindowPanel = new ArchiveContextWindowPanel();
+        let result = await archiveContextWindowPanel.isOpened();
         if (!result) {
             await this.clickOnDetailsPanelToggleButton();
         }
-        await archiveContextPanel.waitForDetailsPanelLoaded();
-        await archiveContextPanel.waitForSpinnerNotVisible(appConst.TIMEOUT_5);
+        await archiveContextWindowPanel.waitForOpened();
+        await archiveContextWindowPanel.waitForSpinnerNotVisible(appConst.TIMEOUT_5);
         await this.pause(500);
     }
 }

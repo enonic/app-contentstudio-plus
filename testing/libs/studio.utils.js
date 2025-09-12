@@ -789,8 +789,8 @@ module.exports = {
     async openDependencyWidgetInBrowsePanel() {
         let browsePanel = new BrowsePanel();
         let browseDependenciesWidget = new BrowseDependenciesWidget();
-        let browseDetailsPanel = new BrowseDetailsPanel();
-        await browsePanel.openDetailsPanel();
+        let browseDetailsPanel = new BrowseContextWindowPanel();
+        await browsePanel.openContextWindowPanel();
         await browseDetailsPanel.openDependencies();
         return await browseDependenciesWidget.waitForWidgetLoaded();
     },
@@ -1054,7 +1054,7 @@ module.exports = {
         let browsePanel = new BrowsePanel();
         let browseContextWindowPanel = new BrowseContextWindowPanel();
         let browseLayersWidget = new BrowseLayersWidget();
-        await browsePanel.openDetailsPanel();
+        await browsePanel.openContextWindowPanel();
         await browseContextWindowPanel.openLayers();
         await browseLayersWidget.waitForWidgetLoaded();
         return browseLayersWidget;
@@ -1063,7 +1063,7 @@ module.exports = {
         let browsePanel = new BrowsePanel();
         let browseDetailsPanel = new BrowseContextWindowPanel();
         let browseVariantsWidget = new BrowseVariantsWidget();
-        await browsePanel.openDetailsPanel();
+        await browsePanel.openContextWindowPanel();
         await browseDetailsPanel.openVariants();
         await browseVariantsWidget.waitForWidgetLoaded();
         return browseVariantsWidget;

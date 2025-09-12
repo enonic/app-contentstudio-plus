@@ -121,8 +121,7 @@ class BaseContextWindowPanel extends Page {
             await this.clickOnWidgetSelectorDropdownHandle();
             await widgetSelectorDropdown.clickOnOptionByDisplayName(appConst.WIDGET_TITLE.VARIANTS);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_variants_widget');
-            throw new Error(`Error during opening Variants widget, screenshot:${screenshot} ` + err);
+            await this.handleError('Tried to open Variants Widget','err_variants', err);
         }
     }
 
@@ -154,6 +153,11 @@ class BaseContextWindowPanel extends Page {
     async waitForWidgetDropdownRoleAttribute(expectedValue) {
         let locator = this.widgetSelectorDropdownHandle;
         await this.waitForAttributeValue(locator, appConst.ACCESSIBILITY_ATTRIBUTES.ROLE, expectedValue);
+    }
+
+    async isOpened() {
+        let width = await this.getWindowWidth();
+        return width > 1920;
     }
 }
 

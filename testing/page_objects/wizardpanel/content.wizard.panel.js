@@ -175,8 +175,7 @@ class ContentWizardPanel extends Page {
             await this.waitForElementDisplayed(this.localizeButton, appConst.mediumTimeout);
             return await this.waitForElementEnabled(this.localizeButton, appConst.mediumTimeout);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_localize_enabled_button');
-            throw Error('Localize button should be enabled, screenshot: ' + screenshot + ' ' + err);
+            await this.handleError('Localize button should be enabled', 'err_localize_enabled_button', err);
         }
     }
 
@@ -211,8 +210,7 @@ class ContentWizardPanel extends Page {
                 console.log('Content wizard is opened and Details Panel is loaded');
             }
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_details_panel');
-            throw new Error("Details Panel, screenshot:" + screenshot + ' ' + err);
+            await this.handleError('Wizard Context Window Panel in Wizard', 'err_open_context_window_panel', err);
         }
     }
 

@@ -20,11 +20,11 @@ class ArchiveContextWindowPanel extends BaseDetailsPanel {
         return xpath.container + lib.DROPDOWN_SELECTOR.WIDGET_FILTER_DROPDOWN;
     }
 
-    async waitForDetailsPanelLoaded() {
+    async waitForOpened() {
         try {
             return await this.waitForElementDisplayed(xpath.container, appConst.shortTimeout)
         } catch (err) {
-            await this.handleError('Archive Context Panel was not loaded', 'err_archive_context_panel_loaded', err);
+            await this.handleError('Archive Context Window Panel was not loaded', 'err_archive_context_panel_loaded', err);
         }
     }
 

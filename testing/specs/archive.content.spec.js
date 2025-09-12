@@ -131,7 +131,7 @@ describe('archive.content.spec: tests for archiving content', function () {
             // 1. Go to 'Archive Browse Panel' :
             await studioUtils.openArchivePanel();
             await archiveBrowsePanel.clickCheckboxAndSelectRowByDisplayName(FOLDER1.displayName);
-            await archiveBrowsePanel.openDetailsPanel();
+            await archiveBrowsePanel.openContextWindowPanel();
             // 2. Open Versions widget:
             await archiveBrowseContextPanel.openVersionHistory();
             await studioUtils.saveScreenshot('archived_message_versions_widget');
