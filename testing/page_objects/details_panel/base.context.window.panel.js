@@ -115,20 +115,6 @@ class BaseContextWindowPanel extends Page {
         await widgetSelectorDropdown.clickOnOptionByDisplayName(appConst.WIDGET_SELECTOR_OPTIONS.EMULATOR);
     }
 
-    async openEmulatorWidget() {
-        try {
-            let widgetSelectorDropdown = new WidgetSelectorDropdown();
-            await this.clickOnWidgetSelectorDropdownHandle();
-            await this.clickOnEmulatorOptionsItem();
-        } catch (err) {
-            await this.saveScreenshot(appConst.generateRandomName('err_widget_selector'));
-            await this.refresh();
-            await this.pause(3000);
-            await this.clickOnWidgetSelectorDropdownHandle();
-            await this.clickOnEmulatorOptionsItem();
-        }
-    }
-
     async openVariants() {
         try {
             let widgetSelectorDropdown = new WidgetSelectorDropdown();
@@ -154,6 +140,17 @@ class BaseContextWindowPanel extends Page {
         }
         return parsed;
     }
+
+    async openPublishReport() {
+        try {
+            let widgetSelectorDropdown = new WidgetSelectorDropdown();
+            await this.clickOnWidgetSelectorDropdownHandle();
+            await widgetSelectorDropdown.clickOnOptionByDisplayName(appConst.WIDGET_TITLE.PUBLISHING_REPORT);
+        } catch (err) {
+            await this.handleError('Tried to open Publish Report widget', 'err_open_publish_report_widget', err);
+        }
+    }
+
     async waitForWidgetDropdownRoleAttribute(expectedValue) {
         let locator = this.widgetSelectorDropdownHandle;
         await this.waitForAttributeValue(locator, appConst.ACCESSIBILITY_ATTRIBUTES.ROLE, expectedValue);

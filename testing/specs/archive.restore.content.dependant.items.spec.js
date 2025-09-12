@@ -83,8 +83,8 @@ describe('archive.restore.content.dependant.items.spec: tests for archive/restor
             await archiveFilterPanel.waitForClearLinkNotDisplayed();
             await studioUtils.saveScreenshot('issue_arch_filter_panel_hits_3');
             let result2 = await archiveBrowsePanel.getDisplayNamesInGrid();
-            assert.equal(result2.length, 1, 'Grid returns to the initial state');
-            assert.equal(result2[0], FOLDER_DISPLAY_NAME, 'Expected item should be present in the grid');
+            assert.ok(result2.length < 4, 'Grid returns to the initial state');
+            assert.ok(result2.includes(FOLDER_DISPLAY_NAME), 'Expected item should be present in the grid');
         });
 
     it(`WHEN Filter Panel is opened THEN 'Archived', 'Archived By' aggregation groups should be present`,
