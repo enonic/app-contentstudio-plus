@@ -10,7 +10,7 @@ const xpath = {
     scheduleWidgetItem: "//div[contains(@id,'OnlinePropertiesWidgetItemView')]",
 };
 
-class BaseDetailsPanel extends Page {
+class BaseContextWindowPanel extends Page {
 
     async waitForScheduleWidgetItemNotDisplayed() {
         return this.waitForElementNotDisplayed(xpath.scheduleWidgetItem, appConst.mediumTimeout);
@@ -140,22 +140,24 @@ class BaseDetailsPanel extends Page {
         }
     }
 
-    async openPublishReport() {
-        try {
-            let widgetSelectorDropdown = new WidgetSelectorDropdown();
-            await this.clickOnWidgetSelectorDropdownHandle();
-            await widgetSelectorDropdown.clickOnOptionByDisplayName(appConst.WIDGET_TITLE.PUBLISHING_REPORT);
-        } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_publish_report_widget');
-            throw new Error(`Error during opening Variants widget, screenshot:${screenshot} ` + err);
+
+    async getSelectedOptionsDisplayName() {
+        let widgetSelectorDropdown = new WidgetSelectorDropdown();
+        return await widgetSelectorDropdown.getSelectedOptionsDisplayName();
+    }
+
+    getPanelWidth(width) {
+        let value = width.substring(0, width.indexOf('px'));
+        const parsed = Number(value);
+        if (isNaN(parsed)) {
+            return false;
         }
+        return parsed;
     }
-
-    async isPanelVisible() {
-        let width = await this.getWindowWidth();
-        return width > 1920;
+    async waitForWidgetDropdownRoleAttribute(expectedValue) {
+        let locator = this.widgetSelectorDropdownHandle;
+        await this.waitForAttributeValue(locator, appConst.ACCESSIBILITY_ATTRIBUTES.ROLE, expectedValue);
     }
-
 }
 
-module.exports = BaseDetailsPanel;
+module.exports = BaseContextWindowPanel;

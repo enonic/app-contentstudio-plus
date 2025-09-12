@@ -7,10 +7,11 @@ const lib = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
 const ConfirmationDialog = require('../confirmation.dialog');
 const CreateRequestPublishDialog = require('../issue/create.request.publish.dialog');
-const BrowseDetailsPanel = require('../browsepanel/detailspanel/browse.details.panel');
+const BrowseDetailsPanel = require('./detailspanel/browse.context.window.panel');
 const BaseBrowsePanel = require('../base.browse.panel');
 const ProjectSelectionDialog = require('../../page_objects/project/project.selection.dialog');
 const ContentUnpublishDialog = require('../content.unpublish.dialog');
+const {Key} = require('webdriverio');
 
 const XPATH = {
     container: "//div[contains(@id,'ContentBrowsePanel')]",
@@ -187,18 +188,22 @@ class ContentBrowsePanel extends BaseBrowsePanel {
         return await this.isClickable(this.projectViewerButton);
     }
 
-    //Opens menu and select the project
+    // Opens menu and select the project
     async selectContext(projectDisplayName) {
-        let projectSelectionDialog = await this.clickOnProjectViewerButton();
-        await projectSelectionDialog.selectContext(projectDisplayName);
-        await projectSelectionDialog.waitForDialogClosed();
-        return await this.pause(1000);
+        try {
+            let projectSelectionDialog = await this.clickOnProjectViewerButton();
+            await projectSelectionDialog.selectContext(projectDisplayName);
+            await projectSelectionDialog.waitForDialogClosed();
+            return await this.pause(1000);
+        } catch (err) {
+            await this.handleError('Browse Panel - Tried to select the context', 'err_select_context', err);
+        }
     }
 
-    hotKeyPublish() {
-        return this.getBrowser().status().then(status => {
-            return this.getBrowser().keys(['Control', 'Alt', 'p']);
-        })
+    async hotKeyPublish() {
+        const isMacOS = await this.isMacOS();
+        const keyCombination = isMacOS ? [Key.Command, Key.Alt, 'p'] : [Key.Ctrl, Key.Alt, 'p'];
+        return await this.getBrowser().keys(keyCombination);
     }
 
     // Wait for `Publish Menu` Button gets `Publish...`
@@ -206,8 +211,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
         try {
             return await this.waitForElementDisplayed(this.publishButton, appConst.mediumTimeout);
         } catch (err) {
-            await this.saveScreenshot("err_publish_button");
-            throw new Error("Publish button is not visible! " + err);
+            await this.handleError('Publish button should be visible', 'err_publish_button', err);
         }
     }
 
@@ -217,8 +221,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
             await this.waitForElementDisplayed(this.markAsReadyButton, appConst.mediumTimeout);
             await this.pause(300);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_mark_as_ready_button');
-            throw new Error(`Mark as Ready button is not visible! screenshot:  ${screenshot} ` + err);
+            await this.handleError('Mark as Ready button should be visible', 'err_mark_as_ready_button', err);
         }
     }
 
@@ -247,8 +250,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
             await unpublishDialog.pause(1000);
             return unpublishDialog;
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName("err_unpublish_button");
-            throw new Error(`Browse Panel toolbar - Unpublish button screenshot: ${screenshot} ` + err);
+            await this.handleError('Browse Panel - Clicked on Unpublish button', 'err_click_unpublish_button', err);
         }
     }
 
@@ -278,8 +280,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
             await this.waitForMoveButtonEnabled();
             return await this.clickOnElement(this.moveButton);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName("err_move_btn");
-            throw new Error(`error when clicking on the Move button, screenshot: ${screenshot} ` + err);
+            await this.handleError('Browse Panel - Clicked on Move button', 'err_click_move_button', err);
         }
     }
 
@@ -296,10 +297,13 @@ class ContentBrowsePanel extends BaseBrowsePanel {
         return await this.pause(400);
     }
 
-    clickOnDuplicateButton() {
-        return this.clickOnElement(this.duplicateButton).catch(err => {
-            throw new Error('error when clicking on the Duplicate button ' + err);
-        })
+    async clickOnDuplicateButton() {
+        try {
+            await this.waitForElementDisplayed(this.duplicateButton, appConst.mediumTimeout);
+            await this.clickOnElement(this.duplicateButton);
+        } catch (err) {
+            throw new Error('Clicked on the Duplicate button ' + err);
+        }
     }
 
     async clickOnDetailsPanelToggleButton() {
@@ -308,8 +312,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
             await this.clickOnElement(this.detailsPanelToggleButton);
             return await this.pause(400);
         } catch (err) {
-            await this.saveScreenshot('err_click_on_details_panel_toggle');
-            throw new Error(`Error when clicking on Details Panel toggler` + err);
+            await this.handleError('Clicked on Details Panel toggle', 'err_click_on_details_panel_toggle', err);
         }
     }
 
@@ -349,19 +352,17 @@ class ContentBrowsePanel extends BaseBrowsePanel {
             await contentDuplicateDialog.pause(700);
             return contentDuplicateDialog;
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_duplicate_btn_toolbar');
-            throw new Error("Error after clicking on the 'Duplicate' button, screenshot: " + screenshot + ' ' + err);
+            await this.handleError("Clicked on 'Duplicate' button", 'err_click_duplicate_button', err);
         }
     }
 
     async waitForContentDisplayed(contentName, ms) {
         try {
             let timeout = ms ? ms : appConst.mediumTimeout;
-            console.log("waitForContentDisplayed, timeout is:" + timeout);
+            console.log('waitForContentDisplayed, timeout is:' + timeout);
             return await this.waitForElementDisplayed(XPATH.contentsTreeGridRootUL + lib.TREE_GRID.itemByName(contentName), timeout);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_content_displayed');
-            throw new Error(`content is not displayed ! screenshot: ${screenshot} ` + err);
+            await this.handleError(`Content with name ${contentName} is not displayed`, 'err_content_displayed', err);
         }
     }
 
@@ -370,8 +371,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
         try {
             await this.waitForElementNotDisplayed(locator, appConst.mediumTimeout);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_content_should_not_be_displayed');
-            throw new Error("Content is still displayed, screenshot :" + screenshot + "  " + err);
+            await this.handleError("Content is still displayed", 'err_content_should_not_be_displayed', err);
         }
     }
 
@@ -381,8 +381,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
             await this.clickOnElement(this.previewButton);
             return await this.pause(2000);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_browsepanel_preview');
-            throw new Error(`Error occured after clicking on 'Preview' button, screenshot: ${screenshot} ` + err);
+            await this.handleError("Clicked on 'Preview' button", 'err_click_preview_button', err);
         }
     }
 
@@ -419,8 +418,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
         try {
             return await this.waitForElementDisabled(this.sortButton, appConst.mediumTimeout)
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_sort_disabled_button');
-            throw new Error(`Sort button should be disabled, screenshot: ${screenshot} ` + err);
+            await this.handleError('Sort button should be disabled', 'err_sort_disabled_button', err);
         }
     }
 
@@ -468,8 +466,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
             await this.waitForElementDisplayed(this.openButton, appConst.mediumTimeout);
             return await this.waitForElementEnabled(this.openButton, appConst.mediumTimeout);
         } catch (err) {
-            await this.saveScreenshot('err_open_button_is_not_enabled');
-            throw new Error('Open button should be disabled, timeout: ' + 3000 + 'ms')
+            await this.handleError('Open button should be enabled', 'err_open_button_is_not_enabled', err);
         }
     }
 
@@ -479,8 +476,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
             await this.clickOnElement(this.openButton);
             return await this.pause(500);
         } catch (err) {
-            await this.saveScreenshot('err_browse_panel_open_button');
-            throw new Error('Browse Panel: Edit button is not enabled! ' + err);
+            await this.handleError('Browse Panel: Clicked on Open button ', 'err_browse_panel_open_button', err);
         }
     }
 
@@ -495,8 +491,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
         try {
             await this.waitForElementEnabled(this.sortButton, appConst.mediumTimeout)
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_sort_enabled_button');
-            throw new Error('Sort button should be enabled, screenshot: ' + screenshot + ' ' + err);
+            await this.handleError('Sort button should be enabled', 'err_sort_enabled_button', err);
         }
     }
 
@@ -514,8 +509,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
             await this.clickOnElement(nameXpath);
             return await this.pause(500);
         } catch (err) {
-            await this.saveScreenshotUniqueName('err_not_found');
-            throw new Error('Content was not found:  ' + err);
+            await this.handleError('Click on row by displayName', 'err_click_on_row_display_name', err);
         }
     }
 
@@ -544,8 +538,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
             await this.clickOnCheckboxByName(name);
             await this.waitForRowCheckboxSelected(name);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_select_item');
-            throw new Error('Row with the name ' + name + ' was not selected, screenshot: ' + screenshot + ' ' + err);
+            await this.handleError('Clicked on checkbox by name', 'err_click_checkbox', err);
         }
     }
 
@@ -554,8 +547,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
             await this.clickOnCheckboxByDisplayName(displayName);
             return await this.pause(200);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_find_item');
-            throw new Error(`Row with the displayName ${displayName} was not found. Screenshot: :${screenshot}` + err);
+            await this.handleError('Click on checkbox by displayName', 'err_click_checkbox', err);
         }
     }
 
@@ -624,8 +616,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
             // check only the last element:
             return await res[res.length - 1].waitForDisplayed();
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_expand_toggle');
-            throw new Error(`Expand toggle should be displayed! screenshot: ${screenshot} ` + err);
+            await this.handleError('Expand toggle should be displayed', 'err_expand_toggle', err);
         }
     }
 
@@ -634,8 +625,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
             let expanderIcon = this.treeGrid + lib.TREE_GRID.itemTreeGridListElementByName(contentName) + lib.TREE_GRID.EXPANDER_ICON_DIV;
             return await this.waitForElementNotDisplayed(expanderIcon, appConst.shortTimeout);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_expand_toggle');
-            throw new Error(`Expand toggle should not be displayed! screenshot: ${screenshot} ` + err);
+            await this.handleError('Expand toggle should not be displayed', 'err_expand_toggle', err);
         }
     }
 
@@ -646,8 +636,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
             await this.clickOnElement(expanderIcon);
             return await this.pause(900);
         } catch (err) {
-            await this.saveScreenshot('err_click_on_expander');
-            throw new Error('Error occurred after clicking on expand-toggle ' + err);
+            await this.handleError(`Clicked on the expand-toggle for content: ${contentName}`, 'err_click_on_expander', err);
         }
     }
 
@@ -658,8 +647,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
             let attr = await this.getAttribute(divEl, 'class');
             return attr.includes('expanded');
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_expander_icon');
-            throw new Error(`Error occurred during checking the expand-toggle, screenshot: ${screenshot} ` + err);
+            await this.handleError(`Checked if expand-toggle visible for content: ${contentName}`, 'err_check_expander_icon', err);
         }
     }
 
@@ -682,8 +670,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
             let selector = lib.TREE_GRID.itemTreeGridListElementByName(name) + lib.TREE_GRID.CONTENT_STATUS;
             return await this.getText(selector);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_content_status');
-            throw new Error(`Error occurred during getting the status of the content, screenshot: ${screenshot}  ` + err);
+            await this.handleError('Content status of the content', 'err_content_status', err);
         }
     }
 
@@ -720,8 +707,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
             await this.waitForCreateIssueButtonDisplayed();
             return await this.clickOnElement(this.createIssueButton);
         } catch (err) {
-            await this.saveScreenshot("err_click_create_issue_button");
-            throw new Error("Browse Panel. Error when click on Create Issue button in the toolbar! " + err);
+            await this.handleError("Browse Panel. Error when click on Create Issue button in the toolbar!");
         }
     }
 
@@ -762,8 +748,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
             await this.clickOnElement(selector);
             return await this.pause(300);
         } catch (err) {
-            await this.saveScreenshot('err_click_issue_menuItem');
-            throw new Error('error when try to click on publish menu item, ' + err);
+            await this.handleError(`Tried to click on ${menuItem} menu item`, 'err_click_issue_menuItem', err);
         }
     }
 
@@ -843,7 +828,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
         if (!result) {
             await this.clickOnDetailsPanelToggleButton();
         }
-        await browseDetailsPanel.waitForDetailsPanelLoaded();
+        await browseDetailsPanel.waitForLoaded();
         await browseDetailsPanel.waitForSpinnerNotVisible(appConst.TIMEOUT_5);
         await this.pause(500);
         return browseDetailsPanel;
@@ -894,7 +879,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
             await this.clickOnElement(this.localizeButton);
             return await this.pause(1000);
         } catch (err) {
-            await this.handleError(`Browse Panel - 'Localize' button should be enabled, but it is not!` , 'err_localize_btn', err);
+            await this.handleError(`Browse Panel - 'Localize' button should be enabled, but it is not!`, 'err_localize_btn', err);
         }
     }
 

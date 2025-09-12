@@ -4,7 +4,7 @@
 const lib = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
 const BaseBrowsePanel = require('../../page_objects/base.browse.panel');
-const ArchiveContextPanel = require('../browsepanel/detailspanel/archive.context.panel');
+const ArchiveContextPanel = require('../browsepanel/detailspanel/archive.context.window.panel');
 
 const XPATH = {
     container: "//div[contains(@id,'ArchiveBrowsePanel')]",

@@ -1,16 +1,16 @@
 /**
- * Created on 04/07/2018.
+ * Created on 10.07.2025
  */
-const BaseDetailsPanel = require('../../details_panel/base.details.panel');
+const BaseDetailsPanel = require('../../details_panel/base.context.window.panel');
 const lib = require('../../../libs/elements');
 const appConst = require('../../../libs/app_const');
 
 const xpath = {
-    container: `//div[contains(@id,'ContentBrowsePanel')]//div[contains(@id,'DockedContextPanel')]`,
+    container: `//div[contains(@id,'ArchiveBrowsePanel')]//div[contains(@id,'DockedContextPanel')]`,
 };
 
-//  ContentBrowsePanel, ContextView:
-class BrowseDetailsPanel extends BaseDetailsPanel {
+//  ArchiveBrowsePanel, ContextView:
+class ArchiveContextWindowPanel extends BaseDetailsPanel {
 
     get widgetSelectorDropdownHandle() {
         return xpath.container + lib.DROPDOWN_SELECTOR.WIDGET_FILTER_DROPDOWN + lib.DROP_DOWN_HANDLE;
@@ -20,10 +20,12 @@ class BrowseDetailsPanel extends BaseDetailsPanel {
         return xpath.container + lib.DROPDOWN_SELECTOR.WIDGET_FILTER_DROPDOWN;
     }
 
-    waitForDetailsPanelLoaded() {
-        return this.waitForElementDisplayed(xpath.container, appConst.shortTimeout).catch(err => {
-            throw new Error('Details Panel was not loaded in ' + err);
-        });
+    async waitForDetailsPanelLoaded() {
+        try {
+            return await this.waitForElementDisplayed(xpath.container, appConst.shortTimeout)
+        } catch (err) {
+            await this.handleError('Archive Context Panel was not loaded', 'err_archive_context_panel_loaded', err);
+        }
     }
 
     waitForDetailsPanelCleared() {
@@ -35,11 +37,7 @@ class BrowseDetailsPanel extends BaseDetailsPanel {
         }, {timeout: appConst.shortTimeout, timeoutMsg: "Details Panel should be cleared"});
     }
 
-    async waitForWidgetDropdownRoleAttribute(expectedValue) {
-        let locator = this.widgetSelectorDropdownHandle;
-        await this.waitForAttributeValue(locator, appConst.ACCESSIBILITY_ATTRIBUTES.ROLE, expectedValue);
-    }
 }
 
-module.exports = BrowseDetailsPanel;
+module.exports = ArchiveContextWindowPanel;
 

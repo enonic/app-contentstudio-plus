@@ -17,6 +17,7 @@ const ArchivedContentStatusWidget = require('../page_objects/archive/archived.co
 const ArchiveBrowseContextPanel = require('../page_objects/archive/archive.browse.context.panel');
 const ArchivedContentVersionsWidget = require('../page_objects/archive/archived.content.versions.widget');
 const CompareContentVersionsDialog = require('../page_objects/compare.content.versions.dialog');
+const ArchiveContextWindowPanel = require('../page_objects/browsepanel/detailspanel/archive.context.window.panel');
 
 describe('archive.browse.panel.spec: tests for archive browse panel and selection controller', function () {
     this.timeout(appConst.SUITE_TIMEOUT);
@@ -38,7 +39,7 @@ describe('archive.browse.panel.spec: tests for archive browse panel and selectio
             await studioUtils.doAddFolder(FOLDER2);
         });
 
-    it(`WHEN checkbox in a row has been clicked THEN SelectionPanelToggler gets visible`,
+    it(`WHEN checkbox has been clicked in a row THEN SelectionPanelToggle gets visible`,
         async () => {
             let contentBrowsePanel = new ContentBrowsePanel();
             let deleteContentDialog = new DeleteContentDialog();
@@ -88,6 +89,29 @@ describe('archive.browse.panel.spec: tests for archive browse panel and selectio
             // 3. Verify buttons:
             await archiveBrowsePanel.waitForDeleteButtonEnabled();
             await archiveBrowsePanel.waitForRestoreButtonEnabled();
+        });
+
+    // Verify Dependencies widget should not be present in Archive #1667
+    //  https://github.com/enonic/app-contentstudio-plus/issues/1667
+    it(`GIVEN existing folder is selected WHEN widget dropdown selector has been clicked THEN Dependencies option should not be displayed in the dropdown list`,
+        async () => {
+            // 1. Navigate to 'Archive Browse Panel' and check the archived content:
+            await studioUtils.openArchivePanel();
+            let archiveContextWindowPanel = new ArchiveContextWindowPanel();
+            let archiveBrowsePanel = new ArchiveBrowsePanel();
+            await archiveBrowsePanel.clickOnRowByDisplayName(FOLDER1.displayName);
+            // 1. Click on the dropdown handler:
+            await archiveContextWindowPanel.clickOnWidgetSelectorDropdownHandle();
+            let actualOptions = await archiveContextWindowPanel.getWidgetSelectorDropdownOptions();
+            await studioUtils.saveScreenshot('archive_context_window_widget_options');
+            // 2. Verify the options:
+            assert.ok(actualOptions.includes(appConst.WIDGET_SELECTOR_OPTIONS.DEPENDENCIES)===false, 'Dependencies option should not be displayed');
+            assert.ok(actualOptions.includes(appConst.WIDGET_SELECTOR_OPTIONS.VERSION_HISTORY),
+                `'Version history' option should be displayed`);
+            assert.ok(actualOptions.includes(appConst.WIDGET_SELECTOR_OPTIONS.DETAILS), `'Details' option should be displayed`);
+            //assert.equal(actualOptions.length, 3, 'Tree options should be in the selector');
+            // 3. Verify the accessibility attribute in Widget Selector:
+            await archiveContextWindowPanel.waitForWidgetDropdownRoleAttribute('button');
         });
 
     // Verify https://github.com/enonic/app-contentstudio-plus/issues/316

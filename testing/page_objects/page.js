@@ -646,6 +646,15 @@ class Page {
         let result =  await this.getBrowser().getWindowSize();
         return result.width;
     }
+
+    async getBrowserStatus() {
+        return await this.getBrowser().status();
+    }
+
+    async isMacOS() {
+        const status = await this.getBrowserStatus();
+        return status.os.name.includes('Mac');
+    }
 }
 
 module.exports = Page;
