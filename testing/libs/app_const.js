@@ -99,6 +99,25 @@ module.exports = Object.freeze({
         STARTED: "Content synchronisation job has started",
         FINISHED: "Content synchronisation job has finished"
     },
+    GRID_SORTING: {
+        DATE_ASC: 'Date ascending',
+        DATE_DESC: 'Date descending',
+        NAME_ASC: 'Name ascending',
+        NAME_DESC: 'Name descending',
+        MANUALLY_SORTED: 'Manually sorted',
+    },
+    SORT_DIALOG: {
+        MENU_ITEM: {
+            DISPLAY_NAME: 'Display name',
+            MANUALLY_SORTED: 'Manually sorted',
+            MODIFIED_DATE: 'Modified date',
+            CREATED_DATE: 'Created date',
+            PUBLISHED_DATE: "Published date",
+        },
+        ASCENDING: 'ascending',
+        DESCENDING: 'descending'
+
+    },
     PASSWORD: {
         MEDIUM: "password123",
         STRONG: "password123=",

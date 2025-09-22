@@ -15,7 +15,7 @@ const IssueListDialog = require('../page_objects/issue/issue.list.dialog');
 const CreateIssueDialog = require('../page_objects/issue/create.issue.dialog');
 const DeleteContentDialog = require('../page_objects/delete.content.dialog');
 const ContentPublishDialog = require('../page_objects/content.publish.dialog');
-const BrowseDetailsPanel = require('../page_objects/browsepanel/detailspanel/browse.details.panel');
+const BrowseContextWindowPanel = require('../page_objects/browsepanel/detailspanel/browse.context.window.panel');
 const BrowseDependenciesWidget = require('../page_objects/browsepanel/detailspanel/browse.dependencies.widget');
 const ContentUnpublishDialog = require('../page_objects/content.unpublish.dialog');
 const CreateRequestPublishDialog = require('../page_objects/issue/create.request.publish.dialog');
@@ -135,12 +135,12 @@ module.exports = {
     },
     async openBrowseDetailsPanel() {
         let browsePanel = new BrowsePanel();
-        let browseDetailsPanel = new BrowseDetailsPanel();
-        let result = await browseDetailsPanel.isPanelVisible();
+        let browseContextWindowPanel = new BrowseContextWindowPanel();
+        let result = await browseContextWindowPanel.isPanelVisible();
         if (!result) {
             await browsePanel.clickOnDetailsPanelToggleButton();
         }
-        await browseDetailsPanel.waitForDetailsPanelLoaded();
+        await browseContextWindowPanel.waitForLoaded();
         await browsePanel.waitForSpinnerNotVisible(appConst.TIMEOUT_5);
         return await browsePanel.pause(1000);
     },
@@ -789,8 +789,8 @@ module.exports = {
     async openDependencyWidgetInBrowsePanel() {
         let browsePanel = new BrowsePanel();
         let browseDependenciesWidget = new BrowseDependenciesWidget();
-        let browseDetailsPanel = new BrowseDetailsPanel();
-        await browsePanel.openDetailsPanel();
+        let browseDetailsPanel = new BrowseContextWindowPanel();
+        await browsePanel.openContextWindowPanel();
         await browseDetailsPanel.openDependencies();
         return await browseDependenciesWidget.waitForWidgetLoaded();
     },
@@ -1052,18 +1052,18 @@ module.exports = {
     },
     async openLayersWidgetInBrowsePanel() {
         let browsePanel = new BrowsePanel();
-        let browseDetailsPanel = new BrowseDetailsPanel();
+        let browseContextWindowPanel = new BrowseContextWindowPanel();
         let browseLayersWidget = new BrowseLayersWidget();
-        await browsePanel.openDetailsPanel();
-        await browseDetailsPanel.openLayers();
+        await browsePanel.openContextWindowPanel();
+        await browseContextWindowPanel.openLayers();
         await browseLayersWidget.waitForWidgetLoaded();
         return browseLayersWidget;
     },
     async openVariantsWidget() {
         let browsePanel = new BrowsePanel();
-        let browseDetailsPanel = new BrowseDetailsPanel();
+        let browseDetailsPanel = new BrowseContextWindowPanel();
         let browseVariantsWidget = new BrowseVariantsWidget();
-        await browsePanel.openDetailsPanel();
+        await browsePanel.openContextWindowPanel();
         await browseDetailsPanel.openVariants();
         await browseVariantsWidget.waitForWidgetLoaded();
         return browseVariantsWidget;

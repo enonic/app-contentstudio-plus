@@ -25,7 +25,7 @@ describe('archive.content.spec: tests for archiving content', function () {
     let FOLDER2;
     const ARCHIVE_DELETE_TITLE = 'Delete from Archive';
     const ARCHIVE_RESTORE_TITLE = 'Restore from Archive';
-    const TEST_ARCHIVE_LOG_MSG= 'test';
+    const TEST_ARCHIVE_LOG_MSG = 'test';
 
     it(`Precondition: new folder should be added`,
         async () => {
@@ -61,6 +61,9 @@ describe('archive.content.spec: tests for archiving content', function () {
             await studioUtils.openArchivePanel();
             await studioUtils.saveScreenshot('folder_in_archive1');
             await archiveBrowsePanel.waitForContentDisplayed(FOLDER1.displayName);
+            let result = await archiveBrowsePanel.getDisplayNamesInGrid();
+            const hasDuplicates = new Set(result).size !== result.length;
+            assert.ok(hasDuplicates === false, 'There should be no duplicates in the Archive Grid');
         });
 
     it(`GIVEN existing folder is checked AND 'Archive...' context menu item has been clicked WHEN Archive button has been pressed in the modal dialog THEN the folder should be present only in the Archive Grid`,
@@ -128,7 +131,7 @@ describe('archive.content.spec: tests for archiving content', function () {
             // 1. Go to 'Archive Browse Panel' :
             await studioUtils.openArchivePanel();
             await archiveBrowsePanel.clickCheckboxAndSelectRowByDisplayName(FOLDER1.displayName);
-            await archiveBrowsePanel.openDetailsPanel();
+            await archiveBrowsePanel.openContextWindowPanel();
             // 2. Open Versions widget:
             await archiveBrowseContextPanel.openVersionHistory();
             await studioUtils.saveScreenshot('archived_message_versions_widget');
@@ -144,7 +147,7 @@ describe('archive.content.spec: tests for archiving content', function () {
             // 1. Navigate to 'Archive Browse Panel' :
             await studioUtils.openArchivePanel();
             await archiveBrowsePanel.clickCheckboxAndSelectRowByDisplayName(FOLDER1.displayName);
-            // 2. Do 'rightClick' on the folder and Click on 'Restore...' menu item in the Context menu
+            // 2. Do 'rightClick' on the folder and Click on 'Delete...' menu item in the Context menu
             await archiveBrowsePanel.rightClickOnItemByDisplayName(FOLDER1.displayName);
             await studioUtils.saveScreenshot('context-menu-delete');
             await archiveBrowsePanel.clickOnMenuItem(appConst.GRID_CONTEXT_MENU.DELETE);
@@ -167,7 +170,7 @@ describe('archive.content.spec: tests for archiving content', function () {
             let archiveBrowsePanel = new ArchiveBrowsePanel();
             // 1. Navigate to 'Archive Browse Panel' and check the archived folder:
             await studioUtils.openArchivePanel();
-            // 2. Do 'rightClick' on the folder and Click on 'Restore...' menu item in the Context menu
+            // 2. Do 'rightClick' on the folder and Click on 'Delete...' menu item in the Context menu
             await archiveBrowsePanel.rightClickOnItemByDisplayName(FOLDER1.displayName);
             await studioUtils.saveScreenshot('context-menu-delete');
             await archiveBrowsePanel.clickOnMenuItem(appConst.GRID_CONTEXT_MENU.DELETE);

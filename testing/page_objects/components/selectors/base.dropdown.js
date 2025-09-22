@@ -50,8 +50,23 @@ class BaseDropdown extends Page {
     }
 
     async clickOnModeTogglerButton(parentElement) {
-        await this.waitForElementDisplayed(parentElement + this.modeTogglerButton);
-        return await this.clickOnElement(parentElement + this.modeTogglerButton);
+        try {
+            await this.waitForElementDisplayed(parentElement + this.modeTogglerButton);
+            return await this.clickOnElement(parentElement + this.modeTogglerButton);
+        }catch (err){
+            let screenshot = await this.saveScreenshotUniqueName('err_click_mode_toggle');
+            throw new Error(`Error during clicking on mode-toggle icon, screenshot: ${screenshot} ` + err);
+        }
+    }
+
+    // wait for toggle-mode(flat/tree) icon is not displayed
+    async waitForToggleIconNotDisplayed(parentElement) {
+        try {
+            return await this.waitForElementNotDisplayed(parentElement + this.modeTogglerButton, appConst.mediumTimeout);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_toggle_mode_icon');
+            throw new Error(`Toggle-mode icon should be displayed in the selector, screenshot: ${screenshot} ` + err);
+        }
     }
 
     async clickOnDropdownHandle(parentLocator) {
@@ -212,6 +227,36 @@ class BaseDropdown extends Page {
         //return attr.includes('active') ? 'tree' : 'flat';
         return attr.includes('folder-closed') ? 'flat' : 'tree';
     }
+
+    async getSelectedOptionsDisplayName() {
+        let locator = this.container + "//li[contains(@class,'item-view-wrapper') and contains(@class,'selected')]" + lib.H6_DISPLAY_NAME;
+        return await this.getTextInDisplayedElements(locator);
+    }
+
+    async getCheckedOptionsDisplayNameInDropdownList(parentXpath) {
+        let locator = parentXpath + "//ul[contains(@id,'ContentListBox')]" + "//li[contains(@class,'item-view-wrapper')]";
+        let optionElements = await this.findElements(locator);
+        let checkedOptionElements = await this.doFilterCheckedOptionsElements(optionElements);
+        let pr = await checkedOptionElements.map(async (el) => {
+            let e = await el.$(".//h6[contains(@class,'main-name')]");
+            return await e.getText();
+
+        });
+        let result = await Promise.all(pr);
+        return result;
+    }
+
+    async doFilterCheckedOptionsElements(elements) {
+        let pr = await elements.map(async (el) => await this.isOptionItemChecked(el));
+        let result = await Promise.all(pr);
+        return elements.filter((el, i) => result[i]);
+    }
+
+    async isOptionItemChecked(el) {
+        let value = await el.getAttribute('class');
+        return value.includes('checked');
+    }
+
 }
 
 module.exports = BaseDropdown;
