@@ -1,4 +1,5 @@
 import {LiEl} from '@enonic/lib-admin-ui/dom/LiEl';
+import {UlEl} from '@enonic/lib-admin-ui/dom/UlEl';
 import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import {DivEl} from '@enonic/lib-admin-ui/dom/DivEl';
 import {LayerContent} from './LayerContent';
@@ -15,7 +16,7 @@ export class LayerContentView extends LiEl {
 
     private dataBlock: LayerContentViewDataBlock;
 
-    private relationBlock: LayerContentViewRelation;
+    private childBlock: UlEl;
 
     constructor(layerContent: LayerContent, level: number) {
         super(LayerContentView.VIEW_CLASS);
@@ -29,8 +30,10 @@ export class LayerContentView extends LiEl {
     doRender(): Q.Promise<boolean> {
         return super.doRender().then((rendered) => {
             this.addClass(`level-${this.level}`);
-            this.appendChild(this.relationBlock);
             this.appendChild(this.dataBlock);
+            if (this.childBlock) {
+                this.appendChild(this.childBlock);
+            }
 
             return rendered;
         });
@@ -48,16 +51,15 @@ export class LayerContentView extends LiEl {
         return this.level;
     }
 
-    getRelationBlock(): DivEl {
-        return this.relationBlock;
-    }
-
     getDataBlock(): DivEl {
         return this.dataBlock;
     }
 
+    setChildBlock(childBlock: UlEl) {
+        this.childBlock = childBlock;
+    }
+
     private initElements(): void {
-        this.relationBlock = new LayerContentViewRelation(`${LayerContentView.VIEW_CLASS}-relation`);
         this.dataBlock = new LayerContentViewDataBlock(this.item, `${LayerContentView.VIEW_CLASS}-data`);
     }
 }
