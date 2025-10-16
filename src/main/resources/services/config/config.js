@@ -20,7 +20,8 @@ function handleGet() {
                 i18nUrl: portal.serviceUrl({service: 'i18n'}),
                 i18nUrlStudio: portal.serviceUrl({service: 'i18n', application: 'com.enonic.app.contentstudio'}),
                 contentUrl: portal.serviceUrl({service: 'content', application: 'com.enonic.app.contentstudio'}),
-                licenseUrl: portal.serviceUrl({service: 'license'})
+                licenseUrl: portal.serviceUrl({service: 'license'}),
+                layersUrl: portal.serviceUrl({service: 'layers'}),
             },
             toolUri: admin.getToolUrl('com.enonic.app.contentstudio', 'main')
         }
