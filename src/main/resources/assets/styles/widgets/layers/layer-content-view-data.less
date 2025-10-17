@@ -14,6 +14,7 @@
 
   &-header {
     display: flex;
+    height: 16px;
 
     .layer-details {
       display: flex;
@@ -44,20 +45,14 @@
 
     .action-button {
       margin: 10px 0;
-      padding: 5px 60px;
       max-width: 200px;
-    }
-  }
-
-  &.expanded {
-    .layers-item-view-data-footer {
-      display: flex;
-      justify-content: center;
+      height: 30px;
     }
   }
 
   &.layer-current {
-    border: 2px solid @admin-blue;
+    border-color: @admin-blue;
+    box-shadow: 1px 1px 3px 2px rgba(66, 148, 222, 0.3)
   }
 
   &.item-inherited {

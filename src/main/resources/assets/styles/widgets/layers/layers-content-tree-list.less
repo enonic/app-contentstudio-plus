@@ -1,128 +1,98 @@
+@tree-line-color: @admin-medium-gray-border;
+
+@box-spacing: 30px;
+
+@vertical-line-top-pos: -@box-spacing;
+
+@vertical-line-left-pos: calc(-@box-spacing/2);
+
+@box-height: 90px;
+
+@box-height-expanded: 140px;
+
+@vertical-line-height: calc(@box-height/2 + @box-spacing);
+
+@vertical-line-height-expanded: calc(@box-height-expanded/2 + @box-spacing);
+
+@arrow-height: 6px;
+
+@arrow-width: 8px;
+
 .layers-content-tree-list {
-  .level(@level: 0) {
-    margin-left: 20px * @level;
-  }
-
-  margin: 4px 8px;
-
-  .layers-content-tree-list-item {
-    margin-bottom: 10px;
-
-    &.level-1 {
-      .level(1);
-    }
-
-    &.level-2 {
-      .level(2);
-    }
-
-    &.level-3 {
-      .level(3);
-    }
-
-    &.level-4 {
-      .level(4);
-    }
-
-    &.level-5 {
-      .level(5);
-    }
-
-    &.level-6 {
-      .level(6);
-    }
-
-    &.level-7 {
-      .level(7);
-    }
-  }
+  margin: 10px 10px 0;
 
   .layers-item-view {
-    margin: 0 10px;
     position: relative;
 
-    .layers-item-view-relation {
-      display: none; // hidden for now
-      // display: flex;
-      flex-direction: column;
-      align-items: center;
-      position: relative;
-
-      .layers-item-view-relation-line {
-        width: 3px;
-        background: @admin-font-gray1;
-        height: 10px;
-      }
-
-      .layers-item-view-relation-arrow {
-        width: 0;
-        height: 0;
-        border-left: 5px solid transparent;
-        border-right: 5px solid transparent;
-        border-top: 10px solid @admin-font-gray1;
-        display: none;
-      }
-    }
-
-    .layers-item-view-data {
-      &-header {
-        .layer-details {
-          .layer-name {
-            max-width: 100px;
-          }
-        }
-      }
-    }
-
-    &-expanded .layers-item-view-data {
-      &-footer {
+    &.expanded > .layers-item-view-data {
+      > .layers-item-view-data-footer {
         display: flex;
         justify-content: center;
       }
     }
+  }
 
-    &.item-inherited {
-      .layers-item-view-data {
-        &-body {
-          opacity: 0.5;
+  ul.layers-item-view-wrapper {
+    margin-left: @box-spacing;
+
+    .layers-item-view {
+      margin: @box-spacing 0;
+
+      &::before {
+        content: "";
+        position: absolute;
+        top: @vertical-line-top-pos;
+        left: @vertical-line-left-pos;
+        border-left: 1px solid @tree-line-color;
+        border-bottom: 1px solid @tree-line-color;
+        width: calc(-1*@vertical-line-left-pos);
+        height: @vertical-line-height;
+      }
+
+      &::after {
+        position: absolute;
+        content: "";
+        top: calc(@box-height/2);
+        left: @vertical-line-left-pos;
+        border-left: 1px solid @tree-line-color;
+        border-top: 1px solid @tree-line-color;
+        width: calc(-1*@vertical-line-left-pos);
+        height: 100%;
+      }
+
+      &:last-child::after {
+        display: none;
+      }
+
+      > .layers-item-view-data {
+        &::before {
+          content: "";
+          position: absolute;
+          left: calc(-1*@arrow-width);
+          top: calc(@box-height/2 - @arrow-height);
+          width: 0;
+          height: 0;
+          border-top: @arrow-height solid transparent;
+          border-bottom: @arrow-height solid transparent;
+          border-left: @arrow-width solid @tree-line-color;
         }
       }
 
-      &.layer-current:not(.readonly) {
-        .layers-item-view-data-footer {
-          .action-button {
-            background-color: @admin-button-blue2;
+      &.expanded {
+        &::before {
+          height: calc(@box-height-expanded/2 + @box-spacing);
+        }
 
-            &:hover {
-              background-color: @admin-button-blue1;
-            }
+        &::after {
+          top: calc(@box-height-expanded/2);
+        }
+
+        > .layers-item-view-data {
+          &::before {
+            top: calc(@box-height-expanded/2 - @arrow-height);
           }
         }
       }
-    }
-
-    &.layer-current {
-      .layers-item-view-data {
-        border: 2px solid @admin-blue;
-      }
-
-      .layers-item-view-relation {
-        .layers-item-view-relation-arrow {
-          display: block;
-        }
-      }
-    }
-
-    &:not(.item-inherited) {
-      .layers-item-view-relation {
-        .layers-item-view-relation-arrow {
-          display: block;
-        }
-      }
-    }
-
-    &:not(:first-child) {
-      margin-top: 20px;
     }
   }
 }

@@ -11,6 +11,7 @@ import {ProjectDeletedEvent} from 'lib-contentstudio/app/settings/event/ProjectD
 import {ProjectUpdatedEvent} from 'lib-contentstudio/app/settings/event/ProjectUpdatedEvent';
 import Q from 'q';
 import {LayerContent} from './LayerContent';
+import {LayersContentTreeDialog} from './LayersContentTreeDialog';
 import {LayersContentTreeList} from './LayersContentTreeList';
 import {MultiLayersContentLoader} from './MultiLayersContentLoader';
 
@@ -30,7 +31,7 @@ export class LayersWidgetItemView
 
         this.layersContentTreeList = new LayersContentTreeList();
         this.loader = new MultiLayersContentLoader();
-        this.showHideToggle = new ActionButton(new Action(i18n('button.expand')));
+        this.showHideToggle = new ActionButton(new Action(i18n('widget.layers.showall', 0)));
 
         this.initListeners();
     }
@@ -55,8 +56,8 @@ export class LayersWidgetItemView
 
     reload(): Q.Promise<void> {
         return this.loader.load().then((items: LayerContent[]) => {
-            this.layersContentTreeList.setItems(items);
-            this.showHideToggle.setLabel(i18n('button.expand'));
+            this.layersContentTreeList.setAllItems(items);
+            this.showHideToggle.setLabel(i18n('widget.layers.showall', items.length));
             this.showHideToggle.setVisible(this.layersContentTreeList.hasLayersToHide());
 
             return Q();
@@ -78,10 +79,7 @@ export class LayersWidgetItemView
         this.initContentEventListeners();
 
         this.showHideToggle.onClicked(() => {
-            this.layersContentTreeList.toggleHiddenLayersVisible();
-            this.showHideToggle.setLabel(
-                this.layersContentTreeList.hasClass(LayersContentTreeList.HIDE_OTHER_TREES_CLASS) ? i18n('button.expand') : i18n(
-                    'button.collapse'));
+            LayersContentTreeDialog.get().setItems(this.layersContentTreeList.getAllItems()).open();
         });
     }
 
