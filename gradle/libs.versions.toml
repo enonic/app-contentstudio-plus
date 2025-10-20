@@ -6,7 +6,7 @@ nodeGradle = "7.0.2"
 
 # App
 libMustache = "2.1.1"
-libLicense = "3.2.0-SNAPSHOT"
+libLicense = "4.0.0-SNAPSHOT"
 
 [libraries]
 
