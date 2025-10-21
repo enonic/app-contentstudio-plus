@@ -19,12 +19,26 @@ describe('folder.variants.spec - tests for Create Variant modal dialog', functio
     const NOT_AVAILABLE_MESSAGE = 'Not available';
     const FOLDER_NAME = studioUtils.generateRandomName('folder');
     const VARIANT_NAME_1 = appConst.generateRandomName('variant');
-
+    const IMPORTED_TEST_FOLDER = appConst.TEST_FOLDER_WITH_IMAGES_NAME;
 
     it(`Precondition: new folder should be added`,
         async () => {
             let folder = contentBuilder.buildFolder(FOLDER_NAME);
             await studioUtils.doAddFolder(folder);
+        });
+
+    it("GIVEN existing folder is selected AND Variants has been opened WHEN another folder has been selected THEN 'Create Variant' button should be displayed",
+        async () => {
+            let contentBrowsePanel = new ContentBrowsePanel();
+            // 1. Select the folder and open Variants widget:
+            await contentBrowsePanel.clickOnRowByName(FOLDER_NAME);
+            let browseVariantsWidget = await studioUtils.openVariantsWidget();
+            await browseVariantsWidget.waitForCreateVariantWidgetButtonDisplayed();
+            // 2. Select another folder in the grid:
+            await contentBrowsePanel.clickOnRowByName(IMPORTED_TEST_FOLDER);
+            await studioUtils.saveScreenshot('variant_widget_reselected_item');
+            // 3. Verify that 'Create Variant' is displayed in the widget:
+            await browseVariantsWidget.waitForCreateVariantWidgetButtonDisplayed();
         });
 
     it("GIVEN 'create variant dialog' is opened WHEN variant name input has been cleared THEN 'Create Variant' button gets disabled",
