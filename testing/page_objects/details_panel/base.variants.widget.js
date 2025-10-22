@@ -32,8 +32,12 @@ class BaseVariantsWidget extends Page {
         return this.variantsWidget + xpath.variantsListItemView;
     }
 
-    waitForCreateVariantWidgetButtonDisplayed() {
-        return this.waitForElementDisplayed(this.createVariantWidgetButton, appConst.mediumTimeout);
+    async waitForCreateVariantWidgetButtonDisplayed() {
+        try {
+            return await this.waitForElementDisplayed(this.createVariantWidgetButton, appConst.mediumTimeout);
+        } catch (err) {
+            await this.handleError(`'Create Variant' button should be displayed in the widget`,'err_variant_widget', err);
+        }
     }
 
     waitForCreateVariantWidgetButtonNotDisplayed() {
@@ -79,9 +83,7 @@ class BaseVariantsWidget extends Page {
         try {
             await this.waitForElementDisplayed(this.variantsWidget, appConst.mediumTimeout);
         } catch (err) {
-            let screenshot = appConst.generateRandomName('err_load_variants_widget');
-            await this.saveScreenshot(screenshot);
-            throw new Error(`Variants Widget was not loaded in ${screenshot} ` + err);
+            await this.handleError('Variants Widget should be loaded', 'err_load_variants_widget', err);
         }
     }
 
@@ -94,11 +96,9 @@ class BaseVariantsWidget extends Page {
         try {
             await this.waitForElementDisplayed(this.createVariantButtonInOriginalItem, appConst.mediumTimeout);
         } catch (err) {
-            await this.saveScreenshot('create_variant_orig_button');
-            throw new Error("Variants Widget - " + err);
+            await this.handleError(`'Create Variant' button should be displayed in the Original item`, 'create_variant_orig_button', err);
         }
     }
-
 }
 
 module.exports = BaseVariantsWidget;
