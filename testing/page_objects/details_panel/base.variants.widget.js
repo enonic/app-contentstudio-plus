@@ -36,7 +36,7 @@ class BaseVariantsWidget extends Page {
         try {
             return await this.waitForElementDisplayed(this.createVariantWidgetButton, appConst.mediumTimeout);
         } catch (err) {
-            await this.handleError(`'Create Variant'  Button should be displayed in the widget`, err);
+            await this.handleError(`'Create Variant' button should be displayed in the widget`,'err_variant_widget', err);
         }
     }
 
