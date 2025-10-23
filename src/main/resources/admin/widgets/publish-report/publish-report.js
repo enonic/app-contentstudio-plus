@@ -36,7 +36,10 @@ const makeParams = (content, isArchived, locales) => {
             path: 'styles/widgets/publish-report.css'
         }),
         jsUri: portal.assetUrl({
-            path: 'js/widgets/publish-report.js'
+            path: 'js/widgets/publish-report.js',
+            params: {
+                dt: Date.now().toString()
+            }
         }),
         configScriptId: 'pr-widget-config-json',
         configAsJson: JSON.stringify(configLib.getConfig(locales), null, 4).replace(/<(\/?script|!--)/gi, "\\u003C$1"),
