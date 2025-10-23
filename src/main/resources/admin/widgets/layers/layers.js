@@ -16,13 +16,20 @@ function renderWidgetView(req) {
     }
 
     const view = resolve('layers.html');
+
     const params = {
         contentId: contentId || '',
-        assetsUri: portal.assetUrl({
-            path: ''
+        stylesUri: portal.assetUrl({
+            path: 'styles/widgets/layers.css'
+        }),
+        jsUri: portal.assetUrl({
+            path: 'js/widgets/layers.js',
+            params: {
+                dt: Date.now().toString()
+            }
         }),
         configScriptId: 'layers-widget-config-json',
-        configAsJson: JSON.stringify(configLib.getConfig(req.locales), null, 4).replace(/<(\/?script|!--)/gi, "\\u003C$1"),
+        configAsJson: JSON.stringify(configLib.getConfig(req.locales), null, 4).replace(/<(\/?script|!--)/gi, "\\u003C$1")
     };
 
     return {
