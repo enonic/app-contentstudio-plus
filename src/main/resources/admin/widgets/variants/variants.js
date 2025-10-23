@@ -18,11 +18,17 @@ function renderWidgetView(req) {
     const view = resolve('variants.html');
     const params = {
         contentId: contentId || '',
-        assetsUri: portal.assetUrl({
-            path: ''
+        stylesUri: portal.assetUrl({
+            path: 'styles/widgets/variants.css'
+        }),
+        jsUri: portal.assetUrl({
+            path: 'js/widgets/variants.js',
+            params: {
+                dt: Date.now().toString()
+            }
         }),
         configScriptId: 'variants-widget-config-json',
-        configAsJson: JSON.stringify(configLib.getConfig(req.locales), null, 4).replace(/<(\/?script|!--)/gi, "\\u003C$1"),
+        configAsJson: JSON.stringify(configLib.getConfig(req.locales), null, 4).replace(/<(\/?script|!--)/gi, "\\u003C$1")
     };
 
     return {
