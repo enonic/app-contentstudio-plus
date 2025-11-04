@@ -593,7 +593,7 @@ module.exports = {
             return await browsePanel.pause(1500);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_navigate_to_studio');
-            throw new Error(`error when navigate to Content Studio, screenshot: ${screenshot} `  + err);
+            throw new Error(`Tried to navigate to Content Studio, screenshot: ${screenshot} `  + err);
         }
     },
     async clickOnContentStudioLink(userName, password) {
@@ -647,7 +647,7 @@ module.exports = {
             await browsePanel.waitForGridLoaded(appConst.longTimeout);
             return browsePanel;
         } catch (err) {
-            throw new Error('Error when switching to Content Studio App ' + err);
+            throw new Error('Tried to  switch to Content Studio App ' + err);
         }
     },
     async doSwitchToContentBrowsePanelAndSelectDefaultContext() {
@@ -665,7 +665,7 @@ module.exports = {
             await browsePanel.waitForGridLoaded(appConst.longTimeout);
             return browsePanel;
         } catch (err) {
-            throw new Error('Error when switching to Content Studio App ' + err);
+            throw new Error('Tried to switch to Content Studio App and select Default project ' + err);
         }
     },
     async doSwitchToHome() {
@@ -703,7 +703,6 @@ module.exports = {
             let contentWizardPanel = new ContentWizardPanel();
             return await contentWizardPanel.waitForSpinnerNotVisible();
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_switch_window');
             await this.getBrowser().pause(1500);
             await this.getBrowser().switchWindow(contentDisplayName);
         }
