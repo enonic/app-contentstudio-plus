@@ -18,6 +18,9 @@ class ArchiveItemStatisticsPanel extends Page {
     get contentStatus() {
         return XPATH.container + XPATH.archiveItemPreviewToolbar + XPATH.contentStatus;
     }
+    get liveViewFrame() {
+        return XPATH.container + '//iframe';
+    }
 
     get emulatorDropdown() {
         return XPATH.archiveItemPreviewToolbar + XPATH.divEmulatorDropdown;
@@ -153,6 +156,19 @@ class ArchiveItemStatisticsPanel extends Page {
             let screenshot = await this.saveScreenshotUniqueName('err_preview_btn_disabled');
             throw new Error(`Preview button should be displayed and disabled, screenshot  : ${screenshot} ` + err);
         }
+    }
+    //  gets a text(*.txt) in the Preview panel
+    async getTextInAttachmentPreview() {
+        try {
+            let textLocator = '//body/pre';
+            await this.waitForElementDisplayed(textLocator, appConst.mediumTimeout);
+            return await this.getText(textLocator);
+        } catch (err) {
+            await this.handleError(`Archive Content Item Preview - tried to get the text in the preview iframe`, 'err_get_text_preview', err);
+        }
+    }
+    async switchToLiveViewFrame() {
+        return await this.switchToFrame(this.liveViewFrame);
     }
 }
 
