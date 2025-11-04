@@ -31,7 +31,7 @@ class ArchiveItemStatisticsPanel extends Page {
     }
 
     get previewButton() {
-        return XPATH.archiveItemPreviewToolbar + "//button[contains(@id, 'ActionButton') and contains(@aria-label,'Open in new tab')]";
+        return XPATH.archiveItemPreviewToolbar + "//button[contains(@id, 'ActionButton') and contains(@aria-label,'Preview')]";
     }
 
     async getStatus() {
