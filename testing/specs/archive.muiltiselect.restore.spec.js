@@ -10,6 +10,10 @@ const DeleteContentDialog = require('../page_objects/delete.content.dialog');
 const ArchiveBrowsePanel = require('../page_objects/archive/archive.browse.panel');
 const ConfirmValueDialog = require('../page_objects/confirm.content.delete.dialog');
 const ArchiveRestoreDialog = require('../page_objects/archive/archive.restore.dialog');
+const assert = require('node:assert');
+const ArchiveBrowseContextPanel = require('../page_objects/archive/archive.browse.context.panel');
+const ArchivedContentVersionsWidget = require('../page_objects/archive/archived.content.versions.widget');
+const ArchiveFilterPanel = require('../page_objects/archive/archive.filter.panel');
 
 describe('archive.muiltiselect.restore.spec: tests for restore several items', function () {
     this.timeout(appConst.SUITE_TIMEOUT);
@@ -22,6 +26,8 @@ describe('archive.muiltiselect.restore.spec: tests for restore several items', f
     let FOLDER2;
     const FOLDER_DISPLAY_NAME = appConst.TEST_FOLDER_WITH_IMAGES_2;
     const FOLDER_NAME = appConst.TEST_FOLDER_WITH_IMAGES_NAME_2;
+    const TEST_ARCHIVE_LOG_MSG = 'test archive message';
+    const CHILD_ARCHIVED_CONTENT_NAME = 'geek.png';
 
     it(`Precondition: new folders should be added`,
         async () => {
@@ -138,27 +144,78 @@ describe('archive.muiltiselect.restore.spec: tests for restore several items', f
             await archiveBrowsePanel.waitForContentNotDisplayed(FOLDER2.displayName);
         });
 
-    // Verify https://github.com/enonic/app-contentstudio-plus/issues/346
-    // Error after restoring filtered content #346
-    it(`GIVEN existing archived folder with children items is filtered WHEN the folder has been restored THEN 'Hide Selection' circle gets not visible`,
+    // https://github.com/enonic/app-contentstudio/issues/9361
+    // Archive message doesn't work for multiple items #9361
+    it(`GIVEN existing folder with children items has been archived WHEN the archived parent folder has been selected in Archive THEN 'Archive message' should be displayed in Versions Widget`,
         async () => {
             let contentBrowsePanel = new ContentBrowsePanel();
             let deleteContentDialog = new DeleteContentDialog();
             let archiveBrowsePanel = new ArchiveBrowsePanel();
             let confirmValueDialog = new ConfirmValueDialog();
-            let archiveRestoreDialog = new ArchiveRestoreDialog();
+            let archiveBrowseContextPanel = new ArchiveBrowseContextPanel();
+            let archivedContentVersionsWidget = new ArchivedContentVersionsWidget();
             // 1. Select a folder
             await studioUtils.findContentAndClickCheckBox(FOLDER_DISPLAY_NAME);
             // 2. Archive this folder with children:
             await contentBrowsePanel.clickOnArchiveButton();
             await deleteContentDialog.waitForDialogOpened();
+            await deleteContentDialog.clickOnLogMessageLinkAndShowInput();
+            // 3. Insert Archive message:
+            await deleteContentDialog.typeTextInArchiveMessageInput(TEST_ARCHIVE_LOG_MSG);
             await deleteContentDialog.clickOnArchiveButton();
+            // 4. Confirm the archiving
             await confirmValueDialog.waitForDialogOpened();
             await confirmValueDialog.typeNumberOrName(11);
             await confirmValueDialog.clickOnConfirmButton();
-            // 3. Navigate to 'Archive Browse Panel' and select the archived content:
+            // 5. Navigate to 'Archive Browse Panel' and select the archived parent folder:
             await studioUtils.openArchivePanel();
-            await studioUtils.saveScreenshot('folder_in_archive1_2');
+            await archiveBrowsePanel.clickOnCheckboxAndSelectRowByName(FOLDER_NAME);
+            await studioUtils.saveScreenshot('parent_folder_archived_message');
+            await archiveBrowsePanel.openContextWindowPanel();
+            // 6. Open Versions widget:
+            await archiveBrowseContextPanel.openVersionHistory();
+            await studioUtils.saveScreenshot('parent_folder_archived_message_versions_widget');
+            // 7. Verify that the Archive message is displayed for the parent item in the Versions Widget:
+            let result = await archivedContentVersionsWidget.getLogMessageFromArchivedItems();
+            assert.strictEqual(result[0], TEST_ARCHIVE_LOG_MSG,
+                'Expected log message should be displayed in the archived item in the Versions Widget');
+        });
+
+    // https://github.com/enonic/app-contentstudio/issues/9361
+    // Archive message doesn't work for multiple items #9361
+    it(`WHEN archived child content has been selected in Archive THEN 'Archive message' should be displayed in Versions Widget`,
+        async () => {
+            let archiveFilterPanel = new ArchiveFilterPanel();
+            let archiveBrowsePanel = new ArchiveBrowsePanel();
+            let confirmValueDialog = new ConfirmValueDialog();
+            let archiveBrowseContextPanel = new ArchiveBrowseContextPanel();
+            let archivedContentVersionsWidget = new ArchivedContentVersionsWidget();
+            // 1. Navigate to 'Archive Browse Panel' and select the archived child content:
+            await studioUtils.openArchivePanel();
+            // 2. Select the child content:
+            await archiveBrowsePanel.clickOnSearchButton();
+            await archiveFilterPanel.waitForOpened();
+            await archiveFilterPanel.typeSearchText(CHILD_ARCHIVED_CONTENT_NAME);
+            await archiveFilterPanel.pause(500);
+            await archiveBrowsePanel.clickOnCheckboxAndSelectRowByName(CHILD_ARCHIVED_CONTENT_NAME);
+            // 3. Open Versions widget
+            await archiveBrowsePanel.openContextWindowPanel();
+            await archiveBrowseContextPanel.openVersionHistory();
+            await studioUtils.saveScreenshot('child_image_archived_message_versions_widget');
+            // 7. Verify that the Archive message is displayed for the child item in the Versions Widget:
+            let result = await archivedContentVersionsWidget.getLogMessageFromArchivedItems();
+            assert.strictEqual(result[0], TEST_ARCHIVE_LOG_MSG,
+                'Expected log message should be displayed in the archived item in the Versions Widget');
+        });
+
+    // Verify https://github.com/enonic/app-contentstudio-plus/issues/346
+    // Error after restoring filtered content #346
+    it(`GIVEN existing archived folder with children items is filtered WHEN the folder has been restored THEN 'Hide Selection' circle gets not visible`,
+        async () => {
+            let archiveBrowsePanel = new ArchiveBrowsePanel();
+            let confirmValueDialog = new ConfirmValueDialog();
+            let archiveRestoreDialog = new ArchiveRestoreDialog();
+            await studioUtils.openArchivePanel();
             await archiveBrowsePanel.clickOnCheckboxAndSelectRowByName(FOLDER_NAME);
             // 4. Click on 'Show Selection' circle:
             await archiveBrowsePanel.clickOnSelectionToggler();
