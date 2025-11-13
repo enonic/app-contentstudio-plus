@@ -352,7 +352,7 @@ class BaseVersionsWidget extends Page {
             await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
             return await this.getTextInDisplayedElements(locator);
         } catch (err) {
-            await this.handleError('The message when archiving content ', 'err_log_message_archived_items', err)
+            await this.handleError('Versions Widget - Tried to get the Archive message ', 'err_archived_message_in_widget', err)
         }
     }
 }
