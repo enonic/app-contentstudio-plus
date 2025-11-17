@@ -124,4 +124,4 @@ jobs:
         with:
           name: 'contentstudio'
           path: |
-            build/install/enonic-xp-generic-*/home/deploy/contentstudio*.jar
+            testing/build/install/enonic-xp-generic-*/home/deploy/contentstudio*.jar
