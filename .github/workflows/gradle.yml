@@ -122,6 +122,6 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: contentstudio
+          name: 'contentstudio'
           path: |
-            build/install/home/deploy/contentstudio.jar
+            build/install/enonic-xp-generic-*/home/deploy/contentstudio*.jar
