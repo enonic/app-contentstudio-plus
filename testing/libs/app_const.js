@@ -9,17 +9,17 @@ module.exports = Object.freeze({
         return `Item \"${name}\" has been marked as ready.`
     },
     itemIsArchived(name) {
-        return `Item \"${name}\" has been archived.`
+        return `Item \"${name}\" has been archived`
     },
     itemIsRestored(name) {
-        return `Item \"${name}\" has been restored.`;
+        return `Item \"${name}\" has been restored`;
     },
 
     itemIsDeleted(name) {
         return `Item \"${name}\" has been deleted.`;
     },
     variantCreated(name) {
-        return `A variant for \"${name}\" has been created.`;
+        return `A variant for \"${name}\" has been created`;
     },
     itemDuplicated(name) {
         return `Item \"${name}\" has been duplicated.`;
