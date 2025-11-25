@@ -16,10 +16,10 @@ module.exports = Object.freeze({
     },
 
     itemIsDeleted(name) {
-        return `Item \"${name}\" is deleted`;
+        return `Item \"${name}\" has been deleted.`;
     },
     variantCreated(name) {
-        return `A variant for \"${name}\" has been created`;
+        return `A variant for \"${name}\" has been created.`;
     },
     itemDuplicated(name) {
         return `Item \"${name}\" has been duplicated.`;
