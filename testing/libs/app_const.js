@@ -6,13 +6,13 @@ module.exports = Object.freeze({
         return part + Math.round(Math.random() * 1000000);
     },
     itemMarkedAsReadyMessage(name) {
-        return `Item \"${name}\" is marked as ready`;
+        return `Item \"${name}\" has been marked as ready.`
     },
     itemIsArchived(name) {
-        return `Item \"${name}\" is archived`;
+        return `Item \"${name}\" has been archived.`
     },
     itemIsRestored(name) {
-        return `Item \"${name}\" is restored`;
+        return `Item \"${name}\" has been restored.`;
     },
 
     itemIsDeleted(name) {
@@ -22,53 +22,45 @@ module.exports = Object.freeze({
         return `A variant for \"${name}\" has been created`;
     },
     itemDuplicated(name) {
-        return `Item \"${name}\" is duplicated.`;
+        return `Item \"${name}\" has been duplicated.`;
     },
 
-    itemSavedNotificationMessage: function (name) {
-        return `Item \"${name}\" is saved.`
+    itemSavedNotificationMessage (name) {
+        return `Item \"${name}\" has been saved.`;
     },
-    itemPublishedNotificationMessage: function (name) {
-        return `Item \"${name}\" is published.`
+    itemPublishedNotificationMessage (name) {
+        return `Item \"${name}\" has been published.`;
     },
-    issueClosedNotificationMessage: function (name) {
-        return `Issue \"${name}\" is closed.`
+    issueClosedNotificationMessage (name) {
+        return `Issue \"${name}\" has been closed.`
     },
-    sortOrderTitle: function (by, order) {
+    sortOrderTitle(by, order) {
         return `Sorted by \"${by}\" in ${order} order`
     },
-    permissionsAppliedNotificationMessage: function (name) {
-        return `Permissions for \"${name}\" are applied.`
+    permissionsAppliedNotificationMessage (name) {
+        return `Permissions for \"${name}\" have been applied.`
     },
-    projectModifiedMessage: displayName => `Project \"${displayName}\" is modified.`,
-    markedAsReadyMessage: function (name) {
-        return `Item \"${name}\" is marked as ready`;
+    projectModifiedMessage: displayName => `Project \"${displayName}\" has been modified.`,
+    markedAsReadyMessage (name) {
+        return `Item \"${name}\" has been marked as ready.`;
     },
-    publishRequestClosedMessage: function (name) {
-        return `Publish request \"${name}\" is closed`;
+    publishRequestClosedMessage (name) {
+        return `Publish request \"${name}\" has been closed.`;
     },
-    taskClosedMessage: function (name) {
-        return `Task \"${name}\" is closed`;
-    },
-    saveFailedAttempt: function (name) {
+    saveFailedAttempt (name) {
         return `Content \[${name}\] could not be updated. A content with that name already exists`;
     },
     requiredValidationMessage: (occurrences) => {
         return `Min ${occurrences} valid occurrence(s) required`;
     },
-    projectCreatedMessage: name => `Project \"${name}\" is created.`,
+    projectCreatedMessage: name => `Project \"${name}\" has been created.`,
     projectNameAlreadyExistsMessage: name => `Project with name [${name}] already exists`,
-    projectDeletedMessage: name => `Project \"${name}\" is deleted.`,
+    projectDeletedMessage: name => `Project \"${name}\" has been deleted.`,
     NO_CHANGES_TO_REVERT_MESSAGE: "No changes to revert.",
-    THIS_PUBLISH_REQUEST_OPEN: 'The publish request is Open.',
+    THIS_PUBLISH_REQUEST_OPEN: 'The publish request has been opened.',
     REQUEST_CREATED_MESSAGE: 'New publish request created successfully.',
-    TASK_CLOSED_MESSAGE: 'The task is Closed.',
-    TASK_CREATED_MESSAGE: "New task created successfully.",
-    PUBLISH_REQUEST_CLOSED_MESSAGE: 'The publish request is Closed.',
+    PUBLISH_REQUEST_CLOSED_MESSAGE: 'The publish request has been closed.',
     TASK_OPENED_MESSAGE: 'The task is Open.',
-    TWO_ITEMS_PUBLISHED: "2 items are published.",
-    TWO_ITEMS_UNPUBLISHED: "2 items are unpublished",
-    ITEM_IS_UNDELETED_MESSAGE: "Item is undeleted",
     CONTENT_RENAMED: "Content has been renamed",
     TEST_FOLDER_WITH_IMAGES: "All Content types images",
     TEST_FOLDER_WITH_IMAGES_NAME: "all-content-types-images",
@@ -89,8 +81,31 @@ module.exports = Object.freeze({
     CONTENT_REVERTED_MESSAGE: 'The content was reverted to the version from',
     PROJECT_UNSAVED_CHANGES_MESSAGE: "There are unsaved changes, do you want to save them before closing?",
     NOTIFICATION_MSG: {
-        CONTENT_LOCALIZED: 'Inherited content is localized',
+        CONTENT_LOCALIZED: 'Inherited content has been localized',
     },
+
+    NOTIFICATION_MESSAGES: {
+        YOUR_COMMENT_ADDED: 'A comment has been added to the issue.',
+        LOCALIZED_MESSAGE_1: 'Language was copied from current project.',
+        NO_CHANGES_TO_REVERT_MESSAGE: "No changes to revert.",
+        ISSUE_CREATED_MESSAGE: "The issue has been created.",
+        ISSUE_CLOSED_MESSAGE: 'The issue has been closed.',
+        REQUEST_CREATED_MESSAGE: 'The publish request has been created.',
+        REQUEST_HAS_BEEN_CLOSED:'The publish request has been closed.',
+        PUBLISH_REQUEST_CLOSED_MESSAGE: 'The publish request has been closed.',
+        ISSUE_OPENED_MESSAGE: 'The issue has been opened.',
+        ISSUE_UPDATED_MESSAGE: 'The issue has been updated.',
+        THIS_PUBLISH_REQUEST_OPEN: 'The publish request has been opened.',
+        CONTENT_RENAMED: 'Content has been renamed',
+        TWO_ITEMS_PUBLISHED: '2 items have been published.',
+        TWO_ITEMS_UNPUBLISHED: '2 items have been unpublished',
+        CONTENT_REVERTED: 'The content has been reverted to the version from',
+        INHERITED_CONTENT_LOCALIZED: 'The inherited content has been localized.',
+        applicationsCopiedFromParent: (name) => {
+            return `Applications successfully copied from \"${name}\"`
+        },
+    },
+
     ACCESS_WIDGET_HEADER: {
         RESTRICTED_ACCESS: "Restricted access to item",
         EVERYONE_CAN_READ: "Everyone can read this item"
