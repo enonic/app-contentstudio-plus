@@ -49,6 +49,7 @@ describe('archive.content.spec: tests for archiving content', function () {
             await deleteContentDialog.waitForDialogOpened();
             await studioUtils.saveScreenshot('folder_to_archive1');
             await deleteContentDialog.clickOnLogMessageLinkAndShowInput();
+            // Insert Archive message:
             await deleteContentDialog.typeTextInArchiveMessageInput(TEST_ARCHIVE_LOG_MSG);
             // 3. Click on 'Archive' button in the modal dialog:
             await deleteContentDialog.clickOnArchiveButton();
@@ -135,7 +136,7 @@ describe('archive.content.spec: tests for archiving content', function () {
             // 2. Open Versions widget:
             await archiveBrowseContextPanel.openVersionHistory();
             await studioUtils.saveScreenshot('archived_message_versions_widget');
-            // 3. Verify that the log message is displayed in the archived item in the Versions Widget:
+            // 3. Verify that the archive message is displayed in the archived item in the Versions Widget:
             let result = await archivedContentVersionsWidget.getLogMessageFromArchivedItems();
             assert.strictEqual(result[0], TEST_ARCHIVE_LOG_MSG, 'Expected log message should be displayed in the archived item in the Versions Widget');
         });

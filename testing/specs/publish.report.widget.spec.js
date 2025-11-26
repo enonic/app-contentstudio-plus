@@ -88,7 +88,7 @@ describe('publish.report.widget.spec: tests for publish report widget', function
             await wizardPublishReportWidget.waitForGenerateButtonDisabled();
             // 5. Expected validation message should appear:
             let actualMessage = await wizardPublishReportWidget.getValidationMessage();
-            assert.equal(actualMessage, 'Start date must be before end date', "Expected validation message should appears in the widget");
+            assert.equal(actualMessage, 'The start date must be before the end date', "Expected validation message should appears in the widget");
         });
 
     it(`GIVEN 'Publish report' widget has been opened WHEN invalid date has been typed in the 'From' input THEN 'Generate' button gets disabled`,
