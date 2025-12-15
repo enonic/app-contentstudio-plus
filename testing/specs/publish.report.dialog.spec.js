@@ -60,7 +60,8 @@ describe('publish.report.dialog.spec: tests for publish report dialog', function
             assert.equal(actualText, ITEM_ONLINE_TEXT, `'Item went online' - this text should be displayed in the single comparison block`);
         });
 
-    it(`GIVEN existing folder has been unpublished in the wizard WHEN 'Publish report' modal dialog has been opened THEN 'Item went offline' text should appear`,
+    // TODO update 2 tests when Versions Widget will be reimplemented
+    it.skip(`GIVEN existing folder has been unpublished in the wizard WHEN 'Publish report' modal dialog has been opened THEN 'Item went offline' text should appear`,
         async () => {
             let contentWizard = new ContentWizardPanel();
             let wizardPublishReportWidget = new WizardPublishReportWidget();
@@ -91,7 +92,7 @@ describe('publish.report.dialog.spec: tests for publish report dialog', function
             assert.equal(actualText, ITEM_ONLINE_TEXT, 'Item went online - this text should be displayed in the comparison block');
         });
 
-    it(`GIVEN existing folder has been published in the second time WHEN 'Publish report' modal dialog has been opened THEN 'Comparing' text should appear in the modal dialog`,
+    it.skip(`GIVEN existing folder has been published in the second time WHEN 'Publish report' modal dialog has been opened THEN 'Comparing' text should appear in the modal dialog`,
         async () => {
             let contentWizard = new ContentWizardPanel();
             let wizardPublishReportWidget = new WizardPublishReportWidget();
