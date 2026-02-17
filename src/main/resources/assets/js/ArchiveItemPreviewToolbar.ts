@@ -1,7 +1,7 @@
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
-import {ContentItemPreviewToolbar} from 'lib-contentstudio/app/view/ContentItemPreviewToolbar';
-import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
-import {PreviewActionHelper} from 'lib-contentstudio/app/action/PreviewActionHelper';
+import {ContentItemPreviewToolbar} from '@enonic/lib-contentstudio/app/view/ContentItemPreviewToolbar';
+import {ContentSummaryAndCompareStatus} from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
+import {PreviewActionHelper} from '@enonic/lib-contentstudio/app/action/PreviewActionHelper';
 
 export class ArchiveItemPreviewToolbar
     extends ContentItemPreviewToolbar {

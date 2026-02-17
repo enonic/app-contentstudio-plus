@@ -6,13 +6,13 @@ import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import {Button} from '@enonic/lib-admin-ui/ui/button/Button';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {CreateVariantDialog} from './dialog/CreateVariantDialog';
-import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
-import {ContentSummaryAndCompareStatusFetcher} from 'lib-contentstudio/app/resource/ContentSummaryAndCompareStatusFetcher';
-import {ContentId} from 'lib-contentstudio/app/content/ContentId';
+import {ContentSummaryAndCompareStatus} from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
+import {ContentSummaryAndCompareStatusFetcher} from '@enonic/lib-contentstudio/app/resource/ContentSummaryAndCompareStatusFetcher';
+import {ContentId} from '@enonic/lib-contentstudio/app/content/ContentId';
 import {VariantsList} from './ui/list/VariantsList';
-import {ContentServerEventsHandler} from 'lib-contentstudio/app/event/ContentServerEventsHandler';
+import {ContentServerEventsHandler} from '@enonic/lib-contentstudio/app/event/ContentServerEventsHandler';
 import {NotifyManager} from '@enonic/lib-admin-ui/notify/NotifyManager';
-import {ContentServerChangeItem} from 'lib-contentstudio/app/event/ContentServerChangeItem';
+import {ContentServerChangeItem} from '@enonic/lib-contentstudio/app/event/ContentServerChangeItem';
 
 export class VariantsWidget
     extends Widget {

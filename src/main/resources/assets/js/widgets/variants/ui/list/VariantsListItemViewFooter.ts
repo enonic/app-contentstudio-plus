@@ -1,5 +1,5 @@
 import {DivEl} from '@enonic/lib-admin-ui/dom/DivEl';
-import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
+import {ContentSummaryAndCompareStatus} from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import Q from 'q';
 import {VariantsListItemViewMenuButton} from './VariantsListItemViewMenuButton';
 

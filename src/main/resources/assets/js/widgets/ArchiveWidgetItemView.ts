@@ -1,6 +1,6 @@
 import Q from 'q';
-import {WidgetItemView} from 'lib-contentstudio/app/view/context/WidgetItemView';
-import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
+import {WidgetItemView} from '@enonic/lib-contentstudio/app/view/context/WidgetItemView';
+import {ContentSummaryAndCompareStatus} from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import {ArchiveContentViewer} from '../ArchiveContentViewer';
 
 export class ArchiveWidgetItemView

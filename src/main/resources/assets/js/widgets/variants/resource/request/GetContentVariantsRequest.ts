@@ -1,10 +1,10 @@
 import {JsonResponse} from '@enonic/lib-admin-ui/rest/JsonResponse';
-import {ContentSummary} from 'lib-contentstudio/app/content/ContentSummary';
-import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
-import {ContentSummaryJson} from 'lib-contentstudio/app/content/ContentSummaryJson';
-import {CmsContentResourceRequest} from 'lib-contentstudio/app/resource/CmsContentResourceRequest';
-import {ContentSummaryAndCompareStatusFetcher} from 'lib-contentstudio/app/resource/ContentSummaryAndCompareStatusFetcher';
-import {ListContentResult} from 'lib-contentstudio/app/resource/ListContentResult';
+import {ContentSummary} from '@enonic/lib-contentstudio/app/content/ContentSummary';
+import {ContentSummaryAndCompareStatus} from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
+import {ContentSummaryJson} from '@enonic/lib-contentstudio/app/content/ContentSummaryJson';
+import {CmsContentResourceRequest} from '@enonic/lib-contentstudio/app/resource/CmsContentResourceRequest';
+import {ContentSummaryAndCompareStatusFetcher} from '@enonic/lib-contentstudio/app/resource/ContentSummaryAndCompareStatusFetcher';
+import {ListContentResult} from '@enonic/lib-contentstudio/app/resource/ListContentResult';
 import Q from 'q';
 
 export class GetContentVariantsRequest extends CmsContentResourceRequest<ContentSummary[]> {

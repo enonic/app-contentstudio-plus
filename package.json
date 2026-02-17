@@ -27,7 +27,7 @@
     "jquery": "^3.7.1",
     "jquery-simulate": "^1.0.2",
     "jquery-ui": "^1.14.1",
-    "lib-contentstudio": "workspace:*",
+    "@enonic/lib-contentstudio": "workspace:*",
     "mousetrap": "^1.6.5",
     "q": "^1.5.1"
   },

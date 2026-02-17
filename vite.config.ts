@@ -81,7 +81,7 @@ export default defineConfig(({mode}) => {
       resolve: {
         alias: {
           '@enonic/lib-admin-ui': path.join(__dirname, '.xp/dev/lib-admin-ui'),
-          'lib-contentstudio': path.join(__dirname, '.xp/dev/lib-contentstudio'),
+            '@enonic/lib-contentstudio': path.join(__dirname, '.xp/dev/lib-contentstudio'),
         },
         extensions: ['.ts', '.js']
       },

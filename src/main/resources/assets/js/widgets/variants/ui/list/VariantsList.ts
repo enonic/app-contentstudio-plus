@@ -1,7 +1,7 @@
 import {H6El} from '@enonic/lib-admin-ui/dom/H6El';
 import {ListBox} from '@enonic/lib-admin-ui/ui/selector/list/ListBox';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
-import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
+import {ContentSummaryAndCompareStatus} from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import {VariantsListItemView} from './VariantsListItemView';
 
 export class VariantsList

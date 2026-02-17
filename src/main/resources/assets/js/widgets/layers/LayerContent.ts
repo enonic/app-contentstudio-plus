@@ -1,8 +1,8 @@
 import {Equitable} from '@enonic/lib-admin-ui/Equitable';
 import {ObjectHelper} from '@enonic/lib-admin-ui/ObjectHelper';
-import {ContentId} from 'lib-contentstudio/app/content/ContentId';
-import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
-import {Project} from 'lib-contentstudio/app/settings/data/project/Project';
+import {ContentId} from '@enonic/lib-contentstudio/app/content/ContentId';
+import {ContentSummaryAndCompareStatus} from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
+import {Project} from '@enonic/lib-contentstudio/app/settings/data/project/Project';
 import {LayerContentJson} from '../../resource/json/LayerContentJson';
 import {LayerContentHelper} from './LayerContentHelper';
 

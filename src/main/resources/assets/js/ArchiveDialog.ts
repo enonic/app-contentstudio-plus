@@ -1,9 +1,9 @@
 import {ModalDialog, ModalDialogConfig} from '@enonic/lib-admin-ui/ui/dialog/ModalDialog';
-import {ConfirmValueDialog} from 'lib-contentstudio/app/remove/ConfirmValueDialog';
+import {ConfirmValueDialog} from '@enonic/lib-contentstudio/app/remove/ConfirmValueDialog';
 import {H6El} from '@enonic/lib-admin-ui/dom/H6El';
-import {ContentId} from 'lib-contentstudio/app/content/ContentId';
+import {ContentId} from '@enonic/lib-contentstudio/app/content/ContentId';
 import {Action} from '@enonic/lib-admin-ui/ui/Action';
-import {GetDescendantsOfContentsRequest} from 'lib-contentstudio/app/resource/GetDescendantsOfContentsRequest';
+import {GetDescendantsOfContentsRequest} from '@enonic/lib-contentstudio/app/resource/GetDescendantsOfContentsRequest';
 import {ArchiveItemsList} from './ArchiveItemsList';
 import {ArchiveDialogItemList} from './ArchiveDialogItemList';
 import {ArchiveResourceRequest} from './resource/ArchiveResourceRequest';

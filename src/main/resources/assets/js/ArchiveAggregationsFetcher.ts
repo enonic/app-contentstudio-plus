@@ -1,5 +1,5 @@
 import {SearchInputValues} from '@enonic/lib-admin-ui/query/SearchInputValues';
-import {ContentAggregationsFetcher} from 'lib-contentstudio/app/browse/filter/ContentAggregationsFetcher';
+import {ContentAggregationsFetcher} from '@enonic/lib-contentstudio/app/browse/filter/ContentAggregationsFetcher';
 import {ArchiveSearchContentQueryCreator} from './ArchiveSearchContentQueryCreator';
 
 export class ArchiveAggregationsFetcher

@@ -1,10 +1,9 @@
 import {LiEl} from '@enonic/lib-admin-ui/dom/LiEl';
 import {UlEl} from '@enonic/lib-admin-ui/dom/UlEl';
-import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
+import {ContentSummaryAndCompareStatus} from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import {DivEl} from '@enonic/lib-admin-ui/dom/DivEl';
 import {LayerContent} from './LayerContent';
 import {LayerContentViewDataBlock} from './LayerContentViewDataBlock';
-import {LayerContentViewRelation} from './LayerContentViewRelation';
 
 export class LayerContentView extends LiEl {
 

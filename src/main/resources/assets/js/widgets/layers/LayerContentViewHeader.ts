@@ -1,7 +1,6 @@
 import {DivEl} from '@enonic/lib-admin-ui/dom/DivEl';
-import {CompareStatusFormatter} from 'lib-contentstudio/app/content/CompareStatus';
 import {LayerContent} from './LayerContent';
-import {ProjectHelper} from 'lib-contentstudio/app/settings/data/project/ProjectHelper';
+import {ProjectHelper} from '@enonic/lib-contentstudio/app/settings/data/project/ProjectHelper';
 
 export class LayerContentViewHeader extends DivEl {
 

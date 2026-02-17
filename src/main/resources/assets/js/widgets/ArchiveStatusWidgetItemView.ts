@@ -1,7 +1,7 @@
 import Q from 'q';
 import {SpanEl} from '@enonic/lib-admin-ui/dom/SpanEl';
-import {WidgetItemView} from 'lib-contentstudio/app/view/context/WidgetItemView';
-import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
+import {WidgetItemView} from '@enonic/lib-contentstudio/app/view/context/WidgetItemView';
+import {ContentSummaryAndCompareStatus} from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 
 export class ArchiveStatusWidgetItemView

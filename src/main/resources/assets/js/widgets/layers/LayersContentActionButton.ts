@@ -1,11 +1,11 @@
-import {ProjectContext} from 'lib-contentstudio/app/project/ProjectContext';
-import {EditContentEvent} from 'lib-contentstudio/app/event/EditContentEvent';
+import {ProjectContext} from '@enonic/lib-contentstudio/app/project/ProjectContext';
+import {EditContentEvent} from '@enonic/lib-contentstudio/app/event/EditContentEvent';
 import {ActionButton} from '@enonic/lib-admin-ui/ui/button/ActionButton';
 import {Action} from '@enonic/lib-admin-ui/ui/Action';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {LayerContent} from './LayerContent';
-import {ContentLocalizer} from 'lib-contentstudio/app/browse/action/ContentLocalizer';
-import {ContentEventsProcessor} from 'lib-contentstudio/app/ContentEventsProcessor';
+import {ContentLocalizer} from '@enonic/lib-contentstudio/app/browse/action/ContentLocalizer';
+import {ContentEventsProcessor} from '@enonic/lib-contentstudio/app/ContentEventsProcessor';
 import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 
 enum Mode {

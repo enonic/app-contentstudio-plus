@@ -1,15 +1,15 @@
 import {Action} from '@enonic/lib-admin-ui/ui/Action';
 import {ModalDialog} from '@enonic/lib-admin-ui/ui/dialog/ModalDialog';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
-import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
+import {ContentSummaryAndCompareStatus} from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import {OriginalContentBlock} from './OriginalContentBlock';
 import Q from 'q';
 import {VariableNameHelper} from './VariableNameHelper';
-import {DuplicateContentRequest} from 'lib-contentstudio/app/resource/DuplicateContentRequest';
+import {DuplicateContentRequest} from '@enonic/lib-contentstudio/app/resource/DuplicateContentRequest';
 import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
-import {ContentDuplicateParams} from 'lib-contentstudio/app/resource/ContentDuplicateParams';
+import {ContentDuplicateParams} from '@enonic/lib-contentstudio/app/resource/ContentDuplicateParams';
 import {VariantNameInput} from './VariantNameInput';
-import {ValidityStatus, ValueValidationState} from 'lib-contentstudio/app/inputtype/text/CheckedValueInput';
+import {ValidityStatus, ValueValidationState} from '@enonic/lib-contentstudio/app/inputtype/text/CheckedValueInput';
 
 export class CreateVariantDialog
     extends ModalDialog {

@@ -1,5 +1,5 @@
-import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
-import {ContentPath} from 'lib-contentstudio/app/content/ContentPath';
+import {ContentSummaryAndCompareStatus} from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
+import {ContentPath} from '@enonic/lib-contentstudio/app/content/ContentPath';
 
 export class ArchiveContentViewItem
     extends ContentSummaryAndCompareStatus {

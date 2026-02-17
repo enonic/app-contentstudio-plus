@@ -1,4 +1,4 @@
-import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
+import {ContentSummaryAndCompareStatus} from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import {ArchiveContentViewer} from './ArchiveContentViewer';
 import {ListBox} from '@enonic/lib-admin-ui/ui/selector/list/ListBox';
 

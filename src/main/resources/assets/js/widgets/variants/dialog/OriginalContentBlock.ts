@@ -1,11 +1,11 @@
 import {DivEl} from '@enonic/lib-admin-ui/dom/DivEl';
 import {H6El} from '@enonic/lib-admin-ui/dom/H6El';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
-import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
-import {ContentSummaryAndCompareStatusViewer} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatusViewer';
+import {ContentSummaryAndCompareStatus} from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
+import {ContentSummaryAndCompareStatusViewer} from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatusViewer';
 import Q from 'q';
-import {ContentEventsProcessor} from 'lib-contentstudio/app/ContentEventsProcessor';
-import {EditContentEvent} from 'lib-contentstudio/app/event/EditContentEvent';
+import {ContentEventsProcessor} from '@enonic/lib-contentstudio/app/ContentEventsProcessor';
+import {EditContentEvent} from '@enonic/lib-contentstudio/app/event/EditContentEvent';
 
 export class OriginalContentBlock extends DivEl {
 

@@ -3,9 +3,9 @@ import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import {TreeListBox, TreeListBoxParams, TreeListElement, TreeListElementParams} from '@enonic/lib-admin-ui/ui/selector/list/TreeListBox';
 import {ArchiveContentViewItem} from './ArchiveContentViewItem';
 import {ArchiveContentFetcher} from './ArchiveContentFetcher';
-import {ContentPath} from 'lib-contentstudio/app/content/ContentPath';
+import {ContentPath} from '@enonic/lib-contentstudio/app/content/ContentPath';
 import {FetchResponse} from './FetchResponse';
-import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
+import {ContentSummaryAndCompareStatus} from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import {ArchiveListItemViewer} from './ArchiveListItemViewer';
 
 export class ArchiveTreeList

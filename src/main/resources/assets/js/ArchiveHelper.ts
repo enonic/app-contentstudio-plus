@@ -1,4 +1,4 @@
-import {ContentPath} from 'lib-contentstudio/app/content/ContentPath';
+import {ContentPath} from '@enonic/lib-contentstudio/app/content/ContentPath';
 
 interface ItemWithPath {
     getPath(): ContentPath;
