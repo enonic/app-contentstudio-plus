@@ -1,7 +1,7 @@
-import {Flag} from 'lib-contentstudio/app/locale/Flag';
-import {Project} from 'lib-contentstudio/app/settings/data/project/Project';
-import {ContentSummaryAndCompareStatusViewer} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatusViewer';
-import {ProjectIconUrlResolver} from 'lib-contentstudio/app/project/ProjectIconUrlResolver';
+import {Flag} from '@enonic/lib-contentstudio/app/locale/Flag';
+import {Project} from '@enonic/lib-contentstudio/app/settings/data/project/Project';
+import {ContentSummaryAndCompareStatusViewer} from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatusViewer';
+import {ProjectIconUrlResolver} from '@enonic/lib-contentstudio/app/project/ProjectIconUrlResolver';
 import Q from 'q';
 
 export class LangBasedContentSummaryViewer extends ContentSummaryAndCompareStatusViewer {

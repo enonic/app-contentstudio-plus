@@ -1,7 +1,7 @@
 import {DivEl} from '@enonic/lib-admin-ui/dom/DivEl';
 import Q from 'q';
-import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
-import {ContentSummaryAndCompareStatusViewer} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatusViewer';
+import {ContentSummaryAndCompareStatus} from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
+import {ContentSummaryAndCompareStatusViewer} from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatusViewer';
 import {SpanEl} from '@enonic/lib-admin-ui/dom/SpanEl';
 
 export class VariantsListItemViewBody extends DivEl {

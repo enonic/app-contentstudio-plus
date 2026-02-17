@@ -1,4 +1,4 @@
-import {SearchContentQueryCreator} from 'lib-contentstudio/app/browse/filter/SearchContentQueryCreator';
+import {SearchContentQueryCreator} from '@enonic/lib-contentstudio/app/browse/filter/SearchContentQueryCreator';
 import {ArchiveAggregation} from './ArchiveAggregation';
 
 export class ArchiveSearchContentQueryCreator

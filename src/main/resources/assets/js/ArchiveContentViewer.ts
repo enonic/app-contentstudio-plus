@@ -1,4 +1,4 @@
-import {ContentSummaryAndCompareStatusViewer} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatusViewer';
+import {ContentSummaryAndCompareStatusViewer} from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatusViewer';
 
 export class ArchiveContentViewer extends ContentSummaryAndCompareStatusViewer {
 

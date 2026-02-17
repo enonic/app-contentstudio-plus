@@ -1,18 +1,18 @@
-import {ContentSummaryAndCompareStatusFetcher} from 'lib-contentstudio/app/resource/ContentSummaryAndCompareStatusFetcher';
+import {ContentSummaryAndCompareStatusFetcher} from '@enonic/lib-contentstudio/app/resource/ContentSummaryAndCompareStatusFetcher';
 import Q from 'q';
-import {ContentQueryRequest} from 'lib-contentstudio/app/resource/ContentQueryRequest';
-import {ContentSummaryJson} from 'lib-contentstudio/app/content/ContentSummaryJson';
-import {ContentSummary} from 'lib-contentstudio/app/content/ContentSummary';
+import {ContentQueryRequest} from '@enonic/lib-contentstudio/app/resource/ContentQueryRequest';
+import {ContentSummaryJson} from '@enonic/lib-contentstudio/app/content/ContentSummaryJson';
+import {ContentSummary} from '@enonic/lib-contentstudio/app/content/ContentSummary';
 import {Expand} from '@enonic/lib-admin-ui/rest/Expand';
-import {ContentQueryResult} from 'lib-contentstudio/app/resource/ContentQueryResult';
-import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
-import {CompareStatus} from 'lib-contentstudio/app/content/CompareStatus';
-import {ContentQuery} from 'lib-contentstudio/app/content/ContentQuery';
-import {ContentPath} from 'lib-contentstudio/app/content/ContentPath';
+import {ContentQueryResult} from '@enonic/lib-contentstudio/app/resource/ContentQueryResult';
+import {ContentSummaryAndCompareStatus} from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
+import {CompareStatus} from '@enonic/lib-contentstudio/app/content/CompareStatus';
+import {ContentQuery} from '@enonic/lib-contentstudio/app/content/ContentQuery';
+import {ContentPath} from '@enonic/lib-contentstudio/app/content/ContentPath';
 import {ArchiveResourceRequest} from './resource/ArchiveResourceRequest';
 import {FetchResponse} from './FetchResponse';
-import {ContentId} from 'lib-contentstudio/app/content/ContentId';
-import {ContentResponse} from 'lib-contentstudio/app/resource/ContentResponse';
+import {ContentId} from '@enonic/lib-contentstudio/app/content/ContentId';
+import {ContentResponse} from '@enonic/lib-contentstudio/app/resource/ContentResponse';
 
 export class ArchiveContentFetcher
     extends ContentSummaryAndCompareStatusFetcher {

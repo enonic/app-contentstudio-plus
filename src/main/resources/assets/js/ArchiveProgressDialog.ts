@@ -1,6 +1,6 @@
 import {ArchiveDialog} from './ArchiveDialog';
 import {NotifyManager} from '@enonic/lib-admin-ui/notify/NotifyManager';
-import {ProgressBarManager} from 'lib-contentstudio/app/dialog/ProgressBarManager';
+import {ProgressBarManager} from '@enonic/lib-contentstudio/app/dialog/ProgressBarManager';
 import {TaskState} from '@enonic/lib-admin-ui/task/TaskState';
 import {ManagedActionExecutor} from '@enonic/lib-admin-ui/managedaction/ManagedActionExecutor';
 

@@ -2,16 +2,16 @@ import {Content as XPContent} from '@enonic-types/lib-content';
 import {Project as XPProject, ProjectPermission} from '@enonic-types/lib-project';
 import {ContentTypeName} from '@enonic/lib-admin-ui/schema/content/ContentTypeName';
 import {PrincipalKey} from '@enonic/lib-admin-ui/security/PrincipalKey';
-import {ContentId} from 'lib-contentstudio/app/content/ContentId';
-import {ContentInheritType} from 'lib-contentstudio/app/content/ContentInheritType';
-import {ContentName} from 'lib-contentstudio/app/content/ContentName';
-import {ContentPath} from 'lib-contentstudio/app/content/ContentPath';
-import {ContentSummary, ContentSummaryBuilder} from 'lib-contentstudio/app/content/ContentSummary';
-import {ContentUnnamed} from 'lib-contentstudio/app/content/ContentUnnamed';
-import {Project} from 'lib-contentstudio/app/settings/data/project/Project';
-import {ProjectItemPermissionsBuilder, ProjectPermissions} from 'lib-contentstudio/app/settings/data/project/ProjectPermissions';
-import {ProjectReadAccess} from 'lib-contentstudio/app/settings/data/project/ProjectReadAccess';
-import {ProjectReadAccessType} from 'lib-contentstudio/app/settings/data/project/ProjectReadAccessType';
+import {ContentId} from '@enonic/lib-contentstudio/app/content/ContentId';
+import {ContentInheritType} from '@enonic/lib-contentstudio/app/content/ContentInheritType';
+import {ContentName} from '@enonic/lib-contentstudio/app/content/ContentName';
+import {ContentPath} from '@enonic/lib-contentstudio/app/content/ContentPath';
+import {ContentSummary, ContentSummaryBuilder} from '@enonic/lib-contentstudio/app/content/ContentSummary';
+import {ContentUnnamed} from '@enonic/lib-contentstudio/app/content/ContentUnnamed';
+import {Project} from '@enonic/lib-contentstudio/app/settings/data/project/Project';
+import {ProjectItemPermissionsBuilder, ProjectPermissions} from '@enonic/lib-contentstudio/app/settings/data/project/ProjectPermissions';
+import {ProjectReadAccess} from '@enonic/lib-contentstudio/app/settings/data/project/ProjectReadAccess';
+import {ProjectReadAccessType} from '@enonic/lib-contentstudio/app/settings/data/project/ProjectReadAccessType';
 
 export class LibToStudioConverter {
 

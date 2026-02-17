@@ -3,7 +3,7 @@ import {LayerContent} from './LayerContent';
 import {LayerContentViewHeader} from './LayerContentViewHeader';
 import {LayerContentViewBody} from './LayerContentViewBody';
 import {LayerContentViewFooter} from './LayerContentViewFooter';
-import {ProjectContext} from 'lib-contentstudio/app/project/ProjectContext';
+import {ProjectContext} from '@enonic/lib-contentstudio/app/project/ProjectContext';
 
 export class LayerContentViewDataBlock extends DivEl {
 

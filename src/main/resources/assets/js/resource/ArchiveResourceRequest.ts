@@ -1,5 +1,5 @@
-import {CmsProjectBasedResourceRequest} from 'lib-contentstudio/app/wizard/CmsProjectBasedResourceRequest';
-import {ContentResourceRequest} from 'lib-contentstudio/app/resource/ContentResourceRequest';
+import {CmsProjectBasedResourceRequest} from '@enonic/lib-contentstudio/app/wizard/CmsProjectBasedResourceRequest';
+import {ContentResourceRequest} from '@enonic/lib-contentstudio/app/resource/ContentResourceRequest';
 
 export abstract class ArchiveResourceRequest<PARSED_TYPE>
     extends CmsProjectBasedResourceRequest<PARSED_TYPE> {

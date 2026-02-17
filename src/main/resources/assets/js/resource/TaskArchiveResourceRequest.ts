@@ -2,7 +2,7 @@ import Q from 'q';
 import {TaskIdJson} from '@enonic/lib-admin-ui/task/TaskIdJson';
 import {TaskState} from '@enonic/lib-admin-ui/task/TaskState';
 import {TaskId} from '@enonic/lib-admin-ui/task/TaskId';
-import {GetTaskInfoRequest} from 'lib-contentstudio/app/resource/GetTaskInfoRequest';
+import {GetTaskInfoRequest} from '@enonic/lib-contentstudio/app/resource/GetTaskInfoRequest';
 import {TaskInfo} from '@enonic/lib-admin-ui/task/TaskInfo';
 import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import {JsonResponse} from '@enonic/lib-admin-ui/rest/JsonResponse';

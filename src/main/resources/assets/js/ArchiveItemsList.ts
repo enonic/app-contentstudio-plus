@@ -1,13 +1,13 @@
 import {ArchiveContentDialogViewer} from './ArchiveContentDialogViewer';
 import {ListBox} from '@enonic/lib-admin-ui/ui/selector/list/ListBox';
-import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
-import {ContentSummaryAndCompareStatusFetcher} from 'lib-contentstudio/app/resource/ContentSummaryAndCompareStatusFetcher';
-import {ContentId} from 'lib-contentstudio/app/content/ContentId';
+import {ContentSummaryAndCompareStatus} from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
+import {ContentSummaryAndCompareStatusFetcher} from '@enonic/lib-contentstudio/app/resource/ContentSummaryAndCompareStatusFetcher';
+import {ContentId} from '@enonic/lib-contentstudio/app/content/ContentId';
 import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import type {Element} from '@enonic/lib-admin-ui/dom/Element';
 import {AppHelper} from '@enonic/lib-admin-ui/util/AppHelper';
 import {ArchiveResourceRequest} from './resource/ArchiveResourceRequest';
-import {ContentSummary} from 'lib-contentstudio/app/content/ContentSummary';
+import {ContentSummary} from '@enonic/lib-contentstudio/app/content/ContentSummary';
 
 export class ArchiveItemsList extends ListBox<ContentSummaryAndCompareStatus> {
 

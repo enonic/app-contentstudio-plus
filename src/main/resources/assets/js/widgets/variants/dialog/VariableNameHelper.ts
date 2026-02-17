@@ -1,5 +1,5 @@
 import {NumberHelper} from '@enonic/lib-admin-ui/util/NumberHelper';
-import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
+import {ContentSummaryAndCompareStatus} from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 
 export class VariableNameHelper {
 

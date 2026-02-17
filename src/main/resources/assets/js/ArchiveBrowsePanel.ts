@@ -3,9 +3,9 @@ import {ArchiveBrowseItemPanel} from './ArchiveBrowseItemPanel';
 import Q from 'q';
 import {ArchiveContextView} from './ArchiveContextView';
 import {ArchiveContentViewItem} from './ArchiveContentViewItem';
-import {ResponsiveBrowsePanel} from 'lib-contentstudio/app/browse/ResponsiveBrowsePanel';
+import {ResponsiveBrowsePanel} from '@enonic/lib-contentstudio/app/browse/ResponsiveBrowsePanel';
 import {ArchiveFilterPanel} from './ArchiveFilterPanel';
-import {ContentQuery} from 'lib-contentstudio/app/content/ContentQuery';
+import {ContentQuery} from '@enonic/lib-contentstudio/app/content/ContentQuery';
 import {SelectableListBoxPanel} from '@enonic/lib-admin-ui/ui/panel/SelectableListBoxPanel';
 import {ViewItem} from '@enonic/lib-admin-ui/app/view/ViewItem';
 import {ArchiveTreeGridActions} from './ArchiveTreeGridActions';
@@ -14,13 +14,13 @@ import {SelectableTreeListBoxKeyNavigator} from '@enonic/lib-admin-ui/ui/selecto
 import {ListBoxToolbar} from '@enonic/lib-admin-ui/ui/selector/list/ListBoxToolbar';
 import {SelectableListBoxWrapper} from '@enonic/lib-admin-ui/ui/selector/list/SelectableListBoxWrapper';
 import {ArchiveTreeRootList} from './ArchiveTreeRootList';
-import {ArchiveServerEvent} from 'lib-contentstudio/app/event/ArchiveServerEvent';
+import {ArchiveServerEvent} from '@enonic/lib-contentstudio/app/event/ArchiveServerEvent';
 import {NodeServerChangeType} from '@enonic/lib-admin-ui/event/NodeServerChange';
-import {ContentServerChangeItem} from 'lib-contentstudio/app/event/ContentServerChangeItem';
-import {ContentServerEventsHandler} from 'lib-contentstudio/app/event/ContentServerEventsHandler';
+import {ContentServerChangeItem} from '@enonic/lib-contentstudio/app/event/ContentServerChangeItem';
+import {ContentServerEventsHandler} from '@enonic/lib-contentstudio/app/event/ContentServerEventsHandler';
 import {ArchiveHelper} from './ArchiveHelper';
 import {ArchiveTreeListElement} from './ArchiveTreeList';
-import {ProjectContext} from 'lib-contentstudio/app/project/ProjectContext';
+import {ProjectContext} from '@enonic/lib-contentstudio/app/project/ProjectContext';
 
 export class ArchiveBrowsePanel
     extends ResponsiveBrowsePanel {

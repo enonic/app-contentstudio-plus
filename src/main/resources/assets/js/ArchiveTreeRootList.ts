@@ -1,5 +1,5 @@
 import {ArchiveTreeList} from './ArchiveTreeList';
-import {ContentQuery} from 'lib-contentstudio/app/content/ContentQuery';
+import {ContentQuery} from '@enonic/lib-contentstudio/app/content/ContentQuery';
 import {ArchiveContentFetcher} from './ArchiveContentFetcher';
 import Q from 'q';
 import {FetchResponse} from './FetchResponse';

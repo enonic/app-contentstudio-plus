@@ -1,5 +1,5 @@
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
-import {DeleteContentRequest} from 'lib-contentstudio/app/resource/DeleteContentRequest';
+import {DeleteContentRequest} from '@enonic/lib-contentstudio/app/resource/DeleteContentRequest';
 import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import {ArchiveResourceRequest} from './resource/ArchiveResourceRequest';
 import {ArchiveProgressDialog} from './ArchiveProgressDialog';

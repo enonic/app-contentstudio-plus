@@ -1,4 +1,4 @@
-import {ContentDuplicateDialog} from 'lib-contentstudio/app/duplicate/ContentDuplicateDialog';
+import {ContentDuplicateDialog} from '@enonic/lib-contentstudio/app/duplicate/ContentDuplicateDialog';
 
 export class DuplicateVariantDialog extends ContentDuplicateDialog {
 

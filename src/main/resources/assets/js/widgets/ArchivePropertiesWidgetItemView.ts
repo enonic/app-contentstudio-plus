@@ -1,10 +1,12 @@
 import {Path} from '@enonic/lib-admin-ui/rest/Path';
 import {DateTimeFormatter} from '@enonic/lib-admin-ui/ui/treegrid/DateTimeFormatter';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
-import {BasePropertiesWidgetItemView} from 'lib-contentstudio/app/view/context/widget/details/BasePropertiesWidgetItemView';
-import {BasePropertiesWidgetItemViewHelper} from 'lib-contentstudio/app/view/context/widget/details/BasePropertiesWidgetItemViewHelper';
-import {PropertiesWidgetItemViewHelper} from 'lib-contentstudio/app/view/context/widget/details/PropertiesWidgetItemViewHelper';
-import {PropertiesWidgetItemViewValue} from 'lib-contentstudio/app/view/context/widget/details/PropertiesWidgetItemViewValue';
+import {BasePropertiesWidgetItemView} from '@enonic/lib-contentstudio/app/view/context/widget/details/BasePropertiesWidgetItemView';
+import {
+    BasePropertiesWidgetItemViewHelper
+} from '@enonic/lib-contentstudio/app/view/context/widget/details/BasePropertiesWidgetItemViewHelper';
+import {PropertiesWidgetItemViewHelper} from '@enonic/lib-contentstudio/app/view/context/widget/details/PropertiesWidgetItemViewHelper';
+import {PropertiesWidgetItemViewValue} from '@enonic/lib-contentstudio/app/view/context/widget/details/PropertiesWidgetItemViewValue';
 
 export class ArchivePropertiesWidgetItemView
     extends BasePropertiesWidgetItemView {

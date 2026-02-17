@@ -1,4 +1,4 @@
-import {ContentJson} from 'lib-contentstudio/app/content/ContentJson';
+import {ContentJson} from '@enonic/lib-contentstudio/app/content/ContentJson';
 
 export class ComparisonHelper {
 

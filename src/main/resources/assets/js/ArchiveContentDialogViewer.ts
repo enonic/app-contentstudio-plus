@@ -1,5 +1,5 @@
-import {ContentSummaryAndCompareStatusViewer} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatusViewer';
-import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
+import {ContentSummaryAndCompareStatusViewer} from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatusViewer';
+import {ContentSummaryAndCompareStatus} from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 
 export class ArchiveContentDialogViewer extends ContentSummaryAndCompareStatusViewer {
 

@@ -1,4 +1,4 @@
-import {ContentId} from 'lib-contentstudio/app/content/ContentId';
+import {ContentId} from '@enonic/lib-contentstudio/app/content/ContentId';
 import {ArchivedContainerJson} from './ArchivedContainerJson';
 
 export class ArchivedContainer {

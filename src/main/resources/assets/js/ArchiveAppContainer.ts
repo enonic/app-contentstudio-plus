@@ -1,4 +1,4 @@
-import {AppContainer} from 'lib-contentstudio/app/AppContainer';
+import {AppContainer} from '@enonic/lib-contentstudio/app/AppContainer';
 import {AppPanel} from '@enonic/lib-admin-ui/app/AppPanel';
 import {ArchiveAppPanel} from './ArchiveAppPanel';
 import {Body} from '@enonic/lib-admin-ui/dom/Body';

@@ -1,4 +1,4 @@
-import {ContentSummaryAndCompareStatus} from 'lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
+import {ContentSummaryAndCompareStatus} from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import Q from 'q';
 import {GetLayersRequest} from '../../resource/GetLayersRequest';
 import {LayerContent} from './LayerContent';

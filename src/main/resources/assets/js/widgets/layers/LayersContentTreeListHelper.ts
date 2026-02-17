@@ -1,7 +1,7 @@
-import {ProjectContext} from 'lib-contentstudio/app/project/ProjectContext';
-import {Project} from 'lib-contentstudio/app/settings/data/project/Project';
+import {ProjectContext} from '@enonic/lib-contentstudio/app/project/ProjectContext';
+import {Project} from '@enonic/lib-contentstudio/app/settings/data/project/Project';
 import {LayerContent} from './LayerContent';
-import {ProjectsChainBlock} from 'lib-contentstudio/app/settings/wizard/panel/form/element/ProjectsChainBlock';
+import {ProjectsChainBlock} from '@enonic/lib-contentstudio/app/settings/wizard/panel/form/element/ProjectsChainBlock';
 
 export class LayersContentTreeListHelper {
 
