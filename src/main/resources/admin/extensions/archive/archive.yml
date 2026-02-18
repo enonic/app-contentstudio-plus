@@ -1,0 +1,10 @@
+displayName:
+  text: "Archive"
+  i18n: "widget.archive.displayName"
+description:
+  text: "Archive tool"
+  i18n: "widget.archive.description"
+interfaces:
+- "contentstudio.menuitem"
+config:
+  context: "project"

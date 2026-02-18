@@ -1,0 +1,8 @@
+displayName:
+  text: "Variants"
+  i18n: "widget.variants.displayName"
+description:
+  text: "Create variants of a content"
+  i18n: "widget.variants.description"
+interfaces:
+- "contentstudio.contextpanel"

@@ -1,0 +1,8 @@
+displayName:
+  text: "Publishing report"
+  i18n: "widget.publishReport.displayName"
+description:
+  text: "Compare published versions"
+  i18n: "widget.publishReport.description"
+interfaces:
+- "contentstudio.contextpanel"
