@@ -23,10 +23,7 @@ function renderWidgetView(req) {
             path: 'styles/widgets/layers.css'
         }),
         jsUri: portal.assetUrl({
-            path: 'js/widgets/layers.js',
-            params: {
-                dt: Date.now().toString()
-            }
+            path: 'js/widgets/layers.js'
         }),
         configScriptId: 'layers-widget-config-json',
         configAsJson: JSON.stringify(configLib.getConfig(req.locales), null, 4).replace(/<(\/?script|!--)/gi, "\\u003C$1")

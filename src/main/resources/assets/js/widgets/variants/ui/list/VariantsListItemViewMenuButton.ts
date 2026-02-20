@@ -8,6 +8,7 @@ import {CreateVariantDialog} from '../../dialog/CreateVariantDialog';
 import {GetContentVariantsRequest} from '../../resource/request/GetContentVariantsRequest';
 import {ContentEventsProcessor} from '@enonic/lib-contentstudio/app/ContentEventsProcessor';
 import {EditContentEvent} from '@enonic/lib-contentstudio/app/event/EditContentEvent';
+import {AppHelper} from '../../../../util/AppHelper';
 
 export class VariantsListItemViewMenuButton
     extends MenuButton {
@@ -45,7 +46,18 @@ export class VariantsListItemViewMenuButton
     }
 
     private openCreateVersionDialog(): void {
-        CreateVariantDialog.get().setContent(this.item).setVariants(GetContentVariantsRequest.getCachedVariants(this.item.getId())).open();
+        const widgetClass = AppHelper.getVariantsWidgetClass();
+        let container = this.getParentElement();
+
+        while (container != null && !container.hasClass(widgetClass)) {
+            container = container.getParentElement();
+        }
+
+        CreateVariantDialog
+            .get(container)
+            .setContent(this.item)
+            .setVariants(GetContentVariantsRequest.getCachedVariants(this.item.getId()))
+            .open();
     }
 
     private handleSecondaryActionExecuted(): void {
