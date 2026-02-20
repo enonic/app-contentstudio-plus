@@ -79,7 +79,7 @@ export class LayersWidgetItemView
         this.initContentEventListeners();
 
         this.showHideToggle.onClicked(() => {
-            LayersContentTreeDialog.get().setItems(this.layersContentTreeList.getAllItems()).open();
+            LayersContentTreeDialog.get(this.getParentElement()).setItems(this.layersContentTreeList.getAllItems()).open();
         });
     }
 

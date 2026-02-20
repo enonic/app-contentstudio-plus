@@ -6,6 +6,7 @@ import {ContentSummaryAndCompareStatus} from '@enonic/lib-contentstudio/app/cont
 import {LayerContent} from './LayerContent';
 import {LayersContentTreeList} from './LayersContentTreeList';
 import {Store} from '@enonic/lib-admin-ui/store/Store';
+import {Element} from '@enonic/lib-admin-ui/dom/Element';
 
 export class LayersContentTreeDialog extends ModalDialog {
 
@@ -13,16 +14,18 @@ export class LayersContentTreeDialog extends ModalDialog {
 
     private subTitle: H6El;
 
-    private constructor() {
-        super({class: 'layers-content-tree-dialog'});
+    private constructor(container: Element) {
+        super({class: 'layers-content-tree-dialog', container: container});
     }
 
-    static get(): LayersContentTreeDialog {
+    static get(container: Element): LayersContentTreeDialog {
         let instance: LayersContentTreeDialog = Store.instance().get(LayersContentTreeDialog.name);
 
         if (instance == null) {
-            instance = new LayersContentTreeDialog();
+            instance = new LayersContentTreeDialog(container);
             Store.instance().set(LayersContentTreeDialog.name, instance);
+        } else {
+            instance.setContainer(container);
         }
 
         return instance;

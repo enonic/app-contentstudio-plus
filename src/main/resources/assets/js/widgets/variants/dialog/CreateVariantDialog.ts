@@ -1,6 +1,8 @@
+import {Store} from '@enonic/lib-admin-ui/store/Store';
 import {Action} from '@enonic/lib-admin-ui/ui/Action';
 import {ModalDialog} from '@enonic/lib-admin-ui/ui/dialog/ModalDialog';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
+import {Element} from '@enonic/lib-admin-ui/dom/Element';
 import {ContentSummaryAndCompareStatus} from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import {OriginalContentBlock} from './OriginalContentBlock';
 import Q from 'q';
@@ -14,8 +16,6 @@ import {ValidityStatus, ValueValidationState} from '@enonic/lib-contentstudio/ap
 export class CreateVariantDialog
     extends ModalDialog {
 
-    private static INSTANCE: CreateVariantDialog;
-
     private originalContentBlock: OriginalContentBlock;
 
     private variantNameInput: VariantNameInput;
@@ -26,19 +26,25 @@ export class CreateVariantDialog
 
     private originalContent: ContentSummaryAndCompareStatus;
 
-    private constructor() {
+    private constructor(container: Element) {
         super({
             class: 'create-variant-dialog',
             title: i18n('widget.variants.create.text'),
+            container: container
         });
     }
 
-    static get(): CreateVariantDialog {
-        if (!CreateVariantDialog.INSTANCE) {
-            CreateVariantDialog.INSTANCE = new CreateVariantDialog();
+    static get(container: Element): CreateVariantDialog {
+        let instance: CreateVariantDialog = Store.instance().get(CreateVariantDialog.name);
+
+        if (instance == null) {
+            instance = new CreateVariantDialog(container);
+            Store.instance().set(CreateVariantDialog.name, instance);
+        } else {
+            instance.setContainer(container);
         }
 
-        return CreateVariantDialog.INSTANCE;
+        return instance;
     }
 
     protected initElements(): void {

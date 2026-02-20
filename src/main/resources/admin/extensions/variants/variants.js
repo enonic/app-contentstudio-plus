@@ -22,10 +22,7 @@ function renderWidgetView(req) {
             path: 'styles/widgets/variants.css'
         }),
         jsUri: portal.assetUrl({
-            path: 'js/widgets/variants.js',
-            params: {
-                dt: Date.now().toString()
-            }
+            path: 'js/widgets/variants.js'
         }),
         configScriptId: 'variants-widget-config-json',
         configAsJson: JSON.stringify(configLib.getConfig(req.locales), null, 4).replace(/<(\/?script|!--)/gi, "\\u003C$1")

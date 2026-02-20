@@ -17,8 +17,6 @@ import {ContentServerChangeItem} from '@enonic/lib-contentstudio/app/event/Conte
 export class VariantsWidget
     extends Widget {
 
-    private static INSTANCE: VariantsWidget;
-
     private createVariantsButton?: Button;
 
     private originalContent: ContentSummaryAndCompareStatus;
@@ -33,16 +31,10 @@ export class VariantsWidget
 
     private contentDeletedListener: (items: ContentServerChangeItem[]) => void;
 
-    constructor() {
+    constructor(contentId: string) {
         super(AppHelper.getVariantsWidgetClass());
-    }
 
-    static get(): VariantsWidget {
-        if (!VariantsWidget.INSTANCE) {
-            VariantsWidget.INSTANCE = new VariantsWidget();
-        }
-
-        return VariantsWidget.INSTANCE;
+        this.setContentId(contentId);
     }
 
     protected initElements(): void {
@@ -181,7 +173,7 @@ export class VariantsWidget
         button.addClass('variants-widget-button-create');
 
         button.onClicked(() => {
-            CreateVariantDialog.get().setContent(this.originalContent).setVariants(this.variants).open();
+            CreateVariantDialog.get(this.getParentElement()).setContent(this.originalContent).setVariants(this.variants).open();
         });
 
         return button;
