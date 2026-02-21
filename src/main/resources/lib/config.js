@@ -42,7 +42,7 @@ const getConfig = (locales) => {
                 api: `${app.name}:layers`,
             }),
         },
-        widgetApiUrl: admin.apiUrl({
+        widgetApiUrl: portal.apiUrl({
             api: 'admin:extension',
         }),
         toolUri: csToolUri,
