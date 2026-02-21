@@ -36,14 +36,14 @@ const getConfig = (locales) => {
                 api: `${csAppName}:content`,
             }),
             licenseUrl: portal.apiUrl({
-                api: 'license',
+                api: `${app.name}:license`,
             }),
             layersUrl: portal.apiUrl({
-                api: 'layers',
+                api: `${app.name}:layers`,
             }),
         },
-        widgetApiUrl: portal.apiUrl({
-            api: 'admin:widget',
+        widgetApiUrl: admin.apiUrl({
+            api: 'admin:extension',
         }),
         toolUri: csToolUri,
         phrasesAsJson: JSON.stringify(getPhrases(locales)),
