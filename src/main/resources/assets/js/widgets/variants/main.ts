@@ -16,12 +16,14 @@ void (() => {
     Messages.addMessages(JSON.parse(CONFIG.getString('phrasesAsJson')) as object);
 
     const widgetContainer = Element.fromHtmlElement(
-        document.querySelector(`.${AppHelper.getVariantsWidgetClass()}`),
+        document.querySelector(`.${AppHelper.getCommonWidgetContainerClass()}`),
         true
     );
 
-    const widget: VariantsWidget = new VariantsWidget(contentId);
-    widgetContainer.appendChild(widget);
-
-    void widget.render();
+    widgetContainer
+        .render()
+        .then(() => {
+            const widget = new VariantsWidget(contentId);
+            widgetContainer.appendChild(widget);
+        });
 })();

@@ -3,6 +3,7 @@ import {H6El} from '@enonic/lib-admin-ui/dom/H6El';
 import Q from 'q';
 import {ProjectContext} from '@enonic/lib-contentstudio/app/project/ProjectContext';
 import {ContentSummaryAndCompareStatus} from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
+import {Widget} from '../Widget';
 import {LayerContent} from './LayerContent';
 import {LayersContentTreeList} from './LayersContentTreeList';
 import {Store} from '@enonic/lib-admin-ui/store/Store';
@@ -15,11 +16,15 @@ export class LayersContentTreeDialog extends ModalDialog {
     private subTitle: H6El;
 
     private constructor(container: Element) {
-        super({class: 'layers-content-tree-dialog', container: container});
+        super({
+            class: 'layers-content-tree-dialog',
+            container: container
+        });
     }
 
-    static get(container: Element): LayersContentTreeDialog {
+    static get(hostElement: Element): LayersContentTreeDialog {
         let instance: LayersContentTreeDialog = Store.instance().get(LayersContentTreeDialog.name);
+        const container = Widget.getContainer(hostElement);
 
         if (instance == null) {
             instance = new LayersContentTreeDialog(container);
