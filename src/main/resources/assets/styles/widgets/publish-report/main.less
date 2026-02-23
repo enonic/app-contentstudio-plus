@@ -1,4 +1,7 @@
 @import "jsondiffpatch/formatters/styles/html.css";
+@import '@enonic/lib-admin-ui/styles/api/ui/time/calendar';
+@import '@enonic/lib-admin-ui/styles/api/ui/time/date-time-range-picker';
+@import '@enonic/lib-admin-ui/styles/api/ui/time/date-time-picker';
 @import "../widget";
 @import "comparisons-container";
 @import "comparison-block";
@@ -12,14 +15,7 @@
   justify-content: center;
   align-items: center;
 
-  .labelTo {
-    margin-top: 10px;
-  }
-
   .widget-publish-report-button-open {
-    text-align: center;
-    max-width: 240px;
-    width: calc(100% - 40px);
     padding: 8px 70px;
     margin: 20px auto;
     background-color: @admin-button-blue2;

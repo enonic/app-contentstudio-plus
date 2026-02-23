@@ -10,12 +10,9 @@ import {Form} from '@enonic/lib-admin-ui/ui/form/Form';
 import {FormView} from '@enonic/lib-admin-ui/form/FormView';
 import {Fieldset} from '@enonic/lib-admin-ui/ui/form/Fieldset';
 import {ValidationResult} from '@enonic/lib-admin-ui/ui/form/ValidationResult';
-import Q from 'q';
 
 export class PublishReportWidget
     extends Widget {
-
-    private static INSTANCE: PublishReportWidget;
 
     private generateButton: Button;
 
@@ -29,30 +26,21 @@ export class PublishReportWidget
 
     private isContentArchived: boolean;
 
-    constructor() {
-        super(AppHelper.getPublishReportWidgetClass());
+    constructor(contentId: string, firstPublished: string, isArchived: boolean) {
+        super(contentId, AppHelper.getPublishReportWidgetClass());
+
+        this.isContentArchived = isArchived;
+        this.setPublishFirstDateString(firstPublished);
     }
 
-    static get(): PublishReportWidget {
-        if (!PublishReportWidget.INSTANCE) {
-            PublishReportWidget.INSTANCE = new PublishReportWidget();
-        }
-
-        return PublishReportWidget.INSTANCE;
+    protected renderWidgetContents(): void {
+        this.appendChildren(this.form, this.generateButton as Element);
     }
 
-    setPublishFirstDateString(value: string): this {
+    setPublishFirstDateString(value: string) {
         const publishFirst = new Date(value);
         this.dateRangeInput.setFromTo(publishFirst, new Date());
         this.dateRangeInput.setFirstPublishDate(publishFirst);
-
-        return this;
-    }
-
-    setIsContentArchived(value: boolean): this {
-        this.isContentArchived = value;
-
-        return this;
     }
 
     protected initElements(): void {
@@ -79,6 +67,7 @@ export class PublishReportWidget
 
     private createForm(): void {
         this.form = new Form(FormView.VALIDATION_CLASS);
+        this.form.addClass('date-range-form');
 
         const fieldSet: Fieldset = new Fieldset();
 
@@ -95,7 +84,7 @@ export class PublishReportWidget
         button.addClass('widget-publish-report-button-open');
 
         button.onClicked(() => {
-            PublishReportDialog.get()
+            PublishReportDialog.get(this)
                 .setContentId(this.contentId)
                 .setFromTo(this.dateRangeInput.getFrom(), this.dateRangeInput.getTo())
                 .setIsContentArchived(this.isContentArchived)
@@ -114,7 +103,7 @@ export class PublishReportWidget
             this.generateButton.setEnabled(validationResult.isValid());
         });
     }
-
+/*
     doRender(): Q.Promise<boolean> {
         return super.doRender().then((rendered: boolean) => {
             this.form.addClass('date-range-form');
@@ -123,4 +112,5 @@ export class PublishReportWidget
             return rendered;
         });
     }
+ */
 }

@@ -1,10 +1,13 @@
 import {ModalDialog} from '@enonic/lib-admin-ui/ui/dialog/ModalDialog';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
+import {Store} from '@enonic/lib-admin-ui/store/Store';
+import {Element} from '@enonic/lib-admin-ui/dom/Element';
 import Q from 'q';
 import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import {ContentId} from '@enonic/lib-contentstudio/app/content/ContentId';
 import {GetContentVersionsRequest} from '@enonic/lib-contentstudio/app/resource/GetContentVersionsRequest';
 import {GetContentVersionsResult} from '@enonic/lib-contentstudio/app/resource/GetContentVersionsResult';
+import {Widget} from '../../Widget';
 import {ComparisonsContainer} from './ComparisonsContainer';
 import {Action} from '@enonic/lib-admin-ui/ui/Action';
 import {Body} from '@enonic/lib-admin-ui/dom/Body';
@@ -16,8 +19,6 @@ import {ArchiveContentFetcher} from '../../../ArchiveContentFetcher';
 
 export class PublishReportDialog
     extends ModalDialog {
-
-    private static INSTANCE: PublishReportDialog;
 
     private contentId: ContentId;
 
@@ -37,19 +38,26 @@ export class PublishReportDialog
 
     private subTitleEl: H6El;
 
-    private constructor() {
+    private constructor(container: Element) {
         super({
             class: 'publish-report-dialog',
             title: i18n('widget.publishReport.dialog.title'),
+            container: container
         });
     }
 
-    static get(): PublishReportDialog {
-        if (!PublishReportDialog.INSTANCE) {
-            PublishReportDialog.INSTANCE = new PublishReportDialog();
+    static get(hostElement: Element): PublishReportDialog {
+        let instance: PublishReportDialog = Store.instance().get(PublishReportDialog.name);
+        const container = Widget.getContainer(hostElement);
+
+        if (instance == null) {
+            instance = new PublishReportDialog(container);
+            Store.instance().set(PublishReportDialog.name, instance);
+        } else {
+            instance.setContainer(container);
         }
 
-        return PublishReportDialog.INSTANCE;
+        return instance;
     }
 
     setContentId(value: string): PublishReportDialog {
