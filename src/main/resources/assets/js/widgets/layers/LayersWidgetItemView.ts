@@ -78,9 +78,7 @@ export class LayersWidgetItemView
         this.initProjectEventListeners();
         this.initContentEventListeners();
 
-        this.showHideToggle.onClicked(() => {
-            LayersContentTreeDialog.get(this.getParentElement()).setItems(this.layersContentTreeList.getAllItems()).open();
-        });
+        this.showHideToggle.onClicked(() => LayersContentTreeDialog.get(this).setItems(this.layersContentTreeList.getAllItems()).open());
     }
 
     private initProjectEventListeners(): void {

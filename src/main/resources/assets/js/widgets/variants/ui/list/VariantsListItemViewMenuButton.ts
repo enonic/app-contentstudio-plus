@@ -46,15 +46,8 @@ export class VariantsListItemViewMenuButton
     }
 
     private openCreateVersionDialog(): void {
-        const widgetClass = AppHelper.getVariantsWidgetClass();
-        let container = this.getParentElement();
-
-        while (container != null && !container.hasClass(widgetClass)) {
-            container = container.getParentElement();
-        }
-
         CreateVariantDialog
-            .get(container)
+            .get(this)
             .setContent(this.item)
             .setVariants(GetContentVariantsRequest.getCachedVariants(this.item.getId()))
             .open();

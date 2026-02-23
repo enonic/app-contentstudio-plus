@@ -2,13 +2,10 @@ import {Widget} from '../Widget';
 import {AppHelper} from '../../util/AppHelper';
 import Q from 'q';
 import {GetContentVariantsRequest} from './resource/request/GetContentVariantsRequest';
-import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import {Button} from '@enonic/lib-admin-ui/ui/button/Button';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {CreateVariantDialog} from './dialog/CreateVariantDialog';
 import {ContentSummaryAndCompareStatus} from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
-import {ContentSummaryAndCompareStatusFetcher} from '@enonic/lib-contentstudio/app/resource/ContentSummaryAndCompareStatusFetcher';
-import {ContentId} from '@enonic/lib-contentstudio/app/content/ContentId';
 import {VariantsList} from './ui/list/VariantsList';
 import {ContentServerEventsHandler} from '@enonic/lib-contentstudio/app/event/ContentServerEventsHandler';
 import {NotifyManager} from '@enonic/lib-admin-ui/notify/NotifyManager';
@@ -21,8 +18,6 @@ export class VariantsWidget
 
     private originalContent: ContentSummaryAndCompareStatus;
 
-    private content: ContentSummaryAndCompareStatus;
-
     private variants: ContentSummaryAndCompareStatus[];
 
     private variantsList: VariantsList;
@@ -32,9 +27,7 @@ export class VariantsWidget
     private contentDeletedListener: (items: ContentServerChangeItem[]) => void;
 
     constructor(contentId: string) {
-        super(AppHelper.getVariantsWidgetClass());
-
-        this.setContentId(contentId);
+        super(contentId, AppHelper.getVariantsWidgetClass());
     }
 
     protected initElements(): void {
@@ -53,7 +46,7 @@ export class VariantsWidget
 
     private handeContentDuplicated(duplicatedItems: ContentSummaryAndCompareStatus[]): void {
         if (this.isInDOM() && this.isAnyItemDuplicated(duplicatedItems)) {
-            this.loadDataAndUpdateWidgetContent();
+            this.fetchAndProcessContent();
             NotifyManager.get().showFeedback(i18n('widget.variants.event.create', this.originalContent.getDisplayName()));
         }
     }
@@ -72,7 +65,7 @@ export class VariantsWidget
 
     private handleContentDeleted(items: ContentServerChangeItem[]): void {
         if (this.isInDOM() && this.isAnyVariantDeleted(items)) {
-            this.loadDataAndUpdateWidgetContent();
+            this.fetchAndProcessContent();
         }
     }
 
@@ -84,58 +77,40 @@ export class VariantsWidget
         return this.variants?.some((variant: ContentSummaryAndCompareStatus) => variant.getId() === id);
     }
 
-    setContentId(contentId: string): void {
-        super.setContentId(contentId);
-
-        if (!this.contentId) {
-            this.handleNoSelectedItem();
-            return;
-        }
-
-        this.loadDataAndUpdateWidgetContent();
-    }
-
     cleanUp(): void {
         super.cleanUp();
         ContentServerEventsHandler.getInstance().unContentDuplicated(this.contentDuplicatedListener);
         ContentServerEventsHandler.getInstance().unContentDeleted(this.contentDeletedListener);
     }
 
-    private loadDataAndUpdateWidgetContent(): void {
-        this.fetchData().then(() => {
-            this.displayVariants();
-            return Q.resolve();
-        }).catch((e: Error) => {
-            DefaultErrorHandler.handle(e);
-            this.handleErrorWhileLoadingVariants();
-        }).finally(() => this.loadMask.hide());
+    protected renderWidgetContents(): void {
+        this.fetchAndProcessContent();
     }
 
-    private fetchData(): Q.Promise<void> {
-        return this.fetchContent().then(() => this.fetchVariants());
+    protected processContent(content: ContentSummaryAndCompareStatus): Q.Promise<void> {
+        return this.findOriginalContent(content)
+            .then(() => this.fetchAndDisplayVariants());
     }
 
-    private fetchContent(): Q.Promise<void> {
-        return new ContentSummaryAndCompareStatusFetcher().fetch(new ContentId(this.contentId)).then(
-            (content: ContentSummaryAndCompareStatus) => {
-                this.content = content;
+    private findOriginalContent(content: ContentSummaryAndCompareStatus): Q.Promise<void> {
+        if (content.isVariant()) {
+            const variantId: string = content.getContentSummary().getVariantOf();
+            return this.fetchAndProcessContent(variantId, (original: ContentSummaryAndCompareStatus) => {
+                this.originalContent = original;
+                return;
+            })
+        }
 
-                if (this.content.isVariant()) {
-                    const id: ContentId = new ContentId(this.content.getContentSummary().getVariantOf());
-                    return new ContentSummaryAndCompareStatusFetcher().fetch(id).then((original: ContentSummaryAndCompareStatus) => {
-                        this.originalContent = original;
-                    });
-                }
-
-                this.originalContent = content;
-                return Q.resolve();
-            });
+        this.originalContent = content;
+        return Q.resolve();
     }
 
-    private fetchVariants(): Q.Promise<void> {
-        return new GetContentVariantsRequest(this.originalContent.getId()).fetchWithCompareStatus().then(
-            (variants: ContentSummaryAndCompareStatus[]) => {
+    private fetchAndDisplayVariants(): Q.Promise<void> {
+        return new GetContentVariantsRequest(this.originalContent.getId())
+            .fetchWithCompareStatus()
+            .then((variants: ContentSummaryAndCompareStatus[]) => {
                 this.variants = variants;
+                this.displayVariants();
                 return Q.resolve();
             });
     }
@@ -173,14 +148,10 @@ export class VariantsWidget
         button.addClass('variants-widget-button-create');
 
         button.onClicked(() => {
-            CreateVariantDialog.get(this.getParentElement()).setContent(this.originalContent).setVariants(this.variants).open();
+            CreateVariantDialog.get(this).setContent(this.originalContent).setVariants(this.variants).open();
         });
 
         return button;
-    }
-
-    private handleErrorWhileLoadingVariants(): void {
-        //
     }
 
     private isInDOM(): boolean {

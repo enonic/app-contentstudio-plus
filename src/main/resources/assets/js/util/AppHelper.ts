@@ -6,6 +6,10 @@ export class AppHelper {
         return `${AppHelper.APP_PREFIX}widget`;
     }
 
+    static getCommonWidgetContainerClass(): string {
+        return `${AppHelper.APP_PREFIX}widget-container`;
+    }
+
     static getLayersWidgetClass(): string {
         return AppHelper.getWidgetClass('layers');
     }

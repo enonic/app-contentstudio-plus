@@ -12,6 +12,7 @@ import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import {ContentDuplicateParams} from '@enonic/lib-contentstudio/app/resource/ContentDuplicateParams';
 import {VariantNameInput} from './VariantNameInput';
 import {ValidityStatus, ValueValidationState} from '@enonic/lib-contentstudio/app/inputtype/text/CheckedValueInput';
+import {Widget} from '../../Widget';
 
 export class CreateVariantDialog
     extends ModalDialog {
@@ -34,8 +35,9 @@ export class CreateVariantDialog
         });
     }
 
-    static get(container: Element): CreateVariantDialog {
+    static get(hostElement: Element): CreateVariantDialog {
         let instance: CreateVariantDialog = Store.instance().get(CreateVariantDialog.name);
+        const container = Widget.getContainer(hostElement);
 
         if (instance == null) {
             instance = new CreateVariantDialog(container);
