@@ -1,7 +1,6 @@
 import {Element} from '@enonic/lib-admin-ui/dom/Element';
 import {AppHelper} from '../../util/AppHelper';
 import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
-import {VariantsWidget} from '../variants/VariantsWidget';
 import {PublishReportWidget} from './PublishReportWidget';
 import {resolveConfig} from '../../util/WidgetConfigResolver';
 import {getModuleScript, getRequiredAttribute, getOptionalAttribute} from '../../util/ModuleScriptHelper';
@@ -12,7 +11,7 @@ void (() => {
 
     const configScriptId = getRequiredAttribute(currentScript, 'data-config-script-id');
     const contentId = getOptionalAttribute(currentScript, 'data-content-id');
-    const publishFirstAsString = getOptionalAttribute(currentScript, 'data-publish-first');
+    const firstPublished = getOptionalAttribute(currentScript, 'data-publish-first');
     const isArchivedAttrValue = getOptionalAttribute(currentScript, 'data-archived');
     const isArchived = Boolean(isArchivedAttrValue == 'true');
 
@@ -27,7 +26,7 @@ void (() => {
     widgetContainer
         .render()
         .then(() => {
-            const widget = new PublishReportWidget(contentId);
+            const widget = new PublishReportWidget(contentId, firstPublished, isArchived);
             widgetContainer.appendChild(widget);
         });
 
