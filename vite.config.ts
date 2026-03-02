@@ -50,9 +50,9 @@ export default defineConfig(({mode}) => {
           ],
           input: {
             'js/archive': path.join(IN_PATH, 'js/archive.ts'),
-            'js/widgets/layers': path.join(IN_PATH, 'js/widgets/layers/main.ts'),
-            'js/widgets/variants': path.join(IN_PATH, 'js/widgets/variants/main.ts'),
-            'js/widgets/publish-report': path.join(IN_PATH, 'js/widgets/publish-report/main.ts'),
+            'js/extension/layers': path.join(IN_PATH, 'js/extension/layers/main.ts'),
+            'js/extension/variants': path.join(IN_PATH, 'js/extension/variants/main.ts'),
+            'js/extension/publish-report': path.join(IN_PATH, 'js/extension/publish-report/main.ts'),
           },
           output: {
             format: 'es',
@@ -107,9 +107,9 @@ export default defineConfig(({mode}) => {
         rollupOptions: {
           input: {
             'styles/main': path.join(IN_PATH, 'styles/main.less'),
-            'styles/widgets/layers': path.join(IN_PATH, 'styles/widgets/layers/main.less'),
-            'styles/widgets/variants': path.join(IN_PATH, 'styles/widgets/variants/main.less'),
-            'styles/widgets/publish-report': path.join(IN_PATH, 'styles/widgets/publish-report/main.less'),
+            'styles/extension/layers': path.join(IN_PATH, 'styles/extension/layers/main.less'),
+            'styles/extension/variants': path.join(IN_PATH, 'styles/extension/variants/main.less'),
+            'styles/extension/publish-report': path.join(IN_PATH, 'styles/extension/publish-report/main.less'),
             'styles/license': path.join(IN_PATH, 'styles/license.less'),
           },
           output: {

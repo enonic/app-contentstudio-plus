@@ -61,6 +61,7 @@ class LayersContentTreeDialog extends Page {
         return await this.getText(XPATH.container + XPATH.title);
     }
 
+    //TODO
     async getLayersName() {
         let locator = XPATH.container + XPATH.itemView + `//div[@class='layer-name']`;
         await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
