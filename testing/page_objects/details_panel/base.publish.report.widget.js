@@ -42,7 +42,7 @@ class BasePublishReportWidget extends Page {
 
     async waitForWidgetLoaded() {
         try {
-            let locator = "//div[contains(@id,'WidgetsSelectionRow')]" + lib.itemByName('Compare published versions');
+            let locator = "//div[contains(@id,'ExtensionSelectionRow')]" + lib.itemByName('Compare published versions');
             return await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
         } catch (err) {
             await this.handleError('Publish report Widget was not loaded', 'err_publish_report_load', err);

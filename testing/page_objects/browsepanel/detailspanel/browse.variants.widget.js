@@ -4,7 +4,7 @@
 const BaseVariantsWidget = require('../../details_panel/base.variants.widget');
 
 const xpath = {
-    widget: "//div[contains(@id,'ContentBrowsePanel')]//div[contains(@id,'VariantsWidget') and contains(@class,'widget-variants')]",
+    widget: "//div[contains(@id,'ContentBrowsePanel')]//div[contains(@id,'VariantsExtension') and contains(@class,'extension-variants')]",
 };
 
 class BrowseVariantsWidget extends BaseVariantsWidget {

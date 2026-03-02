@@ -10,7 +10,7 @@ const XPATH = {
     archiveItemPreviewToolbar: "//div[contains(@id,'ArchiveItemPreviewToolbar')]",
     contentStatus: "//span[@class='status']",
     divEmulatorDropdown: "//div[contains(@id,'EmulatorDropdown')]",
-    divPreviewWidgetDropdown: "//div[contains(@id,'PreviewWidgetDropdown')]",
+    divPreviewWidgetDropdown: "//div[contains(@id,'PreviewModeDropdown')]",
 };
 
 class ArchiveItemStatisticsPanel extends Page {

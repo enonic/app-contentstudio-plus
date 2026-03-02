@@ -6,8 +6,8 @@ const lib = require('../../../libs/elements');
 const appConst = require('../../../libs/app_const');
 
 const XPATH = {
-    container: "//div[contains(@id,'WidgetFilterDropdown')]",
-    widgetDropdownListUL: "//ul[contains(@id,'WidgetSelectorDropdown')]",
+    container: "//div[contains(@id,'ExtensionFilterDropdown')]",
+    widgetDropdownListUL: "//ul[contains(@id,'ExtensionSelectorDropdown')]",
 }
 
 class WidgetSelectorDropdown extends BaseDropdown {
@@ -21,7 +21,7 @@ class WidgetSelectorDropdown extends BaseDropdown {
             await this.clickOnFilteredByDisplayNameItem(widgetDisplayName, parentElement);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_dropdown');
-            throw new Error('WidgetSelectorDropdown - Error during selecting the option, screenshot: ' + screenshot + ' ' + err);
+            throw new Error('ExtensionFilterDropdown - Error during selecting the option, screenshot: ' + screenshot + ' ' + err);
         }
     }
 

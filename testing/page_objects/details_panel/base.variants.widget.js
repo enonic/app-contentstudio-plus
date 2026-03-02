@@ -6,9 +6,9 @@ const appConst = require('../../libs/app_const');
 const lib = require('../../libs/elements');
 
 const xpath = {
-    variantsList: "//ul[contains(@class,'variants-widget-list')]",
-    originalVariantsListItemView: "//li[contains(@class,'variants-widget-list') and contains(@class,'original')]",
-    variantsListItemView: "//li[contains(@class,'variants-widget-list-item') and not(contains(@class,'original'))]",
+    variantsList: "//ul[contains(@class,'variants-extension-list')]",
+    originalVariantsListItemView: "//li[contains(@class,'variants-extension-list') and contains(@class,'original')]",
+    variantsListItemView: "//li[contains(@class,'variants-extension-list-item') and not(contains(@class,'original'))]",
     variantByName: resolution => `//div[contains(@class,'slick-row') and descendant::h6[text()='${resolution}']]//h5`,
     createVariantWidgetButton: "//button[contains(@class,'widget-button-create') and child::span[text()='Create Variant']]",
     createVariantItemButton: "//button[contains(@class,'action-button') and text()='Create Variant']",

@@ -5,7 +5,7 @@ const Page = require('../page');
 const appConst = require('../../libs/app_const');
 
 const xpath = {
-    container: `//div[contains(@id,'ArchiveBrowsePanel')]//div[contains(@id,'ArchiveStatusWidgetItemView')]`,
+    container: `//div[contains(@id,'ArchiveBrowsePanel')]//div[contains(@id,'ExtensionArchiveStatusItemView')]`,
     status: "//span[contains(@class,'archived')]",
 };
 

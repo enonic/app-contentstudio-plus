@@ -7,7 +7,7 @@ const appConst = require('../../libs/app_const');
 const WidgetSelectorDropdown = require('../components/selectors/widget.selector.dropdown')
 
 const xpath = {
-    scheduleWidgetItem: "//div[contains(@id,'OnlinePropertiesWidgetItemView')]",
+    scheduleWidgetItem: "//div[contains(@id,'ExtensionOnlinePropertiesItemView')]",
 };
 
 class BaseContextWindowPanel extends Page {
