@@ -5,10 +5,10 @@ import {WidgetView} from '@enonic/lib-contentstudio/app/view/context/WidgetView'
 import {WidgetItemView} from '@enonic/lib-contentstudio/app/view/context/WidgetItemView';
 import {AttachmentsWidgetItemView} from '@enonic/lib-contentstudio/app/view/context/widget/details/AttachmentsWidgetItemView';
 import {ContentPath} from '@enonic/lib-contentstudio/app/content/ContentPath';
-import {ArchiveStatusWidgetItemView} from './widgets/ArchiveStatusWidgetItemView';
+import {ArchiveStatusExtensionItemView} from './extensions/ArchiveStatusExtensionItemView';
 import {ArchiveContentViewItem} from './ArchiveContentViewItem';
-import {ArchivePropertiesWidgetItemView} from './widgets/ArchivePropertiesWidgetItemView';
-import {ArchiveWidgetItemView} from './widgets/ArchiveWidgetItemView';
+import {ArchivePropertiesExtensionItemView} from './extensions/ArchivePropertiesExtensionItemView';
+import {ArchiveExtensionItemView} from './extensions/ArchiveExtensionItemView';
 import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
 
 export class ArchiveContextView
@@ -16,9 +16,9 @@ export class ArchiveContextView
 
     private static allowedWidgetIds = ['publish-report'];
 
-    private archiveWidgetItemView: ArchiveWidgetItemView;
+    private archiveWidgetItemView: ArchiveExtensionItemView;
 
-    private propertiesWidgetItemView: ArchivePropertiesWidgetItemView;
+    private propertiesWidgetItemView: ArchivePropertiesExtensionItemView;
 
     constructor() {
         super();
@@ -51,12 +51,12 @@ export class ArchiveContextView
     }
 
     protected getDetailsWidgetItemViews(): WidgetItemView[] {
-        this.archiveWidgetItemView = new ArchiveWidgetItemView();
-        this.propertiesWidgetItemView = new ArchivePropertiesWidgetItemView();
+        this.archiveWidgetItemView = new ArchiveExtensionItemView();
+        this.propertiesWidgetItemView = new ArchivePropertiesExtensionItemView();
 
         return [
             this.archiveWidgetItemView,
-            new ArchiveStatusWidgetItemView(),
+            new ArchiveStatusExtensionItemView(),
             this.propertiesWidgetItemView,
             new AttachmentsWidgetItemView().setContentRootPath(ContentPath.ARCHIVE_ROOT),
         ];
