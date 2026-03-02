@@ -1,64 +1,64 @@
 import {ContextView} from '@enonic/lib-contentstudio/app/view/context/ContextView';
 import Q from 'q';
-import {Widget} from '@enonic/lib-admin-ui/content/Widget';
-import {WidgetView} from '@enonic/lib-contentstudio/app/view/context/WidgetView';
-import {WidgetItemView} from '@enonic/lib-contentstudio/app/view/context/WidgetItemView';
-import {AttachmentsWidgetItemView} from '@enonic/lib-contentstudio/app/view/context/widget/details/AttachmentsWidgetItemView';
+import {Extension} from '@enonic/lib-admin-ui/extension/Extension';
+import {ExtensionView} from '@enonic/lib-contentstudio/app/view/context/ExtensionView';
+import {ExtensionItemView} from '@enonic/lib-contentstudio/app/view/context/ExtensionItemView';
+import {ExtensionAttachmentsItemView} from '@enonic/lib-contentstudio/app/view/context/extension/details/ExtensionAttachmentsItemView';
 import {ContentPath} from '@enonic/lib-contentstudio/app/content/ContentPath';
-import {ArchiveStatusWidgetItemView} from './widgets/ArchiveStatusWidgetItemView';
+import {ExtensionArchiveStatusItemView} from './extension/ExtensionArchiveStatusItemView';
 import {ArchiveContentViewItem} from './ArchiveContentViewItem';
-import {ArchivePropertiesWidgetItemView} from './widgets/ArchivePropertiesWidgetItemView';
-import {ArchiveWidgetItemView} from './widgets/ArchiveWidgetItemView';
+import {ExtensionArchivePropertiesItemView} from './extension/ExtensionArchivePropertiesItemView';
+import {ExtensionArchiveItemView} from './extension/ExtensionArchiveItemView';
 import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
 
 export class ArchiveContextView
     extends ContextView {
 
-    private static allowedWidgetIds = ['publish-report'];
+    private static allowedExtensionIds = ['publish-report'];
 
-    private archiveWidgetItemView: ArchiveWidgetItemView;
+    private archiveExtensionItemView: ExtensionArchiveItemView;
 
-    private propertiesWidgetItemView: ArchivePropertiesWidgetItemView;
+    private propertiesExtensionItemView: ExtensionArchivePropertiesItemView;
 
     constructor() {
         super();
         this.addClass('archive-context-view');
     }
 
-    protected fetchCustomWidgetViews(): Q.Promise<Widget[]> {
+    protected fetchCustomExtensions(): Q.Promise<Extension[]> {
         const appId = CONFIG.getString('appId');
-        const allowedWidgetIds = ArchiveContextView.allowedWidgetIds.map((widgetId: string) =>
+        const allowedExtensionIds = ArchiveContextView.allowedExtensionIds.map((extensionId: string) =>
             // If allowed widgetId is missing appId, assume it's from the Content Studio+ app
-            widgetId.split(':').length == 2 ? widgetId : `${appId}:${widgetId}`
+            extensionId.split(':').length == 2 ? extensionId : `${appId}:${extensionId}`
         );
-        const allowedWidgets = super.fetchCustomWidgetViews().then((widgets: Widget[]) =>
-            widgets.filter((widget: Widget) => allowedWidgetIds.indexOf(widget.getWidgetDescriptorKey().toString()) > -1)
+        const allowedExtensions = super.fetchCustomExtensions().then((extensions: Extension[]) =>
+            extensions.filter((extension: Extension) => allowedExtensionIds.indexOf(extension.getDescriptorKey().toString()) > -1)
         );
 
-        return Q(allowedWidgets);
+        return Q(allowedExtensions);
     }
 
     setArchiveItem(item: ArchiveContentViewItem): void {
         if (item) {
-            this.archiveWidgetItemView.whenRendered(() => {
-                this.archiveWidgetItemView.setSubName(item.getOriginalFullPath());
+            this.archiveExtensionItemView.whenRendered(() => {
+                this.archiveExtensionItemView.setSubName(item.getOriginalFullPath());
             });
         }
     }
 
-    protected getInitialWidgets(): WidgetView[] {
-        return [this.propertiesWidgetView, this.createVersionsWidgetView()];
+    protected getInitialExtensions(): ExtensionView[] {
+        return [this.extensionPropertiesView, this.createExtensionVersionsView()];
     }
 
-    protected getDetailsWidgetItemViews(): WidgetItemView[] {
-        this.archiveWidgetItemView = new ArchiveWidgetItemView();
-        this.propertiesWidgetItemView = new ArchivePropertiesWidgetItemView();
+    protected getExtensionDetailsItemViews(): ExtensionItemView[] {
+        this.archiveExtensionItemView = new ExtensionArchiveItemView();
+        this.propertiesExtensionItemView = new ExtensionArchivePropertiesItemView();
 
         return [
-            this.archiveWidgetItemView,
-            new ArchiveStatusWidgetItemView(),
-            this.propertiesWidgetItemView,
-            new AttachmentsWidgetItemView().setContentRootPath(ContentPath.ARCHIVE_ROOT),
+            this.archiveExtensionItemView,
+            new ExtensionArchiveStatusItemView(),
+            this.propertiesExtensionItemView,
+            new ExtensionAttachmentsItemView().setContentRootPath(ContentPath.ARCHIVE_ROOT),
         ];
     }
 }

@@ -1,22 +1,9 @@
 /**
  * Created on 20.02.2023
  */
-const BaseVariantsWidget = require('../../details_panel/base.variants.widget');
+const VariantsExtension = require('../../details_panel/variants.extension');
 
-const xpath = {
-    widget: "//div[contains(@id,'ContentBrowsePanel')]//div[contains(@id,'VariantsWidget') and contains(@class,'widget-variants')]",
-};
-
-class BrowseVariantsWidget extends BaseVariantsWidget {
-
-    get variantsWidget() {
-        return xpath.widget;
-    }
-
-    get widgetItemView() {
-        return xpath.widgetItemView;
-    }
+class BrowseVariantsWidget extends VariantsExtension {
 }
 
 module.exports = BrowseVariantsWidget;
-

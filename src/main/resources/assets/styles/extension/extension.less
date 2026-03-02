@@ -1,0 +1,37 @@
+@import '@enonic/lib-admin-ui/styles/main.lite';
+
+.headers-mixin();
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+ul,
+li {
+  margin: 0;
+  padding: 0;
+}
+
+li {
+  list-style: none;
+}
+
+fieldset {
+  border: none;
+}
+
+.cs-plus-extension-container {
+  padding: 5px;
+
+  .cs-plus-extension {
+    width: 100%;
+  }
+
+  .error {
+    .watermark-text(@color: @admin-font-gray1);
+    left: 0;
+    top: 45%;
+  }
+}

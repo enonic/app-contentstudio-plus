@@ -3,34 +3,14 @@
  */
 const Page = require('./page');
 const appConst = require('../libs/app_const');
-const lib = require('../libs/elements');
-const XPATH = {
-    container: `//div[contains(@id,'PublishReportDialog')]`,
-    comparisonsContainer: "//div[contains(@id,'ComparisonsContainer')]",
-    comparisonBlockDiv: "//div[contains(@id,'ComparisonBlock')]",
-    textAndDateHeader: "//div[@class='header']/div[contains(@id,'TextAndDateBlock')]",
-    textAndDateSubheader: "//div[contains(@id,'TextAndDateBlock') and contains(@class,'subtitle')]",
-};
 
 class PublishReportDialog extends Page {
 
-    get showEntireContentCheckbox() {
-        return XPATH.container + XPATH.comparisonBlockDiv + lib.DIV.SHOW_ENTIRE_CONTENT_CHECKBOX_DIV;
-    }
-
-    get printButton() {
-        return XPATH.container + lib.dialogButton('Print');
-    }
-
-    get cancelTopButton() {
-        return XPATH.container + lib.CANCEL_BUTTON_TOP;
-    }
-
     async getHeaderInComparisonBlock(index) {
         try {
-            let locator = XPATH.container + XPATH.comparisonBlockDiv + XPATH.textAndDateHeader + "/span[@class='text'][1]";
-            await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
-            let elements = await this.findElements(locator)
+            const host = await this.getShadowHost();
+            const elements = await host.shadow$$('div[id*="ComparisonBlock"] div.header > div[id*="TextAndDateBlock"] span.text');
+            await elements[0].waitForDisplayed({timeout: appConst.mediumTimeout});
             return await elements[index].getText();
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_publish_report_comparison_header');
@@ -40,9 +20,9 @@ class PublishReportDialog extends Page {
 
     async getSubtitleInComparisonBlock(index) {
         try {
-            let locator = XPATH.container + XPATH.comparisonBlockDiv + XPATH.textAndDateSubheader + "/span[@class='text'][1]";
-            await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
-            let elements = await this.findElements(locator)
+            const host = await this.getShadowHost();
+            const elements = await host.shadow$$('div[id*="ComparisonBlock"] div[id*="TextAndDateBlock"][class*="subtitle"] span.text');
+            await elements[0].waitForDisplayed({timeout: appConst.mediumTimeout});
             return await elements[index].getText();
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_publish_report_date_subtitle');
@@ -52,9 +32,9 @@ class PublishReportDialog extends Page {
 
     async getDateInHeaderOfComparisonBlock(index) {
         try {
-            let locator = XPATH.container + XPATH.comparisonBlockDiv + XPATH.textAndDateHeader + "/span[@class='date']";
-            await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
-            let elements = await this.findElements(locator)
+            const host = await this.getShadowHost();
+            const elements = await host.shadow$$('div[id*="ComparisonBlock"] div.header > div[id*="TextAndDateBlock"] span.date');
+            await elements[0].waitForDisplayed({timeout: appConst.mediumTimeout});
             return await elements[index].getText();
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_publish_report_date_header');
@@ -64,9 +44,14 @@ class PublishReportDialog extends Page {
 
     async getAllComparisonsBlockHeader() {
         try {
-            let locator = XPATH.comparisonsContainer + "/div[contains(@id,'TextAndDateBlock')]" + "/span[@class='text']";
-            await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
-            return await this.getText(locator);
+            const host = await this.getShadowHost();
+            const elements = await host.shadow$$('div[id*="TextAndDateBlock"] span.text');
+            await elements[0].waitForDisplayed({timeout: appConst.mediumTimeout});
+            const texts = [];
+            for (const el of elements) {
+                texts.push(await el.getText());
+            }
+            return texts;
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_publish_report_dlg_header');
             throw new Error(`PublishReport modal dialog, text in  TextAndDate Block, screenshot: ${screenshot} ` + err);
@@ -75,9 +60,14 @@ class PublishReportDialog extends Page {
 
     async getAllComparisonsDate() {
         try {
-            let locator = XPATH.comparisonsContainer + "/div[contains(@id,'TextAndDateBlock')]" + "/span[@class='date']";
-            await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
-            return await this.getText(locator);
+            const host = await this.getShadowHost();
+            const elements = await host.shadow$$('div[id*="TextAndDateBlock"] span.date');
+            await elements[0].waitForDisplayed({timeout: appConst.mediumTimeout});
+            const texts = [];
+            for (const el of elements) {
+                texts.push(await el.getText());
+            }
+            return texts;
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_publish_report_dlg_date');
             throw new Error(`PublishReport modal dialog, date in Comparisons Block, screenshot: ${screenshot} ` + err);
@@ -85,41 +75,45 @@ class PublishReportDialog extends Page {
     }
 
     async waitForShowEntireContentCheckboxNotDisplayed() {
-        let checkBoxInput = this.showEntireContentCheckbox + lib.INPUTS.CHECKBOX_INPUT;
-        return await this.waitForElementNotDisplayed(checkBoxInput, appConst.mediumTimeout);
+        const host = await this.getShadowHost();
+        const checkbox = await host.shadow$('div[id*="ComparisonBlock"] input[type="checkbox"]');
+        return await checkbox.waitForDisplayed({timeout: appConst.mediumTimeout, reverse: true});
     }
 
     async clickOnShowEntireContentCheckbox(index) {
-        let checkBoxInput = this.showEntireContentCheckbox + "/label";
-        await this.waitForElementDisplayed(this.showEntireContentCheckbox, appConst.mediumTimeout);
-        let res = await this.findElements(checkBoxInput);
-        if (index > res.length) {
+        const host = await this.getShadowHost();
+        const labels = await host.shadow$$('div[id*="ComparisonBlock"] div[id*="Checkbox"] label');
+        if (index >= labels.length) {
             throw new Error('Publish report modal dialog, the number of checkboxes less then expected');
         }
-        return await res[index].click();
+        await labels[0].waitForDisplayed({timeout: appConst.mediumTimeout});
+        return await labels[index].click();
     }
 
     async isShowEntireContentCheckboxSelected(index) {
-        let checkBoxInput = this.showEntireContentCheckbox + lib.INPUTS.CHECKBOX_INPUT;
-        await this.waitForElementDisplayed(this.showEntireContentCheckbox, appConst.mediumTimeout);
-        let res = await this.findElements(checkBoxInput);
-        if (index > res.length) {
+        const host = await this.getShadowHost();
+        const checkboxes = await host.shadow$$('div[id*="ComparisonBlock"] input[type="checkbox"]');
+        if (index >= checkboxes.length) {
             throw new Error('Publish report modal dialog, the number of checkboxes less then expected');
         }
-        return await res[index].isSelected();
-
+        await checkboxes[0].waitForDisplayed({timeout: appConst.mediumTimeout});
+        return await checkboxes[index].isSelected();
     }
 
     async clickOnCancelTopButton() {
-        await this.waitForElementDisplayed(this.cancelTopButton, appConst.shortTimeout);
-        await this.clickOnElement(this.cancelTopButton);
+        const host = await this.getShadowHost();
+        const button = await host.shadow$('div.cancel-button-top');
+        await button.waitForDisplayed({timeout: appConst.shortTimeout});
+        await button.click();
         await this.waitForDialogClosed();
         return await this.pause(200);
     }
 
     async waitForDialogLoaded() {
         try {
-            return await this.waitForElementDisplayed(this.printButton, appConst.mediumTimeout)
+            const host = await this.getShadowHost();
+            const dialog = await host.shadow$('div[id*="PublishReportDialog"]');
+            await dialog.waitForDisplayed({timeout: appConst.mediumTimeout});
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_load_publish_report_dlg');
             throw new Error(`PublishReport  dialog was not loaded! screenshot: ${screenshot} ` + err);
@@ -128,20 +122,34 @@ class PublishReportDialog extends Page {
 
     async waitForPrintButtonEnabled() {
         try {
-            await this.waitForElementDisplayed(this.printButton, appConst.mediumTimeout);
-            await this.waitForElementEnabled(this.printButton, appConst.mediumTimeout);
+            const host = await this.getShadowHost();
+            const buttons = await host.shadow$$('button[id*="DialogButton"]');
+            let printButton;
+            for (const btn of buttons) {
+                const text = await btn.getText();
+                if (text.includes('Print')) {
+                    printButton = btn;
+                    break;
+                }
+            }
+            await printButton.waitForDisplayed({timeout: appConst.mediumTimeout});
+            return await printButton.waitForEnabled({timeout: appConst.mediumTimeout});
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_publish_report_print_btn');
             throw new Error(`PublishReport modal dialog - Print button, screenshot: ${screenshot} ` + err);
         }
     }
 
-    isDialogVisible() {
-        return this.isElementDisplayed(XPATH.container);
+    async isDialogVisible() {
+        const host = await this.getShadowHost();
+        const dialog = await host.shadow$('div[id*="PublishReportDialog"]');
+        return await dialog.isDisplayed();
     }
 
     async waitForDialogClosed() {
-        await this.waitForElementNotDisplayed(XPATH.container, appConst.shortTimeout);
+        const host = await this.getShadowHost();
+        const dialog = await host.shadow$('div[id*="PublishReportDialog"]');
+        return await dialog.waitForDisplayed({timeout: appConst.shortTimeout, reverse: true});
     }
 }
 

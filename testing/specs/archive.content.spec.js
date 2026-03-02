@@ -55,9 +55,9 @@ describe('archive.content.spec: tests for archiving content', function () {
             await deleteContentDialog.clickOnArchiveButton();
             // 4. Verify that the content is not displayed in Content Browse Panel:
             await contentBrowsePanel.waitForContentNotDisplayed(FOLDER1.displayName);
-            let message = await contentBrowsePanel.waitForNotificationMessage();
+            let messages = await contentBrowsePanel.waitForNotificationMessages();
             let expectedMessage = appConst.itemIsArchived(FOLDER1.displayName);
-            assert.equal(message, expectedMessage, 'Expected notification message should appear');
+            assert.ok(messages.includes(expectedMessage), 'Expected notification message should appear');
             // 5. Navigate to 'Archive Browse Panel' and check the archived content:
             await studioUtils.openArchivePanel();
             await studioUtils.saveScreenshot('folder_in_archive1');
@@ -84,9 +84,9 @@ describe('archive.content.spec: tests for archiving content', function () {
             await deleteContentDialog.clickOnArchiveButton();
             // 4. Verify that the content is not displayed in Content Browse Panel:
             await contentBrowsePanel.waitForContentNotDisplayed(FOLDER2.displayName);
-            let message = await contentBrowsePanel.waitForNotificationMessage();
+            let messages = await contentBrowsePanel.waitForNotificationMessages();
             let expectedMessage = appConst.itemIsArchived(FOLDER2.displayName);
-            assert.equal(message, expectedMessage, 'Expected notification message should appear');
+            assert.ok(messages.includes(expectedMessage), 'Expected notification message should appear');
             // 5. Navigate to 'Archive Browse Panel' and check the archived content:
             await studioUtils.openArchivePanel();
             await studioUtils.saveScreenshot('folder_in_archive2');

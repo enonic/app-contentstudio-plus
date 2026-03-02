@@ -6,7 +6,7 @@ const appConst = require('../../../libs/app_const');
 const EditPermissionsDialog = require('../../../page_objects/edit.permissions.dialog');
 
 const xpath = {
-    container: "//div[contains(@id,'WidgetView')]//div[contains(@id,'UserAccessWidgetItemView')]",
+    container: "//div[contains(@id,'ExtensionView')]//div[contains(@id,'ExtensionPropertiesItemView')]",
     headerString: "//span[contains(@class,'header-string')]",
     editPermissionsLink: "//a[@class='edit-permissions-link']",
     header: "//span[@class='header-string']",

@@ -37,9 +37,9 @@ describe('archive.image.spec: tests for PreviewWidgetDropdown', function () {
             await deleteContentDialog.clickOnArchiveButton();
             // 4. Verify that the image is not displayed in Content Browse Panel:
             await contentBrowsePanel.waitForContentNotDisplayed(TEST_IMAGE);
-            let message = await contentBrowsePanel.waitForNotificationMessage();
+            let messages = await contentBrowsePanel.waitForNotificationMessages();
             let expectedMessage = appConst.itemIsArchived(TEST_IMAGE);
-            assert.equal(message, expectedMessage, 'Expected notification message should appear');
+            assert.ok(messages.includes(expectedMessage), 'Expected notification message should appear');
             // 5. Navigate to 'Archive Browse Panel' and check the archived image:
             await studioUtils.openArchivePanel();
             await studioUtils.saveScreenshot('image_in_archive');
@@ -71,7 +71,7 @@ describe('archive.image.spec: tests for PreviewWidgetDropdown', function () {
             assert.equal(actualInCS, appConst.EMULATOR_RESOLUTION_VALUE.FULL_SIZE, '100% option should be selected in the dropdown');
         });
 
-    it(`GIVEN existing archived image is selected WHEN 'Automatic' is selected THEN Preview button should be enabled and img html element should be visible in the iframe in Statistics Panel`,
+    it(`GIVEN existing archived image is selected WHEN 'Automatic' is selected THEN img html element should be visible in the iframe in Statistics Panel`,
         async () => {
             let archiveItemStatisticsPanel = new ArchiveItemStatisticsPanel();
             let archiveBrowsePanel = new ArchiveBrowsePanel();
@@ -88,56 +88,55 @@ describe('archive.image.spec: tests for PreviewWidgetDropdown', function () {
 
             assert.equal(actualOption, appConst.PREVIEW_WIDGET.AUTOMATIC,
                 'Automatic option should be selected in preview widget by default');
-            // 4. Verify that 'Preview' button should be enabled when an image and 'Automatic' are selected
-            await archiveItemStatisticsPanel.waitForPreviewButtonEnabled();
-            // 5. Switch to the iframe and verify that img html element is displayed in the iframe in Item Preview Panel:
+            // 5. Switch to the iframe and verify that img html-element is displayed in the iframe in Item Preview Panel:
             await archiveItemStatisticsPanel.waitForImageElementDisplayed();
         });
 
-    it(`GIVEN existing archived image is selected WHEN 'Json' is selected THEN 'Preview' button should be enabled`,
+    it(`GIVEN existing archived image is selected WHEN 'Json' is selected THEN expected JSON keys should be displayed in the Preview Panel `,
         async () => {
             let archiveItemStatisticsPanel = new ArchiveItemStatisticsPanel();
             let archiveBrowsePanel = new ArchiveBrowsePanel();
             // 1. Navigate to 'Archive Browse Panel' :
             await studioUtils.openArchivePanel();
             await archiveBrowsePanel.clickCheckboxAndSelectRowByDisplayName(TEST_IMAGE);
+            await archiveItemStatisticsPanel.clickOnPreviewModeDropdownHandle();
             await archiveItemStatisticsPanel.selectOptionInPreviewWidget(appConst.PREVIEW_WIDGET.JSON);
             await studioUtils.saveScreenshot('archive_image_json');
-            // 2. Click on 'Preview' button
-            await archiveItemStatisticsPanel.clickOnPreviewButton();
-            // 3. Switch to the new opened browser tab and verify that img element is displayed in the page:
-            await studioUtils.doSwitchToNextTab();
+            // 3. Switch to the iframe in Preview Panel and verify that the expected JSON values are displayed in the Preview Panel:
+            await archiveItemStatisticsPanel.switchToLiveViewFrame();
             let actualName = await studioUtils.getJSON_info(appConst.PREVIEW_JSON_KEY.NAME);
             assert.equal(actualName, `"${TEST_IMAGE}.jpeg"`, 'expected name should be displayed in JSON preview');
         });
 
-    it(`GIVEN existing archived image is selected WHEN 'Media' is selected THEN 'Preview' button should be enabled`,
+    it(`GIVEN existing archived image is selected WHEN 'Media' is selected THEN expected image should be displayed in the Preview Panel`,
         async () => {
             let archiveItemStatisticsPanel = new ArchiveItemStatisticsPanel();
             let archiveBrowsePanel = new ArchiveBrowsePanel();
             // 1. Navigate to 'Archive Browse Panel' :
             await studioUtils.openArchivePanel();
             await archiveBrowsePanel.clickCheckboxAndSelectRowByDisplayName(TEST_IMAGE);
+            await archiveItemStatisticsPanel.clickOnPreviewModeDropdownHandle();
             await archiveItemStatisticsPanel.selectOptionInPreviewWidget(appConst.PREVIEW_WIDGET.MEDIA);
             await studioUtils.saveScreenshot('archive_image_media');
-            // 2. Click on 'Preview' button
-            await archiveItemStatisticsPanel.clickOnPreviewButton();
+
             // 3. Switch to the new opened browser tab and verify that img element is displayed in the page:
-            await studioUtils.doSwitchToNextTab();
+            await archiveItemStatisticsPanel.switchToLiveViewFrame();
             await studioUtils.waitForElementDisplayed('//img', appConst.mediumTimeout);
         });
 
-    it(`GIVEN existing archived image is selected WHEN 'Enonic Rendering' is selected THEN 'Preview' button should be disabled`,
+    it(`GIVEN existing archived image is selected WHEN 'Enonic Rendering' is selected THEN Preview not available message should be displayed in the Preview Panel`,
         async () => {
             let archiveItemStatisticsPanel = new ArchiveItemStatisticsPanel();
             let archiveBrowsePanel = new ArchiveBrowsePanel();
             // 1. Navigate to 'Archive Browse Panel' :
             await studioUtils.openArchivePanel();
             await archiveBrowsePanel.clickCheckboxAndSelectRowByDisplayName(TEST_IMAGE);
+            await archiveItemStatisticsPanel.clickOnPreviewModeDropdownHandle();
             await archiveItemStatisticsPanel.selectOptionInPreviewWidget(appConst.PREVIEW_WIDGET.ENONIC_RENDERING);
             await studioUtils.saveScreenshot('archive_image_rendering');
-            // 2. Verify that 'Preview' button is disabled
-            await archiveItemStatisticsPanel.waitForPreviewButtonDisabled();
+            // 2. Verify that 'Preview not available' message is displayed in the Preview Panel:
+            let result = await archiveItemStatisticsPanel.getNoPreviewMessage();
+            assert.equal(result[0], "Preview not available", 'expected message should be displayed');
         });
 
     it(`GIVEN existing archived image is selected AND 'Restore...' context menu item has been clicked WHEN Archive button has been pressed in the modal dialog THEN the image should be present only in the Content Grid`,
@@ -163,7 +162,6 @@ describe('archive.image.spec: tests for PreviewWidgetDropdown', function () {
             await studioUtils.saveScreenshot('image_is_restored');
             await studioUtils.findContentAndClickCheckBox(TEST_IMAGE);
         });
-
 
     beforeEach(async () => {
         return await studioUtils.navigateToContentStudioCloseProjectSelectionDialog();

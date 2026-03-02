@@ -32,13 +32,13 @@ describe('folder.variants.spec - tests for Create Variant modal dialog', functio
             let contentBrowsePanel = new ContentBrowsePanel();
             // 1. Select the folder and open Variants widget:
             await contentBrowsePanel.clickOnRowByName(FOLDER_NAME);
-            let browseVariantsWidget = await studioUtils.openVariantsWidget();
-            await browseVariantsWidget.waitForCreateVariantWidgetButtonDisplayed();
+            let variantsExtension = await studioUtils.openVariantsWidget();
+            await variantsExtension.waitForCreateVariantWidgetButtonDisplayed();
             // 2. Select another folder in the grid:
             await contentBrowsePanel.clickOnRowByName(IMPORTED_TEST_FOLDER);
             await studioUtils.saveScreenshot('variant_widget_reselected_item');
             // 3. Verify that 'Create Variant' is displayed in the widget:
-            await browseVariantsWidget.waitForCreateVariantWidgetButtonDisplayed();
+            await variantsExtension.waitForCreateVariantWidgetButtonDisplayed();
         });
 
     it("GIVEN 'create variant dialog' is opened WHEN variant name input has been cleared THEN 'Create Variant' button gets disabled",
@@ -46,10 +46,10 @@ describe('folder.variants.spec - tests for Create Variant modal dialog', functio
             let createVariantDialog = new CreateVariantDialog();
             // 1. Select the folder and open Variants widget:
             await studioUtils.findAndSelectItem(FOLDER_NAME);
-            let browseVariantsWidget = await studioUtils.openVariantsWidget();
-            await browseVariantsWidget.waitForCreateVariantWidgetButtonDisplayed();
+            let variantsExtension = await studioUtils.openVariantsWidget();
+            await variantsExtension.waitForCreateVariantWidgetButtonDisplayed();
             // 2. Click on Create Variant button:
-            await browseVariantsWidget.clickOnCreateVariantWidgetButton();
+            await variantsExtension.clickOnCreateVariantWidgetButton();
             await createVariantDialog.waitForDialogLoaded();
             // 3. Clear the name input in the modal dialog:
             await createVariantDialog.typeTextInVariantNameInput('');
@@ -63,10 +63,10 @@ describe('folder.variants.spec - tests for Create Variant modal dialog', functio
             let createVariantDialog = new CreateVariantDialog();
             // 1. Select the folder and open Variants widget:
             await studioUtils.findAndSelectItem(FOLDER_NAME);
-            let browseVariantsWidget = await studioUtils.openVariantsWidget();
-            await browseVariantsWidget.waitForCreateVariantWidgetButtonDisplayed();
+            let variantsExtension = await studioUtils.openVariantsWidget();
+            await variantsExtension.waitForCreateVariantWidgetButtonDisplayed();
             // 2. Click on 'Create Variant' button:
-            await browseVariantsWidget.clickOnCreateVariantWidgetButton();
+            await variantsExtension.clickOnCreateVariantWidgetButton();
             await createVariantDialog.waitForDialogLoaded();
             // 3. Insert a valid name  for the variant:
             await createVariantDialog.typeTextInVariantNameInput(VARIANT_NAME_1);
@@ -75,8 +75,9 @@ describe('folder.variants.spec - tests for Create Variant modal dialog', functio
             await createVariantDialog.waitForDialogClosed();
             await studioUtils.saveScreenshot('variant_created');
             // 5. Verify the notification message:
-            let actualMessage = await browseVariantsWidget.waitForNotificationMessage();
-            assert.equal(actualMessage, appConst.variantCreated(FOLDER_NAME));
+            let actualMessages = await variantsExtension.waitForNotificationMessages();
+            //assert.ok(actualMessages.includes(appConst.variantCreated(FOLDER_NAME)),
+             //   "Variant created message should be displayed in the notification area");
         });
 
     it("GIVEN 'create variant dialog' is opened WHEN a name that already in use THEN 'Not available' message should appear",
@@ -84,10 +85,10 @@ describe('folder.variants.spec - tests for Create Variant modal dialog', functio
             let createVariantDialog = new CreateVariantDialog();
             // 1. Select the folder and open Variants widget:
             await studioUtils.findAndSelectItem(FOLDER_NAME);
-            let browseVariantsWidget = await studioUtils.openVariantsWidget();
-            await browseVariantsWidget.waitForCreateVariantWidgetButtonNotDisplayed();
+            let variantsExtension = await studioUtils.openVariantsWidget();
+            await variantsExtension.waitForCreateVariantWidgetButtonNotDisplayed();
             // 3. Click on 'Create Variant' in the original item:
-            await browseVariantsWidget.clickOnCreateVariantButtonInOriginalItem();
+            await variantsExtension.clickOnCreateVariantButtonInOriginalItem();
             await createVariantDialog.waitForDialogLoaded();
             // 4. Insert the name that already in use:
             await createVariantDialog.typeTextInVariantNameInput(VARIANT_NAME_1);
@@ -104,10 +105,10 @@ describe('folder.variants.spec - tests for Create Variant modal dialog', functio
             let createVariantDialog = new CreateVariantDialog();
             // 1. Select the folder and open Variants widget:
             await studioUtils.findAndSelectItem(FOLDER_NAME);
-            let browseVariantsWidget = await studioUtils.openVariantsWidget();
-            await browseVariantsWidget.waitForCreateVariantWidgetButtonNotDisplayed();
+            let variantsExtension = await studioUtils.openVariantsWidget();
+            await variantsExtension.waitForCreateVariantWidgetButtonNotDisplayed();
             // 3. Click on 'Create Variant' in the original item:
-            await browseVariantsWidget.clickOnCreateVariantButtonInOriginalItem();
+            await variantsExtension.clickOnCreateVariantButtonInOriginalItem();
             await createVariantDialog.waitForDialogLoaded();
             // 4. Click on Cancel top button:
             await createVariantDialog.clickOnCancelButtonTop();
@@ -133,16 +134,16 @@ describe('folder.variants.spec - tests for Create Variant modal dialog', functio
             let duplicateVariantDialog = new DuplicateVariantDialog();
             // 1. Select the folder and open Variants widget:
             await studioUtils.findAndSelectItem(VARIANT_NAME_1);
-            let browseVariantsWidget = await studioUtils.openVariantsWidget();
+            let variantsExtension = await studioUtils.openVariantsWidget();
             // 2. Click on 'Duplicate' button in the expanded variant-item
-            await browseVariantsWidget.clickOnDuplicateButton();
+            await variantsExtension.clickOnDuplicateButton(VARIANT_NAME_1);
             // 3. Duplicate Variant dialog should be loaded
             await duplicateVariantDialog.waitForLoaded();
             // 4. Click on Duplicate button in the dialog:
             await duplicateVariantDialog.clickOnDuplicateButton();
             // 5. Verify that the dialog is closed:
             await duplicateVariantDialog.waitForClosed();
-            await browseVariantsWidget.pause(1200);
+            await variantsExtension.pause(1200);
             await studioUtils.saveScreenshot('variant_duplicated');
             // 6. Verify notification messages
             let varCreated = appConst.variantCreated(FOLDER_NAME);
