@@ -1,0 +1,113 @@
+import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
+import {DivEl} from '@enonic/lib-admin-ui/dom/DivEl';
+import {Store} from '@enonic/lib-admin-ui/store/Store';
+import {Action} from '@enonic/lib-admin-ui/ui/Action';
+import {ActionButton} from '@enonic/lib-admin-ui/ui/button/ActionButton';
+import {i18n} from '@enonic/lib-admin-ui/util/Messages';
+import {ContentSummaryAndCompareStatus} from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
+import {ContentServerEventsHandler} from '@enonic/lib-contentstudio/app/event/ContentServerEventsHandler';
+import {ProjectCreatedEvent} from '@enonic/lib-contentstudio/app/settings/event/ProjectCreatedEvent';
+import {ProjectDeletedEvent} from '@enonic/lib-contentstudio/app/settings/event/ProjectDeletedEvent';
+import {ProjectUpdatedEvent} from '@enonic/lib-contentstudio/app/settings/event/ProjectUpdatedEvent';
+import Q from 'q';
+import {LayerContent} from './LayerContent';
+import {LayersContentTreeDialog} from './LayersContentTreeDialog';
+import {LayersContentTreeList} from './LayersContentTreeList';
+import {MultiLayersContentLoader} from './MultiLayersContentLoader';
+
+export class LayersExtensionItemView
+    extends DivEl {
+
+    private readonly layersContentTreeList: LayersContentTreeList;
+
+    private readonly loader: MultiLayersContentLoader;
+
+    private readonly showHideToggle: ActionButton;
+
+    private item: ContentSummaryAndCompareStatus;
+
+    private constructor() {
+        super('layers-extension-item-view');
+
+        this.layersContentTreeList = new LayersContentTreeList();
+        this.loader = new MultiLayersContentLoader();
+        this.showHideToggle = new ActionButton(new Action(i18n('widget.layers.showall', 0)));
+
+        this.initListeners();
+    }
+
+    static get(): LayersExtensionItemView {
+        let instance: LayersExtensionItemView = Store.instance().get(LayersExtensionItemView.name);
+
+        if (instance == null) {
+            instance = new LayersExtensionItemView();
+            Store.instance().set(LayersExtensionItemView.name, instance);
+        }
+
+        return instance;
+    }
+
+    setContentAndUpdateView(item: ContentSummaryAndCompareStatus): Q.Promise<void> {
+        this.item = item;
+        this.loader.setItem(item);
+
+        return this.reload().catch(DefaultErrorHandler.handle);
+    }
+
+    reload(): Q.Promise<void> {
+        return this.loader.load().then((items: LayerContent[]) => {
+            this.layersContentTreeList.setAllItems(items);
+            this.showHideToggle.setLabel(i18n('widget.layers.showall', items.length));
+            this.showHideToggle.setVisible(this.layersContentTreeList.hasLayersToHide());
+
+            return Q();
+        });
+    }
+
+    doRender(): Q.Promise<boolean> {
+        return super.doRender().then((rendered: boolean) => {
+            this.appendChild(this.layersContentTreeList);
+            this.appendChild(this.showHideToggle);
+
+            this.showHideToggle.addClass('show-all-button');
+            return rendered;
+        });
+    }
+
+    private initListeners(): void {
+        this.initProjectEventListeners();
+        this.initContentEventListeners();
+
+        this.showHideToggle.onClicked(() => LayersContentTreeDialog.get(this).setItems(this.layersContentTreeList.getAllItems()).open());
+    }
+
+    private initProjectEventListeners(): void {
+        const projectUpdateHandler: () => void = () => {
+            if (this.isVisible()) {
+                this.reload().catch(DefaultErrorHandler.handle);
+            }
+        };
+
+        ProjectCreatedEvent.on(projectUpdateHandler);
+        ProjectUpdatedEvent.on(projectUpdateHandler);
+        ProjectDeletedEvent.on(projectUpdateHandler);
+    }
+
+    private initContentEventListeners(): void {
+        const serverEventsHandler: ContentServerEventsHandler = ContentServerEventsHandler.getInstance();
+
+        const updateHandler: (items: ContentSummaryAndCompareStatus[]) => void = (items: ContentSummaryAndCompareStatus[]) => {
+            if (!this.isVisible()) {
+                return;
+            }
+
+            const id: string = this.item.getContentId().toString();
+
+            if (items.some((item: ContentSummaryAndCompareStatus) => item.getId() === id)) {
+                this.reload().catch(DefaultErrorHandler.handle);
+            }
+        };
+
+        serverEventsHandler.onContentUpdated(updateHandler);
+    }
+}

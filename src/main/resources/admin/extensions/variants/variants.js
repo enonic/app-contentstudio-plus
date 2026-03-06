@@ -19,15 +19,12 @@ function renderWidgetView(req) {
     const params = {
         contentId: contentId || '',
         stylesUri: portal.assetUrl({
-            path: 'styles/widgets/variants.css'
+            path: 'styles/extensions/variants.css'
         }),
         jsUri: portal.assetUrl({
-            path: 'js/widgets/variants.js',
-            params: {
-                dt: Date.now().toString()
-            }
+            path: 'js/extensions/variants.js'
         }),
-        configScriptId: 'variants-widget-config-json',
+        configScriptId: 'variants-extension-config-json',
         configAsJson: JSON.stringify(configLib.getConfig(req.locales), null, 4).replace(/<(\/?script|!--)/gi, "\\u003C$1")
     };
 

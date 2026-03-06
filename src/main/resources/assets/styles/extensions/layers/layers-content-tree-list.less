@@ -1,0 +1,96 @@
+@tree-line-color: @admin-medium-gray-border;
+
+@box-spacing: 30px;
+
+@vertical-line-top-pos: -@box-spacing;
+
+@vertical-line-left-pos: calc(-@box-spacing/2);
+
+@box-height: 90px;
+
+@box-height-expanded: 140px;
+
+@vertical-line-height: calc(@box-height/2 + @box-spacing);
+
+@vertical-line-height-expanded: calc(@box-height-expanded/2 + @box-spacing);
+
+@arrow-height: 6px;
+
+@arrow-width: 8px;
+
+.layers-content-tree-list {
+  .layers-item-view {
+    position: relative;
+
+    &.expanded > .layers-item-view-data {
+      > .layers-item-view-data-footer {
+        display: flex;
+        justify-content: center;
+      }
+    }
+  }
+
+  ul.layers-item-view-wrapper {
+    margin-left: @box-spacing;
+
+    .layers-item-view {
+      margin: @box-spacing 0;
+
+      &::before {
+        content: "";
+        position: absolute;
+        top: @vertical-line-top-pos;
+        left: @vertical-line-left-pos;
+        border-left: 1px solid @tree-line-color;
+        border-bottom: 1px solid @tree-line-color;
+        width: calc(-1*@vertical-line-left-pos);
+        height: @vertical-line-height;
+      }
+
+      &::after {
+        position: absolute;
+        content: "";
+        top: calc(@box-height/2);
+        left: @vertical-line-left-pos;
+        border-left: 1px solid @tree-line-color;
+        border-top: 1px solid @tree-line-color;
+        width: calc(-1*@vertical-line-left-pos);
+        height: 100%;
+      }
+
+      &:last-child::after {
+        display: none;
+      }
+
+      > .layers-item-view-data {
+        &::before {
+          content: "";
+          position: absolute;
+          left: calc(-1*@arrow-width);
+          top: calc(@box-height/2 - @arrow-height);
+          width: 0;
+          height: 0;
+          border-top: @arrow-height solid transparent;
+          border-bottom: @arrow-height solid transparent;
+          border-left: @arrow-width solid @tree-line-color;
+        }
+      }
+
+      &.expanded {
+        &::before {
+          height: calc(@box-height-expanded/2 + @box-spacing);
+        }
+
+        &::after {
+          top: calc(@box-height-expanded/2);
+        }
+
+        > .layers-item-view-data {
+          &::before {
+            top: calc(@box-height-expanded/2 - @arrow-height);
+          }
+        }
+      }
+    }
+  }
+}

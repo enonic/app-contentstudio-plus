@@ -2,23 +2,27 @@ export class AppHelper {
 
     static APP_PREFIX = 'cs-plus-';
 
-    static getCommonWidgetClass(): string {
-        return `${AppHelper.APP_PREFIX}widget`;
+    static getCommonExtensionClass(): string {
+        return `${AppHelper.APP_PREFIX}extension`;
     }
 
-    static getLayersWidgetClass(): string {
-        return AppHelper.getWidgetClass('layers');
+    static getCommonExtensionContainerClass(): string {
+        return `${AppHelper.APP_PREFIX}extension-container`;
     }
 
-    static getVariantsWidgetClass(): string {
-        return AppHelper.getWidgetClass('variants');
+    static getLayersExtensionClass(): string {
+        return AppHelper.getExtensionClass('layers');
     }
 
-    static getPublishReportWidgetClass(): string {
-        return AppHelper.getWidgetClass('publish-report');
+    static getVariantsExtensionClass(): string {
+        return AppHelper.getExtensionClass('variants');
     }
 
-    private static getWidgetClass(widgetName: string): string {
-        return `${AppHelper.getCommonWidgetClass()}-${widgetName}`;
+    static getPublishReportExtensionClass(): string {
+        return AppHelper.getExtensionClass('publish-report');
+    }
+
+    private static getExtensionClass(widgetName: string): string {
+        return `${AppHelper.getCommonExtensionClass()}-${widgetName}`;
     }
 }
