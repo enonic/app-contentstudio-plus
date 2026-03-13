@@ -8,7 +8,7 @@ const studioUtils = require('../libs/studio.utils.js');
 const contentBuilder = require("../libs/content.builder");
 
 const ContentWizardPanel = require('../page_objects/wizardpanel/content.wizard.panel');
-const WizardPublishReportWidget = require('../page_objects/wizardpanel/details/wizard.publish.report.widget');
+const PublishReportWidget = require('../page_objects/details_panel/publish.report.widget');
 const ContentPublishDialog = require('../page_objects/content.publish.dialog');
 
 describe('publish.report.widget.spec: tests for publish report widget', function () {
@@ -34,23 +34,23 @@ describe('publish.report.widget.spec: tests for publish report widget', function
     it(`GIVEN existing New-folder has been opened WHEN 'Publish report' widget has been opened THEN 'Generate' button should not be displayed`,
         async () => {
             let contentWizard = new ContentWizardPanel();
-            let wizardPublishReportWidget = new WizardPublishReportWidget();
+            let publishReportWidget = new PublishReportWidget();
             // 1. Select and open the folder:
             await studioUtils.selectAndOpenContentInWizard(FOLDER1.displayName);
             // 2. Open 'Publish Report' widget:
             await contentWizard.openPublishReportWidget();
-            await wizardPublishReportWidget.waitForWidgetLoaded();
+            await publishReportWidget.waitForWidgetLoaded();
             // 3. Verify that 'Generate' button should not be displayed:
-            await wizardPublishReportWidget.waitForGenerateButtonNotDisplayed();
+            await publishReportWidget.waitForGenerateButtonNotDisplayed();
             // 4. Verify that 'From' and 'to' date pickers are not displayed:
-            await wizardPublishReportWidget.waitForToDateInputNotDisplayed();
-            await wizardPublishReportWidget.waitForFromDateInputNotDisplayed();
+            await publishReportWidget.waitForToDateInputNotDisplayed();
+            await publishReportWidget.waitForFromDateInputNotDisplayed();
         });
 
     it(`GIVEN existing folder has been published in the wizard WHEN 'Publish report' widget has been opened THEN 'Generate' button should be enabled`,
         async () => {
             let contentWizard = new ContentWizardPanel();
-            let wizardPublishReportWidget = new WizardPublishReportWidget();
+            let publishReportWidget = new PublishReportWidget();
             let contentPublishDialog = new ContentPublishDialog();
             // 1. Select and open the folder:
             await studioUtils.selectAndOpenContentInWizard(FOLDER1.displayName);
@@ -60,70 +60,70 @@ describe('publish.report.widget.spec: tests for publish report widget', function
             await contentWizard.waitForNotificationMessage();
             // 2. Open 'Publish Report' widget:
             await contentWizard.openPublishReportWidget();
-            await wizardPublishReportWidget.waitForWidgetLoaded();
+            await publishReportWidget.waitForWidgetLoaded();
             // 3. Verify that 'Generate' button is displayed:
-            await wizardPublishReportWidget.waitForGenerateButtonEnabled();
+            await publishReportWidget.waitForGenerateButtonEnabled();
             // 4. Verify that 'From' and 'to' date pickers are displayed:
-            await wizardPublishReportWidget.waitForToDateInputDisplayed();
-            await wizardPublishReportWidget.waitForFromDateInputDisplayed();
+            await publishReportWidget.waitForToDateInputDisplayed();
+            await publishReportWidget.waitForFromDateInputDisplayed();
             // 5. Expected date should be displayed in the both date inputs:
-            let actualFromDate = await wizardPublishReportWidget.getDateInFromInput();
+            let actualFromDate = await publishReportWidget.getDateInFromInput();
             assert.equal(actualFromDate, CURRENT_DATE, "Expected date should be in From-input");
-            let actualToDate = await wizardPublishReportWidget.getDateInToInput();
+            let actualToDate = await publishReportWidget.getDateInToInput();
             assert.equal(actualToDate, CURRENT_DATE, "Expected date should be in To-input");
         });
 
     it(`GIVEN 'Publish report' widget has been opened WHEN a date in future has been typed in the 'From' input THEN 'Generate' button gets disabled`,
         async () => {
             let contentWizard = new ContentWizardPanel();
-            let wizardPublishReportWidget = new WizardPublishReportWidget();
+            let publishReportWidget = new PublishReportWidget();
             // 1. Select and open the existing published folder:
             await studioUtils.selectAndOpenContentInWizard(FOLDER1.displayName);
             // 2. Open 'Publish Report' widget:
             await contentWizard.openPublishReportWidget();
-            await wizardPublishReportWidget.waitForWidgetLoaded();
+            await publishReportWidget.waitForWidgetLoaded();
             // 3. Enter a date in the future:
-            await wizardPublishReportWidget.typeInFromDateInput(DATE_IN_FUTURE);
+            await publishReportWidget.typeInFromDateInput(DATE_IN_FUTURE);
             // 4. Verify that 'Generate' button gets disabled:
-            await wizardPublishReportWidget.waitForGenerateButtonDisabled();
+            await publishReportWidget.waitForGenerateButtonDisabled();
             // 5. Expected validation message should appear:
-            let actualMessage = await wizardPublishReportWidget.getValidationMessage();
+            let actualMessage = await publishReportWidget.getValidationMessage();
             assert.equal(actualMessage, 'The start date must be before the end date', "Expected validation message should appears in the widget");
         });
 
     it(`GIVEN 'Publish report' widget has been opened WHEN invalid date has been typed in the 'From' input THEN 'Generate' button gets disabled`,
         async () => {
             let contentWizard = new ContentWizardPanel();
-            let wizardPublishReportWidget = new WizardPublishReportWidget();
+            let publishReportWidget = new PublishReportWidget();
             // 1. Select and open the existing published folder:
             await studioUtils.selectAndOpenContentInWizard(FOLDER1.displayName);
             // 2. Open 'Publish Report' widget:
             await contentWizard.openPublishReportWidget();
-            await wizardPublishReportWidget.waitForWidgetLoaded();
+            await publishReportWidget.waitForWidgetLoaded();
             // 3. Enter an invalid date in the future:
-            await wizardPublishReportWidget.typeInFromDateInput(INVALID_DATE);
+            await publishReportWidget.typeInFromDateInput(INVALID_DATE);
             // 4. Verify that 'Generate' button gets disabled:
-            await wizardPublishReportWidget.waitForGenerateButtonDisabled();
+            await publishReportWidget.waitForGenerateButtonDisabled();
             // 5. Expected validation message should appear:
-            let actualMessage = await wizardPublishReportWidget.getValidationMessage();
+            let actualMessage = await publishReportWidget.getValidationMessage();
             assert.equal(actualMessage, 'Invalid date', "Expected validation message should appears in the widget");
         });
 
     it(`GIVEN 'Publish report' widget has been opened WHEN date in the past has been typed in the 'From' input THEN 'Generate' button gets disabled`,
         async () => {
             let contentWizard = new ContentWizardPanel();
-            let wizardPublishReportWidget = new WizardPublishReportWidget();
+            let publishReportWidget = new PublishReportWidget();
             // 1. Select and open the existing published folder:
             await studioUtils.selectAndOpenContentInWizard(FOLDER1.displayName);
             // 2. Open 'Publish Report' widget:
             await contentWizard.openPublishReportWidget();
-            await wizardPublishReportWidget.waitForWidgetLoaded();
+            await publishReportWidget.waitForWidgetLoaded();
             // 3. Enter an invalid date in the future:
-            await wizardPublishReportWidget.typeInFromDateInput(DATE_IN_PAST);
+            await publishReportWidget.typeInFromDateInput(DATE_IN_PAST);
             // 4. Verify that 'Generate' button gets disabled:
-            await wizardPublishReportWidget.waitForGenerateButtonDisabled();
+            await publishReportWidget.waitForGenerateButtonDisabled();
             // 5. Expected validation message should appear:
-            let actualMessage = await wizardPublishReportWidget.getValidationMessage();
+            let actualMessage = await publishReportWidget.getValidationMessage();
             assert.ok(actualMessage.includes('There were no publications before'),
                 "Expected validation message should appears in the widget");
         });

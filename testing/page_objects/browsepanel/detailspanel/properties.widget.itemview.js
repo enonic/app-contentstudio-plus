@@ -5,7 +5,7 @@ const Page = require('../../page');
 const appConst = require('../../../libs/app_const');
 
 const xpath = {
-    container: `//div[contains(@id,'ExtensionView')]//div[contains(@id,'ExtensionPropertiesItemView')]`,
+    container: `//div[contains(@id,'ExtensionView')]//div[contains(@id,'ExtensionBasePropertiesItemView')]`,
     languageProperty: "//dd[contains(.,'Language')]/following-sibling::dt[1]",
     ownerProperty: "//dd[contains(.,'Owner')]/following-sibling::dt[1]",
     publishFromProperty: "//dd[contains(.,'Publish From')]/following-sibling::dt[1]",
@@ -13,7 +13,7 @@ const xpath = {
     type: "//dd[contains(.,'Type')]/following-sibling::dt[1]",
     firstPublished: "//dd[contains(.,'First Published')]/following-sibling::dt[1]",
     modified: "//dd[contains(.,'Modified')]/following-sibling::dt[1]",
-    editSettingsButton: "//a[contains(@class,'edit-settings-link') and text()='Edit Settings']",
+    editSettingsButton: "//a[contains(@class,'edit-settings-link') and contains(.,'Edit Settings')]",
 };
 
 class PropertiesItemView extends Page {
@@ -60,8 +60,11 @@ class PropertiesItemView extends Page {
 
     async clickOnEditSettingsButton() {
         try {
-            await this.waitForEditSettingsButtonDisplayed();
-            await this.clickOnElement(this.editSettingsButton);
+            await this.pause(300);
+            //await this.waitForEditSettingsButtonDisplayed();
+            let elements = await this.getDisplayedElements(this.editSettingsButton);
+            await elements[0].click();
+            //await this.clickOnElement(this.editSettingsButton);
             await this.pause(300);
         } catch (err) {
             await this.handleError('Properties Widget, Edit button is not displayed','err_click_edit_settings', err, );

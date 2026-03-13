@@ -655,6 +655,14 @@ class Page {
         const status = await this.getBrowserStatus();
         return status.os.name.includes('Mac');
     }
+    async getShadowHost() {
+        try {
+            const host = await this.findElement(lib.WIDGETS.SHADOW_HOST);
+            return host;
+        } catch (err) {
+            await this.handleError('Layer Widget - failed to get shadow root', 'err_layer_widget_shadow_root', err);
+        }
+    }
 }
 
 module.exports = Page;

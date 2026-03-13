@@ -8,7 +8,7 @@ const PublishReportDialog = require('../page_objects/publish.report.dialog');
 const studioUtils = require('../libs/studio.utils.js');
 const contentBuilder = require('../libs/content.builder');
 const ContentWizardPanel = require('../page_objects/wizardpanel/content.wizard.panel');
-const WizardPublishReportWidget = require('../page_objects/wizardpanel/details/wizard.publish.report.widget');
+const PublishReportWidget = require('../page_objects/details_panel/publish.report.widget');
 const ContentPublishDialog = require('../page_objects/content.publish.dialog');
 const ContentUnpublishDialog = require('../page_objects/content.unpublish.dialog');
 
@@ -36,7 +36,7 @@ describe('publish.report.dialog.spec: tests for publish report dialog', function
     it(`GIVEN existing folder has been published in the wizard WHEN  'Generate' button has been pressed in 'Publish report' widget THEN publish report modal dialog should appear`,
         async () => {
             let contentWizard = new ContentWizardPanel();
-            let wizardPublishReportWidget = new WizardPublishReportWidget();
+            let publishReportWidget = new PublishReportWidget();
             let contentPublishDialog = new ContentPublishDialog();
             let publishReportDialog = new PublishReportDialog();
             // 1. Select and open the folder:
@@ -47,9 +47,9 @@ describe('publish.report.dialog.spec: tests for publish report dialog', function
             await contentWizard.waitForNotificationMessage();
             // 2. Open 'Publish Report' widget:
             await contentWizard.openPublishReportWidget();
-            await wizardPublishReportWidget.waitForWidgetLoaded();
+            await publishReportWidget.waitForWidgetLoaded();
             // 3. Click on 'Generate' button:
-            await wizardPublishReportWidget.clickOnGenerateButton();
+            await publishReportWidget.clickOnGenerateButton();
             // 4. Verify that 'Print' button is displayed:
             await publishReportDialog.waitForDialogLoaded();
             await publishReportDialog.waitForPrintButtonEnabled();
@@ -64,7 +64,7 @@ describe('publish.report.dialog.spec: tests for publish report dialog', function
     it.skip(`GIVEN existing folder has been unpublished in the wizard WHEN 'Publish report' modal dialog has been opened THEN 'Item went offline' text should appear`,
         async () => {
             let contentWizard = new ContentWizardPanel();
-            let wizardPublishReportWidget = new WizardPublishReportWidget();
+            let publishReportWidget = new PublishReportWidget();
             let unpublishDialog = new ContentUnpublishDialog();
             let publishReportDialog = new PublishReportDialog();
             // 1. Select and open the folder:
@@ -77,9 +77,9 @@ describe('publish.report.dialog.spec: tests for publish report dialog', function
             await contentWizard.waitForNotificationMessage();
             // 3. Open 'Publish Report' widget:
             await contentWizard.openPublishReportWidget();
-            await wizardPublishReportWidget.waitForWidgetLoaded();
+            await publishReportWidget.waitForWidgetLoaded();
             // 4. Click on 'Generate' button:
-            await wizardPublishReportWidget.clickOnGenerateButton();
+            await publishReportWidget.clickOnGenerateButton();
             await publishReportDialog.waitForDialogLoaded();
             // 5. Verify that the Comparisons-block with 'Item went offline' text gets visible in the modal dialog:
             let actualText = await publishReportDialog.getAllComparisonsBlockHeader();
@@ -95,7 +95,7 @@ describe('publish.report.dialog.spec: tests for publish report dialog', function
     it.skip(`GIVEN existing folder has been published in the second time WHEN 'Publish report' modal dialog has been opened THEN 'Comparing' text should appear in the modal dialog`,
         async () => {
             let contentWizard = new ContentWizardPanel();
-            let wizardPublishReportWidget = new WizardPublishReportWidget();
+            let publishReportWidget = new PublishReportWidget();
             let contentPublishDialog = new ContentPublishDialog();
             let publishReportDialog = new PublishReportDialog();
             // 1. Select and open the folder:
@@ -107,9 +107,9 @@ describe('publish.report.dialog.spec: tests for publish report dialog', function
             await contentWizard.waitForNotificationMessage();
             // 3. Open 'Publish Report' widget:
             await contentWizard.openPublishReportWidget();
-            await wizardPublishReportWidget.waitForWidgetLoaded();
+            await publishReportWidget.waitForWidgetLoaded();
             // 4. Open 'Publish Report' modal dialog:
-            await wizardPublishReportWidget.clickOnGenerateButton();
+            await publishReportWidget.clickOnGenerateButton();
             await publishReportDialog.waitForDialogLoaded();
             // 5. Verify 'Comparing' text in the header of the single comparison block:
             let actualText = await publishReportDialog.getHeaderInComparisonBlock(0);

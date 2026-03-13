@@ -60,8 +60,10 @@ describe('layers.content.tree.widget.spec - tests for Layers  Tree  in the widge
             let contentBrowsePanel = new ContentBrowsePanel();
             await studioUtils.switchToContentMode();
             // 1. select the layer's context:
+            //await contentBrowsePanel.selectContext("layer43177");//LAYER1_DISPLAY_NAME);
             await contentBrowsePanel.selectContext(LAYER1_DISPLAY_NAME);
             // 2. Select the folder and open Layers widget:
+            //await studioUtils.findAndSelectItem("folder330180");//TEST_FOLDER_DISPLAY_NAME);
             await studioUtils.findAndSelectItem(TEST_FOLDER_DISPLAY_NAME);
             let browseLayersWidget = await studioUtils.openLayersWidgetInBrowsePanel();
             await studioUtils.saveScreenshot('layers_widget_1');
@@ -77,14 +79,17 @@ describe('layers.content.tree.widget.spec - tests for Layers  Tree  in the widge
         async () => {
             let contentBrowsePanel = new ContentBrowsePanel();
             await studioUtils.switchToContentMode();
-            await contentBrowsePanel.selectContext(LAYER1_DISPLAY_NAME);
+            await contentBrowsePanel.selectContext(LAYER1_DISPLAY_NAME);//"layer43177");
             // 1. Select the folder and open Layers widget:
+            //await studioUtils.findAndSelectItem("folder330180");//TEST_FOLDER_DISPLAY_NAME);
             await studioUtils.findAndSelectItem(TEST_FOLDER_DISPLAY_NAME);
             let browseLayersWidget = await studioUtils.openLayersWidgetInBrowsePanel();
             // 2. Click on parent project-item in the widget:
+            //await browseLayersWidget.clickOnWidgetItem("project679919") ;//PROJECT_DISPLAY_NAME);
             await browseLayersWidget.clickOnWidgetItem(PROJECT_DISPLAY_NAME);
             await studioUtils.saveScreenshot('layers_tree_widget_2');
             // 3. Verify that 'Open' button should be displayed for its parent project-item:
+            //await browseLayersWidget.waitForOpenButtonEnabled("project679919") ;//PROJECT_DISPLAY_NAME);
             await browseLayersWidget.waitForOpenButtonEnabled(PROJECT_DISPLAY_NAME);
         });
 
@@ -123,7 +128,6 @@ describe('layers.content.tree.widget.spec - tests for Layers  Tree  in the widge
             // 5. Verify that 'New' status should be displayed for the content in parent project-item:
             let actualStatusParent = await browseLayersWidget.getContentStatus(PROJECT_DISPLAY_NAME);
             assert.equal(actualStatusParent, 'New', `'New' status should be displayed for content in parent project-item`);
-
         });
 
     it(`GIVEN the local copy of inherited folder is selected WHEN Layers widget has been opened THEN 2 layer-items should be displayed in the widget AND current layer should be selected in the widget AND 'Edit' button should be visible`,

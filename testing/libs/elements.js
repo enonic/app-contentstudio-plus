@@ -36,6 +36,9 @@ module.exports = Object.freeze({
             return `//div[contains(@id,'ContentSelectedOptionView') and descendant::h6[contains(@class,'main-name') and text()='${option}']]`
         }
     },
+    WIDGETS:{
+        SHADOW_HOST: "context-panel-extension",
+    },
     FORM_VIEW_PANEL: {
         INPUT_VIEW: "//div[contains(@id,'InputView')]",
         HTML_AREA_INPUT: "//div[contains(@id,'InputView') and descendant::div[contains(@id,'HtmlArea')]]",
