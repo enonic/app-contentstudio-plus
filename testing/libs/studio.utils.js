@@ -37,7 +37,7 @@ const PropertiesWidgetItem = require('../page_objects/browsepanel/detailspanel/p
 const ArchiveBrowsePanel = require('../page_objects/archive/archive.browse.panel');
 const EditSettingDialog = require('../page_objects/details_panel/edit.settings.dialog');
 const BrowseLayersWidget = require('../page_objects/browsepanel/detailspanel/browse.layers.widget');
-const BrowseVariantsWidget = require('../page_objects/browsepanel/detailspanel/browse.variants.widget');
+const VariantsExtension = require('../page_objects/details_panel/variants.extension');
 
 module.exports = {
 
@@ -557,7 +557,7 @@ module.exports = {
             return await browsePanel.selectContext(context);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_select_context');
-            throw new Error(`Error during selecting a context, screenshot:${screenshot} `  + err);
+            throw new Error(`Error during selecting a context, screenshot:${screenshot} ` + err);
         }
     },
 
@@ -593,7 +593,7 @@ module.exports = {
             return await browsePanel.pause(1500);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_navigate_to_studio');
-            throw new Error(`Tried to navigate to Content Studio, screenshot: ${screenshot} `  + err);
+            throw new Error(`Tried to navigate to Content Studio, screenshot: ${screenshot} ` + err);
         }
     },
     async clickOnContentStudioLink(userName, password) {
@@ -614,7 +614,7 @@ module.exports = {
             await this.closeProjectSelectionDialog();
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_navigate_to_studio');
-            throw new Error(`Error when navigate to Content Studio app. Screenshot: ${screenshot} `  + err);
+            throw new Error(`Error when navigate to Content Studio app. Screenshot: ${screenshot} ` + err);
         }
     },
     //Clicks on Cancel button and switches to Default project
@@ -633,7 +633,7 @@ module.exports = {
         await loginPage.doLogin(userName, password);
         let launcherPanel = new LauncherPanel();
         const isAlertOpen = await this.getBrowser().isAlertOpen();
-        if(isAlertOpen){
+        if (isAlertOpen) {
             await this.getBrowser().acceptAlert();
         }
         return await launcherPanel.clickOnContentStudioLink();
@@ -1045,7 +1045,7 @@ module.exports = {
             await this.getBrowser().pause(300);
             await archiveBrowsePanel.waitForGridLoaded(appConst.mediumTimeout);
         } catch (err) {
-            let screenshot =  await this.saveScreenshotUniqueName('err_open_settings');
+            let screenshot = await this.saveScreenshotUniqueName('err_open_settings');
             throw new Error(`Error Open Archive Panel:${screenshot} ` + err);
         }
     },
@@ -1061,11 +1061,11 @@ module.exports = {
     async openVariantsWidget() {
         let browsePanel = new BrowsePanel();
         let browseDetailsPanel = new BrowseContextWindowPanel();
-        let browseVariantsWidget = new BrowseVariantsWidget();
+        let variantsExtension = new VariantsExtension();
         await browsePanel.openContextWindowPanel();
         await browseDetailsPanel.openVariants();
-        await browseVariantsWidget.waitForWidgetLoaded();
-        return browseVariantsWidget;
+        await variantsExtension.waitForLoaded();
+        return variantsExtension;
     },
     async getJSON_info(keyText) {
         let locator = `//span[@class='key' and contains(.,'${keyText}')]/following-sibling::span[@class='string'][1]`;

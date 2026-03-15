@@ -3,62 +3,74 @@
  */
 const Page = require('../page');
 const appConst = require('../../libs/app_const');
-const lib = require('../../libs/elements');
 
-const XPATH = {
-    container: `//div[contains(@id,'CreateVariantDialog')]`,
-    variantNameInputDiv: "//div[contains(@id,'VariantNameInput')]",
+const selectors = {
+    container: 'div[id*="CreateVariantDialog"]',
+    variantNameInput: 'div[id*="VariantNameInput"] input[type="text"]',
+    cancelButtonTop: 'div.cancel-button-top',
+    validationStatus: 'div.status.invalid',
 };
 
 class CreateVariantDialog extends Page {
 
-    get createVariantButton() {
-        return XPATH.container + lib.dialogButton('Create Variant');
-    }
-
-    get variantNameInput() {
-        return XPATH.container + XPATH.variantNameInputDiv + lib.TEXT_INPUT;
-    }
-
-    get cancelButtonTop() {
-        return XPATH.container + lib.CANCEL_BUTTON_TOP;
+    async findCreateVariantButton() {
+        const host = await this.getShadowHost();
+        const buttons = await host.shadow$$('button[id*="DialogButton"]');
+        for (const btn of buttons) {
+            const text = await btn.getText();
+            if (text.includes('Create Variant')) {
+                return btn;
+            }
+        }
+        throw new Error('Create Variant button not found in the dialog');
     }
 
     async typeTextInVariantNameInput(text) {
-        await this.waitForElementDisplayed(this.variantNameInput, appConst.mediumTimeout);
-        return await this.typeTextInInput(this.variantNameInput, text);
+        const host = await this.getShadowHost();
+        const input = await host.shadow$(selectors.variantNameInput);
+        await input.waitForDisplayed({timeout: appConst.mediumTimeout});
+        return await input.setValue(text);
     }
 
     async waitForCreateVariantButtonEnabled() {
-        await this.waitForElementDisplayed(this.createVariantButton, appConst.mediumTimeout);
-        await this.waitForElementEnabled(this.createVariantButton, appConst.mediumTimeout);
+        const button = await this.findCreateVariantButton();
+        await button.waitForDisplayed({timeout: appConst.mediumTimeout});
+        return await button.waitForEnabled({timeout: appConst.mediumTimeout});
     }
 
     async waitForCreateVariantButtonDisabled() {
-        await this.waitForElementDisplayed(this.createVariantButton, appConst.mediumTimeout);
-        await this.waitForElementDisabled(this.createVariantButton, appConst.mediumTimeout);
+        const button = await this.findCreateVariantButton();
+        await button.waitForDisplayed({timeout: appConst.mediumTimeout});
+        return await button.waitForEnabled({timeout: appConst.mediumTimeout, reverse: true});
     }
 
     async waitForValidationPathMessageDisplayed() {
-        let locator = XPATH.container + "//div[@class='status invalid']";
-        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
-        return await this.getText(locator);
+        const host = await this.getShadowHost();
+        const div = await host.shadow$(selectors.validationStatus);
+        await div.waitForDisplayed({timeout: appConst.mediumTimeout});
+        return await div.getText();
     }
 
     async clickOnCreateVariantButton() {
-        await this.waitForElementDisplayed(this.createVariantButton, appConst.mediumTimeout);
-        await this.waitForCreateVariantButtonEnabled();
-        await this.clickOnElement(this.createVariantButton);
+        const button = await this.findCreateVariantButton();
+        await button.waitForDisplayed({timeout: appConst.mediumTimeout});
+        await button.waitForEnabled({timeout: appConst.mediumTimeout});
+        return await button.click();
     }
 
     async clickOnCancelButtonTop() {
-        await this.clickOnElement(this.cancelButtonTop);
+        const host = await this.getShadowHost();
+        const button = await host.shadow$(selectors.cancelButtonTop);
+        await button.waitForDisplayed({timeout: appConst.shortTimeout});
+        await button.click();
         return await this.waitForDialogClosed();
     }
 
     async waitForDialogLoaded() {
         try {
-            return await this.waitForElementDisplayed(XPATH.container, appConst.mediumTimeout)
+            const host = await this.getShadowHost();
+            const dialog = await host.shadow$(selectors.container);
+            await dialog.waitForDisplayed({timeout: appConst.mediumTimeout});
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_variants_dlg');
             throw new Error(`Create Variant Dialog is not loaded ${screenshot} ` + err);
@@ -67,7 +79,9 @@ class CreateVariantDialog extends Page {
 
     async waitForDialogClosed() {
         try {
-            return await this.waitForElementNotDisplayed(XPATH.container, appConst.mediumTimeout)
+            const host = await this.getShadowHost();
+            const dialog = await host.shadow$(selectors.container);
+            return await dialog.waitForDisplayed({timeout: appConst.shortTimeout, reverse: true});
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_variants_dlg');
             throw new Error(`Create Variant Dialog is not closed ${screenshot} ` + err);

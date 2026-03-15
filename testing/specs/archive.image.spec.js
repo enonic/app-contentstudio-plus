@@ -37,9 +37,9 @@ describe('archive.image.spec: tests for PreviewWidgetDropdown', function () {
             await deleteContentDialog.clickOnArchiveButton();
             // 4. Verify that the image is not displayed in Content Browse Panel:
             await contentBrowsePanel.waitForContentNotDisplayed(TEST_IMAGE);
-            let message = await contentBrowsePanel.waitForNotificationMessage();
+            let messages = await contentBrowsePanel.waitForNotificationMessages();
             let expectedMessage = appConst.itemIsArchived(TEST_IMAGE);
-            assert.equal(message, expectedMessage, 'Expected notification message should appear');
+            assert.ok(messages.includes(expectedMessage), 'Expected notification message should appear');
             // 5. Navigate to 'Archive Browse Panel' and check the archived image:
             await studioUtils.openArchivePanel();
             await studioUtils.saveScreenshot('image_in_archive');

@@ -60,12 +60,11 @@ describe('layers.content.tree.widget.spec - tests for Layers  Tree  in the widge
             let contentBrowsePanel = new ContentBrowsePanel();
             await studioUtils.switchToContentMode();
             // 1. select the layer's context:
-            //await contentBrowsePanel.selectContext("layer43177");//LAYER1_DISPLAY_NAME);
             await contentBrowsePanel.selectContext(LAYER1_DISPLAY_NAME);
             // 2. Select the folder and open Layers widget:
-            //await studioUtils.findAndSelectItem("folder330180");//TEST_FOLDER_DISPLAY_NAME);
             await studioUtils.findAndSelectItem(TEST_FOLDER_DISPLAY_NAME);
             let browseLayersWidget = await studioUtils.openLayersWidgetInBrowsePanel();
+            await browseLayersWidget.pause(1000);
             await studioUtils.saveScreenshot('layers_widget_1');
             // 3. Verify  all items in the widget:
             let layers = await browseLayersWidget.getLayersName();
@@ -81,15 +80,12 @@ describe('layers.content.tree.widget.spec - tests for Layers  Tree  in the widge
             await studioUtils.switchToContentMode();
             await contentBrowsePanel.selectContext(LAYER1_DISPLAY_NAME);//"layer43177");
             // 1. Select the folder and open Layers widget:
-            //await studioUtils.findAndSelectItem("folder330180");//TEST_FOLDER_DISPLAY_NAME);
             await studioUtils.findAndSelectItem(TEST_FOLDER_DISPLAY_NAME);
             let browseLayersWidget = await studioUtils.openLayersWidgetInBrowsePanel();
             // 2. Click on parent project-item in the widget:
-            //await browseLayersWidget.clickOnWidgetItem("project679919") ;//PROJECT_DISPLAY_NAME);
             await browseLayersWidget.clickOnWidgetItem(PROJECT_DISPLAY_NAME);
             await studioUtils.saveScreenshot('layers_tree_widget_2');
             // 3. Verify that 'Open' button should be displayed for its parent project-item:
-            //await browseLayersWidget.waitForOpenButtonEnabled("project679919") ;//PROJECT_DISPLAY_NAME);
             await browseLayersWidget.waitForOpenButtonEnabled(PROJECT_DISPLAY_NAME);
         });
 

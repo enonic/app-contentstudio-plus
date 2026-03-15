@@ -6,7 +6,6 @@ const appConst = require('../../libs/app_const');
 const lib = require('../../libs/elements');
 
 const xpath = {
-    shadowHost: "context-panel-extension",
     layersItemViewDiv: "//div[contains(@class,'layers-item-view-data')]",
     localizeButton: "//div[contains(@class,'data-footer')]//button[child::span[text()='Localize']]",
     editButton: "//div[contains(@class,'data-footer')]//button[child::span[text()='Edit']]",
@@ -15,22 +14,12 @@ const xpath = {
     layerLanguageDiv: "//div[@class='layer-language']",
     layerNameDiv: "//div[@class='layer-name']",
     layerViewByName: layerName => `//div[contains(@class,'layers-item-view-data') and descendant::div[@class='layer-name' and text()='${layerName}']]`,
-
 };
 
 class BaseLayersWidget extends Page {
 
     isWidgetVisible() {
         return this.isElementDisplayed(this.layersWidget);
-    }
-
-    async getShadowHost() {
-        try {
-            const host = await this.findElement(xpath.shadowHost);
-            return host;
-        } catch (err) {
-            await this.handleError('Layer Widget - failed to get shadow root', 'err_layer_widget_shadow_root', err);
-        }
     }
 
     async waitForWidgetLoaded() {
@@ -154,11 +143,6 @@ class BaseLayersWidget extends Page {
         const postfix = await (await item.$(baseXpath + '//span[@class="display-name-postfix"]')).getText();
         return displayName + postfix;
     }
-
-    // const item = await this.findLayerItemViewDataByName(layerName);
-    // const el = await item.$('div[id*="LayerContentViewHeader"] div[class*="status"]');
-    // await el.waitForDisplayed();
-    // return el.getText();
 
     async getContentStatus(layerName) {
         try {
