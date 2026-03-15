@@ -151,7 +151,7 @@ class PublishReportWidget extends Page {
             const inputs = await host.shadow$$(selectors.datePickerInput);
             await inputs[1].waitForDisplayed({timeout: appConst.mediumTimeout});
         } catch (err) {
-            await this.handleError('PublishReport widget: To date text input should be displayed', 'err_publish_rep_to_date', err);
+            await this.handleError('PublishReport widget: To date text input should be displayed', 'err_to_date_in_publish_report', err);
         }
     }
 
@@ -162,7 +162,7 @@ class PublishReportWidget extends Page {
             if (inputs.length === 0) return;
             await inputs[1].waitForDisplayed({timeout: appConst.mediumTimeout, reverse: true});
         } catch (err) {
-            await this.handleError('PublishReport widget: To date text input should not be displayed', 'err_publish_rep_to_date', err);
+            await this.handleError('PublishReport widget: To date text input should not be displayed', 'err_to_date_in_publish_report', err);
         }
     }
 
@@ -173,7 +173,7 @@ class PublishReportWidget extends Page {
             await inputs[0].waitForDisplayed({timeout: appConst.mediumTimeout});
             await inputs[0].setValue(date);
         } catch (err) {
-            await this.handleError('PublishReport - tried to insert a date in from input', 'err_load_publish_report_dlg', err);
+            await this.handleError('PublishReport - tried to insert a date in from input', 'err_from_date_in_publish_report_dlg', err);
         }
     }
 
