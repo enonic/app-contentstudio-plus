@@ -36,16 +36,16 @@ describe('archive.item.preview.for.text.content.spec: tests for archive item pre
             await deleteContentDialog.clickOnArchiveButton();
             // 4. Verify that the image is not displayed in Content Browse Panel:
             await contentBrowsePanel.waitForContentNotDisplayed(IMPORTED_TEXT_CONTENT_NAME);
-            let message = await contentBrowsePanel.waitForNotificationMessage();
+            let messages = await contentBrowsePanel.waitForNotificationMessages();
             let expectedMessage = appConst.itemIsArchived(IMPORTED_TEXT_CONTENT_DISPLAY_NAME);
-            assert.equal(message, expectedMessage, 'Expected notification message should appear');
+            assert.ok(messages.includes(expectedMessage), 'Expected notification message should appear');
             // 5. Navigate to 'Archive Browse Panel' and check the archived text-content:
             await studioUtils.openArchivePanel();
             await studioUtils.saveScreenshot('text_content_in_archive');
             await archiveBrowsePanel.waitForContentDisplayed(IMPORTED_TEXT_CONTENT_NAME);
         });
 
-    it(`WHEN existing archived text-content is selected WHEN 'Automatic' is selected THEN 'Preview' button should be enabled and the expected text in the iframe in Preview Panel`,
+    it(`WHEN existing archived text-content is selected WHEN 'Automatic' is selected THEN the expected text in the iframe in Preview Panel`,
         async () => {
             let archiveItemStatisticsPanel = new ArchiveItemStatisticsPanel();
             let archiveBrowsePanel = new ArchiveBrowsePanel();
@@ -61,58 +61,59 @@ describe('archive.item.preview.for.text.content.spec: tests for archive item pre
             let actualOption = await archiveItemStatisticsPanel.getSelectedOptionInPreviewWidget();
             assert.equal(actualOption, appConst.PREVIEW_WIDGET.AUTOMATIC,
                 'Automatic option should be selected in preview widget by default');
-            // 4. Verify that 'Preview' button should be enabled when an image and 'Automatic' are selected
-            await archiveItemStatisticsPanel.waitForPreviewButtonEnabled();
-            // 5. Switch to the iframe and verify that the expected text is displayed in the iframe in Item Preview Panel:
+            // 4. Switch to the iframe and verify that the expected text is displayed in the iframe in Item Preview Panel:
             await archiveItemStatisticsPanel.switchToLiveViewFrame();
             let actualText = await archiveItemStatisticsPanel.getTextInAttachmentPreview();
             assert.ok(actualText.includes('Belarus'), 'expected text should be present in the Archive Preview Panel');
         });
 
-    it(`GIVEN existing archived text-content is selected WHEN 'Json' is selected THEN 'Preview' button should be enabled`,
+    it(`GIVEN existing archived text-content is selected WHEN 'Json' is selected THEN expected JSON values should be displayed in the Preview Panel`,
         async () => {
             let archiveItemStatisticsPanel = new ArchiveItemStatisticsPanel();
             let archiveBrowsePanel = new ArchiveBrowsePanel();
             // 1. Navigate to 'Archive Browse Panel' :
             await studioUtils.openArchivePanel();
             await archiveBrowsePanel.clickCheckboxAndSelectRowByDisplayName(IMPORTED_TEXT_CONTENT_DISPLAY_NAME);
+            // 2. Expand the dropdown list in 'Preview' widget and select 'Json' option:
+            await archiveItemStatisticsPanel.clickOnPreviewModeDropdownHandle();
             await archiveItemStatisticsPanel.selectOptionInPreviewWidget(appConst.PREVIEW_WIDGET.JSON);
             await studioUtils.saveScreenshot('archive_text_content_json');
-            // 2. Click on 'Preview' button
-            await archiveItemStatisticsPanel.clickOnPreviewButton();
-            // 3. Switch to the new opened browser tab and verify that img element is displayed in the page:
-            await studioUtils.doSwitchToNextTab();
+            // 3. Verify the JSON values in Preview Panel
+            await archiveItemStatisticsPanel.switchToLiveViewFrame();
             let actualName = await studioUtils.getJSON_info(appConst.PREVIEW_JSON_KEY.NAME);
             assert.equal(actualName, `"${IMPORTED_TEXT_CONTENT_NAME}"`, 'expected name should be displayed in JSON preview');
         });
 
-    it(`GIVEN existing archived text content is selected WHEN 'Media' is selected THEN 'Preview' button should be enabled`,
+    it(`GIVEN existing archived text content is selected WHEN 'Media' is selected THEN expected text should be displayed in the Preview Panel`,
         async () => {
             let archiveItemStatisticsPanel = new ArchiveItemStatisticsPanel();
             let archiveBrowsePanel = new ArchiveBrowsePanel();
             // 1. Navigate to 'Archive Browse Panel' :
             await studioUtils.openArchivePanel();
+            // 2. Select the existing text content and select 'Media' option in Preview Widget dropdown:
             await archiveBrowsePanel.clickCheckboxAndSelectRowByDisplayName(IMPORTED_TEXT_CONTENT_DISPLAY_NAME);
+            await archiveItemStatisticsPanel.clickOnPreviewModeDropdownHandle();
             await archiveItemStatisticsPanel.selectOptionInPreviewWidget(appConst.PREVIEW_WIDGET.MEDIA);
             await studioUtils.saveScreenshot('archived_text_media');
-            // 2. Click on 'Preview' button
-            await archiveItemStatisticsPanel.clickOnPreviewButton();
-            // 3. Switch to the new opened browser tab and verify that expected text is displayed in the page:
-            await studioUtils.doSwitchToNextTab();
+            // 3. Verify the text in Preview Panel
+            await archiveItemStatisticsPanel.switchToLiveViewFrame();
             await studioUtils.waitForElementDisplayed(`//pre[contains(.,'Belarus')]`, appConst.mediumTimeout);
         });
 
-    it(`GIVEN existing archived text content is selected WHEN 'Enonic Rendering' is selected THEN 'Preview' button should be disabled`,
+    it(`GIVEN existing archived text content is selected WHEN 'Enonic Rendering' is selected THEN expected message should be displayed in the Preview Panel`,
         async () => {
             let archiveItemStatisticsPanel = new ArchiveItemStatisticsPanel();
             let archiveBrowsePanel = new ArchiveBrowsePanel();
             // 1. Navigate to 'Archive Browse Panel' :
             await studioUtils.openArchivePanel();
             await archiveBrowsePanel.clickCheckboxAndSelectRowByDisplayName(IMPORTED_TEXT_CONTENT_DISPLAY_NAME);
+            // 2. Expand the dropdown list in 'Preview' widget and select 'Enonic Rendering' option:
+            await archiveItemStatisticsPanel.clickOnPreviewModeDropdownHandle();
             await archiveItemStatisticsPanel.selectOptionInPreviewWidget(appConst.PREVIEW_WIDGET.ENONIC_RENDERING);
             await studioUtils.saveScreenshot('archive_image_rendering');
-            // 2. Verify that 'Preview' button is disabled
-            await archiveItemStatisticsPanel.waitForPreviewButtonDisabled();
+            // 3. Verify that "Preview not available" is displayed in the Preview Panel:
+            let result = await archiveItemStatisticsPanel.getNoPreviewMessage();
+            assert.equal(result[0], "Preview not available", 'expected message should be displayed');
         });
 
     it(`GIVEN existing archived text content is selected AND 'Restore...' context menu item has been clicked WHEN Archive button has been pressed in the modal dialog THEN the content should be present only in the Content Grid`,

@@ -64,6 +64,7 @@ describe('layers.content.tree.widget.spec - tests for Layers  Tree  in the widge
             // 2. Select the folder and open Layers widget:
             await studioUtils.findAndSelectItem(TEST_FOLDER_DISPLAY_NAME);
             let browseLayersWidget = await studioUtils.openLayersWidgetInBrowsePanel();
+            await browseLayersWidget.pause(1000);
             await studioUtils.saveScreenshot('layers_widget_1');
             // 3. Verify  all items in the widget:
             let layers = await browseLayersWidget.getLayersName();
@@ -77,7 +78,7 @@ describe('layers.content.tree.widget.spec - tests for Layers  Tree  in the widge
         async () => {
             let contentBrowsePanel = new ContentBrowsePanel();
             await studioUtils.switchToContentMode();
-            await contentBrowsePanel.selectContext(LAYER1_DISPLAY_NAME);
+            await contentBrowsePanel.selectContext(LAYER1_DISPLAY_NAME);//"layer43177");
             // 1. Select the folder and open Layers widget:
             await studioUtils.findAndSelectItem(TEST_FOLDER_DISPLAY_NAME);
             let browseLayersWidget = await studioUtils.openLayersWidgetInBrowsePanel();
@@ -123,7 +124,6 @@ describe('layers.content.tree.widget.spec - tests for Layers  Tree  in the widge
             // 5. Verify that 'New' status should be displayed for the content in parent project-item:
             let actualStatusParent = await browseLayersWidget.getContentStatus(PROJECT_DISPLAY_NAME);
             assert.equal(actualStatusParent, 'New', `'New' status should be displayed for content in parent project-item`);
-
         });
 
     it(`GIVEN the local copy of inherited folder is selected WHEN Layers widget has been opened THEN 2 layer-items should be displayed in the widget AND current layer should be selected in the widget AND 'Edit' button should be visible`,

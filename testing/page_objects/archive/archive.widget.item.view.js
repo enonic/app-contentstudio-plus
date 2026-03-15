@@ -6,7 +6,7 @@ const appConst = require('../../libs/app_const');
 const lib = require('../../libs/elements');
 
 const xpath = {
-    container: `//div[contains(@id,'WidgetView')]//div[contains(@id,'ArchiveWidgetItemView')]`,
+    container: `//div[contains(@id,'ExtensionView')]//div[contains(@id,'ExtensionArchiveItemView')]`,
     nameView: "//div[contains(@id,'NamesAndIconView')]",
     workInProgressIcon: "//div[@title='Work in progress' or @title='Ready for publishing']"
 };

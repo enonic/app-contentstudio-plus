@@ -7,10 +7,11 @@ const appConst = require('../../libs/app_const');
 
 const XPATH = {
     container: "//div[contains(@id,'ArchiveItemStatisticsPanel')]",
+    noPreviewMessageSpan: "//div[contains(@class,'no-preview-message')]//span",
     archiveItemPreviewToolbar: "//div[contains(@id,'ArchiveItemPreviewToolbar')]",
     contentStatus: "//span[@class='status']",
     divEmulatorDropdown: "//div[contains(@id,'EmulatorDropdown')]",
-    divPreviewWidgetDropdown: "//div[contains(@id,'PreviewWidgetDropdown')]",
+    divPreviewWidgetDropdown: "//div[contains(@id,'PreviewModeDropdown')]",
 };
 
 class ArchiveItemStatisticsPanel extends Page {
@@ -18,6 +19,7 @@ class ArchiveItemStatisticsPanel extends Page {
     get contentStatus() {
         return XPATH.container + XPATH.archiveItemPreviewToolbar + XPATH.contentStatus;
     }
+
     get liveViewFrame() {
         return XPATH.container + '//iframe';
     }
@@ -79,10 +81,21 @@ class ArchiveItemStatisticsPanel extends Page {
         return await this.getText(locator);
     }
 
+    async clickOnPreviewModeDropdownHandle() {
+        try {
+            let locator = this.previewWidgetDropdown + "//button[contains(@id,'DropdownHandle')]";
+            await this.waitForPreviewWidgetDropdownDisplayed();
+            await this.pause(300);
+            await this.clickOnElement(locator);
+            await this.pause(300);
+        } catch (err) {
+            await this.handleError('Tried to click on Preview dropdown handle.', 'err_preview_dropdown_handle', err);
+        }
+    }
+
     // Clicks on the dropdown handle in the 'Preview dropdown' then clicks on a list-item by its name
     async selectOptionInPreviewWidget(optionName) {
         await this.waitForPreviewWidgetDropdownDisplayed();
-        await this.clickOnElement(this.previewWidgetDropdown);
         let optionSelector = this.previewWidgetDropdown + lib.DROPDOWN_SELECTOR.listItemByDisplayName(optionName);
         await this.waitForElementDisplayed(optionSelector, appConst.mediumTimeout);
         await this.clickOnElement(optionSelector);
@@ -112,15 +125,6 @@ class ArchiveItemStatisticsPanel extends Page {
         }
     }
 
-    async waitForPreviewButtonEnabled() {
-        try {
-            await this.waitForPreviewButtonDisplayed();
-            await this.waitForElementEnabled(this.previewButton, appConst.mediumTimeout);
-        } catch (err) {
-            await this.handleError(`Preview button - should be enabled`, 'err_preview_btn_enabled', err);
-        }
-    }
-
     async waitForPreviewButtonNotDisplayed() {
         try {
             return await this.waitForElementNotDisplayed(this.previewButton, appConst.mediumTimeout);
@@ -129,34 +133,6 @@ class ArchiveItemStatisticsPanel extends Page {
         }
     }
 
-    // Waits for the 'Preview' button to be displayed in the Preview Toolbar
-    async waitForPreviewButtonDisplayed() {
-        try {
-            return await this.waitForElementDisplayed(this.previewButton, appConst.mediumTimeout);
-        } catch (err) {
-            await this.handleError(`Archive Item Statistics, Preview button - should be displayed`, 'err_preview_btn_displayed', err);
-        }
-    }
-
-    async clickOnPreviewButton() {
-        try {
-            await this.waitForPreviewButtonEnabled();
-            await this.clickOnElement(this.previewButton);
-            return await this.pause(2000);
-        } catch (err) {
-            await this.handleError(`Archive Item Statistics, clicked on 'Preview' button`, 'err_click_preview_btn', err);
-        }
-    }
-
-    async waitForPreviewButtonDisabled() {
-        try {
-            await this.waitForPreviewButtonDisplayed();
-            await this.waitForElementDisabled(this.previewButton, appConst.mediumTimeout)
-        } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_preview_btn_disabled');
-            throw new Error(`Preview button should be displayed and disabled, screenshot  : ${screenshot} ` + err);
-        }
-    }
     //  gets a text(*.txt) in the Preview panel
     async getTextInAttachmentPreview() {
         try {
@@ -164,11 +140,30 @@ class ArchiveItemStatisticsPanel extends Page {
             await this.waitForElementDisplayed(textLocator, appConst.mediumTimeout);
             return await this.getText(textLocator);
         } catch (err) {
-            await this.handleError(`Archive Content Item Preview - tried to get the text in the preview iframe`, 'err_get_text_preview', err);
+            await this.handleError(`Archive Content Item Preview - tried to get the text in the preview iframe`, 'err_get_text_preview',
+                err);
         }
     }
+
+    async getJsonKeys() {
+        try {
+            let spanLocator = `//span[@class='key')]`;
+            await this.waitForElementDisplayed(spanLocator, appConst.mediumTimeout);
+            return await this.getText(spanLocator);
+        } catch (err) {
+            await this.handleError(`Archive Content Item Preview - tried to get the text in the preview iframe`, 'err_get_text_preview',
+                err);
+        }
+    }
+
     async switchToLiveViewFrame() {
         return await this.switchToFrame(this.liveViewFrame);
+    }
+
+    async getNoPreviewMessage() {
+        let locator = XPATH.container + XPATH.noPreviewMessageSpan;
+        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+        return await this.getTextInDisplayedElements(locator);
     }
 }
 

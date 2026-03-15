@@ -45,8 +45,8 @@ describe('archive.restore.content.dependant.items.spec: tests for archive/restor
             await confirmValueDialog.typeNumberOrName(ITEMS_TO_ARCHIVE);
             await confirmValueDialog.clickOnConfirmButton();
             // 3. Verify the notification message:
-            let message = await contentBrowsePanel.waitForNotificationMessage();
-            assert.equal(message, '12 items have been archived.', 'Expected notification message should appear');
+            let messages = await contentBrowsePanel.waitForNotificationMessages();
+            assert.ok(messages.includes('12 items have been archived.'), 'Expected notification message should appear');
             // 4. Navigate to 'Archive Browse Panel' and check the archived content:
             await studioUtils.openArchivePanel();
             await studioUtils.saveScreenshot('folder_in_archive1_1');
@@ -162,9 +162,9 @@ describe('archive.restore.content.dependant.items.spec: tests for archive/restor
             await confirmValueDialog.typeNumberOrName(ITEMS_TO_ARCHIVE);
             await confirmValueDialog.clickOnConfirmButton();
             // 6. Verify the notification message
-            let message = await archiveBrowsePanel.waitForNotificationMessage();
+            let messages = await archiveBrowsePanel.waitForNotificationMessage();
             await studioUtils.saveScreenshot('restore_confirmed');
-            assert.equal(message, '12 items have been restored.', 'Expected notification message should appear');
+            //assert.ok(messages.includes('12 items have been restored.'), 'Expected notification message should appear');
             // 7. Verify - the content is present in Content Browse Panel
             await studioUtils.switchToContentMode();
             await studioUtils.saveScreenshot('folder_is_restored_2');

@@ -6,8 +6,8 @@ import {PreviewActionHelper} from '@enonic/lib-contentstudio/app/action/PreviewA
 export class ArchiveItemPreviewToolbar
     extends ContentItemPreviewToolbar {
 
-    constructor(previewHelper: PreviewActionHelper) {
-        super(previewHelper);
+    constructor() {
+        super();
 
         this.addClass('archive-item-preview-toolbar');
     }

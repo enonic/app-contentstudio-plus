@@ -1,19 +1,13 @@
-<widget id="{{containerId}}">
-    {{#isNoIdMode}}
-    <div class="error">Select an item - and we'll show you the details!</div>
-    {{/isNoIdMode}}
-
-    {{^isNoIdMode}}
+<div class="cs-plus-extension-container">
     <link rel="stylesheet" href="{{stylesUri}}" type="text/css" media="all"/>
-    {{/isNoIdMode}}
 
     {{#isNoPublishMode}}
-    <div class="error">This content has never been published</div>
+    <div class="error">{{neverPublishedError}}</div>
     {{/isNoPublishMode}}
 
-    {{#isNormalMode}}
+    {{^isNoPublishMode}}
     <script type="application/json" id="{{configScriptId}}">{{{configAsJson}}}</script>
     <script type="module" src="{{jsUri}}" data-config-script-id="{{configScriptId}}" data-content-id="{{contentId}}" data-publish-first="{{publishFirst}}" data-archived="{{isArchived}}"></script>
-    {{/isNormalMode}}
+    {{/isNoPublishMode}}
 
-</widget>
+</div>

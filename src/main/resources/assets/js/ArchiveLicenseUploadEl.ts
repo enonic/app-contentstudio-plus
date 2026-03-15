@@ -52,7 +52,7 @@ export class ArchiveLicenseUploadEl
         new UploadLicenseRequest((this.input.getHTMLElement() as HTMLInputElement).files[0]).sendAndParse().then(
             (isValidLicense: boolean) => {
                 if (isValidLicense) {
-                    window.dispatchEvent(new CustomEvent('ReloadActiveWidgetEvent'));
+                    window.dispatchEvent(new CustomEvent('ReloadActiveExtensionEvent'));
                     window.dispatchEvent(new CustomEvent('ValidLicenseLoadedEvent'));
                     isValid = true;
                 }

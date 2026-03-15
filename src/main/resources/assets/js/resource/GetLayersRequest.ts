@@ -4,7 +4,7 @@ import {ResourceRequest} from '@enonic/lib-admin-ui/rest/ResourceRequest';
 import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
 import {ContentId} from '@enonic/lib-contentstudio/app/content/ContentId';
 import {ProjectContext} from '@enonic/lib-contentstudio/app/project/ProjectContext';
-import {LayerContent} from '../widgets/layers/LayerContent';
+import {LayerContent} from '../extension/layers/LayerContent';
 import {LayerContentJson} from './json/LayerContentJson';
 
 export class GetLayersRequest

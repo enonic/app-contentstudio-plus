@@ -1,0 +1,26 @@
+.date-range-form {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0;
+
+  fieldset {
+    min-width: auto;
+
+    .input-view {
+      &.invalid {
+        .validation-viewer {
+          margin-top: 5px;
+        }
+      }
+    }
+
+    .date-range-input {
+      display: grid;
+      row-gap: 4px;
+
+      .labelTo {
+        margin-top: 10px;
+      }
+    }
+  }
+}

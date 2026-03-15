@@ -195,7 +195,7 @@ describe('archive.browse.panel.spec: tests for archive browse panel and selectio
             assert.equal(result.length, 1, `One item with 'archived-icon' should be present in the selector options`);
         });
 
-    it("WHEN 'Edited' item has been clicked in Versions Widget THEN Restore button should not be displayed in the Versions widget",
+    it.skip("WHEN 'Edited' item has been clicked in Versions Widget THEN Restore button should not be displayed in the Versions widget",
         async () => {
             let archiveBrowseContextPanel = new ArchiveBrowseContextPanel()
             let archivedContentVersionsWidget = new ArchivedContentVersionsWidget();

@@ -1,5 +1,6 @@
 import {ArchiveItemPreviewToolbar} from './ArchiveItemPreviewToolbar';
 import {ContentPath} from '@enonic/lib-contentstudio/app/content/ContentPath';
+import {ExtensionRenderingHandler} from '@enonic/lib-contentstudio/app/view/ExtensionRenderingHandler';
 import {ArchiveContentViewItem} from './ArchiveContentViewItem';
 import {ContentItemPreviewPanel} from '@enonic/lib-contentstudio/app/view/ContentItemPreviewPanel';
 import {PreviewActionHelper} from '@enonic/lib-contentstudio/app/action/PreviewActionHelper';
@@ -16,8 +17,10 @@ export class ArchiveItemPreviewPanel
     }
 
     createToolbar(): ArchiveItemPreviewToolbar {
-        return new ArchiveItemPreviewToolbar(new PreviewActionHelper({
-            archive: "true"
-        }));
+        return new ArchiveItemPreviewToolbar();
+    }
+
+    protected createExtensionRenderingHandler(): ExtensionRenderingHandler {
+        return new ExtensionRenderingHandler(this, new PreviewActionHelper({archive: "true"}));
     }
 }
