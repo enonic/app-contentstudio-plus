@@ -75,18 +75,26 @@ class VariantsExtension extends Page {
             }
             throw new Error(`Variant item with name '${name}' was not found`);
         } catch (err) {
-            await this.saveScreenshot(appConst.generateRandomName("err_expand_version"));
-            throw new Error("Error when clicking on the version item: " + err);
+            await this.handleError(`Error when clicking on the version item with name '${name}'`, 'err_click_variant_item', err);
         }
     }
 
-    async clickOnDuplicateButton() {
+    async clickOnDuplicateButton(name) {
         const host = await this.getShadowHost();
-        const menuButton = await host.shadow$(selectors.variantListItems);
-        const button = await menuButton.$(`.//button[contains(@id,"ActionButton") and .//span[contains(.,'Duplicate')]]`);
-        await button.waitForDisplayed({timeout: appConst.mediumTimeout});
-        await button.click();
-        return await this.pause(300);
+        const items = await host.shadow$$(selectors.variantListItems);
+        for (const item of items) {
+            //const nameEl = await item.$('p.xp-admin-common-sub-name');
+            const nameEl = await item.$(`.//p[contains(@class,'xp-admin-common-sub-name')]`);
+            if (await nameEl.isExisting()) {
+                const text = await nameEl.getText();
+                if (text.includes(name)) {
+                    const button = await item.$(`.//button[contains(@id,'ActionButton') and .//span[contains(.,'Duplicate')]]`);
+                    await button.waitForDisplayed({timeout: appConst.mediumTimeout});
+                    return await button.click();
+                }
+            }
+        }
+        throw new Error(`Variant item with name '${name}' was not found`);
     }
 
     async waitForCreateVariantButtonInOriginalItem() {

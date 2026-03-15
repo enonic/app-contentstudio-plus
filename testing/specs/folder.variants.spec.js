@@ -75,8 +75,9 @@ describe('folder.variants.spec - tests for Create Variant modal dialog', functio
             await createVariantDialog.waitForDialogClosed();
             await studioUtils.saveScreenshot('variant_created');
             // 5. Verify the notification message:
-            let actualMessage = await variantsExtension.waitForNotificationMessage();
-            assert.equal(actualMessage, appConst.variantCreated(FOLDER_NAME));
+            let actualMessages = await variantsExtension.waitForNotificationMessages();
+            assert.ok(actualMessages.includes(appConst.variantCreated(FOLDER_NAME)),
+                "Variant created message should be displayed in the notification area");
         });
 
     it("GIVEN 'create variant dialog' is opened WHEN a name that already in use THEN 'Not available' message should appear",
@@ -135,7 +136,7 @@ describe('folder.variants.spec - tests for Create Variant modal dialog', functio
             await studioUtils.findAndSelectItem(VARIANT_NAME_1);
             let variantsExtension = await studioUtils.openVariantsWidget();
             // 2. Click on 'Duplicate' button in the expanded variant-item
-            await variantsExtension.clickOnDuplicateButton();
+            await variantsExtension.clickOnDuplicateButton(VARIANT_NAME_1);
             // 3. Duplicate Variant dialog should be loaded
             await duplicateVariantDialog.waitForLoaded();
             // 4. Click on Duplicate button in the dialog:
