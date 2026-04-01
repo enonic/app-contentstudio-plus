@@ -1,10 +1,11 @@
-displayName:
+kind: "AdminExtension"
+title:
   text: "Archive"
   i18n: "widget.archive.displayName"
 description:
   text: "Archive tool"
   i18n: "widget.archive.description"
 interfaces:
-- "contentstudio.menuitem"
+  - "contentstudio.menuitem"
 config:
   context: "project"
