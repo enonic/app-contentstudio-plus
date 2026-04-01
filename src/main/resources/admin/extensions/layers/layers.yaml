@@ -1,8 +1,9 @@
-displayName:
+kind: "AdminExtension"
+title:
   text: "Layers"
   i18n: "widget.layers.displayName"
 description:
   text: "See item localisation state"
   i18n: "widget.layers.description"
 interfaces:
-- "contentstudio.contextpanel"
+  - "contentstudio.contextpanel"
