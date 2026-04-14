@@ -59,7 +59,7 @@ exports.config = {
     ],
 
     // Hook that gets executed before the suite starts
-    beforeSuite: function (suite) {
-        browser.url(this.baseUrl);
+    beforeSuite: async function (suite) {
+        await browser.url(this.baseUrl);
     },
 };
