@@ -8,7 +8,7 @@ class PublishReportDialog extends Page {
 
     async getHeaderInComparisonBlock(index) {
         try {
-            const host = await this.getShadowHost();
+            const host = await this.getWidgetShadowHost();
             const elements = await host.shadow$$('div[id*="ComparisonBlock"] div.header > div[id*="TextAndDateBlock"] span.text');
             await elements[0].waitForDisplayed({timeout: appConst.mediumTimeout});
             return await elements[index].getText();
@@ -20,7 +20,7 @@ class PublishReportDialog extends Page {
 
     async getSubtitleInComparisonBlock(index) {
         try {
-            const host = await this.getShadowHost();
+            const host = await this.getWidgetShadowHost();
             const elements = await host.shadow$$('div[id*="ComparisonBlock"] div[id*="TextAndDateBlock"][class*="subtitle"] span.text');
             await elements[0].waitForDisplayed({timeout: appConst.mediumTimeout});
             return await elements[index].getText();
@@ -32,7 +32,7 @@ class PublishReportDialog extends Page {
 
     async getDateInHeaderOfComparisonBlock(index) {
         try {
-            const host = await this.getShadowHost();
+            const host = await this.getWidgetShadowHost();
             const elements = await host.shadow$$('div[id*="ComparisonBlock"] div.header > div[id*="TextAndDateBlock"] span.date');
             await elements[0].waitForDisplayed({timeout: appConst.mediumTimeout});
             return await elements[index].getText();
@@ -44,7 +44,7 @@ class PublishReportDialog extends Page {
 
     async getAllComparisonsBlockHeader() {
         try {
-            const host = await this.getShadowHost();
+            const host = await this.getWidgetShadowHost();
             const elements = await host.shadow$$('div[id*="TextAndDateBlock"] span.text');
             await elements[0].waitForDisplayed({timeout: appConst.mediumTimeout});
             const texts = [];
@@ -60,7 +60,7 @@ class PublishReportDialog extends Page {
 
     async getAllComparisonsDate() {
         try {
-            const host = await this.getShadowHost();
+            const host = await this.getWidgetShadowHost();
             const elements = await host.shadow$$('div[id*="TextAndDateBlock"] span.date');
             await elements[0].waitForDisplayed({timeout: appConst.mediumTimeout});
             const texts = [];
@@ -75,13 +75,13 @@ class PublishReportDialog extends Page {
     }
 
     async waitForShowEntireContentCheckboxNotDisplayed() {
-        const host = await this.getShadowHost();
+        const host = await this.getWidgetShadowHost();
         const checkbox = await host.shadow$('div[id*="ComparisonBlock"] input[type="checkbox"]');
         return await checkbox.waitForDisplayed({timeout: appConst.mediumTimeout, reverse: true});
     }
 
     async clickOnShowEntireContentCheckbox(index) {
-        const host = await this.getShadowHost();
+        const host = await this.getWidgetShadowHost();
         const labels = await host.shadow$$('div[id*="ComparisonBlock"] div[id*="Checkbox"] label');
         if (index >= labels.length) {
             throw new Error('Publish report modal dialog, the number of checkboxes less then expected');
@@ -91,7 +91,7 @@ class PublishReportDialog extends Page {
     }
 
     async isShowEntireContentCheckboxSelected(index) {
-        const host = await this.getShadowHost();
+        const host = await this.getWidgetShadowHost();
         const checkboxes = await host.shadow$$('div[id*="ComparisonBlock"] input[type="checkbox"]');
         if (index >= checkboxes.length) {
             throw new Error('Publish report modal dialog, the number of checkboxes less then expected');
@@ -101,7 +101,7 @@ class PublishReportDialog extends Page {
     }
 
     async clickOnCancelTopButton() {
-        const host = await this.getShadowHost();
+        const host = await this.getWidgetShadowHost();
         const button = await host.shadow$('div.cancel-button-top');
         await button.waitForDisplayed({timeout: appConst.shortTimeout});
         await button.click();
@@ -111,7 +111,7 @@ class PublishReportDialog extends Page {
 
     async waitForDialogLoaded() {
         try {
-            const host = await this.getShadowHost();
+            const host = await this.getWidgetShadowHost();
             const dialog = await host.shadow$('div[id*="PublishReportDialog"]');
             await dialog.waitForDisplayed({timeout: appConst.mediumTimeout});
         } catch (err) {
@@ -122,7 +122,7 @@ class PublishReportDialog extends Page {
 
     async waitForPrintButtonEnabled() {
         try {
-            const host = await this.getShadowHost();
+            const host = await this.getWidgetShadowHost();
             const buttons = await host.shadow$$('button[id*="DialogButton"]');
             let printButton;
             for (const btn of buttons) {
@@ -135,19 +135,18 @@ class PublishReportDialog extends Page {
             await printButton.waitForDisplayed({timeout: appConst.mediumTimeout});
             return await printButton.waitForEnabled({timeout: appConst.mediumTimeout});
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_publish_report_print_btn');
-            throw new Error(`PublishReport modal dialog - Print button, screenshot: ${screenshot} ` + err);
+            await this.handleError(`PublishReport modal dialog - Print button should be enabled`, 'err_publish_report_print_btn_enabled', err);
         }
     }
 
     async isDialogVisible() {
-        const host = await this.getShadowHost();
+        const host = await this.getWidgetShadowHost();
         const dialog = await host.shadow$('div[id*="PublishReportDialog"]');
         return await dialog.isDisplayed();
     }
 
     async waitForDialogClosed() {
-        const host = await this.getShadowHost();
+        const host = await this.getWidgetShadowHost();
         const dialog = await host.shadow$('div[id*="PublishReportDialog"]');
         return await dialog.waitForDisplayed({timeout: appConst.shortTimeout, reverse: true});
     }

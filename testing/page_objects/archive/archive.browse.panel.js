@@ -1,7 +1,7 @@
 /**
  * Created on 04.11.2021
  */
-const lib = require('../../libs/elements');
+const lib = require('../../libs/elements-old');
 const appConst = require('../../libs/app_const');
 const BaseBrowsePanel = require('../../page_objects/base.browse.panel');
 const ArchiveContextWindowPanel = require('../browsepanel/detailspanel/archive.context.window.panel');
@@ -250,6 +250,9 @@ class ArchiveBrowsePanel extends BaseBrowsePanel {
         await archiveContextWindowPanel.waitForOpened();
         await archiveContextWindowPanel.waitForSpinnerNotVisible(appConst.TIMEOUT_5);
         await this.pause(500);
+    }
+    async waitForBrowsePanelLoaded(){
+        return await this.waitForElementDisplayed(this.container);
     }
 }
 

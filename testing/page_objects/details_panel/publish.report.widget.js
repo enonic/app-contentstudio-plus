@@ -32,20 +32,20 @@ class PublishReportWidget extends Page {
     }
 
     async waitForValidationMessageDisplayed() {
-        const host = await this.getShadowHost();
+        const host = await this.getWidgetShadowHost();
         const viewer = await host.shadow$(selectors.validationViewer);
         return await viewer.waitForDisplayed({timeout: appConst.mediumTimeout});
     }
 
 
     async waitForValidationMessageNotDisplayed() {
-        const host = await this.getShadowHost();
+        const host = await this.getWidgetShadowHost();
         const viewer = await host.shadow$(selectors.validationViewer);
         return await viewer.waitForDisplayed({timeout: appConst.mediumTimeout, reverse: true});
     }
 
     async getValidationMessage() {
-        const host = await this.getShadowHost();
+        const host = await this.getWidgetShadowHost();
         const viewer = await host.shadow$(selectors.validationViewer);
         await viewer.waitForDisplayed({timeout: appConst.mediumTimeout});
         return await viewer.getText();
@@ -54,7 +54,7 @@ class PublishReportWidget extends Page {
 
     async waitForWidgetLoaded() {
         try {
-            const host = await this.getShadowHost();
+            const host = await this.getWidgetShadowHost();
             let locator = "//div[contains(@id,'ExtensionSelectionRow')]" + lib.itemByName('Compare published versions');
             return await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
         } catch (err) {
@@ -64,7 +64,7 @@ class PublishReportWidget extends Page {
 
     async waitForGenerateButtonNotDisplayed() {
         try {
-            let host = await this.getShadowHost();
+            let host = await this.getWidgetShadowHost();
             const button = await host.shadow$(selectors.generateButton);
             return await this.waitForElementNotDisplayed(this.generateButton, appConst.mediumTimeout);
         } catch (err) {
@@ -74,7 +74,7 @@ class PublishReportWidget extends Page {
 
     async waitForGenerateButtonEnabled() {
         try {
-            let host = await this.getShadowHost();
+            let host = await this.getWidgetShadowHost();
             const button = await host.shadow$(selectors.generateButton);
             await button.waitForEnabled({timeout: appConst.mediumTimeout});
         } catch (err) {
@@ -84,7 +84,7 @@ class PublishReportWidget extends Page {
 
     async waitForGenerateButtonDisabled() {
         try {
-            const host = await this.getShadowHost();
+            const host = await this.getWidgetShadowHost();
             const button = await host.shadow$(selectors.generateButton);
             await button.waitForDisplayed({timeout: appConst.mediumTimeout});
             await button.waitForEnabled({timeout: appConst.mediumTimeout, reverse: true});
@@ -95,7 +95,7 @@ class PublishReportWidget extends Page {
 
     async clickOnGenerateButton() {
         try {
-            let host = await this.getShadowHost();
+            let host = await this.getWidgetShadowHost();
             const button = await host.shadow$(selectors.generateButton);
             await button.waitForDisplayed({timeout: appConst.mediumTimeout});
             await button.waitForEnabled({timeout: appConst.mediumTimeout});
@@ -107,7 +107,7 @@ class PublishReportWidget extends Page {
 
     async getDateInFromInput() {
         await this.waitForFromDateInputDisplayed();
-        const host = await this.getShadowHost();
+        const host = await this.getWidgetShadowHost();
         const inputs = await host.shadow$$(selectors.datePickerInput);
         await inputs[0].waitForDisplayed({timeout: appConst.mediumTimeout});
         return await inputs[0].getValue();
@@ -115,7 +115,7 @@ class PublishReportWidget extends Page {
     }
 
     async getDateInToInput() {
-        const host = await this.getShadowHost();
+        const host = await this.getWidgetShadowHost();
         const inputs = await host.shadow$$(selectors.datePickerInput);
         await inputs[1].waitForDisplayed({timeout: appConst.mediumTimeout});
         return await inputs[1].getValue();
@@ -124,7 +124,7 @@ class PublishReportWidget extends Page {
 
     async waitForFromDateInputDisplayed() {
         try {
-            const host = await this.getShadowHost();
+            const host = await this.getWidgetShadowHost();
             const inputs = await host.shadow$$(selectors.datePickerInput);
             await inputs[0].waitForDisplayed({timeout: appConst.mediumTimeout});
         } catch (err) {
@@ -134,7 +134,7 @@ class PublishReportWidget extends Page {
 
     async waitForFromDateInputNotDisplayed() {
         try {
-            const host = await this.getShadowHost();
+            const host = await this.getWidgetShadowHost();
             const inputs = await host.shadow$$(selectors.datePickerInput);
             if (inputs.length === 0) return;
             await inputs[0].waitForDisplayed({timeout: appConst.mediumTimeout, reverse: true});
@@ -147,7 +147,7 @@ class PublishReportWidget extends Page {
 
     async waitForToDateInputDisplayed() {
         try {
-            const host = await this.getShadowHost();
+            const host = await this.getWidgetShadowHost();
             const inputs = await host.shadow$$(selectors.datePickerInput);
             await inputs[1].waitForDisplayed({timeout: appConst.mediumTimeout});
         } catch (err) {
@@ -157,7 +157,7 @@ class PublishReportWidget extends Page {
 
     async waitForToDateInputNotDisplayed() {
         try {
-            const host = await this.getShadowHost();
+            const host = await this.getWidgetShadowHost();
             const inputs = await host.shadow$$(selectors.datePickerInput);
             if (inputs.length === 0) return;
             await inputs[1].waitForDisplayed({timeout: appConst.mediumTimeout, reverse: true});
@@ -168,7 +168,7 @@ class PublishReportWidget extends Page {
 
     async typeInFromDateInput(date) {
         try {
-            const host = await this.getShadowHost();
+            const host = await this.getWidgetShadowHost();
             const inputs = await host.shadow$$(selectors.datePickerInput);
             await inputs[0].waitForDisplayed({timeout: appConst.mediumTimeout});
             await inputs[0].setValue(date);
@@ -179,7 +179,7 @@ class PublishReportWidget extends Page {
 
     async typeInToInput(dateTime) {
         try {
-            const host = await this.getShadowHost();
+            const host = await this.getWidgetShadowHost();
             const inputs = await host.shadow$$(selectors.datePickerInput);
             await inputs[1].waitForDisplayed({timeout: appConst.mediumTimeout});
             await inputs[1].setValue(dateTime);

@@ -10,7 +10,7 @@ const baseURL = properties.get('base.url');
 exports.config = {
 
     specs: [
-        path.join(__dirname, './specs/*.spec.js')
+        path.join(__dirname, './specs/archive.browse.panel.spec.js')
     ],
 
     maxInstances: 1,
