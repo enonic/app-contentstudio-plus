@@ -1,8 +1,10 @@
 const webDriverHelper = require('../libs/WebDriverHelper');
 const appConst = require('../libs/app_const');
-const lib = require('../libs/elements');
+const lib = require('../libs/elements-old');
 const path = require('path');
 const fs = require('fs');
+const {Key} = require('webdriverio');
+const {COMMON} = require('../libs/elements');
 
 class Page {
 
@@ -23,6 +25,22 @@ class Page {
         return this.browser.keys(value);
     }
 
+    pressCtrl_A() {
+        return this.browser.keys([Key.Ctrl, 'a']);
+    }
+
+    pressCtrl_C() {
+        return this.browser.keys([Key.Ctrl, 'c']);
+    }
+
+    pressEndKey() {
+        return this.browser.keys([Key.End]);
+    }
+
+    pressCtrl_V() {
+        return this.browser.keys([Key.Ctrl, 'v']);
+    }
+
     findElement(selector) {
         return this.browser.$(selector);
     }
@@ -33,10 +51,6 @@ class Page {
 
     getTitle() {
         return this.browser.getTitle();
-    }
-
-    getSource() {
-        return this.browser.getSource();
     }
 
     async getDisplayedElements(selector) {
@@ -97,23 +111,21 @@ class Page {
         return results;
     }
 
-    async clearTextInput(locator) {
-        let inputElement = await this.findElement(locator);
-        return await inputElement.setValue("");
-    }
 
     async typeTextInInput(selector, text) {
         try {
             let inputElement = await this.findElement(selector);
             await inputElement.setValue(text);
-            let value = await inputElement.getValue();
-            // workaround for issue in WebdriverIO
-            if (value === "") {
-                await inputElement.setValue(text);
-            }
             return await this.pause(200);
         } catch (err) {
-            throw new Error("Error when set value in input " + err);
+            throw new Error("Tried to set the value in the input " + err);
+        }
+    }
+
+    async enterTextUsingArray(selector, text) {
+        let inputElement = await this.findElement(selector);
+        for (const ch of text) {
+            await inputElement.addValue(ch);
         }
     }
 
@@ -141,14 +153,29 @@ class Page {
         return await inputElement.getValue();
     }
 
+    // clearValue() does not trigger React synthetic events (onChange/onInput), so the component
+    // state is not updated. Simulating Ctrl+A → Delete fires the full keyboard event chain
+    // that React listens to, reliably clearing both the DOM value and the component state.
     async clearInputText(selector) {
         try {
             let inputElement = await this.findElement(selector);
             await inputElement.waitForDisplayed({timeout: 2000});
-            await inputElement.clearValue();
-            return await this.pause(1000);
+            await inputElement.click();
+            await this.browser.keys([Key.Ctrl, 'a']);
+            await this.browser.keys('Delete');
+            return await this.pause(300);
         } catch (err) {
-            throw new Error("Error when clear value in input" + err);
+            throw new Error('Tried to clear the value in the input: ' + err);
+        }
+    }
+    async clearInputTextElement(element) {
+        try {
+            await element.click();
+            await this.browser.keys([Key.Ctrl, 'a']);
+            await this.browser.keys('Delete');
+            return await this.pause(300);
+        } catch (err) {
+            throw new Error('Tried to clear the value in the input: ' + err);
         }
     }
 
@@ -180,7 +207,7 @@ class Page {
         return await element.isEnabled();
     }
 
-    async waitForElementEnabled(selector, ms) {
+    async waitForElementEnabled(selector, ms = appConst.mediumTimeout) {
         let el = await this.findElements(selector);
         if (el.length > 1) {
             throw new Error("More than one element were found with the selector " + selector);
@@ -202,7 +229,7 @@ class Page {
         return await el[0].waitForEnabled({timeout: ms});
     }
 
-    async waitForElementDisabled(selector, ms) {
+    async waitForElementDisabled(selector, ms = appConst.mediumTimeout) {
         let element = await this.findElements(selector);
         if (element.length > 1) {
             throw new Error("More than one element were found with the selector " + selector);
@@ -224,7 +251,7 @@ class Page {
      *     - is not disabled
      *     otherwise exception will be thrown.
      */
-    async waitForElementClickable(selector, ms) {
+    async waitForElementClickable(selector, ms = appConst.mediumTimeout) {
         let element = await this.findElements(selector);
         if (element.length > 1) {
             throw new Error("More than one element were found with the selector " + selector);
@@ -258,43 +285,44 @@ class Page {
         return await element[0].waitForEnabled({timeout: ms, reverse: true});
     }
 
-    waitForElementNotDisplayed(selector, ms) {
+    waitForElementNotDisplayed(selector, ms = appConst.mediumTimeout) {
         return this.getBrowser().waitUntil(() => {
             return this.getDisplayedElements(selector).then(result => {
                 return result.length === 0;
             })
-        }, {timeout: ms, timeoutMsg: 'Timeout exception. Element ' + selector + ' still visible, timeout is ' + ms});
+        }, {timeout: ms, timeoutMsg: `Timeout exception. Element ${selector} still visible in: ${ms}`});
     }
 
-    waitUntilDisplayed(selector, ms) {
+    waitUntilDisplayed(selector, ms = appConst.mediumTimeout) {
         return this.getBrowser().waitUntil(() => {
             return this.getDisplayedElements(selector).then(result => {
                 return result.length > 0;
             })
-        }, {timeout: ms, timeoutMsg: 'Timeout exception. Element ' + selector + ' still not visible in: ' + ms});
+        }, {timeout: ms, timeoutMsg: `Timeout exception. Element ${selector} still not visible in: ${ms}`});
     }
 
-    async waitForElementDisplayed(selector, ms) {
+    async waitForElementDisplayed(selector, ms = appConst.mediumTimeout) {
         let element = await this.findElement(selector);
         return await element.waitForDisplayed({timeout: ms});
     }
 
-    async waitForSpinnerNotVisible(ms) {
+    async waitForSpinnerNotVisible(ms = appConst.longTimeout, spinnerSelector = "//div[@class='spinner']") {
         try {
-            let timeout1;
-            timeout1 = ms === undefined ? appConst.longTimeout : ms;
-            let message = 'Spinner still displayed! timeout is ' + timeout1;
-            return await this.browser.waitUntil(async () => {
-                let res = await this.isElementNotDisplayed("//div[@class='spinner']");
-                return res;
-            }, {timeout: timeout1, timeoutMsg: message});
+            const timeoutMsg = `Spinner still displayed! Timeout is ${ms}`;
+            await this.browser.waitUntil(
+                async () => {
+                    const isNotDisplayed = await this.isElementNotDisplayed(spinnerSelector);
+                    return isNotDisplayed;
+                },
+                {timeout: ms, timeoutMsg: timeoutMsg}
+            );
         } catch (err) {
-            await this.handleError(`Timeout exceeded` , 'err_spinner', err);
+            await this.handleError('Spinner should not be visible!', 'err_spinner', err);
         }
     }
 
     waitUntilElementNotVisible(selector, ms) {
-        let message = 'Element still displayed! timeout is ' + appConst.longTimeout + '  ' + selector;
+        let message = `Element still displayed! ${ms}  ` + selector;
         return this.browser.waitUntil(() => {
             return this.isElementNotDisplayed(selector);
         }, {timeout: ms, timeoutMsg: message});
@@ -319,26 +347,25 @@ class Page {
 
     async removeNotificationMessage() {
         try {
-            let selector = "//div[contains(@id,'NotificationContainer')]//span[contains(@class,'notification-remove')]";
+            let selector = "//div[@class='notification-wrapper']//button[@aria-label='Close notification']";
             await this.clickOnElement(selector);
             return await this.pause(300);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_remove_notif_msg');
-            throw new Error('Error after removing the notification message, screenshot: ' + screenshot + '  ' + err);
+            throw new Error(`Error after removing the notification message, screenshot:${screenshot} ` + err);
         }
     }
 
     async waitForNotificationMessage() {
         try {
-            let notificationXpath = lib.NOTIFICATION_TEXT;
+            let notificationXpath = COMMON.NOTIFICATION_TEXT;
             await this.getBrowser().waitUntil(async () => {
                 return await this.isElementDisplayed(notificationXpath);
-            }, {timeout: appConst.longTimeout, timeoutMsg: 'Error when wait for the notification message'});
-            await this.pause(400);
+            }, {timeout: appConst.longTimeout, timeoutMsg: 'The notification message was not shown'});
+            await this.pause(100);
             return await this.getText(notificationXpath);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_notification');
-            throw new Error('Error when wait for the notification message, screenshot:  ' + screenshot + '  ' + err);
+            await this.handleError('Waited for the notification message', 'err_notif_msg', err);
         }
     }
 
@@ -354,22 +381,20 @@ class Page {
     //returns array of messages
     async waitForNotificationMessages() {
         try {
-            await this.waitForElementDisplayed(lib.NOTIFICATION_TEXT, appConst.mediumTimeout);
+            await this.waitForElementDisplayed(lib.NOTIFICATION_TEXT);
             await this.pause(300);
             return await this.getTextInDisplayedElements(lib.NOTIFICATION_TEXT);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_notification');
-            throw new Error('Error when wait for notification message, screenshot: ' + screenshot + "  " + err);
+            await this.handleError('Wait for notification messages ', 'err_notification_messages', err);
         }
     }
 
     async waitForExpectedNotificationMessage(expectedMessage) {
         try {
-            let selector = `//div[contains(@id,'NotificationMessage')]//div[contains(@class,'notification-text') and contains(.,'${expectedMessage}')]`;
+            let selector = `//div[contains(@id,'NotificationMessage')]//p[contains(.,'${expectedMessage}')]`;
             await this.waitForElementDisplayed(selector, appConst.shortTimeout)
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_notification');
-            throw new Error('expected notification message was not shown, screenshot: ' + screenshot + "  " + err);
+            await this.handleError(`Wait for expected notification message: ${expectedMessage} - `, 'err_exp_notification_message', err);
         }
     }
 
@@ -442,6 +467,55 @@ class Page {
                     type: 'pointerUp',
                     button: 2
                 }]
+        }]);
+    }
+
+    async doPerformMoveToAction(element, offsetX, offsetY) {
+        await element.moveTo();
+        let xValue = await element.getLocation('x');
+        let yValue = await element.getLocation('y');
+        let x = Math.floor(xValue);//parseInt(yValue) + offsetY;
+        let y = Math.floor(yValue);// + offsetX;
+        return await this.getBrowser().performActions([{
+            type: 'pointer',
+            id: 'pointer1',
+            parameters: {
+                pointerType: 'mouse'
+            },
+            actions: [
+                {type: "pointerMove", origin: "pointer", "x": x, "y": y}]
+        }]);
+    }
+
+    async holdDownShiftAndPressArrowDown(count) {
+        // holding down the Shift key
+        await this.getBrowser().performActions([{
+            type: 'key',
+            id: 'keyboard',
+            actions: [
+                {type: 'keyDown', value: Key.Shift}
+            ]
+        }]);
+
+        // press ArrowDown key 'count' times
+        for (let i = 1; i < count; i++) {
+            await this.getBrowser().performActions([{
+                type: 'key',
+                id: 'keyboard',
+                actions: [
+                    {type: 'keyDown', value: Key.ArrowDown},
+                    {type: 'keyUp', value: Key.ArrowDown}
+                ]
+            }]);
+            await this.getBrowser().pause(400);
+        }
+
+        await this.getBrowser().performActions([{
+            type: 'key',
+            id: 'keyboard',
+            actions: [
+                {type: 'keyUp', value: Key.Shift} // Shift
+            ]
         }]);
     }
 
@@ -525,8 +599,7 @@ class Page {
             let el = await this.findElement(selector);
             return await this.getBrowser().switchFrame(el);
         } catch (err) {
-            console.log('Error when switch to frame ' + selector);
-            throw new Error('Error when switch to frame  ' + err);
+            await this.handleError('Tried to switch to the frame', 'err_switch_frame', err);
         }
     }
 
@@ -637,30 +710,75 @@ class Page {
             return text === expectedValue;
         }, {timeout: appConst.mediumTimeout, timeoutMsg: `Expected attribute ${attrName} is not set in the element ${locator}`});
     }
-    // Utility method for error handling
-    async handleError(errorMessage, screenshotName, error) {
-        let screenshot = await this.saveScreenshotUniqueName(screenshotName);
-        throw new Error(`${errorMessage}, screenshot: ${screenshot} ` + error);
-    }
-    async getWindowWidth(){
-        let result =  await this.getBrowser().getWindowSize();
-        return result.width;
+
+    async getPuppeteer() {
+        return await browser.getPuppeteer();
     }
 
     async getBrowserStatus() {
         return await this.getBrowser().status();
     }
 
+    async performScrollWithWheelActions(element, deltaY) {
+        await this.browser.performActions([
+            {
+                type: 'wheel',
+                id: 'wheel1',
+                actions: [
+                    {
+                        type: 'scroll',
+                        origin: element,
+                        x: 0,
+                        y: 0,
+                        deltaX: 0,  // horizontal scroll
+                        deltaY: deltaY,
+                    },
+                ],
+            },
+        ]);
+    }
+
+    // Utility method for error handling
+    async handleError(errorMessage, screenshotName, error) {
+        if (Error.prototype.hasOwnProperty('cause')) {
+            throw new Error(`${errorMessage}: ${error.message}  [screenshot]: ${screenshotName} `, {cause: error});
+        }
+        const wrapped = new Error(`${errorMessage}: ${error.message} `);
+        wrapped.cause = error;
+        wrapped.screenshotTaken = error.screenshotTaken;
+        wrapped.screenshotName = error.screenshotName;
+
+        if (!wrapped.screenshotTaken) {
+            wrapped.screenshotName = screenshotName
+            wrapped.screenshotTaken = true;
+            wrapped.message += `[Screenshot]: ${screenshotName}`
+            await this.saveScreenshotUniqueName(wrapped.screenshotName);
+        }
+        throw wrapped;
+    }
+
     async isMacOS() {
         const status = await this.getBrowserStatus();
         return status.os.name.includes('Mac');
     }
-    async getShadowHost() {
+
+    async getWidgetShadowHost() {
         try {
-            const host = await this.findElement(lib.WIDGETS.SHADOW_HOST);
+            const host = await this.findElement("context-panel-extension");
+            await host.waitForExist({timeout: appConst.mediumTimeout});
             return host;
         } catch (err) {
-            await this.handleError('Layer Widget - failed to get shadow root', 'err_layer_widget_shadow_root', err);
+            await this.handleError('context-panel-extension - failed to get shadow root', 'err_layer_widget_shadow_root', err);
+        }
+    }
+
+    async getXpMenuShadowHost() {
+        try {
+            const host = await this.findElement('xp-menu');
+            await host.waitForExist({timeout: appConst.mediumTimeout});
+            return host;
+        } catch (err) {
+            await this.handleError('Home page, xp menu - failed to get shadow root', 'err_home_page_shadow', err);
         }
     }
 }

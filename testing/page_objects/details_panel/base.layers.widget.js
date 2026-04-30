@@ -24,7 +24,7 @@ class BaseLayersWidget extends Page {
 
     async waitForWidgetLoaded() {
         try {
-            const host = await this.getShadowHost();
+            const host = await this.getWidgetShadowHost();
             const div = await host.shadow$(`div[id*='LayersExtension']`);
             await div.waitForDisplayed({timeout: appConst.mediumTimeout});
         } catch (err) {
@@ -33,7 +33,7 @@ class BaseLayersWidget extends Page {
     }
 
     async findLayerItemViewDataByName(layerName) {
-        let host = await this.getShadowHost();
+        let host = await this.getWidgetShadowHost();
         const items = await host.shadow$$('div.layers-item-view-data');
         for (const item of items) {
             const nameEl = await item.$('div.layer-name');
@@ -58,7 +58,7 @@ class BaseLayersWidget extends Page {
 
     async getLayersName() {
         try {
-            let host = await this.getShadowHost();
+            let host = await this.getWidgetShadowHost();
             let elements = await host.shadow$$('div[id*="LayerContentViewHeader"] > .layer-details .layer-name');
             const names = []
             for (const el of elements) {
@@ -147,7 +147,7 @@ class BaseLayersWidget extends Page {
     async getContentStatus(layerName) {
         try {
             const item = await this.findLayerItemViewDataByName(layerName);
-            const host = await this.getShadowHost();
+            const host = await this.getWidgetShadowHost();
             const el = await item.$('div[id*="LayerContentViewHeader"] div[class*="status"]');
             await el.waitForDisplayed();
             return el.getText();

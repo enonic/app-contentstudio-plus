@@ -14,7 +14,7 @@ const selectors = {
 class CreateVariantDialog extends Page {
 
     async findCreateVariantButton() {
-        const host = await this.getShadowHost();
+        const host = await this.getWidgetShadowHost();
         const buttons = await host.shadow$$('button[id*="DialogButton"]');
         for (const btn of buttons) {
             const text = await btn.getText();
@@ -26,7 +26,7 @@ class CreateVariantDialog extends Page {
     }
 
     async typeTextInVariantNameInput(text) {
-        const host = await this.getShadowHost();
+        const host = await this.getWidgetShadowHost();
         const input = await host.shadow$(selectors.variantNameInput);
         await input.waitForDisplayed({timeout: appConst.mediumTimeout});
         return await input.setValue(text);
@@ -45,7 +45,7 @@ class CreateVariantDialog extends Page {
     }
 
     async waitForValidationPathMessageDisplayed() {
-        const host = await this.getShadowHost();
+        const host = await this.getWidgetShadowHost();
         const div = await host.shadow$(selectors.validationStatus);
         await div.waitForDisplayed({timeout: appConst.mediumTimeout});
         return await div.getText();
@@ -59,7 +59,7 @@ class CreateVariantDialog extends Page {
     }
 
     async clickOnCancelButtonTop() {
-        const host = await this.getShadowHost();
+        const host = await this.getWidgetShadowHost();
         const button = await host.shadow$(selectors.cancelButtonTop);
         await button.waitForDisplayed({timeout: appConst.shortTimeout});
         await button.click();
@@ -68,7 +68,7 @@ class CreateVariantDialog extends Page {
 
     async waitForDialogLoaded() {
         try {
-            const host = await this.getShadowHost();
+            const host = await this.getWidgetShadowHost();
             const dialog = await host.shadow$(selectors.container);
             await dialog.waitForDisplayed({timeout: appConst.mediumTimeout});
         } catch (err) {
@@ -79,7 +79,7 @@ class CreateVariantDialog extends Page {
 
     async waitForDialogClosed() {
         try {
-            const host = await this.getShadowHost();
+            const host = await this.getWidgetShadowHost();
             const dialog = await host.shadow$(selectors.container);
             return await dialog.waitForDisplayed({timeout: appConst.shortTimeout, reverse: true});
         } catch (err) {

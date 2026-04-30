@@ -7,7 +7,7 @@ const LoginPage = require('../page_objects/login.page');
 const BrowsePanel = require('../page_objects/browsepanel/content.browse.panel');
 const FilterPanel = require('../page_objects/browsepanel/content.filter.panel');
 const appConst = require('./app_const');
-const lib = require('./elements');
+const {BUTTONS, COMMON} = require('./elements');
 const NewContentDialog = require('../page_objects/browsepanel/new.content.dialog');
 const ContentWizardPanel = require('../page_objects/wizardpanel/content.wizard.panel');
 const webDriverHelper = require('./WebDriverHelper');
@@ -64,7 +64,7 @@ module.exports = {
             return this.getBrowser().execute(script2);
         })
     },
-    async waitForElementDisplayed(selector, ms) {
+    async waitForElementDisplayed(selector, ms = appConst.mediumTimeout) {
         let element = await this.getBrowser().$(selector);
         return await element.waitForDisplayed(ms);
     },
@@ -570,47 +570,54 @@ module.exports = {
         }
         return await loginPage.waitForPageLoaded();
     },
-    async navigateToContentStudioApp(userName, password) {
+    async navigateToContentStudioAppSelectDefault(userName, password) {
         try {
-            await this.clickOnContentStudioLink(userName, password);
-            await this.doSwitchToContentBrowsePanelAndSelectDefaultContext();
+            await this.doLogin(userName, password);
+            let homePage = new HomePage();
+            await homePage.clickOnContentStudioLink();
+            await this.waitForBrowsePanelAndSelectDefaultContext();
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_navigate_cs');
-            throw new Error(`Error occurred after clicking on  Content Studio link in Launcher Panel,  screenshot:${screenshot}  ` + err);
+            throw new Error(`Error occurred after clicking on Content Studio link in Launcher Panel,  screenshot:${screenshot}  ` + err);
         }
     },
-    async navigateToContentStudioAppMobile(userName, password) {
-        await this.navigateToContentStudioApp(userName, password);
-        //close content studio menu :
-        await this.closeContentStudioMenu();
-    },
-    async navigateToContentStudioWithProjects(userName, password) {
+    // Selects Default project
+    async waitForBrowsePanelAndSelectDefaultContext() {
         try {
-            await this.clickOnContentStudioLink(userName, password);
-            console.log('testUtils:switching to Content Browse panel...');
+            let projectSelectionDialog = new ProjectSelectionDialog();
             let browsePanel = new BrowsePanel();
-            await this.getBrowser().switchWindow('Content Studio - Enonic XP Admin');
-            return await browsePanel.pause(1500);
+            let isLoaded = await projectSelectionDialog.isDialogLoaded();
+            if (isLoaded) {
+                await projectSelectionDialog.selectContext('Default');
+
+                await projectSelectionDialog.waitForDialogClosed();
+                return await this.getBrowser().pause(200);
+            }
+            console.log('Content browse panel loads...');
+            await browsePanel.waitForGridLoaded(appConst.longTimeout);
+            return browsePanel;
+        } catch (err) {
+            throw new Error('Error when navigating to Content Studio(selecting Default context)' + err);
+        }
+    },
+    async navigateToContentStudio(userName, password) {
+        try {
+            await this.doLogin(userName, password);
+            let homePage = new HomePage();
+            await homePage.clickOnContentStudioLink();
+            await homePage.pause(1000);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_navigate_to_studio');
             throw new Error(`Tried to navigate to Content Studio, screenshot: ${screenshot} ` + err);
         }
     },
-    async clickOnContentStudioLink(userName, password) {
-        let launcherPanel = new LauncherPanel();
-        let result = await launcherPanel.isDisplayed(2000);
-        console.log('Launcher Panel is opened, click on the `Content Studio` link...');
-        if (result) {
-            await launcherPanel.clickOnContentStudioLink();
-        } else {
-            console.log('Login Page is opened, type a password and name...');
-            return await this.doLoginAndClickOnContentStudio(userName, password);
-        }
-    },
+
     async navigateToContentStudioCloseProjectSelectionDialog(userName, password) {
         try {
-            await this.clickOnContentStudioLink(userName, password);
-            await this.getBrowser().switchWindow('Content Studio - Enonic XP Admin');
+            await this.doLogin(userName, password);
+            let homePage = new HomePage();
+            await homePage.clickOnContentStudioLink();
+            await homePage.pause(1000);
             await this.closeProjectSelectionDialog();
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_navigate_to_studio');
@@ -627,17 +634,6 @@ module.exports = {
             await projectSelectionDialog.waitForDialogClosed();
             return await this.getBrowser().pause(200);
         }
-    },
-    async doLoginAndClickOnContentStudio(userName, password) {
-        let loginPage = new LoginPage();
-        await loginPage.doLogin(userName, password);
-        let launcherPanel = new LauncherPanel();
-        const isAlertOpen = await this.getBrowser().isAlertOpen();
-        if (isAlertOpen) {
-            await this.getBrowser().acceptAlert();
-        }
-        return await launcherPanel.clickOnContentStudioLink();
-
     },
     async doSwitchToContentBrowsePanel() {
         try {
@@ -1039,11 +1035,12 @@ module.exports = {
     async openArchivePanel() {
         try {
             let archiveBrowsePanel = new ArchiveBrowsePanel();
-            await this.openContentStudioMenu();
-            await this.waitForElementDisplayed(lib.BUTTONS.ARCHIVE_BUTTON, appConst.mediumTimeout);
-            await this.clickOnElement(lib.BUTTONS.ARCHIVE_BUTTON);
+            //await this.openContentStudioMenu();
+            let archiveButton = COMMON.SIDEBAR.NAV + BUTTONS.buttonAriaLabel('Archive');
+            await this.waitForElementDisplayed(archiveButton);
+            await this.clickOnElement(archiveButton);
             await this.getBrowser().pause(300);
-            await archiveBrowsePanel.waitForGridLoaded(appConst.mediumTimeout);
+            await archiveBrowsePanel.waitForBrowsePanelLoaded();
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_open_settings');
             throw new Error(`Error Open Archive Panel:${screenshot} ` + err);
@@ -1071,5 +1068,19 @@ module.exports = {
         let locator = `//span[@class='key' and contains(.,'${keyText}')]/following-sibling::span[@class='string'][1]`;
         await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
         return await this.getText(locator);
-    }
+    },
+    async doLogin(userName, password) {
+        try {
+            let loginPage = new LoginPage();
+            let result = await loginPage.isLoaded();
+            if (result) {
+                await loginPage.doLogin(userName, password);
+            }
+            let homePage = new HomePage();
+            await homePage.waitForUsersLinkDisplayed();
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_login');
+            throw new Error(`Login page error,  screenshot:${screenshot}  ` + err);
+        }
+    },
 };

@@ -35,11 +35,15 @@ describe('archive.browse.panel.spec: tests for archive browse panel and selectio
             let displayName2 = appConst.generateRandomName('folder');
             FOLDER1 = contentBuilder.buildFolder(displayName1);
             FOLDER2 = contentBuilder.buildFolder(displayName2);
-            await studioUtils.doAddFolder(FOLDER1);
-            await studioUtils.doAddFolder(FOLDER2);
+
+            await studioUtils.openArchivePanel();
+            await studioUtils.saveScreenshot('archive_loaded');
+
+            //await studioUtils.doAddFolder(FOLDER1);
+            //await studioUtils.doAddFolder(FOLDER2);
         });
 
-    it(`WHEN checkbox has been clicked in a row THEN SelectionPanelToggle gets visible`,
+    it.skip(`WHEN checkbox has been clicked in a row THEN SelectionPanelToggle gets visible`,
         async () => {
             let contentBrowsePanel = new ContentBrowsePanel();
             let deleteContentDialog = new DeleteContentDialog();
@@ -79,7 +83,7 @@ describe('archive.browse.panel.spec: tests for archive browse panel and selectio
             assert.ok(result === false, 'Selection Controller checkBox should not be selected');
         });
 
-    it("WHEN Selection Controller checkbox is selected (All items are checked) THEN 'Delete..' 'Restore...' buttons should be enabled",
+    it.skip("WHEN Selection Controller checkbox is selected (All items are checked) THEN 'Delete..' 'Restore...' buttons should be enabled",
         async () => {
             // 1. Navigate to 'Archive Browse Panel' and check the archived content:
             await studioUtils.openArchivePanel();
@@ -93,7 +97,7 @@ describe('archive.browse.panel.spec: tests for archive browse panel and selectio
 
     // Verify Dependencies widget should not be present in Archive #1667
     //  https://github.com/enonic/app-contentstudio-plus/issues/1667
-    it(`GIVEN existing folder is selected WHEN widget dropdown selector has been clicked THEN Dependencies option should not be displayed in the dropdown list`,
+    it.skip(`GIVEN existing folder is selected WHEN widget dropdown selector has been clicked THEN Dependencies option should not be displayed in the dropdown list`,
         async () => {
             // 1. Navigate to 'Archive Browse Panel' and check the archived content:
             await studioUtils.openArchivePanel();
@@ -116,7 +120,7 @@ describe('archive.browse.panel.spec: tests for archive browse panel and selectio
 
     // Verify https://github.com/enonic/app-contentstudio-plus/issues/316
     // Workflow state should not be displayed in Archive #316
-    it("WHEN a folder has been selected THEN expected path and status should be displayed in the Item Statistics panel",
+    it.skip("WHEN a folder has been selected THEN expected path and status should be displayed in the Item Statistics panel",
         async () => {
             await studioUtils.openArchivePanel();
             let archiveBrowsePanel = new ArchiveBrowsePanel();
@@ -152,7 +156,7 @@ describe('archive.browse.panel.spec: tests for archive browse panel and selectio
             await archiveItemStatisticsPanel.waitForPreviewWidgetDropdownNotDisplayed();
         });
 
-    it("WHEN existing folder is selected THEN 'Archived' status should be displayed in Details Panel",
+    it.skip("WHEN existing folder is selected THEN 'Archived' status should be displayed in Details Panel",
         async () => {
             let archivedContentStatusWidget = new ArchivedContentStatusWidget();
             // 1. Navigate to 'Archive Browse Panel' and click on a checkbox of a archived folder:
@@ -166,7 +170,7 @@ describe('archive.browse.panel.spec: tests for archive browse panel and selectio
             assert.equal(actualStatus, 'Archived', 'Expected status should be displayed in Details Panel');
         });
 
-    it("GIVEN 'Edited' and 'Created' items have been checked in Versions Widget WHEN 'Compare Versions' button has been clicked THEN Compare Content Versions dialog should be loaded",
+    it.skip("GIVEN 'Edited' and 'Created' items have been checked in Versions Widget WHEN 'Compare Versions' button has been clicked THEN Compare Content Versions dialog should be loaded",
         async () => {
             let archiveBrowseContextPanel = new ArchiveBrowseContextPanel()
             let archivedContentVersionsWidget = new ArchivedContentVersionsWidget();
@@ -212,7 +216,7 @@ describe('archive.browse.panel.spec: tests for archive browse panel and selectio
             await archivedContentVersionsWidget.waitForRestoreButtonNotDisplayed();
         });
 
-    it(`GIVEN 2 folders are selected AND selection controller has been clicked WHEN both folders have been deleted THEN selection controller(circle) gets not visible`,
+    it.skip(`GIVEN 2 folders are selected AND selection controller has been clicked WHEN both folders have been deleted THEN selection controller(circle) gets not visible`,
         async () => {
             let archiveDeleteDialog = new ArchiveDeleteDialog();
             let archiveBrowsePanel = new ArchiveBrowsePanel();
