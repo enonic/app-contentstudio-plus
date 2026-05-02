@@ -66,7 +66,7 @@ export class VariantsListItemViewMenuButton
 
     private updateMainActionLabel(): void {
         const label: string = this.item.isVariant() ? i18n('action.duplicate') : i18n('widget.variants.create.text');
-        this.getActionButton().setLabel(label);
+        this.getActionButton().getAction().setLabel(label);
     }
 
     doRender(): Q.Promise<boolean> {

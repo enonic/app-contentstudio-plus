@@ -7,6 +7,8 @@ import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import {ArchiveNoLicenseDialog} from './ArchiveNoLicenseDialog';
 import {ArchiveNoLicenseBlock} from './ArchiveNoLicenseBlock';
 import {ValidLicenseLoadedEvent} from './event/ValidLicenseLoadedEvent';
+import {ArchiveDeleteDialogElement} from './v6/features/shared/dialogs/archive/ArchiveDeleteDialog';
+import {ArchiveRestoreDialogElement} from './v6/features/shared/dialogs/archive/ArchiveRestoreDialog';
 
 export class ArchiveAppContainer
     extends AppContainer {
@@ -62,6 +64,8 @@ export class ArchiveAppContainer
 
         this.whenRendered(() => {
             super.appendElements();
+            this.appendChild(new ArchiveDeleteDialogElement());
+            this.appendChild(new ArchiveRestoreDialogElement());
         });
 
         this.show();

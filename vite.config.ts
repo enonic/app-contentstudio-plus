@@ -49,6 +49,7 @@ export default defineConfig(({mode}) => {
             }),
           ],
           input: {
+            'js/archive-bootstrap': path.join(IN_PATH, 'js/archiveBootstrap.ts'),
             'js/archive': path.join(IN_PATH, 'js/archive.ts'),
             'js/extension/layers': path.join(IN_PATH, 'js/extension/layers/main.ts'),
             'js/extension/variants': path.join(IN_PATH, 'js/extension/variants/main.ts'),
@@ -73,6 +74,9 @@ export default defineConfig(({mode}) => {
         minifyIdentifiers: false,
         keepNames: true,
         treeShaking: true,
+        jsx: 'automatic',
+        jsxImportSource: 'preact',
+        jsxDev: isDevelopment,
         ...(isProduction && {
           drop: ['console', 'debugger'],
           legalComments: 'none'
@@ -81,9 +85,14 @@ export default defineConfig(({mode}) => {
       resolve: {
         alias: {
           '@enonic/lib-admin-ui': path.join(__dirname, '.xp/dev/lib-admin-ui'),
-            '@enonic/lib-contentstudio': path.join(__dirname, '.xp/dev/lib-contentstudio'),
+          '@enonic/lib-contentstudio': path.join(__dirname, '.xp/dev/lib-contentstudio'),
+          react: 'preact/compat',
+          'react-dom': 'preact/compat',
+          'react/jsx-runtime': 'preact/jsx-runtime',
+          'react/jsx-dev-runtime': 'preact/jsx-dev-runtime'
         },
-        extensions: ['.ts', '.js']
+        dedupe: ['@enonic/ui', 'preact', 'preact/compat', '@radix-ui/react-slot', 'focus-trap-react', 'react-virtuoso', '@nanostores/preact', 'nanostores'],
+        extensions: ['.tsx', '.ts', '.jsx', '.js']
       },
       ...(isDevelopment && {
         server: {

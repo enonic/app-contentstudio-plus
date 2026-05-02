@@ -1,4 +1,3 @@
-import {ArchiveItemPreviewToolbar} from './ArchiveItemPreviewToolbar';
 import {ContentPath} from '@enonic/lib-contentstudio/app/content/ContentPath';
 import {ExtensionRenderingHandler} from '@enonic/lib-contentstudio/app/view/ExtensionRenderingHandler';
 import {ArchiveContentViewItem} from './ArchiveContentViewItem';
@@ -14,10 +13,6 @@ export class ArchiveItemPreviewPanel
         super(ContentPath.ARCHIVE_ROOT);
 
         this.addClass('archive-item-preview-panel');
-    }
-
-    createToolbar(): ArchiveItemPreviewToolbar {
-        return new ArchiveItemPreviewToolbar();
     }
 
     protected createExtensionRenderingHandler(): ExtensionRenderingHandler {
