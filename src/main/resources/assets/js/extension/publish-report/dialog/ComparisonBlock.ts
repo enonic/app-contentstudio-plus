@@ -156,8 +156,8 @@ export class ComparisonBlock
     }
 
     private updateHeader(): void {
-        const newerVersionDate = DateHelper.formatDateTime(this.newerVersion.getPublishInfo().getTimestamp());
-        const olderVersionDate = this.olderVersion ? DateHelper.formatDateTime(this.olderVersion.getPublishInfo().getTimestamp()) : null;
+        const newerVersionDate = DateHelper.formatDateTime(this.newerVersion.getPublishInfo().getTime());
+        const olderVersionDate = this.olderVersion ? DateHelper.formatDateTime(this.olderVersion.getPublishInfo().getTime()) : null;
 
         if (olderVersionDate) {
             this.titleElement

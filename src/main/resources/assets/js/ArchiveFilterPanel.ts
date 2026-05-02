@@ -1,4 +1,5 @@
 import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
+import {Aggregation} from '@enonic/lib-admin-ui/aggregation/Aggregation';
 import {ContentAggregation} from '@enonic/lib-contentstudio/app/browse/filter/ContentAggregation';
 import {ArchiveServerEvent} from '@enonic/lib-contentstudio/app/event/ArchiveServerEvent';
 import {ArchiveResourceRequest} from './resource/ArchiveResourceRequest';
@@ -14,28 +15,29 @@ export class ArchiveFilterPanel
     protected aggregationsFetcher: ArchiveAggregationsFetcher;
 
     protected createAggregationFetcher(): ArchiveAggregationsFetcher {
-        const aggregationsFetcher = new ArchiveAggregationsFetcher(this.getAggregationsList());
+        const aggregationsFetcher = new ArchiveAggregationsFetcher([
+            ContentAggregation.CONTENT_TYPE.toString(),
+            ContentAggregation.OWNER.toString(),
+            ContentAggregation.LANGUAGE.toString(),
+            ArchiveAggregation.ARCHIVED_BY.toString(),
+        ]);
         aggregationsFetcher.setRootPath(ArchiveResourceRequest.ARCHIVE_PATH);
 
         return aggregationsFetcher;
     }
 
-    protected isPrincipalAggregation(name: string): boolean {
-        return name === ContentAggregation.OWNER.toString() || name === ArchiveAggregation.ARCHIVED_BY.toString();
+    getExportOptions(): undefined {
+        return undefined;
     }
 
-    protected getAggregationEnum(): Record<string, string> {
-        return {
-            CONTENT_TYPE: ContentAggregation.CONTENT_TYPE,
-            ARCHIVED: ArchiveAggregation.ARCHIVED,
-            ARCHIVED_BY: ArchiveAggregation.ARCHIVED_BY,
-            OWNER: ContentAggregation.OWNER,
-            LANGUAGE: ContentAggregation.LANGUAGE
-        };
-    }
-
-    protected isExportAllowed(): boolean {
-        return false;
+    protected sortAggregations(aggregations: Aggregation[]): void {
+        const order = [
+            ContentAggregation.CONTENT_TYPE.toString(),
+            ArchiveAggregation.ARCHIVED_BY.toString(),
+            ContentAggregation.OWNER.toString(),
+            ContentAggregation.LANGUAGE.toString(),
+        ];
+        aggregations.sort((a, b) => order.indexOf(a.getName()) - order.indexOf(b.getName()));
     }
 
     protected handleEvents(): void {
@@ -60,9 +62,5 @@ export class ArchiveFilterPanel
         };
 
         ArchiveServerEvent.on(() => refreshRequiredHandler());
-    }
-
-    private getAggregationsList(): string[] {
-        return Array.from(this.aggregations.keys());
     }
 }

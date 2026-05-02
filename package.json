@@ -24,13 +24,21 @@
   "dependencies": {
     "@enonic/lib-admin-ui": "workspace:*",
     "@enonic/lib-contentstudio": "workspace:*",
+    "@enonic/ui": "~0.48.0",
+    "@nanostores/preact": "^1.0.0",
+    "@radix-ui/react-slot": "^1.2.3",
     "dompurify": "^3.2.6",
     "flag-icons": "^7.5.0",
+    "focus-trap-react": "^11.0.4",
     "jquery": "^3.7.1",
     "jquery-simulate": "^1.0.2",
     "jquery-ui": "^1.14.1",
+    "lucide-react": "^0.545.0",
     "mousetrap": "^1.6.5",
-    "q": "^1.5.1"
+    "nanostores": "^0.11.4",
+    "preact": "^10.29.0",
+    "q": "^1.5.1",
+    "react-virtuoso": "^4.18.0"
   },
   "devDependencies": {
     "@enonic-types/lib-content": "^7.15.3",

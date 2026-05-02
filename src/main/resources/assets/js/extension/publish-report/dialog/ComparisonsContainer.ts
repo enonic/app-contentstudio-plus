@@ -155,16 +155,16 @@ export class ComparisonsContainer
     }
 
     private isPublished(v: ContentVersion): boolean {
-        return v.hasPublishInfo() && v.getPublishInfo().isPublished() && !v.getPublishInfo().isScheduled();
+        return v.hasPublishInfo() && v.isPublished() && !v.isScheduled();
     }
 
     private isUnpublished(v: ContentVersion): boolean {
-        return v.getPublishInfo()?.isUnpublished();
+        return v.isUnpublished();
     }
 
     private getVersionTimestamp(version: ContentVersion): Date {
         if (version.hasPublishInfo()) {
-            return version.getPublishInfo().getTimestamp();
+            return version.getPublishInfo().getTime();
         }
 
         return version.getTimestamp();

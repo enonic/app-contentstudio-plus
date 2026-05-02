@@ -1,37 +1,45 @@
 import {BrowseItemPanel} from '@enonic/lib-admin-ui/app/browse/BrowseItemPanel';
-import {ArchiveBrowseItemPanel} from './ArchiveBrowseItemPanel';
-import Q from 'q';
-import {ArchiveContextView} from './ArchiveContextView';
-import {ArchiveContentViewItem} from './ArchiveContentViewItem';
-import {ResponsiveBrowsePanel} from '@enonic/lib-contentstudio/app/browse/ResponsiveBrowsePanel';
-import {ArchiveFilterPanel} from './ArchiveFilterPanel';
-import {ContentQuery} from '@enonic/lib-contentstudio/app/content/ContentQuery';
-import {SelectableListBoxPanel} from '@enonic/lib-admin-ui/ui/panel/SelectableListBoxPanel';
 import {ViewItem} from '@enonic/lib-admin-ui/app/view/ViewItem';
-import {ArchiveTreeGridActions} from './ArchiveTreeGridActions';
-import {TreeGridContextMenu} from '@enonic/lib-admin-ui/ui/treegrid/TreeGridContextMenu';
-import {SelectableTreeListBoxKeyNavigator} from '@enonic/lib-admin-ui/ui/selector/list/SelectableTreeListBoxKeyNavigator';
+import {NodeServerChangeType} from '@enonic/lib-admin-ui/event/NodeServerChange';
+import {SelectableListBoxPanel} from '@enonic/lib-admin-ui/ui/panel/SelectableListBoxPanel';
 import {ListBoxToolbar} from '@enonic/lib-admin-ui/ui/selector/list/ListBoxToolbar';
 import {SelectableListBoxWrapper} from '@enonic/lib-admin-ui/ui/selector/list/SelectableListBoxWrapper';
-import {ArchiveTreeRootList} from './ArchiveTreeRootList';
+import {SelectableTreeListBoxKeyNavigator} from '@enonic/lib-admin-ui/ui/selector/list/SelectableTreeListBoxKeyNavigator';
+import {ResponsiveBrowsePanel} from '@enonic/lib-contentstudio/app/browse/ResponsiveBrowsePanel';
+import {ContentQuery} from '@enonic/lib-contentstudio/app/content/ContentQuery';
 import {ArchiveServerEvent} from '@enonic/lib-contentstudio/app/event/ArchiveServerEvent';
-import {NodeServerChangeType} from '@enonic/lib-admin-ui/event/NodeServerChange';
 import {ContentServerChangeItem} from '@enonic/lib-contentstudio/app/event/ContentServerChangeItem';
 import {ContentServerEventsHandler} from '@enonic/lib-contentstudio/app/event/ContentServerEventsHandler';
-import {ArchiveHelper} from './ArchiveHelper';
-import {ArchiveTreeListElement} from './ArchiveTreeList';
 import {ProjectContext} from '@enonic/lib-contentstudio/app/project/ProjectContext';
+import Q from 'q';
+import {ArchiveBrowseItemPanel} from './ArchiveBrowseItemPanel';
+import {ArchiveBrowseToolbarElement} from './ArchiveBrowseToolbar';
+import {ArchiveContentViewItem} from './ArchiveContentViewItem';
+import {ArchiveContextView} from './ArchiveContextView';
+import {ArchiveFilterPanel} from './ArchiveFilterPanel';
+import {ArchiveHelper} from './ArchiveHelper';
+import {ArchiveTreeGridActions} from './ArchiveTreeGridActions';
+import {ArchiveTreeListSelectablePanelProxy} from './ArchiveTreeListSelectablePanelProxy';
+import {ArchiveTreeRootList} from './ArchiveTreeRootList';
+import {setContentFilterOpen} from '@enonic/lib-contentstudio/v6/features/store/contentFilter.store';
+import {
+    loadArchiveItems,
+    removeArchiveItems,
+    setArchiveFilterQuery,
+} from './v6/features/store/archive-list';
+import {clearSelection, setSelection} from './v6/features/store/archive-selection';
+import {ArchiveTreeListElement} from './v6/features/views/browse/archive/ArchiveTreeListElement';
 
 export class ArchiveBrowsePanel
     extends ResponsiveBrowsePanel {
 
     protected treeListBox: ArchiveTreeRootList;
 
+    protected archiveTreeList: ArchiveTreeListElement;
+
     protected treeActions: ArchiveTreeGridActions;
 
     protected toolbar: ListBoxToolbar<ArchiveContentViewItem>;
-
-    protected contextMenu: TreeGridContextMenu;
 
     protected selectionWrapper: SelectableListBoxWrapper<ArchiveContentViewItem>;
 
@@ -50,27 +58,24 @@ export class ArchiveBrowsePanel
     protected initElements(): void {
         super.initElements();
 
-        this.browseToolbar.addClass('content-browse-toolbar');
-        this.browseToolbar.addActions(this.getBrowseActions().getAllActions());
-        this.browseToolbar.appendChild(this.contextSplitPanelToggler);
+        this.browseToolbar.hide();
+
+        this.prependChild(new ArchiveBrowseToolbarElement({
+            toggleFilterPanelAction: this.toggleFilterPanelAction,
+            actions: this.treeActions.getAllActions(),
+        }));
+
+        this.archiveTreeList.setContextMenuActions(this.treeActions.getAllActions());
     }
 
     protected initListeners(): void {
         super.initListeners();
 
+        this.filterPanel.onShown(() => setContentFilterOpen(true));
+        this.filterPanel.onHidden(() => setContentFilterOpen(false));
+
         this.filterPanel.onSearchEvent((query?: ContentQuery) => {
-            this.treeListBox.setFilterQuery(query);
-        });
-
-        this.treeListBox.onItemsAdded((items: ArchiveContentViewItem[], itemViews: ArchiveTreeListElement[]) => {
-            items.forEach((item: ArchiveContentViewItem, index) => {
-                const listElement = itemViews[index]?.getDataView();
-
-                listElement?.onContextMenu((event: MouseEvent) => {
-                    event.preventDefault();
-                    this.contextMenu.showAt(event.clientX, event.clientY);
-                });
-            });
+            void setArchiveFilterQuery(query ?? null);
         });
 
         ArchiveServerEvent.on((event: ArchiveServerEvent) => {
@@ -79,18 +84,9 @@ export class ArchiveBrowsePanel
             if (type === NodeServerChangeType.MOVE || type === NodeServerChangeType.DELETE) {
                 const itemsToRemove: ContentServerChangeItem[] =
                     ArchiveHelper.filterTopMostItems(event.getNodeChange().getChangeItems()) as ContentServerChangeItem[];
-                const itemsToRemoveIds: string[] = itemsToRemove.map((item: ContentServerChangeItem) => item.getContentId().toString());
+                const ids: string[] = itemsToRemove.map((item) => item.getContentId().toString());
 
-                const itemsFound = this.treeListBox.getItems(true).filter((item: ArchiveContentViewItem) => {
-                    return itemsToRemoveIds.some((id: string) => id === item.getId());
-                });
-
-                this.selectionWrapper.deselect(itemsFound);
-
-                itemsFound.forEach((item: ArchiveContentViewItem) => {
-                    const listElement = this.treeListBox.getItemView(item) as ArchiveTreeListElement;
-                    listElement.getParentList().removeItems(item);
-                });
+                removeArchiveItems(ids);
             }
         });
 
@@ -98,20 +94,18 @@ export class ArchiveBrowsePanel
 
         const refreshHandler = (): void => {
             isRefreshTriggered = false;
-            this.selectionWrapper.deselectAll();
+            clearSelection();
             this.filterPanel.reset(true).then(() => {
                 this.hideFilterPanel();
                 this.toggleFilterPanelButton.removeClass('filtered');
             });
-            this.treeListBox.reset();
-            void this.treeListBox.load();
+            void loadArchiveItems();
         };
 
         ContentServerEventsHandler.getInstance().onContentArchived((items: ContentServerChangeItem[]) => {
             if (items.some((item) => item.getRepo()?.split('.').pop() === ProjectContext.get().getProject().getName())) {
                 if (!isRefreshTriggered) {
                     isRefreshTriggered = true;
-
                     this.whenShown(refreshHandler);
                 }
             }
@@ -124,13 +118,12 @@ export class ArchiveBrowsePanel
             }
         });
 
-        this.selectionWrapper.whenRendered(() => {
-            this.treeListBox.load();
+        this.archiveTreeList.whenRendered(() => {
+            void loadArchiveItems();
         });
     }
 
     protected updateContextView(item: ArchiveContentViewItem): Q.Promise<void> {
-        this.contextView.setArchiveItem(item);
         return this.contextView.setItem(item);
     }
 
@@ -149,16 +142,16 @@ export class ArchiveBrowsePanel
         });
 
         this.toolbar = new ListBoxToolbar<ArchiveContentViewItem>(this.selectionWrapper, {
-            refreshAction: () => this.treeListBox.load(),
+            refreshAction: () => {
+                void loadArchiveItems();
+            },
         });
+        this.toolbar.hideAndDisableSelectionToggler();
 
         this.treeActions = new ArchiveTreeGridActions();
-        this.contextMenu = new TreeGridContextMenu(this.treeActions);
+        this.archiveTreeList = new ArchiveTreeListElement();
 
-        const panel = new SelectableListBoxPanel(this.selectionWrapper, this.toolbar);
-        panel.addClass('content-selectable-list-box-panel');
-
-        return panel;
+        return new ArchiveTreeListSelectablePanelProxy(this.selectionWrapper, this.archiveTreeList, this.toolbar);
     }
 
     protected togglePreviewPanelDependingOnScreenSize(): void {
@@ -185,6 +178,7 @@ export class ArchiveBrowsePanel
     protected disableSelectionMode() {
         this.filterPanel.resetConstraints();
         this.hideFilterPanel();
-        this.treeListBox.setFilterQuery(null);
+        void setArchiveFilterQuery(null);
+        setSelection([]);
     }
 }

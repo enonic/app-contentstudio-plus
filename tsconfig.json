@@ -5,6 +5,8 @@
     "target": "ES2023",
     "lib": ["ES2023", "DOM"],
     "baseUrl": ".",
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact",
     "outDir": "build/resources/main/assets/js/",
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
@@ -16,7 +18,11 @@
     "skipLibCheck": true,
     "incremental": true,
     "isolatedModules": true,
-    "types": ["q"]
+    "types": ["q"],
+    "paths": {
+      "react": ["node_modules/preact/compat"],
+      "react-dom": ["node_modules/preact/compat"]
+    }
   },
   "files": ["./src/main/resources/assets/js/extension/layers/main.ts"],
   "include": [

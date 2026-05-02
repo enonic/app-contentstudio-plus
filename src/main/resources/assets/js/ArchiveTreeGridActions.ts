@@ -2,9 +2,9 @@ import Q from 'q';
 import {TreeGridActions} from '@enonic/lib-admin-ui/ui/treegrid/actions/TreeGridActions';
 import {Action} from '@enonic/lib-admin-ui/ui/Action';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
-import {ArchiveDeleteDialog} from './ArchiveDeleteDialog';
-import {ArchiveRestoreDialog} from './ArchiveRestoreDialog';
 import {ArchiveContentViewItem} from './ArchiveContentViewItem';
+import {openArchiveDeleteDialog} from './v6/features/store/dialogs/archiveDeleteDialog.store';
+import {openArchiveRestoreDialog} from './v6/features/store/dialogs/archiveRestoreDialog.store';
 
 export class ArchiveTreeGridActions
     implements TreeGridActions<ArchiveContentViewItem> {
@@ -39,7 +39,7 @@ export class ArchiveTreeGridActions
         const action: Action = new Action(i18n('action.restoreMore')).setEnabled(false);
 
         action.onExecuted(() => {
-            ArchiveRestoreDialog.getInstance().setItems(this.selectedItems).open();
+            openArchiveRestoreDialog(this.selectedItems);
         });
 
         return action;
@@ -49,7 +49,7 @@ export class ArchiveTreeGridActions
         const action: Action = new Action(i18n('action.deleteMore')).setEnabled(false);
 
         action.onExecuted(() => {
-            ArchiveDeleteDialog.getInstance().setItems(this.selectedItems).open();
+            openArchiveDeleteDialog(this.selectedItems);
         });
 
         return action;
