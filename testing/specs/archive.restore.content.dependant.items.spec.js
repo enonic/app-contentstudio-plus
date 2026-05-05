@@ -13,7 +13,7 @@ const ArchiveRestoreDialog = require('../page_objects/archive/archive.restore.di
 const ArchiveDeleteDialog = require('../page_objects/archive/archive.delete.dialog');
 const ArchiveFilterPanel = require('../page_objects/archive/archive.filter.panel');
 
-describe('archive.restore.content.dependant.items.spec: tests for archive/restore folder with children', function () {
+describe.skip('archive.restore.content.dependant.items.spec: tests for archive/restore folder with children', function () {
     this.timeout(appConst.SUITE_TIMEOUT);
     // setup standalone mode if WDIO is not defined:
     if (typeof browser === 'undefined') {

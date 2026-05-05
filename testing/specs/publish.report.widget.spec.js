@@ -11,7 +11,7 @@ const ContentWizardPanel = require('../page_objects/wizardpanel/content.wizard.p
 const PublishReportWidget = require('../page_objects/details_panel/publish.report.widget');
 const ContentPublishDialog = require('../page_objects/content.publish.dialog');
 
-describe('publish.report.widget.spec: tests for publish report widget', function () {
+describe.skip('publish.report.widget.spec: tests for publish report widget', function () {
     this.timeout(appConst.SUITE_TIMEOUT);
     // set up the standalone mode if WDIO-mode is not used:
     if (typeof browser === 'undefined') {

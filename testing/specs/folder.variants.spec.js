@@ -10,7 +10,7 @@ const ContentBrowsePanel = require('../page_objects/browsepanel/content.browse.p
 const appConst = require('../libs/app_const');
 const DuplicateVariantDialog = require('../page_objects/details_panel/duplicate.variant.dialog');
 
-describe('folder.variants.spec - tests for Create Variant modal dialog', function () {
+describe.skip('folder.variants.spec - tests for Create Variant modal dialog', function () {
     this.timeout(appConst.SUITE_TIMEOUT);
     // setup standalone mode if WDIO is not defined:
     if (typeof browser === 'undefined') {

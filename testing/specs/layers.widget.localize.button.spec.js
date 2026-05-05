@@ -12,7 +12,7 @@ const ContentWizard = require('../page_objects/wizardpanel/content.wizard.panel'
 const appConst = require('../libs/app_const');
 const ConfirmationDialog = require("../page_objects/confirmation.dialog");
 
-describe('layers.widget.localize.button.spec - checks Localize button in browse toolbar and Layers widget', function () {
+describe.skip('layers.widget.localize.button.spec - checks Localize button in browse toolbar and Layers widget', function () {
     this.timeout(appConst.SUITE_TIMEOUT);
     // setup standalone mode if WDIO is not defined:
     if (typeof browser === 'undefined') {

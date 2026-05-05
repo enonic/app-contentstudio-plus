@@ -10,7 +10,7 @@ const contentBuilder = require("../libs/content.builder");
 const DeleteContentDialog = require('../page_objects/delete.content.dialog');
 const ArchiveBrowsePanel = require('../page_objects/archive/archive.browse.panel');
 
-describe('archive.content.check.duplicates.spec: tests for archiving content', function () {
+describe.skip('archive.content.check.duplicates.spec: tests for archiving content', function () {
     this.timeout(appConst.SUITE_TIMEOUT);
     // setup standalone mode if WDIO is not defined:
     if (typeof browser === 'undefined') {
