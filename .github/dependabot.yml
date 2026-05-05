@@ -18,6 +18,10 @@ updates:
       - "alansemenov"
     reviewers:
       - "alansemenov"
+    groups:
+      enonic-types:
+        patterns:
+          - "@enonic-types/*"
   - package-ecosystem: "npm"
     directory: "/testing"
     schedule:
@@ -27,6 +31,11 @@ updates:
       - "alansemenov"
     reviewers:
       - "alansemenov"
+    groups:
+      wdio:
+        patterns:
+          - "@wdio/*"
+          - "webdriverio"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
