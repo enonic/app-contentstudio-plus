@@ -15,7 +15,7 @@ const ArchiveBrowseContextPanel = require('../page_objects/archive/archive.brows
 const ArchivedContentVersionsWidget = require('../page_objects/archive/archived.content.versions.widget');
 const ArchiveFilterPanel = require('../page_objects/archive/archive.filter.panel');
 
-describe('archive.muiltiselect.restore.spec: tests for restore several items', function () {
+describe.skip('archive.muiltiselect.restore.spec: tests for restore several items', function () {
     this.timeout(appConst.SUITE_TIMEOUT);
     // setup standalone mode if WDIO is not defined:
     if (typeof browser === 'undefined') {

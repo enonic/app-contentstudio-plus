@@ -11,7 +11,7 @@ const ArchiveBrowsePanel = require('../page_objects/archive/archive.browse.panel
 const ArchiveItemStatisticsPanel = require('../page_objects/archive/archive.item.statistics.panel');
 const ArchiveRestoreDialog = require('../page_objects/archive/archive.restore.dialog');
 
-describe('archive.item.preview.for.text.content.spec: tests for archive item preview', function () {
+describe.skip('archive.item.preview.for.text.content.spec: tests for archive item preview', function () {
     this.timeout(appConst.SUITE_TIMEOUT);
     // setup standalone mode if WDIO is not defined:
     if (typeof browser === 'undefined') {

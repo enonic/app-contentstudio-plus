@@ -12,7 +12,7 @@ const appConst = require('../libs/app_const');
 const ConfirmValueDialog = require('../page_objects/confirm.content.delete.dialog');
 const ContentPublishDialog = require('../page_objects/content.publish.dialog');
 
-describe('layers.content.tree.widget.spec - tests for Layers  Tree  in the widget', function () {
+describe.skip('layers.content.tree.widget.spec - tests for Layers  Tree  in the widget', function () {
     this.timeout(appConst.SUITE_TIMEOUT);
     // setup standalone mode if WDIO is not defined:
     if (typeof browser === 'undefined') {

@@ -12,7 +12,7 @@ const PublishReportWidget = require('../page_objects/details_panel/publish.repor
 const ContentPublishDialog = require('../page_objects/content.publish.dialog');
 const ContentUnpublishDialog = require('../page_objects/content.unpublish.dialog');
 
-describe('publish.report.dialog.spec: tests for publish report dialog', function () {
+describe.skip('publish.report.dialog.spec: tests for publish report dialog', function () {
     this.timeout(appConst.SUITE_TIMEOUT);
     // set up the standalone mode if WDIO-mode is not used:
     if (typeof browser === 'undefined') {

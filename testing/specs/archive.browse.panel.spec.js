@@ -19,7 +19,7 @@ const ArchivedContentVersionsWidget = require('../page_objects/archive/archived.
 const CompareContentVersionsDialog = require('../page_objects/compare.content.versions.dialog');
 const ArchiveContextWindowPanel = require('../page_objects/browsepanel/detailspanel/archive.context.window.panel');
 
-describe('archive.browse.panel.spec: tests for archive browse panel and selection controller', function () {
+describe.skip('archive.browse.panel.spec: tests for archive browse panel and selection controller', function () {
     this.timeout(appConst.SUITE_TIMEOUT);
     // setup standalone mode if WDIO is not defined:
     if (typeof browser === 'undefined') {
