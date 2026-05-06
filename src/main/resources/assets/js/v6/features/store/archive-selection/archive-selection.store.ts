@@ -17,6 +17,8 @@ export const $currentItems = computed($currentIds, (ids) =>
     ids.map((id) => getArchiveItem(id)).filter((item): item is ArchiveContentViewItem => !!item),
 );
 
+export const $archiveContextContent = computed($currentItems, (items) => items.at(-1)?.getContentSummary() ?? null);
+
 export const $selectedItems = computed($selection, (selection) =>
     Array.from(selection)
         .map((id) => getArchiveItem(id))

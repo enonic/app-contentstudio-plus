@@ -1,5 +1,6 @@
 export {
     $activeId,
+    $archiveContextContent,
     $currentIds,
     $currentItems,
     $isAllSelected,
