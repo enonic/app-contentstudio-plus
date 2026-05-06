@@ -1,20 +1,22 @@
 /**
  * Created on 04.11.2021
  */
-const lib = require('../../libs/elements');
+const {BUTTONS, COMMON, TREE_GRID} = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
 const BaseBrowsePanel = require('../../page_objects/base.browse.panel');
 const ArchiveContextWindowPanel = require('../browsepanel/detailspanel/archive.context.window.panel');
 
 const XPATH = {
     container: "//div[contains(@id,'ArchiveBrowsePanel')]",
-    toolbar: "//div[contains(@id,'ResponsiveToolbar')]",
-    archiveTreeRootListUL: `//ul[contains(@id,'ArchiveTreeRootList')]`,
+    toolbar: "//div[@aria-label='Archive toolbar']",
+    archiveTreeListDiv: "//div[@data-component='ArchiveTreeList']",
+    searchButton: "//button[contains(@aria-label, 'search panel')]",
+    highlightedRowNotChecked: `//div[@role='treeitem' and contains(@class,'bg-surface-selected') and descendant::div[@role='checkbox' and @aria-checked='false']]`,
+    hideSearchPanelButton: "//button[contains(@aria-label, 'Hide search panel')]",
     listBoxToolbar: `//div[contains(@id,'ListBoxToolbar')]`,
     selectionControllerCheckBox: `//div[contains(@id,'SelectionController')]`,
-    selectedRow: `//div[contains(@class,'slick-viewport')]//div[contains(@class,'slick-row') and descendant::div[contains(@class,'slick-cell') and contains(@class,'highlight')]]`,
     checkedRows: `//div[contains(@class,'slick-viewport')]//div[contains(@class,'slick-cell-checkboxsel selected')]`,
-    searchButton: "//button[contains(@id, 'ActionButton') and contains(@class, 'icon-search')]",
+
 
     contentSummaryListViewerByName(name) {
         return `//div[contains(@id,'ContentSummaryListViewer') and descendant::p[contains(@class,'sub-name') and contains(.,'${name}')]]`
@@ -37,24 +39,25 @@ class ArchiveBrowsePanel extends BaseBrowsePanel {
     get browseToolbar() {
         return XPATH.toolbar;
     }
+
     get container() {
         return XPATH.container;
     }
 
     get deleteButton() {
-        return XPATH.toolbar + `/*[contains(@id, 'ActionButton') and child::span[text()='Delete...']]`;
+        return XPATH.toolbar + BUTTONS.buttonAriaLabel('Delete...');
     }
 
     get restoreButton() {
-        return XPATH.container + XPATH.toolbar + `/*[contains(@id, 'ActionButton') and child::span[text()='Restore...']]`;
+        return XPATH.toolbar + BUTTONS.buttonAriaLabel('Restore...');
     }
 
     get treeGrid() {
-        return XPATH.container + XPATH.archiveTreeRootListUL;
+        return XPATH.container + XPATH.archiveTreeListDiv;
     }
 
-    get detailsPanelToggleButton() {
-        return XPATH.container + lib.DETAILS_PANEL_TOGGLE_BUTTON;
+    get showContextPanelButton() {
+        return XPATH.container + BUTTONS.buttonAriaLabel('Show context panel');
     }
 
     get selectionControllerCheckBox() {
@@ -70,19 +73,18 @@ class ArchiveBrowsePanel extends BaseBrowsePanel {
     }
 
     get hideSearchPanelButton() {
-        return "//div[contains(@id,'ArchiveFilterPanel')]" + lib.FILTER_PANEL.hideSearchPanelButton;
+        return XPATH.toolbar + XPATH.hideSearchPanelButton;
     }
 
-    get numberInToggler() {
-        return XPATH.listBoxToolbar + lib.NUMBER_IN_SELECTION_TOGGLER;
-    }
 
     get displayNames() {
-        return XPATH.archiveTreeRootListUL + lib.H6_DISPLAY_NAME;
+        // div[1] contains the icon, div[2] contains the name
+        return XPATH.archiveTreeListDiv + TREE_GRID.TREE_LIST_DIV + TREE_GRID.TREE_LIST_ITEM_DIV + TREE_GRID.CONTENT_LABEL_BLOCK +
+               '//div[2]//span';
     }
 
     waitForRestoreButtonEnabled() {
-        return this.waitForElementEnabled(this.restoreButton, appConst.mediumTimeout);
+        return this.waitForElementEnabled(this.restoreButton);
     }
 
     async clickOnRestoreButton() {
@@ -103,74 +105,62 @@ class ArchiveBrowsePanel extends BaseBrowsePanel {
 
     async waitForDeleteButtonEnabled() {
         await this.waitForDeleteButtonDisplayed();
-        return await this.waitForElementEnabled(this.deleteButton, appConst.mediumTimeout)
+        return await this.waitForElementEnabled(this.deleteButton);
     }
 
-    waitForDeleteButtonDisplayed() {
-        return this.waitForElementDisplayed(this.deleteButton, appConst.mediumTimeout);
+    async waitForDeleteButtonDisplayed() {
+        return await this.waitForElementDisplayed(this.deleteButton);
     }
 
     async waitForContentDisplayed(contentName, ms) {
         try {
             let timeout = ms ? ms : appConst.mediumTimeout;
             console.log('waitForContentDisplayed, timeout is:' + timeout);
-            return await this.waitForElementDisplayed(this.treeGrid + lib.itemByName(contentName), timeout);
+            let locator = XPATH.archiveTreeListDiv + TREE_GRID.itemByName(contentName);
+            return await this.waitForElementDisplayed(locator, timeout);
         } catch (err) {
-            await this.handleError('Archive Browse Panel', 'err_wait_for_content_displayed', err);
+            await this.handleError(`Content with name ${contentName} is not displayed`, 'err_content_displayed', err);
         }
     }
 
     async clickOnRowByDisplayName(displayName) {
         try {
-            let nameXpath = this.treeGrid + lib.itemByDisplayName(displayName);
-            await this.waitForElementDisplayed(nameXpath, appConst.mediumTimeout);
+            let nameXpath = XPATH.archiveTreeListDiv + TREE_GRID.itemByDisplayName(displayName);
+            await this.waitForElementDisplayed(nameXpath);
             await this.clickOnElement(nameXpath);
-            return await this.pause(600);
         } catch (err) {
-            await this.handleError('Archive Browse Panel', 'err_click_on_row_by_display_name', err);
-        }
-    }
-
-    async waitForContentByDisplayNamePresent(displayName) {
-        try {
-            let selector = this.treeGrid + lib.itemByDisplayName(displayName);
-            return await this.waitForElementDisplayed(selector, appConst.longTimeout);
-        } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_find');
-            throw new Error('Settings: item was not found ! screenshot ' + screenshot + ' ' + err);
+            await this.handleError(`Tried click on row by displayName: ${displayName}`, 'err_find_content', err);
         }
     }
 
     async waitForContentNotDisplayed(contentName) {
+        let locator = XPATH.archiveTreeListDiv + TREE_GRID.itemByName(contentName);
         try {
-            let selector = this.treeGrid + lib.itemByName(contentName);
-            return await this.waitForElementNotDisplayed(selector, appConst.mediumTimeout);
+            await this.waitForElementNotDisplayed(locator);
         } catch (err) {
-            await this.handleError('Archive Browse Panel', 'err_wait_for_content_not_displayed', err);
+            await this.handleError('Content is still displayed', 'err_content_should_not_be_displayed', err);
         }
     }
 
+    // Returns the display name of the highlighted (but not checked) row, or '' when no such row exists.
     async getNameInHighlightedRow() {
         try {
-            await this.waitForElementDisplayed(XPATH.selectedRow, appConst.mediumTimeout);
-            return await this.getText(XPATH.selectedRow + lib.H6_DISPLAY_NAME);
+            const locator = XPATH.archiveTreeListDiv + XPATH.highlightedRowNotChecked +
+                            TREE_GRID.CONTENT_LABEL_BLOCK + '//div[2]//span';
+            const elements = await this.getDisplayedElements(locator);
+            if (elements.length === 0) {
+                return '';
+            }
+            return await elements[0].getText();
         } catch (err) {
-            throw new Error(`Error when getting name in the selected row ` + err);
+            await this.handleError(`Tried to get name in highlighted row `, 'err_get_name_in_highlighted_row', err);
         }
-    }
-
-    getNumberOfCheckedRows() {
-        return this.findElements(XPATH.checkedRows).then(result => {
-            return result.length;
-        }).catch(err => {
-            throw new Error(`Error when getting selected rows ` + err);
-        });
     }
 
     async rightClickOnItemByDisplayName(displayName) {
         try {
-            const nameXpath = XPATH.container + lib.itemByDisplayName(displayName);
-            await this.waitForElementDisplayed(nameXpath, appConst.mediumTimeout);
+            const nameXpath = XPATH.archiveTreeListDiv + TREE_GRID.itemByDisplayName(displayName) + TREE_GRID.TREE_LIST_ITEM_DIV;
+            await this.waitForElementDisplayed(nameXpath);
             await this.doRightClick(nameXpath);
             return await this.waitForContextMenuDisplayed();
         } catch (err) {
@@ -180,18 +170,19 @@ class ArchiveBrowsePanel extends BaseBrowsePanel {
 
     // Opens/Closes Filter Panel:
     async clickOnSearchButton() {
-        await this.waitForElementDisplayed(this.searchButton, appConst.mediumTimeout);
+        await this.waitForElementDisplayed(this.searchButton);
         return await this.clickOnElement(this.searchButton);
     }
 
     async clickOnHideSearchPanelButton() {
-        await this.waitForElementDisplayed(this.hideSearchPanelButton, appConst.mediumTimeout);
+        await this.waitForElementDisplayed(this.hideSearchPanelButton);
         return await this.clickOnElement(this.hideSearchPanelButton);
     }
 
     async clickCheckboxAndSelectRowByDisplayName(displayName) {
         try {
-            let checkboxElement = lib.TREE_GRID.archiveItemTreeGridListElementByDisplayName(displayName) + lib.DIV.CHECKBOX_DIV + '/label';
+            let checkboxElement = XPATH.archiveTreeListDiv + TREE_GRID.itemByDisplayName(displayName) +
+                                  TREE_GRID.TREE_LIST_ITEM_CHECKBOX_LABEL;
             await this.waitForElementDisplayed(checkboxElement, appConst.mediumTimeout);
             await this.clickOnElement(checkboxElement);
             return await this.pause(200);
@@ -200,18 +191,14 @@ class ArchiveBrowsePanel extends BaseBrowsePanel {
         }
     }
 
-    async clickOnCheckboxByName(name) {
-        let listElements = lib.TREE_GRID.archiveItemTreeGridListElementByName(name);
-        let result = await this.findElements(listElements);
-        if (result.length === 0) {
-            throw new Error('Checkbox was not found!');
+    async clickOnCheckboxAndSelectRowByName(name) {
+        try {
+            await this.clickOnCheckboxByName(name);
+            await this.waitForRowCheckboxSelected(name);
+            await this.pause(200);
+        } catch (err) {
+            await this.handleError(`Row with the displayName ${name} was not checked`, 'err_check_item', err);
         }
-        let listElement = result[result.length - 1];
-        let checkboxElement = await listElement.$('.' + lib.DIV.CHECKBOX_DIV + '/label');
-        // check only the last element:
-        await checkboxElement.waitForDisplayed();
-        await checkboxElement.click();
-        return await this.pause(200);
     }
 
     async clickOnCheckboxAndSelectRowByName(name) {
@@ -224,32 +211,20 @@ class ArchiveBrowsePanel extends BaseBrowsePanel {
         }
     }
 
-    async waitForRowCheckboxSelected(itemName) {
-        let listElements = lib.TREE_GRID.archiveItemTreeGridListElementByName(itemName);
-        let result = await this.findElements(listElements);
-        if (result === 0) {
-            throw new Error('Checkbox was not found!');
-        }
-        // get the last 'ContentsTreeGridListElement' element:
-        let listElement = result[result.length - 1];
-        // get the checkbox input for the last 'ContentsTreeGridListElement' element
-        let checkboxElement = await listElement.$('.' + lib.INPUTS.CHECKBOX_INPUT);
-
-        await this.getBrowser().waitUntil(async () => {
-            let isSelected = await checkboxElement.isSelected();
-            return isSelected;
-        }, {timeout: appConst.mediumTimeout, timeoutMsg: 'Checkbox is not selected'});
+    async isShowContextPanelButtonDisplayed() {
+        return await this.isElementDisplayed(this.showContextPanelButton);
     }
 
-    async openContextWindowPanel() {
-        let archiveContextWindowPanel = new ArchiveContextWindowPanel();
-        let result = await archiveContextWindowPanel.isOpened();
-        if (!result) {
+    async openContextWindow() {
+        let archiveContextWindow = new ArchiveContextWindowPanel();
+        let isDisplayed = await this.isShowContextPanelButtonDisplayed();
+        if (isDisplayed) {
             await this.clickOnDetailsPanelToggleButton();
         }
-        await archiveContextWindowPanel.waitForOpened();
-        await archiveContextWindowPanel.waitForSpinnerNotVisible(appConst.TIMEOUT_5);
+        await archiveContextWindow.waitForOpened();
+        await archiveContextWindow.waitForSpinnerNotVisible(appConst.TIMEOUT_5);
         await this.pause(500);
+        return archiveContextWindow;
     }
 }
 

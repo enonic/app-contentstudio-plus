@@ -139,7 +139,7 @@ describe.skip('archive.image.spec: tests for PreviewWidgetDropdown', function ()
             assert.equal(result[0], "Preview not available", 'expected message should be displayed');
         });
 
-    it(`GIVEN existing archived image is selected AND 'Restore...' context menu item has been clicked WHEN Archive button has been pressed in the modal dialog THEN the image should be present only in the Content Grid`,
+    it(`GIVEN existing archived image is selected AND 'Restore' context menu item has been clicked WHEN Archive button has been pressed in the modal dialog THEN the image should be present only in the Content Grid`,
         async () => {
             let contentBrowsePanel = new ContentBrowsePanel();
             let archiveRestoreDialog = new ArchiveRestoreDialog();
@@ -164,9 +164,9 @@ describe.skip('archive.image.spec: tests for PreviewWidgetDropdown', function ()
         });
 
     beforeEach(async () => {
-        return await studioUtils.navigateToContentStudioCloseProjectSelectionDialog();
+        return await studioUtils.navigateToContentStudioApp();
     });
-    afterEach(() => studioUtils.doCloseAllWindowTabsAndSwitchToHome());
+    afterEach(() => studioUtils.doCloseAllWindowTabsAndNavigateToHome());
     before(() => {
         return console.log('specification is starting: ' + this.title);
     });

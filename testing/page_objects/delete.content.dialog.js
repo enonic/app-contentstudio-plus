@@ -1,59 +1,37 @@
 const Page = require('./page');
 const appConst = require('../libs/app_const');
-const lib = require('../libs/elements');
+const {BUTTONS, TREE_GRID} = require('../libs/elements');
 const XPATH = {
-    container: `//div[contains(@id,'ContentDeleteDialog')]`,
+    container: `//div[contains(@role,'dialog') and descendant::h2[contains(.,'Delete item')]]`,
     inboundErrorStateEntry: "//div[contains(@id,'DialogStateEntry')]/span[text()='Inbound references']",
-    archiveOrDeleteMenu: `//div[contains(@id,'MenuButton')]`,
-    deleteMenuItem: `//li[contains(@id,'MenuItem') and contains(.,'Delete')]`,
-    cancelButton: `//button/span[text()='Cancel']`,
     itemToDeleteList: `//ul[contains(@id,'DialogWithRefsItemList')]`,
     itemViewer: `//div[contains(@id,'DeleteItemViewer']`,
     dependantListUl: "//ul[contains(@id,'DialogWithRefsDependantList')]",
     dependantsHeader: "//div[@class='dependants-header']/span[@class='dependants-title']",
-    logMessageLink: "//div[contains(@class,'content-dialog-sub-title')]/a",
-    archiveLogInput: "//input[contains(@id,'AutosizeTextInput')]",
-    itemToDeleteByDisplayName: displayName => {
-        return `//div[contains(@id,'NamesAndIconView') and descendant::span[contains(@class,'display-name') and contains(.,'${displayName}')]]`
-    },
+    contentStatusBadge: "//span[@data-component='StatusBadge']",
     inboundLink: `//a[contains(@class,'inbound-dependency')]`,
-    getContentStatus(displayName) {
-        return `//div[contains(@id,'ArchiveSelectableItem') and descendant::h6[contains(@class,'main-name') and contains(.,'${displayName}')]]/div[contains(@class,'status')][2]`;
-    },
-    showReferencesButton(displayName) {
-        return `//div[contains(@id,'ArchiveSelectableItem') and descendant::h6[contains(@class,'main-name') and contains(.,'${displayName}')]]/button[contains(@id,'ActionButton') and child::span[text()='Show references']]`;
+    mainListItemsDisplayName: `//div[@role='separator']/preceding::div[@role='listitem'][ancestor::div[@role='dialog' and @data-component='DeleteDialogMainContent']]//div[@data-component='ContentLabel']//span[following-sibling::small]`,
+
+    getShowReferencesButtonLocator(displayName) {
+        return XPATH.container +
+               TREE_GRID.listItemByDisplayNameAndDataComponent('ContentListItemWithReference', displayName) +
+               "//a[text()='Show references']";
     }
 };
 
 // it appears when select a content and click on  'Delete' button on the toolbar
 class DeleteContentDialog extends Page {
 
-    get logMessageLink() {
-        return XPATH.container + XPATH.logMessageLink;
-    }
-
-    get archiveLogInput() {
-        return XPATH.container + XPATH.archiveLogInput;
-    }
-
     get dependentsHeader() {
         return XPATH.container + XPATH.dependantsHeader;
     }
 
-    get cancelButton() {
-        return XPATH.container + lib.dialogButton('Cancel');
+    get closeButton() {
+        return XPATH.container + BUTTONS.buttonAriaLabel('Close');
     }
 
-    get cancelTopButton() {
-        return XPATH.container + lib.CANCEL_BUTTON_TOP;
-    }
-
-    get archiveButton() {
-        return XPATH.container + XPATH.archiveOrDeleteMenu + lib.actionButton('Archive');
-    }
-
-    get archiveMenuDropDownHandle() {
-        return XPATH.container + XPATH.archiveOrDeleteMenu + lib.DROP_DOWN_HANDLE;
+    get deleteButton() {
+        return XPATH.container + BUTTONS.buttonAriaLabel('Delete');
     }
 
     get hideDependantItemsLink() {
@@ -65,157 +43,97 @@ class DeleteContentDialog extends Page {
     }
 
     get ignoreInboundReferencesButton() {
-        return XPATH.container + lib.actionButton('Ignore inbound references');
+        return XPATH.container + "//div[@data-component='StatusBarErrorEntry']" + BUTTONS.button('Ignore inbound references');
     }
 
-    async clickOnLogMessageLinkAndShowInput() {
+    async waitForCloseButtonDisplayed() {
         try {
-            await this.waitForElementDisplayed(this.logMessageLink, appConst.mediumTimeout);
-            return await this.clickOnElement(this.logMessageLink);
+            return await this.waitForElementDisplayed(this.closeButton, appConst.mediumTimeout);
         } catch (err) {
-            await this.handleError(`Delete Content Dialog, log message input `, 'err_log_message_input', err);
-        }
-    }
-
-    async typeTextInArchiveMessageInput(text) {
-        try {
-            return await this.typeTextInInput(this.archiveLogInput, text);
-        } catch (err) {
-            await this.handleError('Archive Content Dialog', 'err_archive_log_input', err);
+            await this.handleError('Delete Content Dialog, Close button should be displayed', 'err_close_button_displayed', err);
         }
     }
 
     async waitForDialogOpened() {
         try {
-            await this.waitForElementDisplayed(this.archiveButton, appConst.mediumTimeout);
-            return await this.pause(500);
+            await this.waitForElementDisplayed(this.deleteButton, appConst.mediumTimeout);
+            return await this.pause(300);
         } catch (err) {
-            await this.handleError('Delete Content Dialog', 'err_archive_dialog_opened', err);
+            await this.handleError('Delete Content Dialog', 'err_delete_dialog_opened', err);
         }
     }
 
-
-    waitForDialogClosed() {
-        return this.waitForElementNotDisplayed(XPATH.container, appConst.mediumTimeout).catch(err => {
-            this.saveScreenshot('err_close_delete_content_dialog');
-            throw new Error('Delete content dialog must be closed ' + err);
-        })
+    async waitForDialogClosed() {
+        try {
+            return this.waitForElementNotDisplayed(XPATH.container, appConst.mediumTimeout)
+        } catch (err) {
+            await this.handleError('Delete content dialog must be closed ', 'err_close_delete_content_dialog', err);
+        }
     }
 
-    async clickOnCancelButton() {
-        return await this.clickOnElement(this.cancelButton);
-    }
-
-    async clickOnCancelTopButton() {
-        return await this.clickOnElement(this.cancelTopButton);
+    async clickOnCloseButton() {
+        return await this.clickOnElement(this.closeButton);
     }
 
     // Clicks on 'Archive' button.(Confirm Archive dialog can appear)
-    async clickOnArchiveButton() {
+    async clickOnDeleteButton() {
         try {
-            await this.waitForElementDisplayed(this.archiveButton, appConst.mediumTimeout);
-            await this.waitForElementEnabled(this.archiveButton, appConst.mediumTimeout);
-            await this.clickOnElement(this.archiveButton);
-            return await this.pause(500);
+            await this.waitForElementDisplayed(this.deleteButton, appConst.mediumTimeout);
+            await this.waitForElementEnabled(this.deleteButton, appConst.mediumTimeout);
+            await this.clickOnElement(this.deleteButton);
         } catch (err) {
-            await this.handleError('Delete Content Dialog', 'err_click_on_archive_button', err);
+            await this.handleError('Delete Content Dialog', 'err_click_on_delete_button', err);
         }
-    }
-
-    async clickOnDeleteMenuItem() {
-        await this.clickOnArchiveMenuDropDownHandle();
-        let menuItem = XPATH.container + XPATH.archiveOrDeleteMenu + XPATH.deleteMenuItem;
-        await this.waitForElementDisplayed(menuItem, appConst.mediumTimeout);
-        await this.clickOnElement(menuItem);
-        return await this.pause(500);
-    }
-
-    // Call the method for deleting single content, Delete Content should be closed after clicking on the menu item
-    async clickOnDeleteMenuItemAndWaitForClosed() {
-        try {
-            await this.clickOnDeleteMenuItem();
-            return await this.waitForDialogClosed();
-        } catch (err) {
-            await this.handleError('Delete Content Dialog', 'err_click_on_delete_menu_item', err);
-        }
-    }
-
-    //Expands the menu in 'Archive' button
-    async clickOnArchiveMenuDropDownHandle() {
-        await this.waitForArchiveMenuDropDownHandleDisplayed();
-        await this.waitForArchiveMenuDropDownHandleEnabled();
-        await this.clickOnElement(this.archiveMenuDropDownHandle);
-        return await this.pause(300);
-    }
-
-    waitForArchiveMenuDropDownHandleDisplayed() {
-        return this.waitForElementDisplayed(this.archiveMenuDropDownHandle, appConst.mediumTimeout);
-    }
-
-    waitForArchiveMenuDropDownHandleEnabled() {
-        return this.waitForElementEnabled(this.archiveMenuDropDownHandle, appConst.mediumTimeout);
-    }
-
-    waitForArchiveMenuDropDownHandleDisabled() {
-        return this.waitForElementDisabled(this.archiveMenuDropDownHandle, appConst.mediumTimeout);
     }
 
     async clickOnShowReferencesButton(itemDisplayName) {
-        let buttonLocator = XPATH.showReferencesButton(itemDisplayName);
+        let buttonLocator = XPATH.getShowReferencesButtonLocator(itemDisplayName);
         await this.waitForSpinnerNotVisible();
-        await this.waitForInboundReferencesEntryDisplayed();
+        //await this.waitForInboundReferencesEntryDisplayed();
         await this.waitForElementDisplayed(buttonLocator, appConst.mediumTimeout);
         await this.clickOnElement(buttonLocator);
-        return await this.pause(3000);
+        return await this.pause(2000);
     }
 
-    async getNumberInArchiveButton() {
+    async getNumberInDeleteButton() {
         try {
             await this.getBrowser().waitUntil(async () => {
-                let text = await this.getText(this.archiveButton);
+                let text = await this.getText(this.deleteButton);
                 return text.includes('(');
             }, {timeout: appConst.mediumTimeout});
-            let result = await this.getText(this.archiveButton);
+            let result = await this.getText(this.deleteButton);
             let startIndex = result.indexOf('(');
             let endIndex = result.indexOf(')');
             return result.substring(startIndex + 1, endIndex);
         } catch (err) {
-            throw new Error("Error when getting number in Archive button " + err);
+            await this.handleError('Tried to get the number id items in Delete button', 'err_get_number_in_archive_button', err);
         }
     }
 
     async getContentStatus(displayName) {
-        let selector = XPATH.container + XPATH.getContentStatus(displayName);
+        let selector = XPATH.container + TREE_GRID.listItemByDisplayName(displayName) + XPATH.contentStatusBadge;
         return await this.getText(selector);
     }
 
-    async isCancelButtonDisplayed() {
-        return this.isElementDisplayed(this.cancelButton);
+    async isDeleteButtonDisplayed() {
+        return this.isElementDisplayed(this.deleteButton);
     }
 
-    async isCancelTopButtonDisplayed() {
-        return this.isElementDisplayed(this.cancelTopButton);
+    async waitForDeleteButtonDisabled() {
+        return this.waitForElementDisabled(this.deleteButton, appConst.mediumTimeout);
     }
 
-    async isArchiveButtonDisplayed() {
-        return this.isElementDisplayed(this.archiveButton);
+    async waitForDeleteButtonEnabled() {
+        return this.waitForElementEnabled(this.deleteButton, appConst.mediumTimeout);
     }
 
-    async waitForArchiveButtonDisabled() {
-        return this.waitForElementDisabled(this.archiveButton, appConst.mediumTimeout);
-    }
-
-    async waitForArchiveButtonEnabled() {
-        return this.waitForElementEnabled(this.archiveButton, appConst.mediumTimeout);
-    }
-
-    async isArchiveMenuDropDownHandleDisplayed() {
-        return await this.isElementDisplayed(this.archiveMenuDropDownHandle);
-    }
-
-    async getDisplayNamesToArchiveOrDelete() {
-        let selector = XPATH.container + XPATH.itemToDeleteList + lib.H6_DISPLAY_NAME;
-        return await this.getTextInElements(selector);
+    async getMainItemsToDeleteDisplayName() {
+        try {
+            let selector = XPATH.container + XPATH.mainListItemsDisplayName;
+            return await this.getTextInElements(selector);
+        } catch (err) {
+            await this.handleError('Content Duplicate dialog', 'err_duplicate_dlg_display_names', err);
+        }
     }
 
     async getDependantItemsName() {
@@ -224,29 +142,32 @@ class DeleteContentDialog extends Page {
         return await this.getTextInDisplayedElements(locator);
     }
 
-
     async waitForDependantsHeaderDisplayed() {
         try {
             return await this.waitForElementDisplayed(this.dependentsHeader, appConst.mediumTimeout);
         } catch (err) {
-            await this.saveScreenshot(appConst.generateRandomName('err_dependants_header'));
-            throw new Error('Delete content dialog, dependants header is not displayed: ' + err);
+            await this.handleError('Delete Content Dialog', 'err_dependants_header_displayed', err);
         }
     }
 
     async waitForShowReferencesButtonDisplayed(displayName) {
-        let locator = XPATH.showReferencesButton(displayName);
-        return await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+        try {
+            //let locator = XPATH.container + TREE_GRID.listItemByDisplayNameAndDataComponent('ContentListItemWithReference', displayName) +
+            //             "//a[text()='Show references']";
+            let locator = XPATH.getShowReferencesButtonLocator(displayName);
+            return await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+        } catch (err) {
+            await this.handleError('Delete Content Dialog', 'err_show_references_button_displayed', err);
+        }
     }
 
     async clickOnIgnoreInboundReferences() {
         try {
             await this.waitForIgnoreInboundReferencesButtonDisplayed();
             await this.clickOnElement(this.ignoreInboundReferencesButton);
-            return await this.pause(700);
+            return await this.waitForIgnoreInboundReferencesButtonNotDisplayed();
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_ignore_inbound_ref');
-            throw new Error("Delete Content dialog, screenshot:" + screenshot + ' ' + err);
+            await this.handleError('Delete Content Dialog', 'err_ignore_inbound_ref', err);
         }
     }
 

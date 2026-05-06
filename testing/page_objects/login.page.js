@@ -1,10 +1,9 @@
 const Page = require('./page');
-const appConst = require('../libs/app_const');
 
 class LoginPage extends Page {
 
     get usernameInput() {
-        return `//div[contains(@class,'home-main-container')]//input[contains(@id,'username-input')]`
+        return `input[id^='username-input']`
     }
 
     get passwordInput() {
@@ -25,8 +24,8 @@ class LoginPage extends Page {
         return await this.pause(200);
     }
 
-    waitForPageLoaded() {
-        return this.waitForElementDisplayed(this.usernameInput, appConst.mediumTimeout)
+    async waitForPageLoaded() {
+        return await this.waitForElementDisplayed(this.usernameInput);
     }
 
     getTitle() {
@@ -42,6 +41,11 @@ class LoginPage extends Page {
         await usernameInput.addValue(name);
         await passwordInput.addValue(pass);
         return await this.clickOnLoginButton();
+    }
+
+    async isLoaded() {
+        let usernameInput = await this.findElement(this.usernameInput);
+        return await usernameInput.isDisplayed();
     }
 }
 

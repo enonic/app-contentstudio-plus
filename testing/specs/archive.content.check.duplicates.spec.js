@@ -1,5 +1,5 @@
 /**
- * Created on 12.09.2025
+ * Created on 12.09.2025 updated on 06.05.2026
  */
 const assert = require('node:assert');
 const webDriverHelper = require('../libs/WebDriverHelper');
@@ -10,7 +10,7 @@ const contentBuilder = require("../libs/content.builder");
 const DeleteContentDialog = require('../page_objects/delete.content.dialog');
 const ArchiveBrowsePanel = require('../page_objects/archive/archive.browse.panel');
 
-describe.skip('archive.content.check.duplicates.spec: tests for archiving content', function () {
+describe('archive.content.check.duplicates.spec: tests for archiving content', function () {
     this.timeout(appConst.SUITE_TIMEOUT);
     // setup standalone mode if WDIO is not defined:
     if (typeof browser === 'undefined') {
@@ -39,9 +39,9 @@ describe.skip('archive.content.check.duplicates.spec: tests for archiving conten
             let archiveBrowsePanel = new ArchiveBrowsePanel();
             // 1. Select the first folder and move it to archive:
             await studioUtils.findContentAndClickCheckBox(FOLDER1.displayName);
-            await contentBrowsePanel.clickOnArchiveButton();
+            await contentBrowsePanel.clickOnDeleteButton();
             await deleteContentDialog.waitForDialogOpened();
-            await deleteContentDialog.clickOnArchiveButton();
+            await deleteContentDialog.clickOnDeleteButton();
             // 2. Verify that the content is not displayed in Content Browse Panel:
             await contentBrowsePanel.waitForContentNotDisplayed(FOLDER1.displayName);
             await contentBrowsePanel.waitForNotificationMessage();
@@ -51,12 +51,12 @@ describe.skip('archive.content.check.duplicates.spec: tests for archiving conten
             let result = await archiveBrowsePanel.getDisplayNamesInGrid();
             const hasDuplicates = new Set(result).size !== result.length;
             assert.ok(hasDuplicates === false, 'There should be no duplicates in the Archive Grid');
-            // 4. Switch to Content mode and move to archive the second folder:
+            // 4. Switch to 'Content' mode and move to archive the second folder:
             await studioUtils.switchToContentMode();
             await studioUtils.findContentAndClickCheckBox(FOLDER2.displayName);
-            await contentBrowsePanel.clickOnArchiveButton();
+            await contentBrowsePanel.clickOnDeleteButton();
             await deleteContentDialog.waitForDialogOpened();
-            await deleteContentDialog.clickOnArchiveButton();
+            await deleteContentDialog.clickOnDeleteButton();
             await contentBrowsePanel.waitForContentNotDisplayed(FOLDER2.displayName);
             await contentBrowsePanel.waitForNotificationMessage();
             // 5. Navigate to 'Archive Browse Panel' and check for duplicates in the grid:
@@ -68,9 +68,9 @@ describe.skip('archive.content.check.duplicates.spec: tests for archiving conten
         });
 
     beforeEach(async () => {
-        return await studioUtils.navigateToContentStudioCloseProjectSelectionDialog();
+        return await studioUtils.navigateToContentStudioApp();
     });
-    afterEach(() => studioUtils.doCloseAllWindowTabsAndSwitchToHome());
+    afterEach(() => studioUtils.doCloseAllWindowTabsAndNavigateToHome());
     before(() => {
         return console.log('specification is starting: ' + this.title);
     });

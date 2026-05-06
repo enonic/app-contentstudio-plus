@@ -2,39 +2,43 @@
  * Created on 24/03/2020.
  */
 const Page = require('../page');
-const ContentBrowsePanel = require('../../page_objects/browsepanel/content.browse.panel');
-const lib = require('../../libs/elements');
+const {BUTTONS,} = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
+const {Key} = require('webdriverio');
 
 const XPATH = {
-    container: `//div[contains(@id,'ProjectSelectionDialog')]`,
-    title: `//h2[@class='title']`,
-    projectList: `//ul[contains(@id,'ProjectList')]`,
+    container: `//div[contains(@role,'dialog') and descendant::h2[text()='Select project']]`,
+    title: "//h2[@class='title']",
+    projectList: "//div[contains(@role,'listbox')]",
+    projectListItemByDisplayName: (displayName) => {
+        return `//div[@data-component='ProjectLabel' and descendant::span[text()='${displayName}']]`;
+    }
 };
 
 class ProjectSelectionDialog extends Page {
 
-    get cancelButtonTop() {
-        return XPATH.container + lib.CANCEL_BUTTON_TOP;
+    get closeButton() {
+        return XPATH.container + BUTTONS.buttonAriaLabel('Close');
     }
 
-    async clickOnCancelButtonTop() {
+    async clickOnCloseButton() {
         try {
-            await this.clickOnElement(this.cancelButtonTop);
+            await this.waitForElementDisplayed(this.closeButton, appConst.mediumTimeout);
+            await this.clickOnElement(this.closeButton);
             return await this.waitForDialogClosed();
         } catch (err) {
-            let screenshot = await this.saveScreenshot('err_click_on_cancel_button');
-            throw new Error(`Project Selection dialog, error when clicking on Cancel(Top) button , screenshot:${screenshot} ` + err);
+            await this.handleError('Project Selection dialog, Error occurred while clicking the Close button ', 'err_proj_sel_close_button',
+                err);
         }
     }
 
     async waitForDialogLoaded() {
         try {
-            let selector = XPATH.container + XPATH.projectList + lib.itemByDisplayName('Default');
-            await this.waitForElementDisplayed(selector, appConst.shortTimeout)
+            let selector = XPATH.container + "//h2[text()='Select project']";
+            return await this.waitForElementDisplayed(selector, appConst.shortTimeout)
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_open_project_selection_dialog');
-            throw new Error(`Project Selection dialog should be opened! screenshot:${screenshot} ` + err);
+            await this.handleError('Project Selection dialog, Error occurred while waiting for the dialog to be loaded',
+                'err_wait_proj_sel_dialog', err);
         }
     }
 
@@ -50,7 +54,7 @@ class ProjectSelectionDialog extends Page {
         try {
             return await this.waitForElementNotDisplayed(XPATH.container, appConst.shortTimeout);
         } catch (err) {
-            throw new Error('Dialog should be closed ' + err);
+            await this.handleError('Project Selection dialog, Error occurred while waiting for the dialog to be closed', err);
         }
     }
 
@@ -58,18 +62,15 @@ class ProjectSelectionDialog extends Page {
         return this.getText(XPATH.container + XPATH.title);
     }
 
-    async waitForCancelButtonTopDisplayed() {
-        try {
-            return await this.waitForElementDisplayed(this.cancelButtonTop, appConst.shortTimeout);
-        } catch (err) {
-            throw new Error('Project Selection dialog - Cancel button is not displayed :' + err);
-        }
-    }
 
     async selectContext(projectDisplayName) {
-        let selector = XPATH.container + XPATH.projectList + lib.TREE_GRID.projectItemByDisplayName(projectDisplayName);
-        await this.waitForElementDisplayed(selector, appConst.longTimeout);
-        await this.scrollAndClickOnElement(selector);
+        try {
+            let selector = XPATH.container + XPATH.projectList + XPATH.projectListItemByDisplayName(projectDisplayName);
+            await this.waitForElementDisplayed(selector, appConst.longTimeout);
+            await this.scrollAndClickOnElement(selector);
+        } catch (err) {
+            await this.handleError('Project Selection Dialog, tried to select the item', 'err_select_project_context', err);
+        }
     }
 
     async getProjectsDisplayName() {
@@ -78,14 +79,33 @@ class ProjectSelectionDialog extends Page {
     }
 
     async getProjectLanguage(projectDisplayName) {
-        let locator = XPATH.container + XPATH.projectList + lib.itemByDisplayName(projectDisplayName) + lib.P_SUB_NAME;
-        return this.getText(locator);
+        let locator = XPATH.container + XPATH.projectList + XPATH.projectListItemByDisplayName(projectDisplayName) + "//span/span";
+        return await this.getText(locator);
     }
 
     async getWarningMessage() {
         let locator = XPATH.container + "//h6[@class='notification-dialog-text']";
         await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
         return await this.getText(locator);
+    }
+
+    async waitForSelectedProjectItem(displayName) {
+        let locator = XPATH.container + XPATH.projectList + XPATH.projectListItemByDisplayName(displayName);
+        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+        let element = await this.findElement(locator);
+        let attr = await element.getAttribute('class');
+        return attr.includes('selected');
+    }
+
+    async getNameOfSelectedProjectItem() {
+        let locator = XPATH.container + XPATH.projectList +
+                      `//div[@data-active='true' and child::div[@data-component='ProjectLabel')]//span`;
+        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+        return await this.getText(locator);
+    }
+
+    press_Shift_Tab() {
+        return this.browser.keys([Key.Shift, Key.Tab]);
     }
 }
 

@@ -49,10 +49,10 @@ describe.skip('archive.browse.panel.spec: tests for archive browse panel and sel
             await studioUtils.findContentAndClickCheckBox(FOLDER1.displayName);
             await studioUtils.findContentAndClickCheckBox(FOLDER2.displayName);
             await contentBrowsePanel.rightClickOnItemByDisplayName(FOLDER2.displayName);
-            await contentBrowsePanel.clickOnMenuItem(appConst.GRID_CONTEXT_MENU.ARCHIVE);
+            await contentBrowsePanel.clickOnMenuItem(appConst.GRID_CONTEXT_MENU.DELETE);
             await deleteContentDialog.waitForDialogOpened();
             await studioUtils.saveScreenshot('folder_to_archive2');
-            await deleteContentDialog.clickOnArchiveButton();
+            await deleteContentDialog.clickOnDeleteButton();
             await confirmValueDialog.waitForDialogOpened();
             await confirmValueDialog.typeNumberOrName(2);
             await confirmValueDialog.clickOnConfirmButton();
@@ -62,7 +62,7 @@ describe.skip('archive.browse.panel.spec: tests for archive browse panel and sel
             // 3. Click on the checkbox:
             await archiveBrowsePanel.clickCheckboxAndSelectRowByDisplayName(FOLDER1.displayName);
             await studioUtils.saveScreenshot('archive_selection_controller1');
-            await archiveBrowsePanel.clickOnSelectionToggler();
+            //await archiveBrowsePanel.clickOnSelectionToggler();
             // 4. Verify that just one item are displayed in the filtered grid:
             let displayNames = await archiveBrowsePanel.getDisplayNamesInGrid();
             assert.equal(displayNames.length, 1, 'Single item should be present in the filtered grid');
@@ -79,13 +79,13 @@ describe.skip('archive.browse.panel.spec: tests for archive browse panel and sel
             assert.ok(result === false, 'Selection Controller checkBox should not be selected');
         });
 
-    it("WHEN Selection Controller checkbox is selected (All items are checked) THEN 'Delete..' 'Restore...' buttons should be enabled",
+    it("WHEN Selection Controller checkbox is selected (All items are checked) THEN 'Delete' 'Restore' buttons should be enabled",
         async () => {
             // 1. Navigate to 'Archive Browse Panel' and check the archived content:
             await studioUtils.openArchivePanel();
             let archiveBrowsePanel = new ArchiveBrowsePanel();
             // 2. 'Selection Controller' checkbox is selected (All items are checked):
-            await archiveBrowsePanel.clickOnSelectionControllerCheckbox();
+            await archiveBrowsePanel.clickOnSelectAllCheckbox();
             // 3. Verify buttons:
             await archiveBrowsePanel.waitForDeleteButtonEnabled();
             await archiveBrowsePanel.waitForRestoreButtonEnabled();
@@ -241,9 +241,9 @@ describe.skip('archive.browse.panel.spec: tests for archive browse panel and sel
         });
 
     beforeEach(async () => {
-        return await studioUtils.navigateToContentStudioCloseProjectSelectionDialog();
+        return await studioUtils.navigateToContentStudioApp();
     });
-    afterEach(() => studioUtils.doCloseAllWindowTabsAndSwitchToHome());
+    afterEach(() => studioUtils.doCloseAllWindowTabsAndNavigateToHome());
     before(() => {
         return console.log('specification is starting: ' + this.title);
     });
