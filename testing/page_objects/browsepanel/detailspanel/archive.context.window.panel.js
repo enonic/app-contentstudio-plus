@@ -1,8 +1,8 @@
 /**
  * Created on 10.07.2025
  */
-const BaseDetailsPanel = require('../../details_panel/base.context.window.panel');
-const lib = require('../../../libs/elements');
+const BaseContextWindowPanel = require('../../details_panel/base.context.window.panel');
+const {DROPDOWN} = require('../../../libs/elements');
 const appConst = require('../../../libs/app_const');
 
 const xpath = {
@@ -10,31 +10,26 @@ const xpath = {
 };
 
 //  ArchiveBrowsePanel, ContextView:
-class ArchiveContextWindowPanel extends BaseDetailsPanel {
+class ArchiveContextWindowPanel extends BaseContextWindowPanel {
+
+    get container() {
+        return xpath.container;
+    }
 
     get widgetSelectorDropdownHandle() {
-        return xpath.container + lib.DROPDOWN_SELECTOR.WIDGET_FILTER_DROPDOWN + lib.DROP_DOWN_HANDLE;
+        return xpath.container + DROPDOWN.WIDGET_COMBOBOX + "//button[@aria-label='Toggle']";
     }
 
     get widgetSelectorDropdown() {
-        return xpath.container + lib.DROPDOWN_SELECTOR.WIDGET_FILTER_DROPDOWN;
+        return xpath.container + DROPDOWN.WIDGET_COMBOBOX;
     }
 
     async waitForOpened() {
         try {
-            return await this.waitForElementDisplayed(xpath.container, appConst.shortTimeout)
+            return await this.waitForElementDisplayed(xpath.container + "//div[contains(@id,'ContextView')]", appConst.shortTimeout);
         } catch (err) {
             await this.handleError('Archive Context Window Panel was not loaded', 'err_archive_context_panel_loaded', err);
         }
-    }
-
-    waitForDetailsPanelCleared() {
-        let selector = xpath.container + "//div[contains(@id,'ContextView')]";
-        return this.getBrowser().waitUntil(() => {
-            return this.getAttribute(selector, 'class').then(result => {
-                return result.includes('no-selection');
-            })
-        }, {timeout: appConst.shortTimeout, timeoutMsg: "Details Panel should be cleared"});
     }
 
 }

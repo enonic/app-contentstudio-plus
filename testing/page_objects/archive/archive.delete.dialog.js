@@ -2,56 +2,46 @@
  * Created on 04.11.2021.
  */
 const Page = require('../page');
-const lib = require('../../libs/elements');
-const appConst = require('../../libs/app_const');
+const {BUTTONS, TREE_GRID} = require('../../libs/elements');
+
 const XPATH = {
-    container: `//div[contains(@id,'ArchiveDeleteDialog')]`,
-    deleteButton: `//button[contains(@id,'DialogButton') and child::span[contains(.,'Delete')]]`,
+    container: `//div[@data-component='ArchiveDeleteDialog']`,
     childListToDelete: "//ul[contains(@id,'ArchiveItemsList')]",
-    header: `//div[contains(@id,'DefaultModalDialogHeader')]`,
+    header: `//header/h2`,
     dialogItemList: "//ul[contains(@id,'ArchiveDialogItemList')]",
 };
 
 class ArchiveDeleteDialog extends Page {
 
     get title() {
-        return XPATH.container + XPATH.header + "//h2[@class='title']";
+        return XPATH.container + XPATH.header;
     }
 
     get deleteButton() {
-        return XPATH.container + XPATH.deleteButton;
+        return XPATH.container + BUTTONS.buttonAriaLabel('Delete');
     }
 
-    get cancelButton() {
-        return XPATH.container + lib.dialogButton('Cancel');
+    get closeButton() {
+        return XPATH.container + BUTTONS.buttonAriaLabel('Close');
     }
 
-    get cancelButtonTop() {
-        return XPATH.container + lib.CANCEL_BUTTON_TOP;
+    async clickOnCloseButton() {
+        return await this.clickOnElement(this.closeButton);
     }
 
-    clickOnCancelButtonTop() {
-        return this.clickOnElement(this.cancelButtonTop);
-    }
-
-    getItemsToDeleteDisplayName() {
-        let locator = XPATH.container + XPATH.dialogItemList + lib.H6_DISPLAY_NAME;
-        return this.getTextInElements(locator);
-    }
-
-    getChildItemsToDeleteDisplayName() {
-        let locator = XPATH.container + XPATH.childListToDelete + lib.H6_DISPLAY_NAME;
-        return this.getTextInElements(locator);
+    async getItemsToDeleteDisplayName() {
+        let locator = XPATH.container + TREE_GRID.CONTENT_LABEL_BLOCK + '//div[2]//span';
+        return await this.getTextInElements(locator);
     }
 
     async clickOnCancelButton() {
-        await this.waitForElementDisplayed(this.cancelButton, appConst.mediumTimeout);
+        await this.waitForElementDisplayed(this.cancelButton);
         return await this.clickOnElement(this.cancelButton);
     }
 
     async waitForOpened() {
         try {
-            await this.waitForElementDisplayed(this.deleteButton, appConst.mediumTimeout)
+            await this.waitForElementDisplayed(this.deleteButton);
         } catch (err) {
             await this.handleError('Archive Delete dialog', 'err_archive_delete_dlg_opened', err);
         }
@@ -59,7 +49,7 @@ class ArchiveDeleteDialog extends Page {
 
     async waitForClosed() {
         try {
-            await this.waitForElementNotDisplayed(XPATH.container, appConst.mediumTimeout)
+            await this.waitForElementNotDisplayed(XPATH.container);
         } catch (err) {
             await this.handleError('Archive Delete dialog', 'err_archive_delete_dlg_close', err);
         }
@@ -74,8 +64,8 @@ class ArchiveDeleteDialog extends Page {
         return await this.clickOnElement(this.deleteButton);
     }
 
-    waitForDeleteButtonDisplayed() {
-        return this.waitForElementDisplayed(this.deleteButton, appConst.mediumTimeout);
+    async waitForDeleteButtonDisplayed() {
+        return await this.waitForElementDisplayed(this.deleteButton);
     }
 
     getChildItemsToDeletePath() {

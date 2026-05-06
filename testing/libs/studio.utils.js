@@ -7,7 +7,7 @@ const LoginPage = require('../page_objects/login.page');
 const BrowsePanel = require('../page_objects/browsepanel/content.browse.panel');
 const FilterPanel = require('../page_objects/browsepanel/content.filter.panel');
 const appConst = require('./app_const');
-const lib = require('./elements');
+const {BUTTONS, COMMON} = require('./elements');
 const NewContentDialog = require('../page_objects/browsepanel/new.content.dialog');
 const ContentWizardPanel = require('../page_objects/wizardpanel/content.wizard.panel');
 const webDriverHelper = require('./WebDriverHelper');
@@ -30,7 +30,6 @@ const ContentBrowsePanel = require('../page_objects/browsepanel/content.browse.p
 const ConfirmValueDialog = require('../page_objects/confirm.content.delete.dialog');
 const DateTimeRange = require('../page_objects/components/datetime.range');
 const WizardDependenciesWidget = require('../page_objects/wizardpanel/details/wizard.dependencies.widget');
-const WizardDetailsPanel = require('../page_objects/wizardpanel/details/wizard.details.panel');
 const fs = require('fs');
 const path = require('path');
 const PropertiesWidgetItem = require('../page_objects/browsepanel/detailspanel/properties.widget.itemview');
@@ -38,6 +37,7 @@ const ArchiveBrowsePanel = require('../page_objects/archive/archive.browse.panel
 const EditSettingDialog = require('../page_objects/details_panel/edit.settings.dialog');
 const BrowseLayersWidget = require('../page_objects/browsepanel/detailspanel/browse.layers.widget');
 const VariantsExtension = require('../page_objects/details_panel/variants.extension');
+const WizardContextPanel = require('../page_objects/wizardpanel/details/wizard.context.window.panel');
 
 module.exports = {
 
@@ -510,10 +510,10 @@ module.exports = {
         let deleteContentDialog = new DeleteContentDialog();
         let confirmValueDialog = new ConfirmValueDialog();
         //1. Open Delete Content dialog:
-        await browsePanel.clickOnArchiveButton();
+        await browsePanel.clickOnDeleteButton();
         await deleteContentDialog.waitForDialogOpened();
         //2. Click on Delete button
-        await deleteContentDialog.clickOnDeleteMenuItem();
+        await deleteContentDialog.clickOnDeleteButton();
         //3. wait for Confirm dialog is loaded:
         await confirmValueDialog.waitForDialogOpened();
         //4. Type required number:
@@ -572,49 +572,53 @@ module.exports = {
     },
     async navigateToContentStudioApp(userName, password) {
         try {
-            await this.clickOnContentStudioLink(userName, password);
-            await this.doSwitchToContentBrowsePanelAndSelectDefaultContext();
+            await this.doLogin(userName, password);
+            let homePage = new HomePage();
+            await homePage.clickOnContentStudioLink();
+            await this.waitForBrowsePanelAndSelectDefaultContext();
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_navigate_cs');
-            throw new Error(`Error occurred after clicking on  Content Studio link in Launcher Panel,  screenshot:${screenshot}  ` + err);
+            throw new Error(`Error occurred after clicking on Content Studio link in Launcher Panel,  screenshot:${screenshot}  ` + err);
         }
     },
-    async navigateToContentStudioAppMobile(userName, password) {
-        await this.navigateToContentStudioApp(userName, password);
-        //close content studio menu :
-        await this.closeContentStudioMenu();
-    },
-    async navigateToContentStudioWithProjects(userName, password) {
+    async waitForBrowsePanelAndSelectDefaultContext() {
         try {
-            await this.clickOnContentStudioLink(userName, password);
-            console.log('testUtils:switching to Content Browse panel...');
+            let projectSelectionDialog = new ProjectSelectionDialog();
             let browsePanel = new BrowsePanel();
-            await this.getBrowser().switchWindow('Content Studio - Enonic XP Admin');
-            return await browsePanel.pause(1500);
+            let isLoaded = await projectSelectionDialog.isDialogLoaded();
+            if (isLoaded) {
+                await projectSelectionDialog.selectContext('Default');
+
+                await projectSelectionDialog.waitForDialogClosed();
+                return await this.getBrowser().pause(200);
+            }
+            console.log('Content browse panel loads...');
+            await browsePanel.waitForGridLoaded(appConst.longTimeout);
+            return browsePanel;
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_navigate_to_studio');
-            throw new Error(`Tried to navigate to Content Studio, screenshot: ${screenshot} ` + err);
+            throw new Error('Error when navigating to Content Studio(selecting Default context)' + err);
         }
     },
-    async clickOnContentStudioLink(userName, password) {
-        let launcherPanel = new LauncherPanel();
-        let result = await launcherPanel.isDisplayed(2000);
-        console.log('Launcher Panel is opened, click on the `Content Studio` link...');
+
+    async doLogin(userName, password) {
+        let loginPage = new LoginPage();
+        let result = await loginPage.isLoaded();
         if (result) {
-            await launcherPanel.clickOnContentStudioLink();
-        } else {
-            console.log('Login Page is opened, type a password and name...');
-            return await this.doLoginAndClickOnContentStudio(userName, password);
+            await loginPage.doLogin(userName, password);
         }
+        let homePage = new HomePage();
+        await homePage.waitForContentLinkDisplayed();
     },
+
     async navigateToContentStudioCloseProjectSelectionDialog(userName, password) {
         try {
-            await this.clickOnContentStudioLink(userName, password);
-            await this.getBrowser().switchWindow('Content Studio - Enonic XP Admin');
+            await this.doLogin(userName, password);
+            let homePage = new HomePage();
+            await homePage.clickOnContentStudioLink();
             await this.closeProjectSelectionDialog();
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_navigate_to_studio');
-            throw new Error(`Error when navigate to Content Studio app. Screenshot: ${screenshot} ` + err);
+            throw new Error(`Error when navigating to Content Studio. Screenshot: ${screenshot}` + err);
         }
     },
     //Clicks on Cancel button and switches to Default project
@@ -623,56 +627,21 @@ module.exports = {
         let isLoaded = await projectSelectionDialog.isDialogLoaded();
         if (isLoaded) {
             await projectSelectionDialog.pause(200);
-            await projectSelectionDialog.clickOnCancelButtonTop();
+            await projectSelectionDialog.clickOnCloseButton();
             await projectSelectionDialog.waitForDialogClosed();
             return await this.getBrowser().pause(200);
         }
     },
-    async doLoginAndClickOnContentStudio(userName, password) {
-        let loginPage = new LoginPage();
-        await loginPage.doLogin(userName, password);
-        let launcherPanel = new LauncherPanel();
-        const isAlertOpen = await this.getBrowser().isAlertOpen();
-        if (isAlertOpen) {
-            await this.getBrowser().acceptAlert();
-        }
-        return await launcherPanel.clickOnContentStudioLink();
-
-    },
     async doSwitchToContentBrowsePanel() {
         try {
             let browsePanel = new BrowsePanel();
-            await this.switchToTab(appConst.BROWSER_TITLES.CONTENT_STUDIO);
+            await this.switchToTab(appConst.BROWSER_XP_TITLES.CONTENT_STUDIO);
             console.log('switched to content browse panel...');
             await browsePanel.waitForGridLoaded(appConst.longTimeout);
             return browsePanel;
         } catch (err) {
-            throw new Error('Tried to  switch to Content Studio App ' + err);
+            throw new Error('Error when switching to Content Studio App ' + err);
         }
-    },
-    async doSwitchToContentBrowsePanelAndSelectDefaultContext() {
-        try {
-            let projectSelectionDialog = new ProjectSelectionDialog();
-            let browsePanel = new BrowsePanel();
-            await this.switchToTab(appConst.BROWSER_TITLES.CONTENT_STUDIO);
-            console.log('switched to content browse panel...');
-            let isLoaded = await projectSelectionDialog.isDialogLoaded();
-            if (isLoaded) {
-                await projectSelectionDialog.selectContext('Default');
-                await projectSelectionDialog.waitForDialogClosed();
-                return await this.getBrowser().pause(200);
-            }
-            await browsePanel.waitForGridLoaded(appConst.longTimeout);
-            return browsePanel;
-        } catch (err) {
-            throw new Error('Tried to switch to Content Studio App and select Default project ' + err);
-        }
-    },
-    async doSwitchToHome() {
-        console.log('testUtils:switching to Home page...');
-        let homePage = new HomePage();
-        await this.switchToTab(appConst.BROWSER_TITLES.XP_HOME);
-        return await homePage.waitForLoaded(appConst.mediumTimeout);
     },
 
     async doCloseWindowTabAndSwitchToBrowsePanel() {
@@ -743,29 +712,35 @@ module.exports = {
         let tabs = await this.getBrowser().getWindowHandles();
         return await this.getBrowser().switchToWindow(tabs[tabs.length - 2]);
     },
-    async doCloseWindowTabByTitle(title) {
-        let arrayId = await this.getBrowser().getWindowHandles();
-        for (const item of arrayId) {
-            let result = await this.switchAndCheckTitle(item, title);
-            if (result) {
-                await this.getBrowser().closeWindow();
-            }
-        }
-        await this.doSwitchToHome();
+    async doCloseAllWindowTabsAndNavigateToHome() {
+        await this.doCloseAllWindowTabs();
+        await this.navigateToHomePage();
     },
     async doCloseAllWindowTabsAndSwitchToHome() {
+        await this.doCloseAllWindowTabs();
+        let contentBrowsePanel = new ContentBrowsePanel();
+        await contentBrowsePanel.clickOnShowXpMenuButton();
+    },
+    async doCloseAllWindowTabs() {
         let handles = await this.getBrowser().getWindowHandles();
         for (const item of handles) {
-            let result = await this.switchAndCheckTitle(item, 'Enonic XP Home');
+            let result = await this.switchAndCheckTitle(item, ["Enonic XP Admin", "Archive"]);
             if (!result) {
                 await this.getBrowser().closeWindow();
+                await this.getBrowser().pause(100);
             }
         }
-        return this.doSwitchToHome();
+    },
+    async navigateToHomePage() {
+        await this.getBrowser().url('http://localhost:8080/admin/');
+        await this.getBrowser().pause(100);
     },
     switchAndCheckTitle(handle, reqTitle) {
         return this.getBrowser().switchToWindow(handle).then(() => {
             return this.getBrowser().getTitle().then(title => {
+                if (Array.isArray(reqTitle)) {
+                    return reqTitle.some(titlePart => title.includes(titlePart));
+                }
                 return title.includes(reqTitle);
             }).catch(err => {
                 console.log('Error when getting Title' + err);
@@ -785,14 +760,7 @@ module.exports = {
             return console.log('screenshot was not saved ' + err);
         }
     },
-    async openDependencyWidgetInBrowsePanel() {
-        let browsePanel = new BrowsePanel();
-        let browseDependenciesWidget = new BrowseDependenciesWidget();
-        let browseDetailsPanel = new BrowseContextWindowPanel();
-        await browsePanel.openContextWindowPanel();
-        await browseDetailsPanel.openDependencies();
-        return await browseDependenciesWidget.waitForWidgetLoaded();
-    },
+
     isStringEmpty(str) {
         return (!str || 0 === str.length);
     },
@@ -805,14 +773,7 @@ module.exports = {
             return await this.getBrowser().pause(200);
         }
     },
-    async closeContentStudioMenu() {
-        let result = await this.isContentStudioMenuOpened();
-        if (result) {
-            await this.waitForElementDisplayed(lib.APP_MODE_SWITCHER_TOGGLER);
-            await this.clickOnElement(lib.APP_MODE_SWITCHER_TOGGLER);
-            return await this.getBrowser().pause(200);
-        }
-    },
+
     async isContentStudioMenuOpened() {
         let element = await this.getBrowser().$("//div[contains(@id,'AppWrapper')]");
         let atrValue = await element.getAttribute('class');
@@ -821,9 +782,9 @@ module.exports = {
     async openSettingsPanel() {
         try {
             let settingsBrowsePanel = new SettingsBrowsePanel();
-            await this.openContentStudioMenu();
-            await this.waitForElementDisplayed(lib.SETTINGS_BUTTON, appConst.mediumTimeout);
-            await this.clickOnElement(lib.SETTINGS_BUTTON);
+            let buttonLocator = COMMON.WIDGET_SIDEBAR.CONTAINER + BUTTONS.buttonAriaLabel('Settings');
+            await this.waitForElementDisplayed(buttonLocator, appConst.mediumTimeout);
+            await this.clickOnElement(buttonLocator);
             await this.getBrowser().pause(300);
             await settingsBrowsePanel.waitForGridLoaded(appConst.mediumTimeout);
             return settingsBrowsePanel;
@@ -833,7 +794,8 @@ module.exports = {
         }
     },
     async switchToContentMode() {
-        await this.clickOnElement(lib.MODE_CONTENT_BUTTON);
+        let buttonLocator = COMMON.WIDGET_SIDEBAR.CONTAINER + BUTTONS.buttonAriaLabel('Content');
+        await this.clickOnElement(buttonLocator);
         await this.getBrowser().pause(200);
         return new ContentBrowsePanel();
     },
@@ -842,29 +804,24 @@ module.exports = {
     },
     async navigateToUsersApp(userName, password) {
         try {
-            let launcherPanel = new LauncherPanel();
-            let isDisplayed = await launcherPanel.isDisplayed(appConst.mediumTimeout);
-            if (isDisplayed) {
-                console.log('Launcher Panel is opened, click on the `Users` link...');
-                await launcherPanel.pause(300);
-                await launcherPanel.clickOnUsersLink();
-            } else {
-                console.log('Login Page is opened, type a password and name...');
-                await this.doLoginAndClickOnUsersLink(userName, password);
-            }
-            await this.doSwitchToUsersApp();
+            await this.doLogin(userName, password);
+            let homePage = new HomePage();
+            await homePage.clickOnUsersLink();
+            await this.waitForUsersBrowsePanelLoaded();
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_navigate_to_users');
-            throw new Error(`error when navigate to Users app, screenshot: ${screenshot} ` + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_navigate_users');
+            throw new Error(`Error occurred after clicking on Users link Home page,  screenshot:${screenshot}  ` + err);
         }
     },
-    async doLoginAndClickOnUsersLink(userName, password) {
-        let loginPage = new LoginPage();
-        await loginPage.doLogin(userName, password);
-        let launcherPanel = new LauncherPanel();
-        await launcherPanel.pause(700);
-        await launcherPanel.clickOnUsersLink();
-        return await loginPage.pause(1000);
+    async waitForUsersBrowsePanelLoaded() {
+        try {
+            let browsePanel = new UserBrowsePanel();
+            console.log("Users app loads...");
+            await browsePanel.waitForSpinnerNotVisible();
+            return browsePanel.waitForUsersGridLoaded(appConst.mediumTimeout);
+        } catch (err) {
+            throw new Error("Tried to navigate to Users App " + err);
+        }
     },
     doSwitchToUsersApp() {
         console.log('testUtils:switching to users app...');
@@ -887,16 +844,6 @@ module.exports = {
         await this.saveScreenshot(appConst.generateRandomName('user'));
         // 3. Save the data and close the wizard:
         return await this.saveAndCloseUserWizard(userData.displayName);
-    },
-    async selectAndDeleteUserItem(name) {
-        let userBrowsePanel = new UserBrowsePanel();
-        let confirmationDialog = new ConfirmationDialog();
-        await this.findAndSelectUserItem(name);
-        await userBrowsePanel.waitForDeleteButtonEnabled();
-        await userBrowsePanel.clickOnDeleteButton();
-        await confirmationDialog.waitForDialogOpened();
-        await confirmationDialog.clickOnYesButton();
-        return await userBrowsePanel.waitForSpinnerNotVisible();
     },
     async typeNameInUserFilterPanel(name) {
         let browsePanel = new UserBrowsePanel();
@@ -945,28 +892,6 @@ module.exports = {
         await browsePanel.pause(700);
         return await browsePanel.waitForSpinnerNotVisible();
     },
-    async showLauncherPanel() {
-        let launcherPanel = new LauncherPanel();
-        let selector = "//button[contains(@class,'launcher-button')]";
-        try {
-            await this.getBrowser().pause(100);
-            await this.clickOnElement(selector);
-            //let el = await this.getDisplayedElements(selector);
-            //await el[0].click();
-            return await launcherPanel.waitForPanelDisplayed();
-        } catch (err) {
-            await this.saveScreenshot(appConst.generateRandomName('err_launcher_button'));
-            await this.getBrowser().refresh();
-            await this.getBrowser().pause(2000);
-            await this.closeProjectSelectionDialog();
-            await this.waitUntilDisplayed(selector, 2000);
-
-            let el = await this.getDisplayedElements(selector);
-            await el[0].click();
-            return await launcherPanel.waitForPanelDisplayed();
-        }
-
-    },
     async getDisplayedElements(selector) {
         let elements = await this.getBrowser().$$(selector);
         if (elements.length === 0) {
@@ -997,9 +922,9 @@ module.exports = {
     async openWizardDependencyWidget() {
         let contentWizard = new ContentWizardPanel();
         let wizardDependenciesWidget = new WizardDependenciesWidget();
-        let wizardDetailsPanel = new WizardDetailsPanel();
-        await contentWizard.openDetailsPanel();
-        await wizardDetailsPanel.openDependencies();
+        let wizardContextWindow = new WizardContextPanel();
+        await contentWizard.openContextWindow();
+        await wizardContextWindow.openDependenciesWidget();
         await wizardDependenciesWidget.waitForWidgetLoaded();
         return wizardDependenciesWidget;
     },
@@ -1039,9 +964,9 @@ module.exports = {
     async openArchivePanel() {
         try {
             let archiveBrowsePanel = new ArchiveBrowsePanel();
-            await this.openContentStudioMenu();
-            await this.waitForElementDisplayed(lib.BUTTONS.ARCHIVE_BUTTON, appConst.mediumTimeout);
-            await this.clickOnElement(lib.BUTTONS.ARCHIVE_BUTTON);
+            let buttonLocator = COMMON.WIDGET_SIDEBAR.CONTAINER + BUTTONS.buttonAriaLabel('Archive');
+            await this.waitForElementDisplayed(buttonLocator, appConst.mediumTimeout);
+            await this.clickOnElement(buttonLocator);
             await this.getBrowser().pause(300);
             await archiveBrowsePanel.waitForGridLoaded(appConst.mediumTimeout);
         } catch (err) {
@@ -1062,7 +987,7 @@ module.exports = {
         let browsePanel = new BrowsePanel();
         let browseDetailsPanel = new BrowseContextWindowPanel();
         let variantsExtension = new VariantsExtension();
-        await browsePanel.openContextWindowPanel();
+        await browsePanel.openContextWindow();
         await browseDetailsPanel.openVariants();
         await variantsExtension.waitForLoaded();
         return variantsExtension;

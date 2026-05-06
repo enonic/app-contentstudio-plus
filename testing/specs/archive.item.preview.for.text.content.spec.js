@@ -28,12 +28,12 @@ describe.skip('archive.item.preview.for.text.content.spec: tests for archive ite
             let archiveBrowsePanel = new ArchiveBrowsePanel();
             // 1. Select a text_content
             await studioUtils.findAndSelectItemByDisplayName(IMPORTED_TEXT_CONTENT_DISPLAY_NAME);
-            // 2. Click on 'Archive...' button in Content Browse toolbar:
-            await contentBrowsePanel.clickOnArchiveButton();
+            // 2. Click on 'Delete' button in Content Browse toolbar:
+            await contentBrowsePanel.clickOnDeleteButton();
             await deleteContentDialog.waitForDialogOpened();
             await studioUtils.saveScreenshot('text_content_to_archive1');
             // 3. Click on 'Archive' button in the modal dialog:
-            await deleteContentDialog.clickOnArchiveButton();
+            await deleteContentDialog.clickOnDeleteButton();
             // 4. Verify that the image is not displayed in Content Browse Panel:
             await contentBrowsePanel.waitForContentNotDisplayed(IMPORTED_TEXT_CONTENT_NAME);
             let messages = await contentBrowsePanel.waitForNotificationMessages();
