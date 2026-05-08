@@ -1,48 +1,49 @@
-import {List} from 'lucide-react';
-import Q from 'q';
 import {Extension} from '@enonic/lib-admin-ui/extension/Extension';
 import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {ContextView} from '@enonic/lib-contentstudio/app/view/context/ContextView';
 import {ExtensionView, InternalExtensionType} from '@enonic/lib-contentstudio/app/view/context/ExtensionView';
-import {ArchiveDetailsWidgetElement}
-    from './v6/features/views/context/widget/details/ArchiveDetailsWidget';
+import {List, Newspaper} from 'lucide-react';
+import {ArchiveDetailsWidgetElement} from './v6/features/views/context/widget/details/ArchiveDetailsWidget';
+import {PublishReportWidgetElement} from './v6/features/views/context/widget/publish-report/ArchivePublishReportWidget';
 
-export class ArchiveContextView
-    extends ContextView {
+export function createArchiveContextView(): ContextView {
+    const contextView = new ContextView();
+    contextView.addClass('archive-context-view');
 
-    private static allowedExtensionIds: string[] = ['publish-report'];
+    const propertiesWidget = createPropertiesWidget(contextView);
+    const publishReportWidget = createPublishReportWidget(contextView);
 
-    constructor() {
-        super();
-        this.addClass('archive-context-view');
-    }
+    contextView.setWidgets([propertiesWidget, publishReportWidget], propertiesWidget);
 
-    protected getInitialExtensions(): ExtensionView[] {
-        const appId = CONFIG.getString('appId');
-        this.extensionPropertiesView = ExtensionView.create()
-            .setExtension(Extension.create().setExtensionDescriptorKey(`${appId}:details`).build())
-            .setName(i18n('field.contextPanel.details'))
-            .setDescription(i18n('field.contextPanel.details.description'))
-            .setExtensionClass('properties-widget')
-            .setIconClass('icon-list')
-            .setIcon(List)
-            .setType(InternalExtensionType.INFO)
-            .setContextView(this)
-            .addExtensionItemView(new ArchiveDetailsWidgetElement())
-            .build();
+    return contextView;
+}
 
-        return [this.extensionPropertiesView, this.extensionVersionsView];
-    }
+function createPropertiesWidget(contextView: ContextView): ExtensionView {
+    const appId = CONFIG.getString('appId');
 
-    protected fetchCustomExtensionViews(): Q.Promise<Extension[]> {
-        const appId = CONFIG.getString('appId');
-        const allowedKeys = ArchiveContextView.allowedExtensionIds.map((id: string) =>
-            id.split(':').length === 2 ? id : `${appId}:${id}`,
-        );
+    return ExtensionView.create()
+        .setExtension(Extension.create().setExtensionDescriptorKey(`${appId}:details`).build())
+        .setName(i18n('field.contextPanel.details'))
+        .setDescription(i18n('field.contextPanel.details.description'))
+        .setExtensionClass('properties-widget')
+        .setIconClass('icon-list')
+        .setIcon(List)
+        .setType(InternalExtensionType.INFO)
+        .setContextView(contextView)
+        .addExtensionItemView(new ArchiveDetailsWidgetElement())
+        .build();
+}
 
-        return super.fetchCustomExtensionViews().then((extensions: Extension[]) =>
-            extensions.filter((extension: Extension) => allowedKeys.indexOf(extension.getDescriptorKey().toString()) > -1),
-        );
-    }
+function createPublishReportWidget(contextView: ContextView): ExtensionView {
+    const appId = CONFIG.getString('appId');
+
+    return ExtensionView.create()
+        .setExtension(Extension.create().setExtensionDescriptorKey(`${appId}:publish-report`).build())
+        .setName(i18n('widget.publishReport.displayName'))
+        .setDescription(i18n('widget.publishReport.description'))
+        .setIcon(Newspaper)
+        .setContextView(contextView)
+        .addExtensionItemView(new PublishReportWidgetElement())
+        .build();
 }

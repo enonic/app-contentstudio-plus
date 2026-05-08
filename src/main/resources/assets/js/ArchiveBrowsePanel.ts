@@ -11,11 +11,12 @@ import {ArchiveServerEvent} from '@enonic/lib-contentstudio/app/event/ArchiveSer
 import {ContentServerChangeItem} from '@enonic/lib-contentstudio/app/event/ContentServerChangeItem';
 import {ContentServerEventsHandler} from '@enonic/lib-contentstudio/app/event/ContentServerEventsHandler';
 import {ProjectContext} from '@enonic/lib-contentstudio/app/project/ProjectContext';
+import {ContextView} from '@enonic/lib-contentstudio/app/view/context/ContextView';
 import Q from 'q';
 import {ArchiveBrowseItemPanel} from './ArchiveBrowseItemPanel';
 import {ArchiveBrowseToolbarElement} from './ArchiveBrowseToolbar';
 import {ArchiveContentViewItem} from './ArchiveContentViewItem';
-import {ArchiveContextView} from './ArchiveContextView';
+import {createArchiveContextView} from './ArchiveContextView';
 import {ArchiveFilterPanel} from './ArchiveFilterPanel';
 import {ArchiveHelper} from './ArchiveHelper';
 import {ArchiveTreeGridActions} from './ArchiveTreeGridActions';
@@ -43,7 +44,7 @@ export class ArchiveBrowsePanel
 
     protected selectionWrapper: SelectableListBoxWrapper<ArchiveContentViewItem>;
 
-    protected contextView: ArchiveContextView;
+    protected contextView: ContextView;
 
     protected filterPanel: ArchiveFilterPanel;
 
@@ -162,8 +163,8 @@ export class ArchiveBrowsePanel
         return new SelectableTreeListBoxKeyNavigator(this.selectionWrapper);
     }
 
-    protected createContextView(): ArchiveContextView {
-        return new ArchiveContextView();
+    protected createContextView(): ContextView {
+        return createArchiveContextView();
     }
 
     protected createFilterPanel(): ArchiveFilterPanel {
