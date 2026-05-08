@@ -28,8 +28,8 @@ const ArchiveTreeListToolbar = ({enabled = true}: ArchiveTreeListToolbarProps): 
     const isAllSelected = useStore($isAllSelected);
     const totalSelected = useStore($selectionCount);
     const isNoneSelected = useStore($isNoneSelected);
-    const selectAllPhrase = useI18n('field.treeListToolbar.selectAll');
-    const deselectAllPhrase = useI18n('field.treeListToolbar.deselectAll', totalSelected);
+    const selectAllPhrase = useI18n('field.selection.selectAll');
+    const deselectAllPhrase = useI18n('field.selection.deselectAll', totalSelected);
     const selectAllLabel = isNoneSelected ? selectAllPhrase : deselectAllPhrase;
 
     const checkedStatus = useMemo<CheckboxChecked>(() => {

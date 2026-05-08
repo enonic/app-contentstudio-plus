@@ -20,7 +20,7 @@ export const ArchiveDetailsWidgetContentSection = (): ReactElement | null => {
 
     const iconLabel = useI18n('field.contextPanel.details.sections.content.icon');
     const statusLabel = useI18n('field.contextPanel.details.sections.content.status');
-    const displayNameLabel = useI18n('field.contextPanel.details.sections.content.displayName');
+    const displayNameLabel = useI18n('field.displayName');
     const pathLabel = useI18n('field.originalPath');
     const archivedLabel = useI18n('status.archived');
 
