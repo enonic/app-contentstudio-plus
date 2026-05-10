@@ -1,4 +1,5 @@
 import inject from '@rollup/plugin-inject';
+import tailwindcss from '@tailwindcss/postcss';
 import autoprefixer from 'autoprefixer';
 import cssnano from 'cssnano';
 import path from 'path';
@@ -154,6 +155,7 @@ export default defineConfig(({mode}) => {
         },
         postcss: {
           plugins: [
+            tailwindcss({base: __dirname}),
             postcssNormalize(),
             autoprefixer(),
             postcssSortMediaQueries({sort: 'desktop-first'}),

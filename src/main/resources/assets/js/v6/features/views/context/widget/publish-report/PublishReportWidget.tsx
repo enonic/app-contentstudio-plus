@@ -1,9 +1,8 @@
-import {Element as UiElement} from '@enonic/lib-admin-ui/dom/Element';
 import {useI18n} from '@enonic/lib-contentstudio/v6/features/hooks/useI18n';
 import {Button, DatePicker, Input, usePrefixedId} from '@enonic/ui';
 import {type ReactElement, useEffect, useMemo, useRef, useState} from 'react';
-import {PublishReportDialog} from '../../../../../../extension/publish-report/dialog/PublishReportDialog';
 import {AppHelper} from '../../../../../../util/AppHelper';
+import {PublishReportDialog} from './PublishReportDialog';
 
 const PUBLISH_REPORT_WIDGET_NAME = 'PublishReportWidget';
 
@@ -158,12 +157,14 @@ export type PublishReportWidgetProps = {
     contentId: string;
     firstPublished: Date | null;
     isArchived: boolean;
+    injected?: boolean;
 };
 
 export const PublishReportWidget = ({
     contentId,
     firstPublished,
     isArchived,
+    injected = false,
 }: PublishReportWidgetProps): ReactElement => {
     const today = useMemo(() => endOfDay(new Date()), []);
     const firstPublishedStart = useMemo(
@@ -207,24 +208,20 @@ export const PublishReportWidget = ({
     const isValid = !!from && !!to && !fromError && !toError && !validationError;
 
     const rootRef = useRef<HTMLDivElement>(null);
-    const buttonRef = useRef<HTMLButtonElement>(null);
     const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(null);
+    const [dialogState, setDialogState] = useState<{from: Date; to: Date} | null>(null);
 
     useEffect(() => {
         setPortalContainer(rootRef.current);
     }, []);
 
     const handleGenerate = (): void => {
-        if (!from || !to || !buttonRef.current) return;
+        if (!from || !to) return;
+        setDialogState({from: startOfDay(from), to: endOfDay(to)});
+    };
 
-        const host = UiElement.fromHtmlElement(buttonRef.current);
-        if (!host) return;
-
-        PublishReportDialog.get(host)
-            .setContentId(contentId)
-            .setFromTo(startOfDay(from), endOfDay(to))
-            .setIsContentArchived(isArchived)
-            .open();
+    const handleDialogClose = (): void => {
+        setDialogState(null);
     };
 
     if (!firstPublishedStart) {
@@ -270,13 +267,23 @@ export const PublishReportWidget = ({
                 {hasRangeError && <div className="text-sm text-error">{validationError}</div>}
             </div>
             <Button
-                ref={buttonRef}
-                variant="solid"
+                className="self-end"
+                size="sm"
+                variant="outline"
+                label={buttonLabel}
                 disabled={!isValid}
                 onClick={handleGenerate}
-            >
-                {buttonLabel}
-            </Button>
+            />
+            <PublishReportDialog
+                open={!!dialogState}
+                onClose={handleDialogClose}
+                contentId={contentId}
+                isArchived={isArchived}
+                from={dialogState?.from ?? new Date()}
+                to={dialogState?.to ?? new Date()}
+                portalContainer={injected ? portalContainer : undefined}
+                injected={injected}
+            />
         </div>
     );
 };
