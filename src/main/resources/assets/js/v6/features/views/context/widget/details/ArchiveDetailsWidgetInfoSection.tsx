@@ -1,5 +1,6 @@
-import {Separator} from '@enonic/ui';
+import {IconButton, Separator, Tooltip} from '@enonic/ui';
 import {useStore} from '@nanostores/preact';
+import {Copy} from 'lucide-react';
 import {type ReactElement, useCallback, useEffect, useMemo, useState} from 'react';
 import {ContentSummaryAndCompareStatus}
     from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
@@ -19,6 +20,11 @@ export const ArchiveDetailsWidgetInfoSection = (): ReactElement | null => {
     const [props, setProps] = useState<ContentProps>(new Map());
 
     const titleText = useI18n('field.contextPanel.details.sections.info');
+    const copyTooltip = useI18n('field.contextPanel.details.sections.info.copy');
+
+    const copyToClipboard = useCallback((text: string): void => {
+        void navigator?.clipboard?.writeText(text);
+    }, []);
 
     useEffect(() => {
         if (!content) {
@@ -38,6 +44,7 @@ export const ArchiveDetailsWidgetInfoSection = (): ReactElement | null => {
     }, [content, helper]);
 
     const renderPropertyRow = useCallback((key: string, value: ExtensionPropertiesItemViewValue): ReactElement => {
+        const isId = key === 'Id';
         const title = value.getTitle() ?? '';
         const displayName = value.getDisplayName();
 
@@ -48,10 +55,22 @@ export const ArchiveDetailsWidgetInfoSection = (): ReactElement | null => {
                     <span className="text-xs truncate" title={title}>
                         {displayName}
                     </span>
+                    {isId && (
+                        <Tooltip delay={150} value={copyTooltip} side="left">
+                            <IconButton
+                                className="size-4 shrink-0"
+                                size="sm"
+                                icon={Copy}
+                                iconSize={14}
+                                aria-label={copyTooltip}
+                                onClick={() => copyToClipboard(displayName)}
+                            />
+                        </Tooltip>
+                    )}
                 </dd>
             </div>
         );
-    }, []);
+    }, [copyTooltip, copyToClipboard]);
 
     if (!content) return null;
 

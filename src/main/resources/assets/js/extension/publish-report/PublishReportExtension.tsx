@@ -39,6 +39,7 @@ export class PublishReportExtension
                     contentId={this.contentId}
                     firstPublished={firstPublished}
                     isArchived={this.isContentArchived}
+                    injected
                 />
             </IdProvider>,
             reactRoot,
