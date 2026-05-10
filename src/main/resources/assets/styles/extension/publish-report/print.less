@@ -1,0 +1,134 @@
+// Print rules for PublishReportDialog (Archive context).
+//
+// `position: fixed` does not paginate — browsers print fixed elements as
+// a one-page watermark and clip the rest. Pull the dialog out of Radix's
+// fixed/centered positioning into normal flow (`position: static`),
+// drop overflow / height caps on it and its ancestors, and hide
+// everything else at the body level so the diff prints from the top of
+// the page across as many pages as it needs.
+
+@media print {
+    @page {
+        margin: 1cm;
+        size: auto;
+    }
+
+    html,
+    body {
+        margin: 0;
+        padding: 0;
+        background: #fff;
+        color: #000;
+        height: auto;
+        overflow: visible;
+    }
+
+    // Hide body children that neither are the dialog nor contain it.
+    // The portal wrapper that owns the dialog stays visible.
+    body > *:not(:has([data-component='PublishReportDialog'])):not([data-component='PublishReportDialog']) {
+        display: none !important;
+    }
+
+    // Modal backdrop should not appear on paper.
+    [data-slot='dialog-overlay'] {
+        display: none !important;
+    }
+
+    // Any ancestor of the dialog might have transform / overflow / height
+    // caps from Radix or @enonic/ui that would crop the page. Neutralize.
+    :has([data-component='PublishReportDialog']) {
+        overflow: visible !important;
+        max-height: none !important;
+        height: auto !important;
+        transform: none !important;
+        position: static !important;
+    }
+
+    [data-component='PublishReportDialog'] {
+        // Force light-mode design tokens so output is consistent.
+        --color-main: #000;
+        --color-main-hover: #000;
+        --color-subtle: #333;
+        --color-alt: #fff;
+        --color-rev: #fff;
+        --color-surface: #fff;
+        --color-surface-neutral: #fff;
+        --color-surface-elevated: #fff;
+        --color-bdr-subtle: #bbb;
+        --color-bdr-soft: #888;
+
+        position: static !important;
+        display: block !important;
+        inset: auto !important;
+        width: 100% !important;
+        height: auto !important;
+        max-width: none !important;
+        max-height: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        transform: none !important;
+        box-shadow: none !important;
+        border: none !important;
+        background: #fff !important;
+        color: #000 !important;
+        overflow: visible !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    // Drop overflow / height caps on every descendant so the full diff
+    // flows; keep `.jsondiffpatch-unchanged` alone so the per-block
+    // "Show entire content" collapse still works.
+    // `flex: 0 0 auto` resets `flex-1` (Tailwind = `1 1 0%`), which would
+    // otherwise let basis-0 children collapse to 0px inside a flex column
+    // and hide content into overflow.
+    [data-component='PublishReportDialog'] *:not(.jsondiffpatch-unchanged) {
+        overflow: visible !important;
+        max-height: none !important;
+        min-height: auto !important;
+        height: auto !important;
+        flex: 0 0 auto !important;
+    }
+
+    // Hide footer, dialog close button, and per-row "show entire content"
+    // checkboxes — they have no place on paper.
+    [data-component='PublishReportDialog'] footer,
+    [data-component='PublishReportDialog'] [data-component='Dialog.DefaultClose'],
+    [data-component='PublishReportDialog'] label:has(input[type='checkbox']),
+    [data-component='PublishReportDialog'] input[type='checkbox'] {
+        display: none !important;
+    }
+
+    // Force the pale (light-mode) jsondiffpatch palette over a white
+    // page, overriding any dark-mode backgrounds from diff-overrides.less.
+    [data-component='PublishReportDialog'] pre {
+        background: transparent !important;
+        color: #000 !important;
+    }
+
+    [data-component='PublishReportDialog'] .jsondiffpatch-deleted .jsondiffpatch-property-name,
+    [data-component='PublishReportDialog'] .jsondiffpatch-deleted .jsondiffpatch-value pre,
+    [data-component='PublishReportDialog'] .jsondiffpatch-modified .jsondiffpatch-left-value pre,
+    [data-component='PublishReportDialog'] .jsondiffpatch-textdiff-deleted {
+        background: #ffbbbb !important;
+        color: #000 !important;
+    }
+
+    [data-component='PublishReportDialog'] .jsondiffpatch-added .jsondiffpatch-property-name,
+    [data-component='PublishReportDialog'] .jsondiffpatch-added .jsondiffpatch-value pre,
+    [data-component='PublishReportDialog'] .jsondiffpatch-modified .jsondiffpatch-right-value pre,
+    [data-component='PublishReportDialog'] .jsondiffpatch-textdiff-added {
+        background: #bbffbb !important;
+        color: #000 !important;
+    }
+
+    [data-component='PublishReportDialog'] .jsondiffpatch-moved .jsondiffpatch-moved-destination {
+        background: #ffffbb !important;
+        color: #000 !important;
+    }
+
+    [data-component='PublishReportDialog'] .jsondiffpatch-unchanged,
+    [data-component='PublishReportDialog'] .jsondiffpatch-movedestination {
+        color: #555 !important;
+    }
+}

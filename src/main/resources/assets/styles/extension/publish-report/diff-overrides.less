@@ -1,0 +1,95 @@
+.jsondiffpatch-delta {
+  display: block;
+  font-size: 0.75rem;
+  padding: 0;
+
+  pre {
+    font-size: inherit;
+    white-space: pre-wrap;
+  }
+
+  ul {
+    padding: 0 0 0 16px;
+  }
+
+  &.empty h3 {
+    text-align: center;
+    color: var(--color-subtle, #888);
+    margin-top: 32px;
+  }
+}
+
+// Counter `jsondiffpatch-unchanged-hidden` leaked onto <body> by other widgets;
+// scope the per-block "Show entire content" collapse to our own class.
+[data-component='PublishReportDialog'] .jsondiffpatch-unchanged {
+  max-height: none;
+}
+[data-component='PublishReportDialog'] .pr-collapse-unchanged .jsondiffpatch-unchanged {
+  max-height: 0;
+}
+
+.jsondiffpatch-unchanged,
+.jsondiffpatch-movedestination {
+  color: var(--color-subtle, #555);
+}
+
+.jsondiffpatch-added .jsondiffpatch-property-name,
+.jsondiffpatch-added .jsondiffpatch-value pre,
+.jsondiffpatch-modified .jsondiffpatch-right-value pre,
+.jsondiffpatch-textdiff-added,
+.jsondiffpatch-deleted .jsondiffpatch-property-name,
+.jsondiffpatch-deleted .jsondiffpatch-value pre,
+.jsondiffpatch-modified .jsondiffpatch-left-value pre,
+.jsondiffpatch-textdiff-deleted,
+.jsondiffpatch-moved .jsondiffpatch-moved-destination {
+  color: #000;
+}
+
+.dark {
+  .jsondiffpatch-deleted {
+    .jsondiffpatch-property-name,
+    .jsondiffpatch-value pre {
+      background: #590000;
+      color: inherit;
+    }
+  }
+
+  .jsondiffpatch-added {
+    .jsondiffpatch-property-name,
+    .jsondiffpatch-value pre {
+      background: #00601e;
+      color: inherit;
+    }
+  }
+
+  .jsondiffpatch-modified {
+    .jsondiffpatch-right-value pre {
+      background: #00601e;
+      color: inherit;
+    }
+
+    .jsondiffpatch-left-value pre {
+      background: #590000;
+      color: inherit;
+    }
+  }
+
+  .jsondiffpatch-textdiff-added {
+    background: #00601e;
+    color: inherit;
+  }
+
+  .jsondiffpatch-textdiff-deleted {
+    background: #590000;
+    color: inherit;
+  }
+
+  .jsondiffpatch-moved .jsondiffpatch-moved-destination {
+    background: #373900;
+    color: inherit;
+  }
+
+  .jsondiffpatch-annotated-delta tr:hover {
+    background: rgba(255, 255, 155, 0.2);
+  }
+}
