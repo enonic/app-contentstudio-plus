@@ -9,6 +9,7 @@ import {ArchiveNoLicenseBlock} from './ArchiveNoLicenseBlock';
 import {ValidLicenseLoadedEvent} from './event/ValidLicenseLoadedEvent';
 import {ArchiveDeleteDialogElement} from './v6/features/shared/dialogs/archive/ArchiveDeleteDialog';
 import {ArchiveRestoreDialogElement} from './v6/features/shared/dialogs/archive/ArchiveRestoreDialog';
+import {ArchiveCompareVersionsDialogElement} from './v6/features/views/context/widget/versions/ArchiveCompareVersionsDialog';
 
 export class ArchiveAppContainer
     extends AppContainer {
@@ -66,6 +67,7 @@ export class ArchiveAppContainer
             super.appendElements();
             this.appendChild(new ArchiveDeleteDialogElement());
             this.appendChild(new ArchiveRestoreDialogElement());
+            this.appendChild(new ArchiveCompareVersionsDialogElement());
         });
 
         this.show();
