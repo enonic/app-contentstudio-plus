@@ -1,4 +1,3 @@
-import {Store} from '@enonic/lib-admin-ui/store/Store';
 import {Action} from '@enonic/lib-admin-ui/ui/Action';
 import {ModalDialog} from '@enonic/lib-admin-ui/ui/dialog/ModalDialog';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
@@ -12,7 +11,6 @@ import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import {ContentDuplicateParams} from '@enonic/lib-contentstudio/app/resource/ContentDuplicateParams';
 import {VariantNameInput} from './VariantNameInput';
 import {ValidityStatus, ValueValidationState} from '@enonic/lib-contentstudio/app/inputtype/text/CheckedValueInput';
-import {Extension} from '../../Extension';
 
 export class CreateVariantDialog
     extends ModalDialog {
@@ -27,26 +25,12 @@ export class CreateVariantDialog
 
     private originalContent: ContentSummaryAndCompareStatus;
 
-    private constructor(container: Element) {
+    constructor(container: Element) {
         super({
             class: 'create-variant-dialog',
             title: i18n('widget.variants.create.text'),
             container: container
         });
-    }
-
-    static get(hostElement: Element): CreateVariantDialog {
-        let instance: CreateVariantDialog = Store.instance().get(CreateVariantDialog.name);
-        const container = Extension.getContainer(hostElement);
-
-        if (instance == null) {
-            instance = new CreateVariantDialog(container);
-            Store.instance().set(CreateVariantDialog.name, instance);
-        } else {
-            instance.setContainer(container);
-        }
-
-        return instance;
     }
 
     protected initElements(): void {

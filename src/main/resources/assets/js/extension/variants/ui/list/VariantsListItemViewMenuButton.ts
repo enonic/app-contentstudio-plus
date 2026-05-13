@@ -8,7 +8,7 @@ import {CreateVariantDialog} from '../../dialog/CreateVariantDialog';
 import {GetContentVariantsRequest} from '../../resource/request/GetContentVariantsRequest';
 import {ContentEventsProcessor} from '@enonic/lib-contentstudio/app/ContentEventsProcessor';
 import {EditContentEvent} from '@enonic/lib-contentstudio/app/event/EditContentEvent';
-import {AppHelper} from '../../../../util/AppHelper';
+import {Extension} from '../../../Extension';
 
 export class VariantsListItemViewMenuButton
     extends MenuButton {
@@ -39,15 +39,14 @@ export class VariantsListItemViewMenuButton
     }
 
     private openDuplicateDialog(): void {
-        DuplicateVariantDialog.get()
+        new DuplicateVariantDialog()
             .setContentToDuplicate([this.item])
             .setOpenTabAfterDuplicate(true)
             .open();
     }
 
     private openCreateVersionDialog(): void {
-        CreateVariantDialog
-            .get(this)
+        new CreateVariantDialog(Extension.getContainer(this))
             .setContent(this.item)
             .setVariants(GetContentVariantsRequest.getCachedVariants(this.item.getId()))
             .open();

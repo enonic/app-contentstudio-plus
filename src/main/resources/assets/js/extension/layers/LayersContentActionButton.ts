@@ -1,4 +1,4 @@
-import {ProjectContext} from '@enonic/lib-contentstudio/app/project/ProjectContext';
+import {getActiveProjectName} from '@enonic/lib-contentstudio/v6/features/store/activeProject.store';
 import {EditContentEvent} from '@enonic/lib-contentstudio/app/event/EditContentEvent';
 import {ActionButton} from '@enonic/lib-admin-ui/ui/button/ActionButton';
 import {Action} from '@enonic/lib-admin-ui/ui/Action';
@@ -42,7 +42,7 @@ export class LayersContentActionButton extends ActionButton {
     }
 
     private getMode(): Mode {
-        const isCurrentProject: boolean = this.item.getProject().getName() === ProjectContext.get().getProject().getName();
+        const isCurrentProject: boolean = this.item.getProject().getName() === getActiveProjectName();
 
         if (this.item.getItem().isReadOnly() || !isCurrentProject) {
             return Mode.READONLY;
@@ -71,6 +71,6 @@ export class LayersContentActionButton extends ActionButton {
 
     private edit(): void {
         ContentEventsProcessor.handleEdit(
-          new EditContentEvent([this.item.getItem()], this.item.getProject()));
+          new EditContentEvent([this.item.getItem()], this.item.getProject().getName()));
     }
 }

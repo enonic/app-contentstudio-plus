@@ -10,7 +10,7 @@ import {ContentQuery} from '@enonic/lib-contentstudio/app/content/ContentQuery';
 import {ArchiveServerEvent} from '@enonic/lib-contentstudio/app/event/ArchiveServerEvent';
 import {ContentServerChangeItem} from '@enonic/lib-contentstudio/app/event/ContentServerChangeItem';
 import {ContentServerEventsHandler} from '@enonic/lib-contentstudio/app/event/ContentServerEventsHandler';
-import {ProjectContext} from '@enonic/lib-contentstudio/app/project/ProjectContext';
+import {getActiveProjectName, onActiveProjectChanged} from '@enonic/lib-contentstudio/v6/features/store/activeProject.store';
 import {ContextView} from '@enonic/lib-contentstudio/app/view/context/ContextView';
 import Q from 'q';
 import {ArchiveBrowseItemPanel} from './ArchiveBrowseItemPanel';
@@ -104,7 +104,7 @@ export class ArchiveBrowsePanel
         };
 
         ContentServerEventsHandler.getInstance().onContentArchived((items: ContentServerChangeItem[]) => {
-            if (items.some((item) => item.getRepo()?.split('.').pop() === ProjectContext.get().getProject().getName())) {
+            if (items.some((item) => item.getRepo()?.split('.').pop() === getActiveProjectName())) {
                 if (!isRefreshTriggered) {
                     isRefreshTriggered = true;
                     this.whenShown(refreshHandler);
@@ -112,7 +112,7 @@ export class ArchiveBrowsePanel
             }
         });
 
-        ProjectContext.get().onProjectChanged(() => {
+        onActiveProjectChanged(() => {
             if (!isRefreshTriggered) {
                 isRefreshTriggered = true;
                 this.whenShown(refreshHandler);
