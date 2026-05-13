@@ -8,21 +8,11 @@ import {TaskId} from '@enonic/lib-admin-ui/task/TaskId';
 export class ArchiveDeleteDialog
     extends ArchiveProgressDialog {
 
-    private static INSTANCE: ArchiveDeleteDialog;
-
     constructor() {
         super({
             title: i18n('dialog.delete.archive.title'),
             class: 'archive-delete-dialog',
         });
-    }
-
-    static getInstance(): ArchiveDeleteDialog {
-        if (!ArchiveDeleteDialog.INSTANCE) {
-            ArchiveDeleteDialog.INSTANCE = new ArchiveDeleteDialog();
-        }
-
-        return ArchiveDeleteDialog.INSTANCE;
     }
 
     protected getSubtitle(): string {

@@ -9,21 +9,11 @@ import {ArchiveContentViewItem} from './ArchiveContentViewItem';
 export class ArchiveRestoreDialog
     extends ArchiveProgressDialog {
 
-    private static INSTANCE: ArchiveRestoreDialog;
-
     constructor() {
         super({
             title: i18n('dialog.restore.archive.title'),
             class: 'archive-restore-dialog',
         });
-    }
-
-    static getInstance(): ArchiveRestoreDialog {
-        if (!ArchiveRestoreDialog.INSTANCE) {
-            ArchiveRestoreDialog.INSTANCE = new ArchiveRestoreDialog();
-        }
-
-        return ArchiveRestoreDialog.INSTANCE;
     }
 
     doRender(): Q.Promise<boolean> {

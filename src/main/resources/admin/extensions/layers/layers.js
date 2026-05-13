@@ -4,6 +4,15 @@ const portal = require('/lib/xp/portal');
 const mustache = require('/lib/mustache');
 const configLib = require('/lib/config');
 
+const REPO_PREFIX = 'com.enonic.cms.';
+
+const getProjectFromRepository = (repository) => {
+    if (!repository || repository.indexOf(REPO_PREFIX) !== 0) {
+        return '';
+    }
+    return repository.substring(REPO_PREFIX.length);
+}
+
 function handleGet(req) {
     return renderWidgetView(req);
 }
@@ -19,6 +28,7 @@ function renderWidgetView(req) {
 
     const params = {
         contentId: contentId || '',
+        project: getProjectFromRepository(req.params.repository),
         stylesUri: portal.assetUrl({
             path: 'styles/extension/layers.css'
         }),

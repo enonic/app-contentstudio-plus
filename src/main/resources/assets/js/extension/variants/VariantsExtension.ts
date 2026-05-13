@@ -148,7 +148,10 @@ export class VariantsExtension
         button.addClass('variants-extension-button-create');
 
         button.onClicked(() => {
-            CreateVariantDialog.get(this).setContent(this.originalContent).setVariants(this.variants).open();
+            new CreateVariantDialog(Extension.getContainer(this))
+                .setContent(this.originalContent)
+                .setVariants(this.variants)
+                .open();
         });
 
         return button;

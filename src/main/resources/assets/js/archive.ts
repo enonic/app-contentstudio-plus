@@ -1,6 +1,8 @@
 import {Body} from '@enonic/lib-admin-ui/dom/Body';
 import type {Element} from '@enonic/lib-admin-ui/dom/Element';
 import {initConfig} from '@enonic/lib-contentstudio/v6/features/store/config.store';
+import {whenProjectInitialized} from '@enonic/lib-contentstudio/v6/features/store/activeProject.store';
+import {initProjects} from '@enonic/lib-contentstudio/v6/features/store/projects.store';
 import {ArchiveAppContainer} from './ArchiveAppContainer';
 import {getModuleScript, getRequiredAttribute} from './util/ModuleScriptHelper';
 
@@ -16,9 +18,12 @@ void (() => {
     const body: Body = Body.get();
     const widgetEl: Element = body.findChildById(elemId, true);
     initConfig(getRequiredAttribute(currentScript, 'data-config-script-id'));
+    initProjects();
 
     const renderListener = (): void => {
-        injectApp(widgetEl);
+        whenProjectInitialized(() => {
+            injectApp(widgetEl);
+        });
         body.unRendered(renderListener);
     };
     body.whenRendered(renderListener);

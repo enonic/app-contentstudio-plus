@@ -1,4 +1,4 @@
-import {ProjectContext} from '@enonic/lib-contentstudio/app/project/ProjectContext';
+import {getActiveProjectName} from '@enonic/lib-contentstudio/v6/features/store/activeProject.store';
 import {Project} from '@enonic/lib-contentstudio/app/settings/data/project/Project';
 import {LayerContent} from './LayerContent';
 import {ProjectsChainBlock} from '@enonic/lib-contentstudio/app/settings/wizard/panel/form/element/ProjectsChainBlock';
@@ -17,7 +17,7 @@ export class LayersContentTreeListHelper {
         this.layerContents = items;
         this.projects = this.layerContents.map(lc => lc.getProject());
 
-        const currentProjectName = ProjectContext.get().getProject().getName();
+        const currentProjectName = getActiveProjectName();
 
         if (currentProjectName !== this.currentProject) {
             this.currentProject = currentProjectName;
@@ -86,7 +86,7 @@ export class LayersContentTreeListHelper {
     }
 
     isCurrentProject(item: LayerContent): boolean {
-        return item.getProject().getName() === ProjectContext.get().getProject().getName();
+        return item.getProject().getName() === getActiveProjectName();
     }
 
     isFromCurrentProjectTree(item: LayerContent): boolean {
