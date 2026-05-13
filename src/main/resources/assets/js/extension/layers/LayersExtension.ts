@@ -15,7 +15,7 @@ export class LayersExtension
     }
 
     protected processContent(content: ContentSummaryAndCompareStatus): void {
-        const layersExtensionItemView: LayersExtensionItemView = LayersExtensionItemView.get();
+        const layersExtensionItemView: LayersExtensionItemView = new LayersExtensionItemView();
         layersExtensionItemView.setContentAndUpdateView(content);
         this.appendChild(layersExtensionItemView);
     }

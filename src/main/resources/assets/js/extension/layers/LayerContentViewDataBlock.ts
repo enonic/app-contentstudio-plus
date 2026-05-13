@@ -3,7 +3,7 @@ import {LayerContent} from './LayerContent';
 import {LayerContentViewHeader} from './LayerContentViewHeader';
 import {LayerContentViewBody} from './LayerContentViewBody';
 import {LayerContentViewFooter} from './LayerContentViewFooter';
-import {ProjectContext} from '@enonic/lib-contentstudio/app/project/ProjectContext';
+import {getActiveProjectName} from '@enonic/lib-contentstudio/v6/features/store/activeProject.store';
 
 export class LayerContentViewDataBlock extends DivEl {
 
@@ -35,7 +35,7 @@ export class LayerContentViewDataBlock extends DivEl {
             this.appendChildren(this.body);
             this.appendChildren(this.footer);
 
-            if (ProjectContext.get().getProject().getName() === this.layerContent.getProject().getName()) {
+            if (getActiveProjectName() === this.layerContent.getProject().getName()) {
                 this.addClass(LayerContentViewDataBlock.CURRENT_CLASS);
             }
 

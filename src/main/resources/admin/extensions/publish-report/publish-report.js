@@ -21,6 +21,15 @@ const getContentId = (req) => {
     return contentId;
 }
 
+const REPO_PREFIX = 'com.enonic.cms.';
+
+const getProjectFromRepository = (repository) => {
+    if (!repository || repository.indexOf(REPO_PREFIX) !== 0) {
+        return '';
+    }
+    return repository.substring(REPO_PREFIX.length);
+}
+
 const getBaseParams = (locales) => {
     return {
         stylesUri: portal.assetUrl({
@@ -34,7 +43,8 @@ const getBaseParams = (locales) => {
         isNoPublishMode: false,
         isArchived: false,
         contentId: '',
-        publishFirst: ''
+        publishFirst: '',
+        project: ''
     }
 }
 
@@ -65,6 +75,8 @@ const getContentFromArchive = (contentId, repository) => {
 
 const getViewParams = (req) => {
     const params = getBaseParams(req.locales);
+
+    params.project = getProjectFromRepository(req.params.repository);
 
     const contentId = getContentId(req);
     let isArchived = false;
