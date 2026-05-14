@@ -533,9 +533,9 @@ module.exports = {
             }
             await filterPanel.typeSearchText(name);
             await browsePanel.waitForSpinnerNotVisible(appConst.longTimeout);
-            return await browsePanel.pause(800);
+            return await browsePanel.pause(300);
         } catch (err) {
-            await this.saveScreenshot(appConst.generateRandomName('err_spinner'));
+            await this.saveScreenshotUniqueName('err_filter_panel');
             throw new Error('Filter Panel-  error : ' + err);
         }
     },
