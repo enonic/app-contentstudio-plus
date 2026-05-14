@@ -27,9 +27,9 @@ const XPATH = {
     checkedRowLi: `//div[contains(@class,'checkbox-left selected checked')]`,
     // v6: treeitem highlighted (bg-surface-selected) with checkbox not checked (aria-checked='false')
     highlightedRowNotChecked: `//div[@role='treeitem' and contains(@class,'bg-surface-selected') and descendant::div[@role='checkbox' and @aria-checked='false']]`,
-    searchButton: "//button[contains(@aria-label, 'search panel')]",
-    hideSearchPanelButton: "//button[contains(@aria-label, 'Hide search panel')]",
-    showSearchPanelButton: "//button[contains(@aria-label, 'Show search panel')]",
+    searchButton: "//button[contains(@aria-label, 'Search Panel')]",
+    hideSearchPanelButton: "//button[contains(@aria-label, 'Hide Search Panel')]",
+    showSearchPanelButton: "//button[contains(@aria-label, 'Show Search Panel')]",
     showIssuesListButton: "//button[contains(@id,'ShowIssuesDialogButton')]/button",//'Assigned to Me' or 'Show Issues'
     markAsReadyMenuItem: "//ul[contains(@id,'Menu')]//li[contains(@id,'MenuItem') and text()='Mark as ready']",
     resetSelectionCheckbox: `//label[child::input[contains(@aria-label,'Reset selection')]]`,
