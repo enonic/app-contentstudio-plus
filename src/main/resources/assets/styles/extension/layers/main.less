@@ -1,10 +1,14 @@
 @import "flag-icons/css/flag-icons.css";
+@import (css) "tailwindcss";
+@import "@enonic/ui/style.css";
+
+@source "src/main/resources/assets/js/**/*.{ts,tsx}";
+
 @import "../../icons";
 @import "../extension";
 @import "@enonic/lib-contentstudio/styles/locale/flag";
-@import "@enonic/lib-contentstudio/styles/view/extended-viewer";
 @import "layers-extension";
-@import "layers-extension-item-view";
-@import "layers-content-tree-list";
-@import "layer-content-view-data";
 
+:host {
+  --default-font-family: @admin-font-family;
+}
