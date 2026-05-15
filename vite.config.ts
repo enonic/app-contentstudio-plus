@@ -2,11 +2,22 @@ import inject from '@rollup/plugin-inject';
 import tailwindcss from '@tailwindcss/postcss';
 import autoprefixer from 'autoprefixer';
 import cssnano from 'cssnano';
+import {cpSync, existsSync} from 'fs';
 import path from 'path';
 import postcssNormalize from 'postcss-normalize';
 import postcssSortMediaQueries from 'postcss-sort-media-queries';
 import {fileURLToPath} from 'url';
-import {defineConfig, type UserConfig} from 'vite';
+import {defineConfig, type Plugin, type UserConfig} from 'vite';
+
+const copyFlagIcons = (sourceRoot: string, outDir: string): Plugin => ({
+  name: 'copy-flag-icons',
+  apply: 'build',
+  closeBundle() {
+    const flagsSrc = path.join(sourceRoot, 'node_modules/flag-icons/flags');
+    if (!existsSync(flagsSrc)) return;
+    cpSync(flagsSrc, path.join(outDir, 'styles/flags'), {recursive: true});
+  },
+});
 
 const allowedTargets = ['js', 'css'] as const;
 type BuildTarget = (typeof allowedTargets)[number];
@@ -109,6 +120,7 @@ export default defineConfig(({mode}) => {
     css: {
       root: IN_PATH,
       base: './',
+      plugins: [copyFlagIcons(__dirname, OUT_PATH)],
       build: {
         outDir: OUT_PATH,
         emptyOutDir: false,

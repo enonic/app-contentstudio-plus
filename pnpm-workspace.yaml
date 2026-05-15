@@ -3,10 +3,12 @@ packages:
   - testing
   - .xp/dev/*
 
+ignore-workspace-root-check: true
+ignoredBuiltDependencies:
+  - '@tailwindcss/oxide'
+
 onlyBuiltDependencies:
   - '@swc/core'
   - esbuild
   - edgedriver
   - geckodriver
-
-ignore-workspace-root-check: true
