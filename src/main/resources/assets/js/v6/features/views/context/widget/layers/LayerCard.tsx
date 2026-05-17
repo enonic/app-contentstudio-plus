@@ -1,9 +1,7 @@
 import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
-import {NamePrettyfier} from '@enonic/lib-admin-ui/NamePrettyfier';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {ContentLocalizer} from '@enonic/lib-contentstudio/app/browse/action/ContentLocalizer';
 import {ContentEventsProcessor} from '@enonic/lib-contentstudio/app/ContentEventsProcessor';
-import {ContentPath} from '@enonic/lib-contentstudio/app/content/ContentPath';
 import {EditContentEvent} from '@enonic/lib-contentstudio/app/event/EditContentEvent';
 import {PublishStatus} from '@enonic/lib-contentstudio/app/publish/PublishStatus';
 import {ProjectIcon} from '@enonic/lib-contentstudio/v6/features/shared/icons/ProjectIcon';
@@ -11,6 +9,7 @@ import {Button, cn} from '@enonic/ui';
 import {Layers2} from 'lucide-react';
 import {type MouseEvent, type ReactElement, useCallback, useMemo} from 'react';
 import {LayerContent} from '../../../../../../extension/layers/LayerContent';
+import {resolveContentDisplay} from '../../../../shared/content/contentDisplay';
 
 export type LayerCardProps = {
     item: LayerContent;
@@ -34,28 +33,6 @@ const STATUS_TONE: Record<string, string> = {
 };
 
 const getStatusTone = (statusClass: string): string => STATUS_TONE[statusClass] ?? 'text-subtle';
-
-type ContentDisplay = {
-    displayName: string;
-    pathString: string;
-};
-
-const resolveContentDisplay = (content: NonNullable<ReturnType<LayerContent['getItem']>>): ContentDisplay => {
-    const summary = content.getContentSummary();
-    const isUnnamed = summary.getName().isUnnamed();
-
-    const displayName = content.getDisplayName()
-        || (isUnnamed ? NamePrettyfier.prettifyUnnamed(summary.getType().getLocalName()) : '');
-
-    const pathString = isUnnamed
-        ? ContentPath.create()
-            .fromParent(summary.getPath().getParentPath(), NamePrettyfier.prettifyUnnamed())
-            .build()
-            .toString()
-        : summary.getPath().toString();
-
-    return {displayName, pathString};
-};
 
 export const LayerCard = ({item, isCurrent, level, isExpanded, onToggle}: LayerCardProps): ReactElement => {
     const isChild = level > 0;
@@ -169,7 +146,7 @@ export const LayerCard = ({item, isCurrent, level, isExpanded, onToggle}: LayerC
 
                         <span
                             className={cn(
-                                'p-1',
+                                'inline-flex items-center p-1',
                                 isInherited ? 'text-subtle' : 'text-main',
                             )}
                             aria-hidden="true"

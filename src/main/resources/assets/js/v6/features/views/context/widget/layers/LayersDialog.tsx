@@ -1,5 +1,5 @@
 import {Dialog} from '@enonic/ui';
-import {type ReactElement, useEffect, useMemo, useState} from 'react';
+import {type ReactElement, useCallback, useEffect, useMemo, useState} from 'react';
 import {LayerCard} from './LayerCard';
 import {type LayerRow} from './layersTree';
 
@@ -26,6 +26,10 @@ export const LayersDialog = ({open, onOpenChange, rows, title, description}: Lay
         }
     }, [open, currentKey]);
 
+    const handleToggle = useCallback((key: string): void => {
+        setExpandedKey(prev => (prev === key ? null : key));
+    }, []);
+
     return (
         <Dialog.Root open={open} onOpenChange={onOpenChange}>
             <Dialog.Portal>
@@ -35,7 +39,7 @@ export const LayersDialog = ({open, onOpenChange, rows, title, description}: Lay
                     data-component={LAYERS_DIALOG_NAME}
                 >
                     <Dialog.DefaultHeader title={title} description={description} withClose />
-                    <Dialog.Body className="flex flex-col gap-5 overflow-y-auto p-2 -m-2">
+                    <Dialog.Body className="flex flex-col gap-5 overflow-y-auto">
                         {rows.map(row => (
                             <LayerCard
                                 key={row.key}
@@ -43,7 +47,7 @@ export const LayersDialog = ({open, onOpenChange, rows, title, description}: Lay
                                 isCurrent={row.isCurrent}
                                 level={row.level}
                                 isExpanded={expandedKey === row.key}
-                                onToggle={() => setExpandedKey(prev => (prev === row.key ? null : row.key))}
+                                onToggle={() => handleToggle(row.key)}
                             />
                         ))}
                     </Dialog.Body>

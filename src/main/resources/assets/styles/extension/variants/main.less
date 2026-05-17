@@ -1,11 +1,12 @@
+@import (css) "tailwindcss";
+@import "@enonic/ui/style.css";
+
+@source "src/main/resources/assets/js/**/*.{ts,tsx}";
+
+@import '../../icons';
 @import '../extension';
-@import '@enonic/lib-admin-ui/styles/api/ui/button/menu-button';
-@import '@enonic/lib-contentstudio/styles/icons';
-@import '@enonic/lib-contentstudio/styles/content/content-summary-and-compare-status-viewer';
-@import "@enonic/lib-contentstudio/styles/inputtype/text/checked-value-input";
-@import "@enonic/lib-contentstudio/styles/view/extended-viewer";
 @import 'variants-extension';
-@import 'variants-dialog-create';
-@import 'variants-extension-list';
-@import 'variants-actions-menu';
-@import 'variants-extension-list-item';
+
+:host {
+  --default-font-family: @admin-font-family;
+}
