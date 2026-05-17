@@ -1,7 +1,7 @@
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {getActiveProjectName} from '@enonic/lib-contentstudio/v6/features/store/activeProject.store';
 import {Button} from '@enonic/ui';
-import {type ReactElement, useEffect, useMemo, useState} from 'react';
+import {type ReactElement, useCallback, useEffect, useMemo, useState} from 'react';
 import {AppHelper} from '../../../../../../util/AppHelper';
 import {LayerCard} from './LayerCard';
 import {LayersDialog} from './LayersDialog';
@@ -37,6 +37,10 @@ export const LayersWidget = ({contentId}: LayersWidgetProps): ReactElement => {
     useEffect(() => {
         setExpandedKey(currentKey);
     }, [currentKey]);
+
+    const handleToggle = useCallback((key: string): void => {
+        setExpandedKey(prev => (prev === key ? null : key));
+    }, []);
 
     const currentRow = useMemo(
         () => tree.all.find(row => row.isCurrent) ?? null,
@@ -93,7 +97,7 @@ export const LayersWidget = ({contentId}: LayersWidgetProps): ReactElement => {
                         isCurrent={row.isCurrent}
                         level={row.level}
                         isExpanded={expandedKey === row.key}
-                        onToggle={() => setExpandedKey(prev => (prev === row.key ? null : row.key))}
+                        onToggle={() => handleToggle(row.key)}
                     />
                 ))}
             </div>
