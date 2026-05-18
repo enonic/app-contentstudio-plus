@@ -74,7 +74,7 @@ export const VariantCard = ({
         >
             {isActive && (
                 <legend className="mx-auto px-3 text-xs font-semibold tracking-widest uppercase text-subtle">
-                    Current
+                    {i18n('widget.variants.current')}
                 </legend>
             )}
 

@@ -6,6 +6,7 @@ export type LayerRow = {
     item: LayerContent;
     level: number;
     isCurrent: boolean;
+    isInChain: boolean;
     key: string;
 };
 
@@ -101,6 +102,7 @@ export const buildLayersTree = (items: LayerContent[], activeProjectName: string
         item,
         level: levels.get(item.getProjectName()) ?? 0,
         isCurrent: item.getProject().getName() === activeProjectName,
+        isInChain: currentChainNames.has(item.getProject().getName()),
         key: getRowKey(item),
     });
 

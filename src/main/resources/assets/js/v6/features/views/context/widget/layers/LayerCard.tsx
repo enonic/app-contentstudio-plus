@@ -5,7 +5,7 @@ import {ContentEventsProcessor} from '@enonic/lib-contentstudio/app/ContentEvent
 import {EditContentEvent} from '@enonic/lib-contentstudio/app/event/EditContentEvent';
 import {PublishStatus} from '@enonic/lib-contentstudio/app/publish/PublishStatus';
 import {ProjectIcon} from '@enonic/lib-contentstudio/v6/features/shared/icons/ProjectIcon';
-import {Button, cn} from '@enonic/ui';
+import {Button, Tooltip, cn} from '@enonic/ui';
 import {Layers2} from 'lucide-react';
 import {type MouseEvent, type ReactElement, useCallback, useMemo} from 'react';
 import {LayerContent} from '../../../../../../extension/layers/LayerContent';
@@ -14,6 +14,7 @@ import {resolveContentDisplay} from '../../../../shared/content/contentDisplay';
 export type LayerCardProps = {
     item: LayerContent;
     isCurrent: boolean;
+    isInChain: boolean;
     level: number;
     isExpanded: boolean;
     onToggle: () => void;
@@ -34,8 +35,9 @@ const STATUS_TONE: Record<string, string> = {
 
 const getStatusTone = (statusClass: string): string => STATUS_TONE[statusClass] ?? 'text-subtle';
 
-export const LayerCard = ({item, isCurrent, level, isExpanded, onToggle}: LayerCardProps): ReactElement => {
+export const LayerCard = ({item, isCurrent, isInChain, level, isExpanded, onToggle}: LayerCardProps): ReactElement => {
     const isChild = level > 0;
+    const isRoot = level === 0;
     const project = item.getProject();
     const hasItem = item.hasItem();
     const content = hasItem ? item.getItem() : null;
@@ -53,13 +55,9 @@ export const LayerCard = ({item, isCurrent, level, isExpanded, onToggle}: LayerC
 
     type ActionMode = 'localize' | 'edit' | 'open';
 
-    const actionMode: ActionMode = isReadOnly
-        ? 'open'
-        : isInherited
-            ? 'localize'
-            : isCurrent
-                ? 'edit'
-                : 'open';
+    const actionMode: ActionMode = isCurrent
+        ? (isReadOnly ? 'open' : isInherited ? 'localize' : 'edit')
+        : 'open';
 
     const actionLabelKey =
         actionMode === 'localize' ? 'action.translate'
@@ -107,15 +105,16 @@ export const LayerCard = ({item, isCurrent, level, isExpanded, onToggle}: LayerC
             <fieldset
                 onClick={onToggle}
                 className={cn(
-                    'group relative m-0 min-w-0 flex-1 cursor-pointer rounded-md border border-bdr-soft p-2.5 text-left text-sm transition-colors outline-none',
+                    'group relative m-0 min-w-0 flex-1 cursor-pointer rounded-md p-2.5 text-left text-sm transition-colors outline-none',
                     'hover:bg-surface-neutral-hover',
+                    isInChain ? 'border-1 border-bdr-strong' : 'border border-bdr-soft',
                     isExpanded && 'shadow-md',
                     !hasItem && 'opacity-60',
                 )}
             >
                 {isCurrent && (
                     <legend className="mx-auto px-3 text-xs font-semibold tracking-widest uppercase text-subtle">
-                        Current
+                        {i18n('widget.layers.current')}
                     </legend>
                 )}
 
@@ -144,15 +143,25 @@ export const LayerCard = ({item, isCurrent, level, isExpanded, onToggle}: LayerC
                             <div className="truncate text-sm text-subtle">{contentDisplay?.pathString}</div>
                         </div>
 
-                        <span
-                            className={cn(
-                                'inline-flex items-center p-1',
-                                isInherited ? 'text-subtle' : 'text-main',
-                            )}
-                            aria-hidden="true"
-                        >
-                            <Layers2 size={14} strokeWidth={1.5} />
-                        </span>
+                        {isRoot ? (
+                            <span aria-hidden="true" />
+                        ) : (
+                            <Tooltip
+                                delay={150}
+                                value={i18n(isInherited ? 'widget.layers.notLocalised' : 'widget.layers.localised')}
+                                side="left"
+                            >
+                                <span
+                                    className={cn(
+                                        'inline-flex items-center p-1 text-main',
+                                        isInherited && 'opacity-40',
+                                    )}
+                                    aria-label={i18n(isInherited ? 'widget.layers.notLocalised' : 'widget.layers.localised')}
+                                >
+                                    <Layers2 size={14} strokeWidth={1.5} />
+                                </span>
+                            </Tooltip>
+                        )}
 
                         {isExpanded && (
                             <div className="col-start-2 flex">

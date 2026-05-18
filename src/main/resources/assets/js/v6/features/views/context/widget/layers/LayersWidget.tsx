@@ -95,6 +95,7 @@ export const LayersWidget = ({contentId}: LayersWidgetProps): ReactElement => {
                         key={row.key}
                         item={row.item}
                         isCurrent={row.isCurrent}
+                        isInChain={row.isInChain}
                         level={row.level}
                         isExpanded={expandedKey === row.key}
                         onToggle={() => handleToggle(row.key)}
