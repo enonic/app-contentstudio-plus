@@ -48,7 +48,7 @@ export class LibToStudioConverter {
         projectBuilder.setParents(source.parents);
         projectBuilder.setLanguage(source.language);
         projectBuilder.setPermissions(LibToStudioConverter.convertXPPermissionsToPermissions(source.permissions));
-        projectBuilder.setReadAccess(LibToStudioConverter.convertXPReadAccessToReadAccess(source.readAccess));
+        projectBuilder.setReadAccess(LibToStudioConverter.convertXPPublicReadToReadAccess(source.publicRead));
         // projectBuilder.setSiteConfigs(LibToStudioConverter.convertXPSiteConfigsToSiteConfigs(source.siteConfig));
 
         return projectBuilder.build();
@@ -64,7 +64,7 @@ export class LibToStudioConverter {
         return builder.build();
     }
 
-    static convertXPReadAccessToReadAccess(readAccess: ProjectPermission): ProjectReadAccess {
+    static convertXPPublicReadToReadAccess(publicRead: boolean): ProjectReadAccess {
        // TODO: Handle other read access types, types from XP and CS are not mapping well
         return new ProjectReadAccess(ProjectReadAccessType.PUBLIC);
     }
