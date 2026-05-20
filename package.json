@@ -1,6 +1,6 @@
 {
   "name": "app-contentstudio-plus",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Enterprise extension for Content Studio",
   "license": "Enonic License 1.0",
   "repository": {
@@ -24,7 +24,7 @@
   "dependencies": {
     "@enonic/lib-admin-ui": "workspace:*",
     "@enonic/lib-contentstudio": "workspace:*",
-    "@enonic/ui": "~1.0.0-beta.1",
+    "@enonic/ui": "~1.0.0-beta.5",
     "@nanostores/preact": "^1.0.0",
     "@radix-ui/react-slot": "^1.2.3",
     "dompurify": "^3.2.6",
@@ -41,8 +41,8 @@
     "react-virtuoso": "^4.18.0"
   },
   "devDependencies": {
-    "@enonic-types/lib-content": "^7.15.3",
-    "@enonic-types/lib-project": "^7.15.3",
+    "@enonic-types/lib-content": "^8.0.0-B4",
+    "@enonic-types/lib-project": "^8.0.0-B4",
     "@enonic/eslint-config": "^2.1.0",
     "@rollup/plugin-inject": "^5.0.5",
     "@tailwindcss/postcss": "4.1.13",
@@ -69,8 +69,8 @@
     "extends browserslist-config-enonic"
   ],
   "engines": {
-    "node": ">= 24.13.0",
-    "pnpm": ">= 10.30.0",
-    "npm": ">= 11.6.2"
+    "node": ">= 24.15.0",
+    "pnpm": ">= 10.33.4",
+    "npm": ">= 11.12.1"
   }
 }
