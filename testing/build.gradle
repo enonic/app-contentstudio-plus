@@ -28,7 +28,7 @@ def contentStudioPlusAppUrl = project.hasProperty( 'contentStudioPlusAppUrl' ) ?
 dependencies {
     distro "com.enonic.xp:enonic-xp-generic:$xpVersion@tgz"
     deploy "com.enonic.app:contentstudio:$libContentStudioVersion@jar"
-    apps "com.enonic.uitest:contenttypes:1.0.0-SNAPSHOT"
+    apps "com.enonic.uitest:contenttypes:2.0.0-SNAPSHOT"
 }
 
 tasks.register( 'unpackDistro', Copy ) {
