@@ -1,8 +1,9 @@
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {ContentSummaryAndCompareStatus} from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import {Button} from '@enonic/ui';
-import {type ReactElement, useEffect, useMemo, useState} from 'react';
+import {type ReactElement, useCallback, useEffect, useMemo, useState} from 'react';
 import {AppHelper} from '../../../../../../util/AppHelper';
+import {useCardListKeyboard} from '../shared/useCardListKeyboard';
 import {CreateVariantDialog} from './CreateVariantDialog';
 import {DuplicateVariantDialog} from './DuplicateVariantDialog';
 import {VariantCard} from './VariantCard';
@@ -36,6 +37,22 @@ export const VariantsWidget = ({contentId}: VariantsWidgetProps): ReactElement =
     const closeDuplicateDialog = (open: boolean): void => {
         if (!open) setDuplicateTarget(null);
     };
+
+    const flatItems = useMemo(
+        () => (original ? [original, ...variants] : []),
+        [original, variants],
+    );
+
+    const handleActiveIndexChange = useCallback((index: number): void => {
+        const id = flatItems[index]?.getId();
+        if (id) setExpandedId(id);
+    }, [flatItems]);
+
+    const {containerRef, handleKeyDown, handleClick, registerEntry} = useCardListKeyboard({
+        itemCount: flatItems.length,
+        onActiveIndexChange: handleActiveIndexChange,
+        enableHorizontal: true,
+    });
 
     if (!contentId) {
         return (
@@ -106,8 +123,11 @@ export const VariantsWidget = ({contentId}: VariantsWidgetProps): ReactElement =
 
     return (
         <div
+            ref={containerRef}
             data-component={VARIANTS_WIDGET_NAME}
             className={`${AppHelper.getCommonExtensionContainerClass()} flex w-full max-w-full min-w-0 flex-col gap-4`}
+            onKeyDown={handleKeyDown}
+            onClick={handleClick}
         >
             <div className="flex flex-col gap-2">
                 <h6 className="m-0 text-xs font-semibold uppercase tracking-widest text-subtle">
@@ -120,6 +140,8 @@ export const VariantsWidget = ({contentId}: VariantsWidgetProps): ReactElement =
                     isExpanded={expandedId === original.getId()}
                     onToggle={() => setExpandedId(prev => (prev === original.getId() ? null : original.getId()))}
                     onCreateVariant={openCreateDialog}
+                    index={0}
+                    registerEntry={registerEntry}
                 />
             </div>
 
@@ -128,7 +150,7 @@ export const VariantsWidget = ({contentId}: VariantsWidgetProps): ReactElement =
                     {i18n('widget.variants.list.header.variants')}
                 </h6>
                 <div className="flex flex-col gap-3">
-                    {variants.map(variant => (
+                    {variants.map((variant, idx) => (
                         <VariantCard
                             key={variant.getId()}
                             item={variant}
@@ -137,6 +159,8 @@ export const VariantsWidget = ({contentId}: VariantsWidgetProps): ReactElement =
                             isExpanded={expandedId === variant.getId()}
                             onToggle={() => setExpandedId(prev => (prev === variant.getId() ? null : variant.getId()))}
                             onDuplicate={openDuplicateDialog}
+                            index={idx + 1}
+                            registerEntry={registerEntry}
                         />
                     ))}
                 </div>
