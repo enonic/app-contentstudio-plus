@@ -32,7 +32,7 @@ const XPATH = {
     showSearchPanelButton: "//button[contains(@aria-label, 'Show Search Panel')]",
     showIssuesListButton: "//button[contains(@id,'ShowIssuesDialogButton')]/button",//'Assigned to Me' or 'Show Issues'
     markAsReadyMenuItem: "//ul[contains(@id,'Menu')]//li[contains(@id,'MenuItem') and text()='Mark as ready']",
-    resetSelectionCheckbox: `//label[child::input[contains(@aria-label,'Reset selection')]]`,
+    resetSelectionCheckbox: `//label[child::input[contains(@aria-label,'Clear selection')]]`,
     numberInSelectionToggler: `//button[contains(@id,'SelectionPanelToggler')]/span`,
     publishMenuItemByName(name) {
         return `//ul[contains(@id,'Menu')]//li[contains(@id,'MenuItem') and contains(.,'${name}')]`
@@ -45,6 +45,7 @@ const XPATH = {
 };
 
 const toolbarButton = (ariaLabel) => XPATH.toolbarDiv + BUTTONS.toolbarButtonAriaLabel(ariaLabel);
+const toolbarTooltipButton = (ariaLabel) => XPATH.toolbarDiv + BUTTONS.toolbarTooltipButtonAriaLabel(ariaLabel);
 
 class ContentBrowsePanel extends BaseBrowsePanel {
 
@@ -114,19 +115,20 @@ class ContentBrowsePanel extends BaseBrowsePanel {
     }
 
     get hideContextWindowButton() {
-        return XPATH.container + BUTTONS.buttonAriaLabel('Hide context panel');
+        return XPATH.container + BUTTONS.buttonAriaLabel('Hide Context Panel');
     }
 
     get showContextPanelButton() {
-        return XPATH.container + BUTTONS.buttonAriaLabel('Show context panel');
+        return XPATH.container + BUTTONS.buttonAriaLabel('Show Context Panel');
     }
 
     async isShowContextPanelButtonDisplayed() {
         return await this.isElementDisplayed(this.showContextPanelButton);
     }
 
+    // Menu dropdown handle
     get showPublishMenuButton() {
-        return toolbarButton('More actions');
+        return toolbarTooltipButton('More actions');
     }
 
     get markAsReadyMenuItem() {
@@ -179,11 +181,11 @@ class ContentBrowsePanel extends BaseBrowsePanel {
 
     get displayNames() {
         // div[1] contains the icon, div[2] contains the name
-        return TREE_GRID.TREE_LIST_DIV + TREE_GRID.TREE_LIST_ITEM_DIV + TREE_GRID.CONTENT_LABEL_BLOCK + '//div[2]//span';
+        return TREE_GRID.CONTENT_TREE_LIST_DATA_COMPONENT + TREE_GRID.VIRTUALIZED_TREE_ROW + TREE_GRID.CONTENT_LABEL_BLOCK + '//div[2]//span';
     }
 
     get contentNames() {
-        return TREE_GRID.TREE_LIST_DIV + TREE_GRID.TREE_LIST_ITEM_DIV + TREE_GRID.CONTENT_LABEL_BLOCK + '//div[2]//small';
+        return TREE_GRID.CONTENT_TREE_LIST_DATA_COMPONENT + TREE_GRID.VIRTUALIZED_TREE_ROW + TREE_GRID.CONTENT_LABEL_BLOCK + '//div[2]//small';
     }
 
     get treeGrid() {
@@ -780,8 +782,8 @@ class ContentBrowsePanel extends BaseBrowsePanel {
         }
     }
 
-    waitForShowPublishMenuDropDownVisible() {
-        return this.waitForElementDisplayed(this.showPublishMenuButton, appConst.mediumTimeout);
+    async waitForShowPublishMenuDropDownVisible() {
+        return await this.waitForElementDisplayed(this.showPublishMenuButton);
     }
 
     async waitForCreateIssueButtonDisplayed() {
@@ -996,7 +998,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
 
     async rightClickOnItemByDisplayName(displayName) {
         try {
-            const nameXpath = XPATH.container + TREE_GRID.itemByDisplayName(displayName) + TREE_GRID.TREE_LIST_ITEM_DIV;
+            const nameXpath = XPATH.container + TREE_GRID.itemByDisplayName(displayName) + TREE_GRID.TREE_LIST_ITEM_COMPONENT;
             await this.waitForElementDisplayed(nameXpath, appConst.mediumTimeout);
             await this.doRightClick(nameXpath);
             return await this.waitForContextMenuDisplayed();
@@ -1127,7 +1129,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
         try {
             return await this.waitForElementDisplayed(this.resetSelectionCheckbox);
         } catch (err) {
-            await this.handleError('Reset Selection checkbox should be displayed', 'err_reset_selection_checkbox', err);
+            await this.handleError('Clear Selection checkbox should be displayed', 'err_reset_selection_checkbox', err);
         }
     }
 
@@ -1136,7 +1138,7 @@ class ContentBrowsePanel extends BaseBrowsePanel {
             await this.waitForResetSelectionCheckboxDisplayed()
             return await this.clickOnElement(this.resetSelectionCheckbox);
         } catch (err) {
-            await this.handleError('Clicked on Reset Selection checkbox', 'err_reset_selection_checkbox', err);
+            await this.handleError('Clicked on Clear Selection checkbox', 'err_reset_selection_checkbox', err);
         }
     }
 
