@@ -1,5 +1,5 @@
 /**
- * Created on 22.01.2025
+ * Created on 22.01.2025 updated on 21.05.2026
  */
 const assert = require('node:assert');
 const webDriverHelper = require('../libs/WebDriverHelper');
@@ -12,7 +12,7 @@ const ArchiveItemStatisticsPanel = require('../page_objects/archive/archive.item
 const ArchiveRestoreDialog = require('../page_objects/archive/archive.restore.dialog');
 const ContentItemPreviewPanel = require('../page_objects/browsepanel/contentItem.preview.panel');
 
-describe.skip('archive.image.spec: tests for PreviewWidgetDropdown', function () {
+describe('archive.image.spec: tests for PreviewWidgetDropdown', function () {
     this.timeout(appConst.SUITE_TIMEOUT);
     // setup standalone mode if WDIO is not defined:
     if (typeof browser === 'undefined') {
@@ -30,11 +30,11 @@ describe.skip('archive.image.spec: tests for PreviewWidgetDropdown', function ()
             // 1. Select an image
             await studioUtils.findAndSelectItemByDisplayName(TEST_IMAGE);
             // 2. Click on 'Archive...' button in Content Browse toolbar:
-            await contentBrowsePanel.clickOnArchiveButton();
+            await contentBrowsePanel.clickOnDeleteButton();
             await deleteContentDialog.waitForDialogOpened();
             await studioUtils.saveScreenshot('image_to_archive1');
             // 3. Click on 'Archive' button in the modal dialog:
-            await deleteContentDialog.clickOnArchiveButton();
+            await deleteContentDialog.clickOnDeleteButton();
             // 4. Verify that the image is not displayed in Content Browse Panel:
             await contentBrowsePanel.waitForContentNotDisplayed(TEST_IMAGE);
             let messages = await contentBrowsePanel.waitForNotificationMessages();
@@ -99,7 +99,6 @@ describe.skip('archive.image.spec: tests for PreviewWidgetDropdown', function ()
             // 1. Navigate to 'Archive Browse Panel' :
             await studioUtils.openArchivePanel();
             await archiveBrowsePanel.clickCheckboxAndSelectRowByDisplayName(TEST_IMAGE);
-            await archiveItemStatisticsPanel.clickOnPreviewModeDropdownHandle();
             await archiveItemStatisticsPanel.selectOptionInPreviewWidget(appConst.PREVIEW_WIDGET.JSON);
             await studioUtils.saveScreenshot('archive_image_json');
             // 3. Switch to the iframe in Preview Panel and verify that the expected JSON values are displayed in the Preview Panel:
@@ -115,7 +114,6 @@ describe.skip('archive.image.spec: tests for PreviewWidgetDropdown', function ()
             // 1. Navigate to 'Archive Browse Panel' :
             await studioUtils.openArchivePanel();
             await archiveBrowsePanel.clickCheckboxAndSelectRowByDisplayName(TEST_IMAGE);
-            await archiveItemStatisticsPanel.clickOnPreviewModeDropdownHandle();
             await archiveItemStatisticsPanel.selectOptionInPreviewWidget(appConst.PREVIEW_WIDGET.MEDIA);
             await studioUtils.saveScreenshot('archive_image_media');
 
@@ -131,12 +129,11 @@ describe.skip('archive.image.spec: tests for PreviewWidgetDropdown', function ()
             // 1. Navigate to 'Archive Browse Panel' :
             await studioUtils.openArchivePanel();
             await archiveBrowsePanel.clickCheckboxAndSelectRowByDisplayName(TEST_IMAGE);
-            await archiveItemStatisticsPanel.clickOnPreviewModeDropdownHandle();
             await archiveItemStatisticsPanel.selectOptionInPreviewWidget(appConst.PREVIEW_WIDGET.ENONIC_RENDERING);
             await studioUtils.saveScreenshot('archive_image_rendering');
-            // 2. Verify that 'Preview not available' message is displayed in the Preview Panel:
+            // 2. Verify that 'No preview available' message is displayed in the Preview Panel:
             let result = await archiveItemStatisticsPanel.getNoPreviewMessage();
-            assert.equal(result[0], "Preview not available", 'expected message should be displayed');
+            assert.equal(result[0], "No preview available", 'expected message should be displayed');
         });
 
     it(`GIVEN existing archived image is selected AND 'Restore' context menu item has been clicked WHEN Archive button has been pressed in the modal dialog THEN the image should be present only in the Content Grid`,
