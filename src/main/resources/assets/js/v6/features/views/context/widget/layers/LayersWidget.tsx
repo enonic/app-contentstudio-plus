@@ -3,6 +3,7 @@ import {getActiveProjectName} from '@enonic/lib-contentstudio/v6/features/store/
 import {Button} from '@enonic/ui';
 import {type ReactElement, useCallback, useEffect, useMemo, useState} from 'react';
 import {AppHelper} from '../../../../../../util/AppHelper';
+import {useCardListKeyboard} from '../shared/useCardListKeyboard';
 import {LayerCard} from './LayerCard';
 import {LayersDialog} from './LayersDialog';
 import {buildLayersTree} from './layersTree';
@@ -41,6 +42,16 @@ export const LayersWidget = ({contentId}: LayersWidgetProps): ReactElement => {
     const handleToggle = useCallback((key: string): void => {
         setExpandedKey(prev => (prev === key ? null : key));
     }, []);
+
+    const handleActiveIndexChange = useCallback((index: number): void => {
+        const key = visibleRows[index]?.key;
+        if (key) setExpandedKey(key);
+    }, [visibleRows]);
+
+    const {containerRef, handleKeyDown, handleClick, registerEntry} = useCardListKeyboard({
+        itemCount: visibleRows.length,
+        onActiveIndexChange: handleActiveIndexChange,
+    });
 
     const currentRow = useMemo(
         () => tree.all.find(row => row.isCurrent) ?? null,
@@ -89,8 +100,13 @@ export const LayersWidget = ({contentId}: LayersWidgetProps): ReactElement => {
             data-component={LAYERS_WIDGET_NAME}
             className={`${AppHelper.getCommonExtensionContainerClass()} flex w-full max-w-full min-w-0 flex-col gap-4`}
         >
-            <div className="flex flex-col gap-5">
-                {visibleRows.map((row) => (
+            <div
+                ref={containerRef}
+                className="flex flex-col gap-5"
+                onKeyDown={handleKeyDown}
+                onClick={handleClick}
+            >
+                {visibleRows.map((row, index) => (
                     <LayerCard
                         key={row.key}
                         item={row.item}
@@ -99,6 +115,8 @@ export const LayersWidget = ({contentId}: LayersWidgetProps): ReactElement => {
                         level={row.level}
                         isExpanded={expandedKey === row.key}
                         onToggle={() => handleToggle(row.key)}
+                        index={index}
+                        registerEntry={registerEntry}
                     />
                 ))}
             </div>
