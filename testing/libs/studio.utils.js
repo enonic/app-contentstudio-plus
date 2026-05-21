@@ -445,10 +445,10 @@ module.exports = {
         let deleteContentDialog = new DeleteContentDialog();
         await this.findAndSelectItem(name);
         // Open modal dialog:
-        await browsePanel.clickOnArchiveButton();
+        await browsePanel.clickOnDeleteButton();
         await deleteContentDialog.waitForDialogOpened();
         // Click on 'Delete' menu item in the modal dialog:
-        await deleteContentDialog.clickOnDeleteMenuItem();
+        await deleteContentDialog.clickOnDeleteButton();
         return await deleteContentDialog.waitForDialogClosed();
     },
     async doDeleteContentByDisplayName(displayName) {
@@ -550,7 +550,6 @@ module.exports = {
             throw new Error('Error when opening Filter Panel! ' + err);
         }
     },
-
     async openProjectSelectionDialogAndSelectContext(context) {
         try {
             let browsePanel = new BrowsePanel();

@@ -1,5 +1,5 @@
 /**
- * Created on 31.10.2025
+ * Created on 31.10.2025 updated on 21.05.2026
  */
 const assert = require('node:assert');
 const webDriverHelper = require('../libs/WebDriverHelper');
@@ -11,7 +11,7 @@ const ArchiveBrowsePanel = require('../page_objects/archive/archive.browse.panel
 const ArchiveItemStatisticsPanel = require('../page_objects/archive/archive.item.statistics.panel');
 const ArchiveRestoreDialog = require('../page_objects/archive/archive.restore.dialog');
 
-describe.skip('archive.item.preview.for.text.content.spec: tests for archive item preview', function () {
+describe('archive.item.preview.for.text.content.spec: tests for archive item preview', function () {
     this.timeout(appConst.SUITE_TIMEOUT);
     // setup standalone mode if WDIO is not defined:
     if (typeof browser === 'undefined') {
@@ -75,7 +75,6 @@ describe.skip('archive.item.preview.for.text.content.spec: tests for archive ite
             await studioUtils.openArchivePanel();
             await archiveBrowsePanel.clickCheckboxAndSelectRowByDisplayName(IMPORTED_TEXT_CONTENT_DISPLAY_NAME);
             // 2. Expand the dropdown list in 'Preview' widget and select 'Json' option:
-            await archiveItemStatisticsPanel.clickOnPreviewModeDropdownHandle();
             await archiveItemStatisticsPanel.selectOptionInPreviewWidget(appConst.PREVIEW_WIDGET.JSON);
             await studioUtils.saveScreenshot('archive_text_content_json');
             // 3. Verify the JSON values in Preview Panel
@@ -92,7 +91,6 @@ describe.skip('archive.item.preview.for.text.content.spec: tests for archive ite
             await studioUtils.openArchivePanel();
             // 2. Select the existing text content and select 'Media' option in Preview Widget dropdown:
             await archiveBrowsePanel.clickCheckboxAndSelectRowByDisplayName(IMPORTED_TEXT_CONTENT_DISPLAY_NAME);
-            await archiveItemStatisticsPanel.clickOnPreviewModeDropdownHandle();
             await archiveItemStatisticsPanel.selectOptionInPreviewWidget(appConst.PREVIEW_WIDGET.MEDIA);
             await studioUtils.saveScreenshot('archived_text_media');
             // 3. Verify the text in Preview Panel
@@ -108,12 +106,11 @@ describe.skip('archive.item.preview.for.text.content.spec: tests for archive ite
             await studioUtils.openArchivePanel();
             await archiveBrowsePanel.clickCheckboxAndSelectRowByDisplayName(IMPORTED_TEXT_CONTENT_DISPLAY_NAME);
             // 2. Expand the dropdown list in 'Preview' widget and select 'Enonic Rendering' option:
-            await archiveItemStatisticsPanel.clickOnPreviewModeDropdownHandle();
             await archiveItemStatisticsPanel.selectOptionInPreviewWidget(appConst.PREVIEW_WIDGET.ENONIC_RENDERING);
             await studioUtils.saveScreenshot('archive_image_rendering');
-            // 3. Verify that "Preview not available" is displayed in the Preview Panel:
+            // 3. Verify that "No preview available" is displayed in the Preview Panel:
             let result = await archiveItemStatisticsPanel.getNoPreviewMessage();
-            assert.equal(result[0], "Preview not available", 'expected message should be displayed');
+            assert.equal(result[0], "No preview available", 'expected message should be displayed');
         });
 
     it(`GIVEN existing archived text content is selected AND 'Restore...' context menu item has been clicked WHEN Archive button has been pressed in the modal dialog THEN the content should be present only in the Content Grid`,
@@ -141,9 +138,9 @@ describe.skip('archive.item.preview.for.text.content.spec: tests for archive ite
         });
 
     beforeEach(async () => {
-        return await studioUtils.navigateToContentStudioCloseProjectSelectionDialog();
+        return await studioUtils.navigateToContentStudioApp();
     });
-    afterEach(() => studioUtils.doCloseAllWindowTabsAndSwitchToHome());
+    afterEach(() => studioUtils.doCloseAllWindowTabsAndNavigateToHome());
     before(() => {
         return console.log('specification is starting: ' + this.title);
     });

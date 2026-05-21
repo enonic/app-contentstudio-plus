@@ -4,8 +4,10 @@
 const Page = require('../page');
 const appConst = require('../../libs/app_const');
 const lib = require('../../libs/elements');
+const LayersContentTreeDialog = require('../project/layers.content.tree.dialog');
 
 const xpath = {
+    showAllButton: "//button[contains(@class,'show-all-button')]",
     layersItemViewDiv: "//div[contains(@class,'layers-item-view-data')]",
     localizeButton: "//div[contains(@class,'data-footer')]//button[child::span[text()='Localize']]",
     editButton: "//div[contains(@class,'data-footer')]//button[child::span[text()='Edit']]",
@@ -18,8 +20,20 @@ const xpath = {
 
 class BaseLayersWidget extends Page {
 
+    get showAllButton() {
+        return this.layersWidget + xpath.showAllButton;
+    }
+
     isWidgetVisible() {
         return this.isElementDisplayed(this.layersWidget);
+    }
+
+    async clickOnShowAllButton() {
+        let layersContentTreeDialog = new LayersContentTreeDialog();
+        await this.waitForElementDisplayed(this.showAllButton, appConst.mediumTimeout);
+        await this.clickOnElement(this.showAllButton);
+        await layersContentTreeDialog.waitForDialogLoaded();
+        return layersContentTreeDialog;
     }
 
     async waitForWidgetLoaded() {
@@ -54,6 +68,13 @@ class BaseLayersWidget extends Page {
         } catch (err) {
             await this.handleError(`Tried to click on widget item for layer: ${layerName}`, 'err_widget_item', err);
         }
+    }
+
+    async waitForLayerItemExpanded(layerName) {
+        let locator = this.widgetItemView + xpath.layerViewByName(layerName) + `/ancestor::li[1]`;
+        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+        let attrClass = await this.getAttribute(locator, 'class');
+        return attrClass.includes('expanded');
     }
 
     async getLayersName() {
