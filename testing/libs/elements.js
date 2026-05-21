@@ -89,7 +89,8 @@ const BUTTONS = {
     radioButtonByLabel: (label) => `//button[@role='radio' and contains(.,'${label}')]`,
     BUTTON_MENU_POPUP: "//button[@aria-haspopup='menu']",
     buttonAriaLabel: (ariaLabel) => `//button[contains(@type,'button') and contains(@aria-label,'${ariaLabel}') and not(ancestor::*[@aria-hidden='true']) and not(ancestor::*[contains(@class,'sm:hidden')])]`,
-    toolbarButtonAriaLabel: (ariaLabel) => `//button[contains(@type,'button') and contains(@aria-label,'${ariaLabel}') and not(ancestor::*[@aria-hidden='true']) and not(ancestor::*[contains(@class,'sm:hidden')])]`,
+    toolbarButtonAriaLabel: (ariaLabel) => `//button[@data-component='Toolbar.Item' and contains(@aria-label,'${ariaLabel}') and not(ancestor::*[@aria-hidden='true']) and not(ancestor::*[contains(@class,'sm:hidden')])]`,
+    toolbarTooltipButtonAriaLabel: (ariaLabel) => `//button[@data-component='Tooltip' and contains(@aria-label,'${ariaLabel}') and not(ancestor::*[@aria-hidden='true']) and not(ancestor::*[contains(@class,'sm:hidden')])]`,
     buttonStatusBar: (label) => `//button[@data-component='StatusBarEntryButton' and contains(.,'${label}')]`,
     actionButton: (label) => `//div[contains(@id,'ActionButton')]/button[contains(.,'${label}')]`,
     togglerButton: (label) => `//button[contains(@id,'TogglerButton') and child::span[text()='${label}']]`,
@@ -117,8 +118,10 @@ const LIVE_VIEW = {
 const TREE_GRID = {
     DIV_ROLE_GRID: "//div[@role='grid']",
     DIV_ROLE_ROW: "//div[@role='row']",
+    CONTENT_TREE_LIST_DATA_COMPONENT:"//div[@data-component='ContentTreeList']",
+    VIRTUALIZED_TREE_ROW: "//div[@data-component='VirtualizedTreeList.Row']",
     TREE_LIST_DIV: "//div[contains(@id,'tree-list')]",
-    TREE_LIST_ITEM_DIV: "//div[contains(@role,'listitem')]",
+    TREE_LIST_ITEM_COMPONENT: "//div[@data-component='ListItem']",
     CONTENT_ITEM_CONTEXT_MENU: "//div[@role='menu' and contains(@id,'content')]",
     TREE_ITEM_DIV: "//div[contains(@role,'treeitem') and descendant::small]",
     TREE_LIST_ITEM_CHECKBOX_LABEL: "//div[@role='checkbox']",
@@ -135,13 +138,14 @@ const TREE_GRID = {
         return `//div[@role='menu' and contains(@id,'content')]//div[contains(@id,'menu-item') and contains(.,'${name}')]`;
     },
     itemByName: name => {
-        return `//div[contains(@role,'treeitem') and descendant::small[contains(@class,'t-subtle') and contains(.,'${name}')]]`
+        return `//div[@data-component='VirtualizedTreeList.Row' and descendant::small[contains(@class,'t-subtle') and contains(.,'${name}')]]`
     },
+    VIRTUALIZED_TREE_ROW: "//div[@data-component='VirtualizedTreeList.Row']",
     itemByDisplayName: displayName => {
-        return `//div[contains(@role,'treeitem') and descendant::span[contains(.,'${displayName}')]]`
+        return `//div[@data-component='VirtualizedTreeList.Row' and descendant::span[contains(.,'${displayName}')]]`
     },
     itemTreeGridListElementByName: name => {
-        return `//div[contains(@role,'treeitem') and descendant::small[contains(@class,'t-subtle') and contains(.,'${name}')]]`;
+        return `//div[@data-component='VirtualizedTreeList.Row' and descendant::small[contains(@class,'t-subtle') and contains(.,'${name}')]]`;
     },
 }
 const DROPDOWN = {
@@ -181,24 +185,7 @@ const DROPDOWN = {
     WIDGET_COMBOBOX: "//div[@data-component='WidgetsSelector']",
     OPTION_FILTER_INPUT: "//input[@role='combobox']",
 };
-const DROPDOWN_OLD = {
-    HANDLE: "//button[contains(@id,'DropdownHandle')]",
-    DROPDOWN_OPTION_FILTER_INPUT: "//input[contains(@id,'DropdownOptionFilterInput')]",
-    OPTION_FILTER_INPUT: "//input[contains(@id,'OptionFilterInput') and contains(@class, 'option-filter-input')]",
-    DROPDOWN_DIV: "//div[contains(@id,'Dropdown')]",
-    DROPDOWN_LIST_ITEM: "//*[contains(@class,'item-view-wrapper')]",
-    DROPDOWN_DIV_ITEM: "//div[contains(@class,'item-view-wrapper')]",
-    FILTERABLE_LISTBOX: "//div[contains(@id,'FilterableListBoxWrapper')]",
-    IMAGE_CONTENT_COMBOBOX_DIV: "//div[contains(@id,'ImageContentComboBox')]",
-    MODE_TOGGLER_BUTTON: "//button[contains(@id,'ModeTogglerButton')]",
-    APPLY_SELECTION_BUTTON: "//button[contains(@class,'apply-selection-button')]",
-    flatModeDropdownImgItemByDisplayName: (container, displayName) => {
-        return container +
-               `//*[contains(@class,'item-view-wrapper') and descendant::h6[contains(@class,'main-name') and contains(.,'${displayName}')]]//img`;
-    },
-    IMG_DROPDOWN_OPT_DISPLAY_NAME_FLAT_MODE: "//li[contains(@class,'item-view-wrapper')]" +
-                                             "//div[contains(@id,'NamesView')]//h6[contains(@class,'main-name')]",
-};
+
 const ISSUE = {
     contentRowByName: displayName => `//div[@data-component='ContentRow' and (descendant::div[@data-component='ContentLabel' and descendant::span[contains(.,'${displayName}')]])]`,
 }
