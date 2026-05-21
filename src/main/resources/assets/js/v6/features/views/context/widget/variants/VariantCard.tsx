@@ -5,8 +5,9 @@ import {EditContentEvent} from '@enonic/lib-contentstudio/app/event/EditContentE
 import {PublishStatus} from '@enonic/lib-contentstudio/app/publish/PublishStatus';
 import {ContentIcon} from '@enonic/lib-contentstudio/v6/features/shared/icons/ContentIcon';
 import {Button, cn} from '@enonic/ui';
-import {type MouseEvent, type ReactElement, useCallback, useMemo} from 'react';
+import {type MouseEvent, type ReactElement, useCallback, useLayoutEffect, useMemo, useRef} from 'react';
 import {resolveContentDisplay} from '../../../../shared/content/contentDisplay';
+import type {CardEntry} from '../shared/useCardListKeyboard';
 
 export type VariantCardProps = {
     item: ContentSummaryAndCompareStatus;
@@ -16,6 +17,8 @@ export type VariantCardProps = {
     onToggle: () => void;
     onCreateVariant?: (item: ContentSummaryAndCompareStatus) => void;
     onDuplicate?: (item: ContentSummaryAndCompareStatus) => void;
+    index?: number;
+    registerEntry?: (index: number, entry: CardEntry | null) => void;
 };
 
 const STATUS_TONE: Record<string, string> = {
@@ -39,6 +42,8 @@ export const VariantCard = ({
     onToggle,
     onCreateVariant,
     onDuplicate,
+    index,
+    registerEntry,
 }: VariantCardProps): ReactElement => {
     const statusText = item.getStatusText();
     const statusClass = item.getPublishStatus() === PublishStatus.ONLINE
@@ -47,6 +52,24 @@ export const VariantCard = ({
 
     const contentDisplay = useMemo(() => resolveContentDisplay(item), [item]);
     const summary = item.getContentSummary();
+
+    const fieldsetRef = useRef<HTMLFieldSetElement>(null);
+    const editBtnRef = useRef<HTMLButtonElement>(null);
+    const secondaryBtnRef = useRef<HTMLButtonElement>(null);
+
+    const hasCreate = isOriginal && !!onCreateVariant;
+    const hasDuplicate = !isOriginal && !!onDuplicate;
+
+    useLayoutEffect(() => {
+        if (!registerEntry || index === undefined) return;
+        const buttons: HTMLButtonElement[] = [];
+        if (isExpanded && editBtnRef.current) buttons.push(editBtnRef.current);
+        if (isExpanded && (hasCreate || hasDuplicate) && secondaryBtnRef.current) {
+            buttons.push(secondaryBtnRef.current);
+        }
+        registerEntry(index, {cardEl: fieldsetRef.current, buttonEls: buttons});
+        return () => registerEntry(index, null);
+    }, [registerEntry, index, isExpanded, hasCreate, hasDuplicate]);
 
     const handleEdit = useCallback((event: MouseEvent<HTMLButtonElement>): void => {
         event.stopPropagation();
@@ -65,6 +88,8 @@ export const VariantCard = ({
 
     return (
         <fieldset
+            ref={fieldsetRef}
+            tabIndex={-1}
             onClick={onToggle}
             className={cn(
                 'group relative m-0 min-w-0 cursor-pointer rounded-md border border-bdr-soft p-2.5 text-left text-sm transition-colors outline-none',
@@ -98,25 +123,19 @@ export const VariantCard = ({
                 {isExpanded && (
                     <div className="col-start-2 col-end-4 flex gap-2">
                         <Button
+                            ref={editBtnRef}
                             size="sm"
                             variant="solid"
                             label={i18n('action.edit')}
                             onClick={handleEdit}
                         />
-                        {isOriginal && onCreateVariant && (
+                        {(hasCreate || hasDuplicate) && (
                             <Button
+                                ref={secondaryBtnRef}
                                 size="sm"
                                 variant="outline"
-                                label={i18n('widget.variants.create.text')}
-                                onClick={handleCreate}
-                            />
-                        )}
-                        {!isOriginal && onDuplicate && (
-                            <Button
-                                size="sm"
-                                variant="outline"
-                                label={i18n('action.duplicate')}
-                                onClick={handleDuplicate}
+                                label={i18n(hasCreate ? 'widget.variants.create.text' : 'action.duplicate')}
+                                onClick={hasCreate ? handleCreate : handleDuplicate}
                             />
                         )}
                     </div>

@@ -7,9 +7,10 @@ import {PublishStatus} from '@enonic/lib-contentstudio/app/publish/PublishStatus
 import {ProjectIcon} from '@enonic/lib-contentstudio/v6/features/shared/icons/ProjectIcon';
 import {Button, Tooltip, cn} from '@enonic/ui';
 import {Layers2} from 'lucide-react';
-import {type MouseEvent, type ReactElement, useCallback, useMemo} from 'react';
+import {type MouseEvent, type ReactElement, useCallback, useLayoutEffect, useMemo, useRef} from 'react';
 import {LayerContent} from '../../../../../../extension/layers/LayerContent';
 import {resolveContentDisplay} from '../../../../shared/content/contentDisplay';
+import type {CardEntry} from '../shared/useCardListKeyboard';
 
 export type LayerCardProps = {
     item: LayerContent;
@@ -18,6 +19,8 @@ export type LayerCardProps = {
     level: number;
     isExpanded: boolean;
     onToggle: () => void;
+    index?: number;
+    registerEntry?: (index: number, entry: CardEntry | null) => void;
 };
 
 const LEVEL_INDENT_PX = 24;
@@ -35,12 +38,14 @@ const STATUS_TONE: Record<string, string> = {
 
 const getStatusTone = (statusClass: string): string => STATUS_TONE[statusClass] ?? 'text-subtle';
 
-export const LayerCard = ({item, isCurrent, isInChain, level, isExpanded, onToggle}: LayerCardProps): ReactElement => {
+export const LayerCard = ({item, isCurrent, isInChain, level, isExpanded, onToggle, index, registerEntry}: LayerCardProps): ReactElement => {
     const isChild = level > 0;
     const isRoot = level === 0;
     const project = item.getProject();
     const hasItem = item.hasItem();
     const content = hasItem ? item.getItem() : null;
+    const fieldsetRef = useRef<HTMLFieldSetElement>(null);
+    const buttonRef = useRef<HTMLButtonElement>(null);
 
     const statusText = content?.getStatusText() ?? '';
     const statusClass = content?.getPublishStatus() === PublishStatus.ONLINE
@@ -88,6 +93,15 @@ export const LayerCard = ({item, isCurrent, isInChain, level, isExpanded, onTogg
 
     const indentPx = Math.max(level - 1, 0) * LEVEL_INDENT_PX;
 
+    useLayoutEffect(() => {
+        if (!registerEntry || index === undefined) return;
+        registerEntry(index, {
+            cardEl: fieldsetRef.current,
+            buttonEls: isExpanded && buttonRef.current ? [buttonRef.current] : [],
+        });
+        return () => registerEntry(index, null);
+    }, [registerEntry, index, isExpanded]);
+
     return (
         <div
             className="flex w-full items-stretch gap-1.5"
@@ -103,6 +117,8 @@ export const LayerCard = ({item, isCurrent, isInChain, level, isExpanded, onTogg
             )}
 
             <fieldset
+                ref={fieldsetRef}
+                tabIndex={-1}
                 onClick={onToggle}
                 className={cn(
                     'group relative m-0 min-w-0 flex-1 cursor-pointer rounded-md p-2.5 text-left text-sm transition-colors outline-none',
@@ -166,6 +182,7 @@ export const LayerCard = ({item, isCurrent, isInChain, level, isExpanded, onTogg
                         {isExpanded && (
                             <div className="col-start-2 flex">
                                 <Button
+                                    ref={buttonRef}
                                     size="sm"
                                     variant="solid"
                                     label={i18n(actionLabelKey)}
