@@ -45,11 +45,11 @@ class ArchiveBrowsePanel extends BaseBrowsePanel {
     }
 
     get deleteButton() {
-        return XPATH.toolbar + BUTTONS.buttonAriaLabel('Delete...');
+        return XPATH.toolbar + BUTTONS.buttonAriaLabel('Delete');
     }
 
     get restoreButton() {
-        return XPATH.toolbar + BUTTONS.buttonAriaLabel('Restore...');
+        return XPATH.toolbar + BUTTONS.buttonAriaLabel('Restore');
     }
 
     get treeGrid() {

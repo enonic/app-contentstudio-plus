@@ -527,7 +527,7 @@ module.exports = Object.freeze({
         DUPLICATE: 'Duplicate',
         MOVE: 'Move',
         SORT: 'Sort',
-        RESTORE: 'Restore...',
+        RESTORE: 'Restore',
         PREVIEW: 'Preview',
         PUBLISH: 'Publish',
         UNPUBLISH: 'Unpublish'
