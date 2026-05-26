@@ -4,8 +4,8 @@ import {ArchiveAppPanel} from './ArchiveAppPanel';
 import {Body} from '@enonic/lib-admin-ui/dom/Body';
 import {HasValidLicenseRequest} from './resource/HasValidLicenseRequest';
 import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
-import {ArchiveNoLicenseDialog} from './ArchiveNoLicenseDialog';
-import {ArchiveNoLicenseBlock} from './ArchiveNoLicenseBlock';
+import {NoLicenseBannerElement} from './v6/features/shared/license/NoLicenseBanner';
+import {NoLicenseDialogElement} from './v6/features/shared/license/NoLicenseDialog';
 import {ValidLicenseLoadedEvent} from './event/ValidLicenseLoadedEvent';
 import {ArchiveDeleteDialogElement} from './v6/features/shared/dialogs/archive/ArchiveDeleteDialog';
 import {ArchiveRestoreDialogElement} from './v6/features/shared/dialogs/archive/ArchiveRestoreDialog';
@@ -50,13 +50,13 @@ export class ArchiveAppContainer
     }
 
     private renderNoLicense(): void {
-        this.appendChild(new ArchiveNoLicenseBlock());
+        this.appendChild(new NoLicenseBannerElement({variant: 'full'}));
 
         ValidLicenseLoadedEvent.on(() => {
             this.handleValidLicenseLoaded();
         });
 
-        new ArchiveNoLicenseDialog().open();
+        new NoLicenseDialogElement().open();
     }
 
     private handleValidLicenseLoaded(): void {
