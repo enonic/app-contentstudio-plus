@@ -1,31 +1,28 @@
 import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import {DivEl} from '@enonic/lib-admin-ui/dom/DivEl';
-import {LoadMask} from '@enonic/lib-admin-ui/ui/mask/LoadMask';
-import {ContentId} from '@enonic/lib-contentstudio/app/content/ContentId';
-import {ContentSummaryAndCompareStatus} from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
-import {ContentSummaryAndCompareStatusFetcher} from '@enonic/lib-contentstudio/app/resource/ContentSummaryAndCompareStatusFetcher';
-import {ArchiveNoLicenseBlock} from '../ArchiveNoLicenseBlock';
+import {NoLicenseBannerElement} from '../v6/features/shared/license/NoLicenseBanner';
 import {AppHelper} from '../util/AppHelper';
 import {SpanEl} from '@enonic/lib-admin-ui/dom/SpanEl';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import Q from 'q';
 import {HasValidLicenseRequest} from '../resource/HasValidLicenseRequest';
 import {Element} from '@enonic/lib-admin-ui/dom/Element';
-import {ObjectHelper} from '@enonic/lib-admin-ui/ObjectHelper';
+
+const DARK_CLASS = 'dark';
 
 export class Extension
     extends DivEl {
 
     protected contentId?: string;
-    protected loadMask: LoadMask;
     private noItemsBlock?: Element;
+    private themeObserver?: MutationObserver;
 
     constructor(contentId: string, cls?: string) {
-        super(AppHelper.getCommonExtensionClass() + (' ' + cls || ''));
+        super(`${AppHelper.getCommonExtensionClass()}${cls ? ` ${cls}` : ''}`);
 
         this.setContentId(contentId);
-        this.initElements();
-        this.initListeners();
+        this.syncTheme();
+        this.observeOuterTheme();
 
         this.hasLicenseValid().then((isValid: boolean) => {
             if (isValid) {
@@ -36,32 +33,29 @@ export class Extension
         }).catch(DefaultErrorHandler.handle);
     }
 
+    private syncTheme(): void {
+        const isDark = document.documentElement.classList.contains(DARK_CLASS);
+
+        this.getHTMLElement().classList.toggle(DARK_CLASS, isDark);
+
+        const root = this.getHTMLElement().getRootNode();
+        if (root instanceof ShadowRoot) {
+            root.host.classList.toggle(DARK_CLASS, isDark);
+        }
+    }
+
+    private observeOuterTheme(): void {
+        this.themeObserver?.disconnect();
+        this.themeObserver = new MutationObserver(() => this.syncTheme());
+        this.themeObserver.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['class'],
+        });
+    }
+
     setContentId(contentId: string): void {
         this.contentId = contentId;
         this.noItemsBlock?.hide();
-    }
-
-    protected initElements(): void {
-        this.loadMask = new LoadMask(this);
-    }
-
-    protected fetchAndProcessContent(contentId?: string, handler?: (content: ContentSummaryAndCompareStatus) => void): Q.Promise<void> {
-        this.loadMask.show();
-        return new ContentSummaryAndCompareStatusFetcher()
-            .fetch(new ContentId(contentId || this.contentId))
-            .then((content: ContentSummaryAndCompareStatus) =>
-                ObjectHelper.isDefined(handler) ? handler(content) : this.processContent(content)
-            )
-            .finally(() => this.loadMask.hide())
-            .catch(DefaultErrorHandler.handle);
-    }
-
-    protected processContent(_content: ContentSummaryAndCompareStatus): Q.Promise<void> | void {
-        return Q.resolve();
-    }
-
-    protected initListeners(): void {
-        //
     }
 
     protected handleNoSelectedItem(): void {
@@ -91,11 +85,12 @@ export class Extension
     }
 
     private renderNoLicense(): void {
-        this.appendChild(new ArchiveNoLicenseBlock());
+        this.appendChild(new NoLicenseBannerElement());
     }
 
     cleanUp(): void {
-        //
+        this.themeObserver?.disconnect();
+        this.themeObserver = undefined;
     }
 
     static getContainer(el: Element): Element {
