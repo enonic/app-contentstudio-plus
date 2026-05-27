@@ -2,7 +2,7 @@ import {Extension} from '@enonic/lib-admin-ui/extension/Extension';
 import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {ContextView} from '@enonic/lib-contentstudio/app/view/context/ContextView';
-import {ExtensionView, InternalExtensionType} from '@enonic/lib-contentstudio/app/view/context/ExtensionView';
+import {ExtensionView} from '@enonic/lib-contentstudio/app/view/context/ExtensionView';
 import {History, List, Newspaper} from 'lucide-react';
 import {ArchiveDetailsWidgetElement} from './v6/features/views/context/widget/details/ArchiveDetailsWidget';
 import {PublishReportWidgetElement} from './v6/features/views/context/widget/publish-report/ArchivePublishReportWidget';
@@ -31,7 +31,6 @@ function createPropertiesWidget(contextView: ContextView): ExtensionView {
         .setExtensionClass('properties-widget')
         .setIconClass('icon-list')
         .setIcon(List)
-        .setType(InternalExtensionType.INFO)
         .setContextView(contextView)
         .addExtensionItemView(new ArchiveDetailsWidgetElement())
         .build();
