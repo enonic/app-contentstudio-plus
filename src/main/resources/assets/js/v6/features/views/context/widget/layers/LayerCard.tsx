@@ -1,6 +1,4 @@
-import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
-import {ContentLocalizer} from '@enonic/lib-contentstudio/app/browse/action/ContentLocalizer';
 import {ContentEventsProcessor} from '@enonic/lib-contentstudio/app/ContentEventsProcessor';
 import {EditContentEvent} from '@enonic/lib-contentstudio/app/event/EditContentEvent';
 import {PublishStatus} from '@enonic/lib-contentstudio/app/publish/PublishStatus';
@@ -58,35 +56,17 @@ export const LayerCard = ({item, isCurrent, isInChain, level, isExpanded, onTogg
         [content],
     );
 
-    type ActionMode = 'localize' | 'edit' | 'open';
+    type ActionMode = 'edit' | 'open';
 
-    const actionMode: ActionMode = isCurrent
-        ? (isReadOnly ? 'open' : isInherited ? 'localize' : 'edit')
-        : 'open';
+    const actionMode: ActionMode = isCurrent && !isReadOnly ? 'edit' : 'open';
 
-    const actionLabelKey =
-        actionMode === 'localize' ? 'action.translate'
-            : actionMode === 'edit' ? 'action.edit'
-                : 'action.open';
-
-    const handleLocalize = useCallback((): void => {
-        if (!content) return;
-        new ContentLocalizer().localizeAndEdit([content]).catch(DefaultErrorHandler.handle);
-    }, [content]);
-
-    const handleEdit = useCallback((): void => {
-        if (!content) return;
-        ContentEventsProcessor.handleEdit(new EditContentEvent([content], project.getName()));
-    }, [content, project]);
+    const actionLabelKey = actionMode === 'edit' ? 'action.edit' : 'action.open';
 
     const handleAction = useCallback((event: MouseEvent<HTMLButtonElement>): void => {
         event.stopPropagation();
-        if (actionMode === 'localize') {
-            handleLocalize();
-        } else {
-            handleEdit();
-        }
-    }, [actionMode, handleLocalize, handleEdit]);
+        if (!content) return;
+        ContentEventsProcessor.handleEdit(new EditContentEvent([content], project.getName()));
+    }, [content, project]);
 
     const projectLabel = project.getDisplayName() || project.getName();
     const projectLang = project.getLanguage();
