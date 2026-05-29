@@ -7,6 +7,10 @@ plugins {
 }
 group = 'com.enonic.app.contentstudio.js_testing'
 
+node {
+    version = '24.15.0'
+}
+
 configurations {
     distro
     deploy
