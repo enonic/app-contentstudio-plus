@@ -7,4 +7,4 @@ Enterprise extension for Content Studio.
 
 This widget extends admin functionality of Content Studio.
 
-Requires Enonic license.
+Requires [Enonic License 2.0](LICENSE.txt).
