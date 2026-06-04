@@ -5,8 +5,8 @@ xpApp = "4.0.0-A1"
 nodeGradle = "7.1.0"
 
 # App
-libMustache = "2.1.1"
-libLicense = "4.0.0-SNAPSHOT"
+libMustache = "3.0.0-B1"
+libLicense = "4.0.0-B1"
 
 [libraries]
 
