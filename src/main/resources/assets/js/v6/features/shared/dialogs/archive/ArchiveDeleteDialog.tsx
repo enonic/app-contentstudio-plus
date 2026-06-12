@@ -14,8 +14,8 @@ import {ArchiveDialogShell} from './ArchiveDialogShell';
 const ARCHIVE_DELETE_DIALOG_NAME = 'ArchiveDeleteDialog';
 
 export const ArchiveDeleteDialog = (): ReactElement => {
-    const {open, items, descendants, loading, submitting, taskId} = useStore($archiveDeleteDialog, {
-        keys: ['open', 'items', 'descendants', 'loading', 'submitting', 'taskId'],
+    const {open, items, descendants, loading, failed, submitting, taskId} = useStore($archiveDeleteDialog, {
+        keys: ['open', 'items', 'descendants', 'loading', 'failed', 'submitting', 'taskId'],
     });
     const total = useStore($archiveDeleteTotal);
     const title = useI18n('dialog.delete.archive.title');
@@ -38,6 +38,9 @@ export const ArchiveDeleteDialog = (): ReactElement => {
             total={total}
             taskId={taskId}
             ready={ready}
+            loading={loading}
+            failed={failed}
+            progressDescriptionKey="dialog.deleting"
             onCancel={cancelArchiveDeleteDialog}
             onExecute={executeArchiveDeleteDialog}
             onTaskComplete={handleArchiveDeleteTaskComplete}
