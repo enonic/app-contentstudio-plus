@@ -1,9 +1,12 @@
 import type {TaskId} from '@enonic/lib-admin-ui/task/TaskId';
 import type {ContentSummary} from '@enonic/lib-contentstudio/app/content/ContentSummary';
+import {useAnimatedEllipsis} from '@enonic/lib-contentstudio/v6/features/hooks/useAnimatedEllipsis';
+import {useI18n} from '@enonic/lib-contentstudio/v6/features/hooks/useI18n';
 import {useTaskProgress} from '@enonic/lib-contentstudio/v6/features/hooks/useTaskProgress';
 import {ContentLabel} from '@enonic/lib-contentstudio/v6/features/shared/content/ContentLabel';
 import {DialogPresetGatedConfirmContent} from '@enonic/lib-contentstudio/v6/features/shared/dialogs/DialogPreset';
 import {ProgressDialogContent} from '@enonic/lib-contentstudio/v6/features/shared/dialogs/ProgressDialogContent';
+import {InboundStatusBar} from '@enonic/lib-contentstudio/v6/features/shared/dialogs/status-bar/InboundStatusBar';
 import {Button, Dialog, ListItem, Separator} from '@enonic/ui';
 import {type ReactElement, useEffect, useState} from 'react';
 import {ArchiveContentViewItem} from '../../../../../ArchiveContentViewItem';
@@ -17,6 +20,9 @@ export type ArchiveDialogShellProps = {
     total: number;
     taskId: TaskId | undefined;
     ready: boolean;
+    loading?: boolean;
+    failed?: boolean;
+    progressDescriptionKey?: string;
     onCancel: () => void;
     onExecute: () => Promise<boolean>;
     onTaskComplete: (success: boolean, message?: string) => void;
@@ -30,6 +36,20 @@ export type ArchiveDialogShellProps = {
     'data-component': string;
 };
 
+const noop = (): void => undefined;
+
+const getProgressDescription = (
+    phaseAware: boolean,
+    resolving: boolean,
+    resolvingDescription: string,
+    progressDescription: string,
+): string | undefined => {
+    if (!phaseAware) {
+        return undefined;
+    }
+    return resolving ? resolvingDescription : progressDescription;
+};
+
 export const ArchiveDialogShell = ({
     open,
     items,
@@ -37,6 +57,9 @@ export const ArchiveDialogShell = ({
     total,
     taskId,
     ready,
+    loading = false,
+    failed = false,
+    progressDescriptionKey,
     onCancel,
     onExecute,
     onTaskComplete,
@@ -50,11 +73,16 @@ export const ArchiveDialogShell = ({
     'data-component': dataComponent,
 }: ArchiveDialogShellProps): ReactElement => {
     const [view, setView] = useState<View>('main');
-    const {progress} = useTaskProgress(taskId, {
+    const {progress, phase, phaseTotal} = useTaskProgress(taskId, {
         onComplete: (resultState, message) => {
             onTaskComplete(resultState === 'SUCCESS', message);
         },
     });
+
+    const phaseAware = progressDescriptionKey != null;
+    const resolving = phaseAware && phase == null;
+    const resolvingDescription = useAnimatedEllipsis(useI18n('dialog.statusBar.loading'), view === 'progress' && resolving);
+    const progressDescription = useI18n(progressDescriptionKey ?? 'dialog.statusBar.loading', phaseTotal ?? total);
 
     useEffect(() => {
         if (!open) {
@@ -101,6 +129,11 @@ export const ArchiveDialogShell = ({
                         className="w-full h-full gap-10 sm:h-fit md:min-w-180 md:max-w-184 md:max-h-[85vh] lg:max-w-220"
                     >
                         <Dialog.DefaultHeader title={title} description={description} withClose />
+                        <InboundStatusBar
+                            loading={loading}
+                            failed={failed}
+                            errors={{inbound: {count: 0, onIgnore: noop}}}
+                        />
                         <Dialog.Body className="flex flex-col gap-y-10">
                             <ul className="flex flex-col gap-y-2.5">
                                 {items.map((item) => (
@@ -154,7 +187,8 @@ export const ArchiveDialogShell = ({
                 {view === 'progress' && (
                     <ProgressDialogContent
                         title={progressTitle}
-                        progress={progress}
+                        description={getProgressDescription(phaseAware, resolving, resolvingDescription, progressDescription)}
+                        progress={resolving ? undefined : progress}
                         className="w-full h-full gap-10 sm:h-fit md:min-w-180 md:max-w-184 md:max-h-[85vh] lg:max-w-220"
                     />
                 )}
