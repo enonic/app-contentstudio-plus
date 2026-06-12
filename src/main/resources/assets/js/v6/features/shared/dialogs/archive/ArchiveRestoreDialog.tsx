@@ -14,8 +14,8 @@ import {ArchiveDialogShell} from './ArchiveDialogShell';
 const ARCHIVE_RESTORE_DIALOG_NAME = 'ArchiveRestoreDialog';
 
 export const ArchiveRestoreDialog = (): ReactElement => {
-    const {open, items, descendants, loading, submitting, taskId} = useStore($archiveRestoreDialog, {
-        keys: ['open', 'items', 'descendants', 'loading', 'submitting', 'taskId'],
+    const {open, items, descendants, loading, failed, submitting, taskId} = useStore($archiveRestoreDialog, {
+        keys: ['open', 'items', 'descendants', 'loading', 'failed', 'submitting', 'taskId'],
     });
     const total = useStore($archiveRestoreTotal);
     const title = useI18n('dialog.restore.archive.title');
@@ -38,6 +38,9 @@ export const ArchiveRestoreDialog = (): ReactElement => {
             total={total}
             taskId={taskId}
             ready={ready}
+            loading={loading}
+            failed={failed}
+            progressDescriptionKey="dialog.restoring"
             onCancel={cancelArchiveRestoreDialog}
             onExecute={executeArchiveRestoreDialog}
             onTaskComplete={handleArchiveRestoreTaskComplete}
