@@ -1,12 +1,12 @@
 [versions]
 
 enonicDefaults = "2.1.7"
-xpApp = "4.0.0-A1"
+xpApp = "4.0.0"
 nodeGradle = "7.1.0"
 
 # App
-libMustache = "3.0.0-B1"
-libLicense = "4.0.0-B1"
+libMustache = "3.0.0"
+libLicense = "4.0.0"
 
 [libraries]
 
