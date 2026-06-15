@@ -2,6 +2,7 @@ import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import {NotifyManager} from '@enonic/lib-admin-ui/notify/NotifyManager';
 import type {TaskId} from '@enonic/lib-admin-ui/task/TaskId';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
+import type {ContentId} from '@enonic/lib-contentstudio/app/content/ContentId';
 import type {ContentSummary} from '@enonic/lib-contentstudio/app/content/ContentSummary';
 import {DeleteContentRequest} from '@enonic/lib-contentstudio/app/resource/DeleteContentRequest';
 import {GetDescendantsOfContentsRequest} from '@enonic/lib-contentstudio/app/resource/GetDescendantsOfContentsRequest';
@@ -13,7 +14,9 @@ import {ArchiveResourceRequest} from '../../../../resource/ArchiveResourceReques
 type ArchiveDeleteDialogState = {
     open: boolean;
     items: ArchiveContentViewItem[];
+    descendantIds: ContentId[];
     descendants: ContentSummary[];
+    descendantWindow: number;
     loading: boolean;
     failed: boolean;
     submitting: boolean;
@@ -25,7 +28,9 @@ type ArchiveDeleteDialogState = {
 const initialState: ArchiveDeleteDialogState = {
     open: false,
     items: [],
+    descendantIds: [],
     descendants: [],
+    descendantWindow: 0,
     loading: false,
     failed: false,
     submitting: false,
@@ -37,12 +42,28 @@ const initialState: ArchiveDeleteDialogState = {
 export const $archiveDeleteDialog = map<ArchiveDeleteDialogState>({...initialState});
 
 export const $archiveDeleteTotal = computed($archiveDeleteDialog, (state) =>
-    state.items.length + state.descendants.length,
+    state.items.length + state.descendantIds.length,
+);
+
+export const $hasMoreArchiveDeleteDescendants = computed($archiveDeleteDialog, (state) =>
+    state.descendantWindow < state.descendantIds.length,
 );
 
 const fetcher = new ArchiveContentFetcher();
 
+const DESCENDANT_LOAD_SIZE = 36;
+
 let instanceId = 0;
+
+let loadingMore = false;
+
+const orderSummariesByIds = (summaries: ContentSummary[], orderIds: ContentId[]): ContentSummary[] => {
+    const indexById = new Map<string, number>();
+    orderIds.forEach((id, index) => indexById.set(id.toString(), index));
+    const indexOf = (item: ContentSummary): number =>
+        indexById.get(item.getContentId().toString()) ?? orderIds.length;
+    return [...summaries].sort((a, b) => indexOf(a) - indexOf(b));
+};
 
 export function openArchiveDeleteDialog(items: ArchiveContentViewItem[]): void {
     if (items.length === 0) {
@@ -67,7 +88,7 @@ export async function executeArchiveDeleteDialog(): Promise<boolean> {
         return false;
     }
 
-    const total = state.items.length + state.descendants.length;
+    const total = state.items.length + state.descendantIds.length;
     const pendingPrimaryName = state.items[0]?.getDisplayName() || state.items[0]?.getPath()?.toString();
 
     try {
@@ -98,7 +119,7 @@ export function handleArchiveDeleteTaskComplete(success: boolean, message?: stri
         return;
     }
 
-    const total = state.pendingTotal || (state.items.length + state.descendants.length);
+    const total = state.pendingTotal || (state.items.length + state.descendantIds.length);
     const primaryName = state.pendingPrimaryName ?? '';
 
     if (success) {
@@ -114,26 +135,68 @@ export function handleArchiveDeleteTaskComplete(success: boolean, message?: stri
     $archiveDeleteDialog.set({...initialState});
 }
 
+async function loadDescendantWindow(allIds: ContentId[], start: number, guardId: number): Promise<void> {
+    const sliceIds = allIds.slice(start, start + DESCENDANT_LOAD_SIZE);
+    const summaries = sliceIds.length > 0 ? await fetcher.fetchByIds(sliceIds) : [];
+
+    if (guardId !== instanceId) return;
+
+    const {descendants, descendantIds} = $archiveDeleteDialog.get();
+    const currentIds = new Set(descendantIds.map((id) => id.toString()));
+    const byId = new Map<string, ContentSummary>();
+    for (const item of [...(start === 0 ? [] : descendants), ...summaries]) {
+        const key = item.getContentId().toString();
+        if (currentIds.has(key)) {
+            byId.set(key, item);
+        }
+    }
+
+    $archiveDeleteDialog.set({
+        ...$archiveDeleteDialog.get(),
+        descendants: orderSummariesByIds([...byId.values()], descendantIds),
+        descendantWindow: Math.min(start + DESCENDANT_LOAD_SIZE, descendantIds.length),
+    });
+}
+
+export async function loadMoreArchiveDeleteDescendants(): Promise<void> {
+    if (loadingMore) return;
+
+    const {descendantIds, descendantWindow} = $archiveDeleteDialog.get();
+    if (descendantWindow >= descendantIds.length) return;
+
+    loadingMore = true;
+    const guardId = instanceId;
+    try {
+        await loadDescendantWindow(descendantIds, descendantWindow, guardId);
+    } finally {
+        loadingMore = false;
+    }
+}
+
 async function loadDescendants(currentInstance: number): Promise<void> {
     $archiveDeleteDialog.setKey('loading', true);
     $archiveDeleteDialog.setKey('failed', false);
 
     try {
         const items = $archiveDeleteDialog.get().items;
-        const ids = await new GetDescendantsOfContentsRequest()
+        const descendantIds = await new GetDescendantsOfContentsRequest()
             .setContentPaths(items.map((item) => item.getContentSummary().getPath()))
             .setContentRootPath(ArchiveResourceRequest.ARCHIVE_PATH)
             .sendAndParse();
 
         if (currentInstance !== instanceId) return;
 
-        const descendants = ids.length > 0 ? await fetcher.fetchByIds(ids) : [];
+        const descendants = descendantIds.length > 0
+            ? await fetcher.fetchByIds(descendantIds.slice(0, DESCENDANT_LOAD_SIZE))
+            : [];
 
         if (currentInstance !== instanceId) return;
 
         $archiveDeleteDialog.set({
             ...$archiveDeleteDialog.get(),
-            descendants,
+            descendantIds,
+            descendants: orderSummariesByIds(descendants, descendantIds),
+            descendantWindow: Math.min(DESCENDANT_LOAD_SIZE, descendantIds.length),
             loading: false,
             failed: false,
         });
