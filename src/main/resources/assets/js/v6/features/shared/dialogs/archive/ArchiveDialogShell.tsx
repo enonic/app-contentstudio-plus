@@ -2,13 +2,14 @@ import type {TaskId} from '@enonic/lib-admin-ui/task/TaskId';
 import type {ContentSummary} from '@enonic/lib-contentstudio/app/content/ContentSummary';
 import {useAnimatedEllipsis} from '@enonic/lib-contentstudio/v6/features/hooks/useAnimatedEllipsis';
 import {useI18n} from '@enonic/lib-contentstudio/v6/features/hooks/useI18n';
+import {useInfiniteScroll} from '@enonic/lib-contentstudio/v6/features/hooks/useInfiniteScroll';
 import {useTaskProgress} from '@enonic/lib-contentstudio/v6/features/hooks/useTaskProgress';
 import {ContentLabel} from '@enonic/lib-contentstudio/v6/features/shared/content/ContentLabel';
 import {DialogPresetGatedConfirmContent} from '@enonic/lib-contentstudio/v6/features/shared/dialogs/DialogPreset';
 import {ProgressDialogContent} from '@enonic/lib-contentstudio/v6/features/shared/dialogs/ProgressDialogContent';
 import {InboundStatusBar} from '@enonic/lib-contentstudio/v6/features/shared/dialogs/status-bar/InboundStatusBar';
 import {Button, Dialog, ListItem, Separator} from '@enonic/ui';
-import {type ReactElement, useEffect, useState} from 'react';
+import {type ReactElement, useCallback, useEffect, useState} from 'react';
 import {ArchiveContentViewItem} from '../../../../../ArchiveContentViewItem';
 
 type View = 'main' | 'confirmation' | 'progress';
@@ -23,6 +24,8 @@ export type ArchiveDialogShellProps = {
     loading?: boolean;
     failed?: boolean;
     progressDescriptionKey?: string;
+    hasMore?: boolean;
+    onLoadMoreDescendants?: () => void | Promise<void>;
     onCancel: () => void;
     onExecute: () => Promise<boolean>;
     onTaskComplete: (success: boolean, message?: string) => void;
@@ -60,6 +63,8 @@ export const ArchiveDialogShell = ({
     loading = false,
     failed = false,
     progressDescriptionKey,
+    hasMore = false,
+    onLoadMoreDescendants,
     onCancel,
     onExecute,
     onTaskComplete,
@@ -73,6 +78,19 @@ export const ArchiveDialogShell = ({
     'data-component': dataComponent,
 }: ArchiveDialogShellProps): ReactElement => {
     const [view, setView] = useState<View>('main');
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
+    const handleLoadMore = useCallback((): void => {
+        if (isLoadingMore || !onLoadMoreDescendants) {
+            return;
+        }
+        setIsLoadingMore(true);
+        void Promise.resolve(onLoadMoreDescendants()).finally(() => setIsLoadingMore(false));
+    }, [isLoadingMore, onLoadMoreDescendants]);
+    const sentinelRef = useInfiniteScroll<HTMLDivElement>({
+        hasMore,
+        isLoading: isLoadingMore,
+        onLoadMore: handleLoadMore,
+    });
     const {progress, phase, phaseTotal} = useTaskProgress(taskId, {
         onComplete: (resultState, message) => {
             onTaskComplete(resultState === 'SUCCESS', message);
@@ -160,6 +178,7 @@ export const ArchiveDialogShell = ({
                                             </ListItem>
                                         ))}
                                     </ul>
+                                    {hasMore && <div ref={sentinelRef} aria-hidden className="h-px w-full" />}
                                 </div>
                             )}
                         </Dialog.Body>
