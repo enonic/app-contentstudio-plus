@@ -5,9 +5,11 @@ import {type ReactElement} from 'react';
 import {
     $archiveDeleteDialog,
     $archiveDeleteTotal,
+    $hasMoreArchiveDeleteDescendants,
     cancelArchiveDeleteDialog,
     executeArchiveDeleteDialog,
     handleArchiveDeleteTaskComplete,
+    loadMoreArchiveDeleteDescendants,
 } from '../../../store/dialogs/archiveDeleteDialog.store';
 import {ArchiveDialogShell} from './ArchiveDialogShell';
 
@@ -18,6 +20,7 @@ export const ArchiveDeleteDialog = (): ReactElement => {
         keys: ['open', 'items', 'descendants', 'loading', 'failed', 'submitting', 'taskId'],
     });
     const total = useStore($archiveDeleteTotal);
+    const hasMoreDescendants = useStore($hasMoreArchiveDeleteDescendants);
     const title = useI18n('dialog.delete.archive.title');
     const description = useI18n('dialog.delete.archive.subtitle');
     const dependantsLabel = useI18n('dialog.delete.archive.items.subtitle');
@@ -40,6 +43,8 @@ export const ArchiveDeleteDialog = (): ReactElement => {
             ready={ready}
             loading={loading}
             failed={failed}
+            hasMore={hasMoreDescendants}
+            onLoadMoreDescendants={loadMoreArchiveDeleteDescendants}
             progressDescriptionKey="dialog.deleting"
             onCancel={cancelArchiveDeleteDialog}
             onExecute={executeArchiveDeleteDialog}
