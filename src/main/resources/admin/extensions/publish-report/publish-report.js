@@ -37,7 +37,7 @@ const getBaseParams = (locales) => {
         }),
         jsUri: portal.assetUrl({
             path: 'js/extension/publish-report.js'
-        }),
+        }) + '?v=' + Date.now(),
         configScriptId: 'extension-pr-config-json',
         configAsJson: JSON.stringify(configLib.getConfig(locales), null, 4).replace(/<(\/?script|!--)/gi, "\\u003C$1"),
         isNoPublishMode: false,

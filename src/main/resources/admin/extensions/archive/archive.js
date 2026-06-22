@@ -10,10 +10,10 @@ function handleGet(req) {
     const params = {
         bootstrapAssetsUri: portal.assetUrl({
             path: 'js/archive-bootstrap.js'
-        }),
+        }) + '?v=' + Date.now(),
         assetsUri: portal.assetUrl({
             path: 'js/archive.js'
-        }),
+        }) + '?v=' + Date.now(),
         stylesUri: portal.assetUrl({
             path: 'styles/main.css'
         }),
