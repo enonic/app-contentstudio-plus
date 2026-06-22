@@ -34,7 +34,7 @@ function renderWidgetView(req) {
         }),
         jsUri: portal.assetUrl({
             path: 'js/extension/layers.js'
-        }),
+        }) + '?v=' + Date.now(),
         configScriptId: 'extension-layers-config-json',
         configAsJson: JSON.stringify(configLib.getConfig(req.locales), null, 4).replace(/<(\/?script|!--)/gi, "\\u003C$1")
     };
