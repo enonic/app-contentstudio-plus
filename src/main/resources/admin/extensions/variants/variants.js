@@ -33,7 +33,7 @@ function renderWidgetView(req) {
         }),
         jsUri: portal.assetUrl({
             path: 'js/extension/variants.js'
-        }),
+        }) + '?v=' + Date.now(),
         configScriptId: 'extension-variants-config-json',
         configAsJson: JSON.stringify(configLib.getConfig(req.locales), null, 4).replace(/<(\/?script|!--)/gi, "\\u003C$1")
     };
