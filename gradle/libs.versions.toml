@@ -1,7 +1,7 @@
 [versions]
 
 enonicDefaults = "2.1.7"
-xpApp = "4.0.0"
+xpApp = "4.1.0"
 nodeGradle = "7.1.0"
 
 # App
