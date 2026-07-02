@@ -1,6 +1,6 @@
 import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import type {ContentVersion} from '@enonic/lib-contentstudio/app/ContentVersion';
-import {useI18n} from '@enonic/lib-contentstudio/v6/features/hooks/useI18n';
+import {useI18n} from '@enonic/lib-contentstudio/v6/shared/lib/hooks/useI18n';
 import {Button, Dialog} from '@enonic/ui';
 import {Printer} from 'lucide-react';
 import {type ReactElement, useEffect, useState} from 'react';

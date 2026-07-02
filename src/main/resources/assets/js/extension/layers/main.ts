@@ -1,13 +1,13 @@
 import {Element} from '@enonic/lib-admin-ui/dom/Element';
-import {initConfig} from '@enonic/lib-contentstudio/v6/features/store/config.store';
+import {initConfig} from '@enonic/lib-contentstudio/v6/shared/config/config.store';
 import {AppHelper} from '../../util/AppHelper';
 import {LayersExtension} from './LayersExtension';
 import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
 import {resolveConfig} from '../../util/WidgetConfigResolver';
 import {getModuleScript, getRequiredAttribute, getOptionalAttribute} from '../../util/ModuleScriptHelper';
 import {Messages} from '@enonic/lib-admin-ui/util/Messages';
-import {whenProjectInitialized} from '@enonic/lib-contentstudio/v6/features/store/activeProject.store';
-import {initProjects} from '@enonic/lib-contentstudio/v6/features/store/projects.store';
+import {whenProjectInitialized} from '@enonic/lib-contentstudio/v6/entities/project/activeProject.store';
+import {initProjects} from '@enonic/lib-contentstudio/v6/entities/project/projects.store';
 
 void (() => {
     const currentScript = getModuleScript('layers');

@@ -1,5 +1,5 @@
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
-import {LegacyElement} from '@enonic/lib-contentstudio/v6/features/shared/LegacyElement';
+import {LegacyElement} from '@enonic/lib-contentstudio/v6/shared/ui/LegacyElement';
 import {KeyRound} from 'lucide-react';
 import {type ReactElement} from 'react';
 import {LicenseUploadButton} from './LicenseUploadButton';

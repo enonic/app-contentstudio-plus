@@ -2,7 +2,7 @@ import {Link, Separator} from '@enonic/ui';
 import {useStore} from '@nanostores/preact';
 import {Paperclip} from 'lucide-react';
 import type {ReactElement} from 'react';
-import {useI18n} from '@enonic/lib-contentstudio/v6/features/hooks/useI18n';
+import {useI18n} from '@enonic/lib-contentstudio/v6/shared/lib/hooks/useI18n';
 import {$archiveAttachments, getArchiveAttachmentUrl} from '../../../../api/archive-attachments';
 import {$archiveContextContent} from '../../../../store/archive-selection';
 

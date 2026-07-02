@@ -1,8 +1,8 @@
 import {Body} from '@enonic/lib-admin-ui/dom/Body';
 import type {Element} from '@enonic/lib-admin-ui/dom/Element';
-import {initConfig} from '@enonic/lib-contentstudio/v6/features/store/config.store';
-import {whenProjectInitialized} from '@enonic/lib-contentstudio/v6/features/store/activeProject.store';
-import {initProjects} from '@enonic/lib-contentstudio/v6/features/store/projects.store';
+import {initConfig} from '@enonic/lib-contentstudio/v6/shared/config/config.store';
+import {whenProjectInitialized} from '@enonic/lib-contentstudio/v6/entities/project/activeProject.store';
+import {initProjects} from '@enonic/lib-contentstudio/v6/entities/project/projects.store';
 import {ArchiveAppContainer} from './ArchiveAppContainer';
 import {getModuleScript, getRequiredAttribute} from './util/ModuleScriptHelper';
 

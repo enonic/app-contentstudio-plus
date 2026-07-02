@@ -14,7 +14,7 @@ import {
     setNodes,
     setRootIds,
     type CreateNodeOptions,
-} from '@enonic/lib-contentstudio/v6/features/lib/tree-store';
+} from '@enonic/lib-contentstudio/v6/shared/lib/tree-store';
 import {ArchiveContentFetcher} from '../../../../ArchiveContentFetcher';
 import {ArchiveContentViewItem} from '../../../../ArchiveContentViewItem';
 import {$archiveListLoading, $archiveListRoot, $archiveTreeState} from './archive-list.store';

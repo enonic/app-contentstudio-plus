@@ -1,6 +1,6 @@
 import {Body} from '@enonic/lib-admin-ui/dom/Body';
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
-import {LegacyElement} from '@enonic/lib-contentstudio/v6/features/shared/LegacyElement';
+import {LegacyElement} from '@enonic/lib-contentstudio/v6/shared/ui/LegacyElement';
 import {Dialog} from '@enonic/ui';
 import {type ReactElement, useCallback} from 'react';
 import {LicenseUploadButton} from './LicenseUploadButton';

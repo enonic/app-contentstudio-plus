@@ -1,4 +1,4 @@
-import type {TreeState} from '@enonic/lib-contentstudio/v6/features/lib/tree-store';
+import type {TreeState} from '@enonic/lib-contentstudio/v6/shared/lib/tree-store';
 import {ArchiveContentViewItem} from '../../../../ArchiveContentViewItem';
 import {$archiveTreeState} from '../archive-list/archive-list.store';
 import {$currentItems, $selection, $activeId} from './archive-selection.store';

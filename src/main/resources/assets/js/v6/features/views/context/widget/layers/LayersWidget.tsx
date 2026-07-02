@@ -1,5 +1,5 @@
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
-import {getActiveProjectName} from '@enonic/lib-contentstudio/v6/features/store/activeProject.store';
+import {getActiveProjectName} from '@enonic/lib-contentstudio/v6/entities/project/activeProject.store';
 import {Button} from '@enonic/ui';
 import {type ReactElement, useCallback, useEffect, useMemo, useState} from 'react';
 import {AppHelper} from '../../../../../../util/AppHelper';
