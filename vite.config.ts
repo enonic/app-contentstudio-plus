@@ -54,6 +54,13 @@ export default defineConfig(({mode}) => {
           chunkSizeWarningLimit: 1000
         }),
         rollupOptions: {
+          onwarn(warning, warn) {
+            // Suppress INVALID_ANNOTATION warnings from @enonic/ui's prebuilt bundle
+            if (warning.code === 'INVALID_ANNOTATION' && warning.id?.includes('@enonic/ui')) {
+              return;
+            }
+            warn(warning);
+          },
           plugins: [
             inject({
               $: 'jquery',
