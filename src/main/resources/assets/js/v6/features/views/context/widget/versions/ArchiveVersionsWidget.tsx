@@ -4,20 +4,20 @@ import type {ContentSummaryAndCompareStatus}
     from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import type {ExtensionItemViewType}
     from '@enonic/lib-contentstudio/app/view/context/ExtensionItemView';
-import {fetchVersion} from '@enonic/lib-contentstudio/v6/features/api/versions';
-import {LegacyElement} from '@enonic/lib-contentstudio/v6/features/shared/LegacyElement';
+import {fetchVersion} from '@enonic/lib-contentstudio/v6/entities/content/api/versions.api';
+import {LegacyElement} from '@enonic/lib-contentstudio/v6/shared/ui/LegacyElement';
 import {$activeWidgetId, $isContextOpen}
-    from '@enonic/lib-contentstudio/v6/features/store/contextWidgets.store';
+    from '@enonic/lib-contentstudio/v6/widgets/context-panel/model/contextWidgets.store';
 import {VERSIONS_WIDGET_KEY}
-    from '@enonic/lib-contentstudio/v6/features/utils/widget/versions/versions';
+    from '@enonic/lib-contentstudio/v6/shared/lib/widget/versions/versions';
 import {loadContentVersions}
-    from '@enonic/lib-contentstudio/v6/features/utils/widget/versions/versionsLoader';
+    from '@enonic/lib-contentstudio/v6/shared/lib/widget/versions/versionsLoader';
 import type {VersionsConfig}
-    from '@enonic/lib-contentstudio/v6/features/views/context/widget/versions/config/VersionsConfig';
+    from '@enonic/lib-contentstudio/v6/widgets/context-panel/widget/versions/config/VersionsConfig';
 import {VersionsConfigProvider}
-    from '@enonic/lib-contentstudio/v6/features/views/context/widget/versions/config/VersionsConfigContext';
+    from '@enonic/lib-contentstudio/v6/widgets/context-panel/widget/versions/config/VersionsConfigContext';
 import {VersionsList}
-    from '@enonic/lib-contentstudio/v6/features/views/context/widget/versions/VersionsList';
+    from '@enonic/lib-contentstudio/v6/widgets/context-panel/widget/versions/VersionsList';
 import {useStore} from '@nanostores/preact';
 import Q from 'q';
 import {useMemo, type ReactElement} from 'react';

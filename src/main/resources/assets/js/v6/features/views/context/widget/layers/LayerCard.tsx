@@ -2,7 +2,7 @@ import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {ContentEventsProcessor} from '@enonic/lib-contentstudio/app/ContentEventsProcessor';
 import {EditContentEvent} from '@enonic/lib-contentstudio/app/event/EditContentEvent';
 import {PublishStatus} from '@enonic/lib-contentstudio/app/publish/PublishStatus';
-import {ProjectIcon} from '@enonic/lib-contentstudio/v6/features/shared/icons/ProjectIcon';
+import {ProjectIcon} from '@enonic/lib-contentstudio/v6/shared/ui/icons/ProjectIcon';
 import {Button, Tooltip, cn} from '@enonic/ui';
 import {Layers2} from 'lucide-react';
 import {type MouseEvent, type ReactElement, useCallback, useLayoutEffect, useMemo, useRef} from 'react';

@@ -1,4 +1,4 @@
-import {createEmptyState, flattenTree, type TreeState} from '@enonic/lib-contentstudio/v6/features/lib/tree-store';
+import {createEmptyState, flattenTree, type TreeState} from '@enonic/lib-contentstudio/v6/shared/lib/tree-store';
 import {atom, computed, map} from 'nanostores';
 import {ArchiveContentViewItem} from '../../../../ArchiveContentViewItem';
 import type {ArchiveListRoot} from './archive-list.types';

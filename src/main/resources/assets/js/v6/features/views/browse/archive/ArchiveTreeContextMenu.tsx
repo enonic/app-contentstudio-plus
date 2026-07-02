@@ -1,5 +1,5 @@
 import {Action} from '@enonic/lib-admin-ui/ui/Action';
-import {useAction} from '@enonic/lib-contentstudio/v6/features/hooks/useAction';
+import {useAction} from '@enonic/lib-contentstudio/v6/shared/lib/hooks/useAction';
 import {ContextMenu} from '@enonic/ui';
 import {ReactElement, ReactNode} from 'react';
 

@@ -1,4 +1,4 @@
-import {useI18n} from '@enonic/lib-contentstudio/v6/features/hooks/useI18n';
+import {useI18n} from '@enonic/lib-contentstudio/v6/shared/lib/hooks/useI18n';
 import {Button, DatePicker, Input, usePrefixedId} from '@enonic/ui';
 import {type ReactElement, useEffect, useMemo, useRef, useState} from 'react';
 import {AppHelper} from '../../../../../../util/AppHelper';

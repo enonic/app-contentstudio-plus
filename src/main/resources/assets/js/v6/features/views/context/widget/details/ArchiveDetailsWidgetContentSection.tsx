@@ -1,8 +1,8 @@
 import {useStore} from '@nanostores/preact';
 import type {ReactElement} from 'react';
 import {Path} from '@enonic/lib-admin-ui/rest/Path';
-import {useI18n} from '@enonic/lib-contentstudio/v6/features/hooks/useI18n';
-import {ContentIcon} from '@enonic/lib-contentstudio/v6/features/shared/icons/ContentIcon';
+import {useI18n} from '@enonic/lib-contentstudio/v6/shared/lib/hooks/useI18n';
+import {ContentIcon} from '@enonic/lib-contentstudio/v6/shared/ui/icons/ContentIcon';
 import {$archiveContextContent} from '../../../../store/archive-selection';
 
 const ARCHIVE_DETAILS_WIDGET_CONTENT_SECTION_NAME = 'ArchiveDetailsWidgetContentSection';

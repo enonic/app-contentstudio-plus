@@ -1,4 +1,4 @@
-import {LegacyElement} from '@enonic/lib-contentstudio/v6/features/shared/LegacyElement';
+import {LegacyElement} from '@enonic/lib-contentstudio/v6/shared/ui/LegacyElement';
 import type {ContentSummaryAndCompareStatus}
     from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import type {ExtensionItemViewType}

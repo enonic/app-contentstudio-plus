@@ -1,7 +1,7 @@
 import {cn, ListItem, VirtualizedTreeList} from '@enonic/ui';
-import {ContentLabel} from '@enonic/lib-contentstudio/v6/features/shared/content/ContentLabel';
+import {ContentLabel} from '@enonic/lib-contentstudio/v6/entities/content/ui/content/ContentLabel';
 import {virtuosoComponents} from '@enonic/lib-contentstudio/v6/features/shared/lists/virtuoso-components';
-import type {FlatNode} from '@enonic/lib-contentstudio/v6/features/lib/tree-store';
+import type {FlatNode} from '@enonic/lib-contentstudio/v6/shared/lib/tree-store';
 import {useStore} from '@nanostores/preact';
 import {type ReactElement, useCallback, useEffect, useMemo, useRef} from 'react';
 import type {ListRange, VirtuosoHandle} from 'react-virtuoso';

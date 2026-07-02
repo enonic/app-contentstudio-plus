@@ -1,9 +1,9 @@
 import {type Action} from '@enonic/lib-admin-ui/ui/Action';
-import {LegacyElement} from '@enonic/lib-contentstudio/v6/features/shared/LegacyElement';
-import {ActionGroup} from '@enonic/lib-contentstudio/v6/features/views/browse/toolbar/ActionGroup';
-import {ContextToggle} from '@enonic/lib-contentstudio/v6/features/views/browse/toolbar/ContextToggle';
-import {SearchToggle} from '@enonic/lib-contentstudio/v6/features/views/browse/toolbar/SearchToggle';
-import {ToolbarActionButton} from '@enonic/lib-contentstudio/v6/features/views/browse/toolbar/ToolbarActionButton';
+import {LegacyElement} from '@enonic/lib-contentstudio/v6/shared/ui/LegacyElement';
+import {ActionGroup} from '@enonic/lib-contentstudio/v6/widgets/browse-toolbar/ActionGroup';
+import {ContextToggle} from '@enonic/lib-contentstudio/v6/widgets/browse-toolbar/ContextToggle';
+import {SearchToggle} from '@enonic/lib-contentstudio/v6/widgets/browse-toolbar/SearchToggle';
+import {ToolbarActionButton} from '@enonic/lib-contentstudio/v6/widgets/browse-toolbar/ToolbarActionButton';
 import {Toolbar} from '@enonic/ui';
 import {type ReactElement} from 'react';
 

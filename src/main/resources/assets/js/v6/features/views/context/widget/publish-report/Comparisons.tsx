@@ -1,6 +1,6 @@
 import type {ContentVersion} from '@enonic/lib-contentstudio/app/ContentVersion';
 import {DateHelper} from '@enonic/lib-admin-ui/util/DateHelper';
-import {useI18n} from '@enonic/lib-contentstudio/v6/features/hooks/useI18n';
+import {useI18n} from '@enonic/lib-contentstudio/v6/shared/lib/hooks/useI18n';
 import {CircleOff} from 'lucide-react';
 import {type ReactElement, useMemo} from 'react';
 import {buildComparisonPlan} from './comparisonPlan';
