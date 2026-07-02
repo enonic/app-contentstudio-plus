@@ -1,9 +1,9 @@
 import type {TaskId} from '@enonic/lib-admin-ui/task/TaskId';
 import type {ContentSummary} from '@enonic/lib-contentstudio/app/content/ContentSummary';
-import {useAnimatedEllipsis} from '@enonic/lib-contentstudio/v6/features/hooks/useAnimatedEllipsis';
+import {useAnimatedEllipsis} from '@enonic/lib-contentstudio/v6/shared/lib/hooks/useAnimatedEllipsis';
 import {useI18n} from '@enonic/lib-contentstudio/v6/features/hooks/useI18n';
 import {useInfiniteScroll} from '@enonic/lib-contentstudio/v6/features/hooks/useInfiniteScroll';
-import {useTaskProgress} from '@enonic/lib-contentstudio/v6/features/hooks/useTaskProgress';
+import {useTaskProgress} from '@enonic/lib-contentstudio/v6/entities/task/useTaskProgress';
 import {ContentLabel} from '@enonic/lib-contentstudio/v6/features/shared/content/ContentLabel';
 import {DialogPresetGatedConfirmContent} from '@enonic/lib-contentstudio/v6/features/shared/dialogs/DialogPreset';
 import {ProgressDialogContent} from '@enonic/lib-contentstudio/v6/features/shared/dialogs/ProgressDialogContent';
