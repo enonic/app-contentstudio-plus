@@ -3,7 +3,7 @@ import {ContentEventsProcessor} from '@enonic/lib-contentstudio/app/ContentEvent
 import {ContentSummaryAndCompareStatus} from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import {EditContentEvent} from '@enonic/lib-contentstudio/app/event/EditContentEvent';
 import {PublishStatus} from '@enonic/lib-contentstudio/app/publish/PublishStatus';
-import {ContentIcon} from '@enonic/lib-contentstudio/v6/features/shared/icons/ContentIcon';
+import {ContentIcon} from '@enonic/lib-contentstudio/v6/shared/ui/icons/ContentIcon';
 import {Button, cn} from '@enonic/ui';
 import {type MouseEvent, type ReactElement, useCallback, useLayoutEffect, useMemo, useRef} from 'react';
 import {resolveContentDisplay} from '../../../../shared/content/contentDisplay';

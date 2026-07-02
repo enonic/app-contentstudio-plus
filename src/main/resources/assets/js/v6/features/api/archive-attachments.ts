@@ -3,8 +3,8 @@ import {Attachments} from '@enonic/lib-contentstudio/app/attachment/Attachments'
 import {ContentId} from '@enonic/lib-contentstudio/app/content/ContentId';
 import {ContentPath} from '@enonic/lib-contentstudio/app/content/ContentPath';
 import {GetContentAttachmentsRequest} from '@enonic/lib-contentstudio/app/resource/GetContentAttachmentsRequest';
-import {$projects} from '@enonic/lib-contentstudio/v6/features/store/projects.store';
-import {getCmsRestUri} from '@enonic/lib-contentstudio/v6/features/utils/url/cms';
+import {$projects} from '@enonic/lib-contentstudio/v6/entities/project/projects.store';
+import {getCmsRestUri} from '@enonic/lib-contentstudio/v6/shared/lib/url/cms';
 import {$archiveContextContent} from '../store/archive-selection';
 
 function getArchiveCmsPath(endpoint: string): string {

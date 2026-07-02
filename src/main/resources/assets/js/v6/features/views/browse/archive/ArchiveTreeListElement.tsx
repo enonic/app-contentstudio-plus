@@ -1,5 +1,5 @@
 import {Action} from '@enonic/lib-admin-ui/ui/Action';
-import {LegacyElement} from '@enonic/lib-contentstudio/v6/features/shared/LegacyElement';
+import {LegacyElement} from '@enonic/lib-contentstudio/v6/shared/ui/LegacyElement';
 import {SelectionChange} from '@enonic/lib-admin-ui/util/SelectionChange';
 import {ArchiveContentViewItem} from '../../../../../ArchiveContentViewItem';
 import {getArchiveItem} from '../../../store/archive-list';

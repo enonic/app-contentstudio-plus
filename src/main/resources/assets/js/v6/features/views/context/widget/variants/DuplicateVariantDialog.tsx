@@ -1,7 +1,7 @@
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import {ContentSummaryAndCompareStatus} from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import {ContentDuplicateParams} from '@enonic/lib-contentstudio/app/resource/ContentDuplicateParams';
-import {ContentIcon} from '@enonic/lib-contentstudio/v6/features/shared/icons/ContentIcon';
+import {ContentIcon} from '@enonic/lib-contentstudio/v6/shared/ui/icons/ContentIcon';
 import {Button, Dialog} from '@enonic/ui';
 import {type ReactElement, useCallback} from 'react';
 import {resolveContentDisplay} from '../../../../shared/content/contentDisplay';

@@ -10,7 +10,7 @@ import {ContentQuery} from '@enonic/lib-contentstudio/app/content/ContentQuery';
 import {ArchiveServerEvent} from '@enonic/lib-contentstudio/app/event/ArchiveServerEvent';
 import {ContentServerChangeItem} from '@enonic/lib-contentstudio/app/event/ContentServerChangeItem';
 import {ContentServerEventsHandler} from '@enonic/lib-contentstudio/app/event/ContentServerEventsHandler';
-import {getActiveProjectName, onActiveProjectChanged} from '@enonic/lib-contentstudio/v6/features/store/activeProject.store';
+import {getActiveProjectName, onActiveProjectChanged} from '@enonic/lib-contentstudio/v6/entities/project/activeProject.store';
 import {ContextView} from '@enonic/lib-contentstudio/app/view/context/ContextView';
 import Q from 'q';
 import {ArchiveBrowseItemPanel} from './ArchiveBrowseItemPanel';
@@ -22,7 +22,7 @@ import {ArchiveHelper} from './ArchiveHelper';
 import {ArchiveTreeGridActions} from './ArchiveTreeGridActions';
 import {ArchiveTreeListSelectablePanelProxy} from './ArchiveTreeListSelectablePanelProxy';
 import {ArchiveTreeRootList} from './ArchiveTreeRootList';
-import {setContentFilterOpen} from '@enonic/lib-contentstudio/v6/features/store/contentFilter.store';
+import {setContentFilterOpen} from '@enonic/lib-contentstudio/v6/features/search/model/contentFilter.store';
 import {
     loadArchiveItems,
     removeArchiveItems,

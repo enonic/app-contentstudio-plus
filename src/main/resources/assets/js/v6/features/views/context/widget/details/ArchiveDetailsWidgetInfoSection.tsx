@@ -6,7 +6,7 @@ import {ContentSummaryAndCompareStatus}
     from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import type {ExtensionPropertiesItemViewValue}
     from '@enonic/lib-contentstudio/app/view/context/extension/details/ExtensionPropertiesItemViewValue';
-import {useI18n} from '@enonic/lib-contentstudio/v6/features/hooks/useI18n';
+import {useI18n} from '@enonic/lib-contentstudio/v6/shared/lib/hooks/useI18n';
 import {$archiveContextContent} from '../../../../store/archive-selection';
 import {ArchivePropertiesExtensionItemViewHelper} from '../../../../../../extension/ArchivePropertiesExtensionItemViewHelper';
 

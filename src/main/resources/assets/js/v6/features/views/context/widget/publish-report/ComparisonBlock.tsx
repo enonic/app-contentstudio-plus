@@ -2,7 +2,7 @@ import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import type {ContentVersion} from '@enonic/lib-contentstudio/app/ContentVersion';
 import {ContentId} from '@enonic/lib-contentstudio/app/content/ContentId';
 import {DateHelper} from '@enonic/lib-admin-ui/util/DateHelper';
-import {useI18n} from '@enonic/lib-contentstudio/v6/features/hooks/useI18n';
+import {useI18n} from '@enonic/lib-contentstudio/v6/shared/lib/hooks/useI18n';
 import {Checkbox, usePrefixedId} from '@enonic/ui';
 import {DiffPatcher} from 'jsondiffpatch';
 import {format} from 'jsondiffpatch/formatters/html';

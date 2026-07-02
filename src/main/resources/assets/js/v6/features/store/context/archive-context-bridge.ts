@@ -1,4 +1,4 @@
-import {$contextContent} from '@enonic/lib-contentstudio/v6/features/store/context/contextContent.store';
+import {$contextContent} from '@enonic/lib-contentstudio/v6/widgets/context-panel/model/contextContent.store';
 import {$currentItems} from '../archive-selection';
 
 // Force lib-cs $contextContent.onMount to run once. Without an active subscriber, the mode-driven
