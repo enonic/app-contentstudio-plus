@@ -1,12 +1,9 @@
 import type {ContentVersion} from '@enonic/lib-contentstudio/app/ContentVersion';
 import {ContentId} from '@enonic/lib-contentstudio/app/content/ContentId';
 import type {ContentJson} from '@enonic/lib-contentstudio/app/content/ContentJson';
-import {GetContentSummaryByIdRequest}
-    from '@enonic/lib-contentstudio/app/resource/GetContentSummaryByIdRequest';
-import {GetContentVersionRequest}
-    from '@enonic/lib-contentstudio/app/resource/GetContentVersionRequest';
-import {GetContentVersionsRequest}
-    from '@enonic/lib-contentstudio/app/resource/GetContentVersionsRequest';
+import {resolveContentSummaries} from '@enonic/lib-contentstudio/v6/entities/content/api/content.api';
+import {fetchContentVersions, fetchVersion}
+    from '@enonic/lib-contentstudio/v6/entities/content/api/versions.api';
 import {ArchiveContentFetcher} from '../../../ArchiveContentFetcher';
 
 export type PublishReportData = {
@@ -25,8 +22,24 @@ export async function fetchPublishReportData(
     const [content, versionsResult] = await Promise.all([
         isArchived
             ? new ArchiveContentFetcher().fetch(cId)
-            : new GetContentSummaryByIdRequest(cId).sendAndParse(),
-        new GetContentVersionsRequest(cId).sendAndParse(),
+            : resolveContentSummaries([cId]).match(
+                (summaries) => {
+                    const summary = summaries[0];
+                    if (summary == null) {
+                        throw new Error(`Content not found: ${contentId}`);
+                    }
+                    return summary;
+                },
+                (error) => {
+                    throw error;
+                },
+            ),
+        fetchContentVersions({contentId: cId}).match(
+            (result) => result,
+            (error) => {
+                throw error;
+            },
+        ),
     ]);
 
     return {
@@ -41,18 +54,12 @@ export function fetchVersionContent(contentId: ContentId, versionId: string): Pr
         return cached;
     }
 
-    const promise = Promise.resolve(
-        new GetContentVersionRequest(contentId)
-            .setVersion(versionId)
-            .sendRequest()
-            .then(stripContentMetadata),
+    const promise = fetchVersion(contentId.toString(), versionId).match(
+        (content) => content,
+        (error) => {
+            throw error;
+        },
     );
     versionContentCache.set(versionId, promise);
     return promise;
-}
-
-function stripContentMetadata(content: ContentJson): ContentJson {
-    const cleaned = {...content};
-    delete cleaned.hasChildren;
-    return cleaned;
 }

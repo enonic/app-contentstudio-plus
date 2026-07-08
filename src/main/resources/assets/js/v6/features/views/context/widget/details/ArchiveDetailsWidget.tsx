@@ -7,7 +7,7 @@ import type {ExtensionItemViewType}
     from '@enonic/lib-contentstudio/app/view/context/ExtensionItemView';
 import {LegacyElement} from '@enonic/lib-contentstudio/v6/shared/ui/LegacyElement';
 import {$activeWidgetId, $isContextOpen} from '@enonic/lib-contentstudio/v6/widgets/context-panel/model/contextWidgets.store';
-import {DETAILS_WIDGET_KEY} from '@enonic/lib-contentstudio/v6/shared/lib/widget/details';
+import {getDetailsWidgetKey} from '@enonic/lib-contentstudio/v6/shared/lib/widget/details';
 import {$archiveContextContent} from '../../../../store/archive-selection';
 import {ArchiveDetailsWidgetAttachmentsSection} from './ArchiveDetailsWidgetAttachmentsSection';
 import {ArchiveDetailsWidgetContentSection} from './ArchiveDetailsWidgetContentSection';
@@ -18,7 +18,7 @@ const ARCHIVE_DETAILS_WIDGET_NAME = 'ArchiveDetailsWidget';
 export const ArchiveDetailsWidget = (): ReactElement | null => {
     const isContextOpen = useStore($isContextOpen);
     const activeWidget = useStore($activeWidgetId);
-    const isActiveWidget = activeWidget === DETAILS_WIDGET_KEY;
+    const isActiveWidget = activeWidget === getDetailsWidgetKey();
     const content = useStore($archiveContextContent);
 
     if (!isContextOpen || !isActiveWidget || !content) return null;
