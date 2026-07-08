@@ -8,10 +8,10 @@ import {fetchVersion} from '@enonic/lib-contentstudio/v6/entities/content/api/ve
 import {LegacyElement} from '@enonic/lib-contentstudio/v6/shared/ui/LegacyElement';
 import {$activeWidgetId, $isContextOpen}
     from '@enonic/lib-contentstudio/v6/widgets/context-panel/model/contextWidgets.store';
-import {VERSIONS_WIDGET_KEY}
+import {getVersionsWidgetKey}
     from '@enonic/lib-contentstudio/v6/shared/lib/widget/versions/versions';
 import {loadContentVersions}
-    from '@enonic/lib-contentstudio/v6/shared/lib/widget/versions/versionsLoader';
+    from '@enonic/lib-contentstudio/v6/entities/content/version';
 import type {VersionsConfig}
     from '@enonic/lib-contentstudio/v6/widgets/context-panel/widget/versions/config/VersionsConfig';
 import {VersionsConfigProvider}
@@ -39,7 +39,7 @@ const createArchiveVersionsConfig = (): VersionsConfig => ({
 export const ArchiveVersionsWidget = (): ReactElement | null => {
     const isContextOpen = useStore($isContextOpen);
     const activeWidget = useStore($activeWidgetId);
-    const isActiveWidget = activeWidget === VERSIONS_WIDGET_KEY;
+    const isActiveWidget = activeWidget === getVersionsWidgetKey();
     const content = useStore($archiveContextContent);
     const config = useMemo(() => createArchiveVersionsConfig(), []);
 
