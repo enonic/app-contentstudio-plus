@@ -3,10 +3,14 @@ import type {Element} from '@enonic/lib-admin-ui/dom/Element';
 import {initConfig} from '@enonic/lib-contentstudio/v6/shared/config/config.store';
 import {whenProjectInitialized} from '@enonic/lib-contentstudio/v6/entities/project/activeProject.store';
 import {initProjects} from '@enonic/lib-contentstudio/v6/entities/project/projects.store';
-import {ArchiveAppContainer} from './ArchiveAppContainer';
 import {getModuleScript, getRequiredAttribute} from './util/ModuleScriptHelper';
 
-const injectApp = (widgetElem: Element): void => {
+// ! Import the app container lazily so v6 config is initialized (initConfig below)
+// ! before modules such as liveViewWidgets.store run their import-time widget fetch.
+// ! A static import evaluates that fetch against an empty extensionApiUrl, leaving
+// ! the preview widget selector empty. Mirrors app-contentstudio main.ts.
+const injectApp = async (widgetElem: Element): Promise<void> => {
+    const {ArchiveAppContainer} = await import('./ArchiveAppContainer');
     const archiveAppContainer = new ArchiveAppContainer();
     widgetElem.appendChild(archiveAppContainer);
 };
@@ -22,7 +26,7 @@ void (() => {
 
     const renderListener = (): void => {
         whenProjectInitialized(() => {
-            injectApp(widgetEl);
+            void injectApp(widgetEl);
         });
         body.unRendered(renderListener);
     };
