@@ -83,10 +83,10 @@ importers:
     devDependencies:
       '@enonic-types/lib-content':
         specifier: ^8
-        version: 8.0.2
+        version: 8.0.3
       '@enonic-types/lib-project':
         specifier: ^8
-        version: 8.0.2
+        version: 8.0.3
       '@enonic/eslint-config':
         specifier: ^2.1.0
         version: 2.1.0(@typescript-eslint/parser@8.56.0(eslint@9.33.0(jiti@2.5.1))(typescript@5.9.2))(typescript-eslint@8.39.1(eslint@9.33.0(jiti@2.5.1))(typescript@5.9.2))(typescript@5.9.2)
@@ -220,14 +220,14 @@ packages:
     peerDependencies:
       react: '>=16.8.0'
 
-  '@enonic-types/core@8.0.2':
-    resolution: {integrity: sha512-UTOB1AeuVRhY/M+l+dGsduAnVzBrWlgPSdw4PHMIKrJbuAUmZxCl8DBeSB8a+CJzlFmsM5CVK6150UDgdW1zpA==}
+  '@enonic-types/core@8.0.3':
+    resolution: {integrity: sha512-8A5loeFE6KNV/1yEtQpWK1gAc914LdTHGl4+1HbCM4qYFq1XvjSNgFUpRnPvDP6CQXpB0j4zWsUu883ULSKTjg==}
 
-  '@enonic-types/lib-content@8.0.2':
-    resolution: {integrity: sha512-gWsAOMR4uTqjbCnj3vT7FfcuC5ybKic6mafbPH2QHMQ4Idpt6pQvYeu3rH63JuywbOurcmALAnqwM2xbBqBgCQ==}
+  '@enonic-types/lib-content@8.0.3':
+    resolution: {integrity: sha512-nzl/RWDUTLqCB235SsBESr+9klUL+tV4Eml+WaUZuOJVrWRJXPV2ahDy2ddLmEkBT5cEqUepuwxWPH12CNmHIQ==}
 
-  '@enonic-types/lib-project@8.0.2':
-    resolution: {integrity: sha512-3Usc7BVcJtW8hBIEVBkdFHRqKXbO5b37oA7KQcmfg/YcCNnDwC71myRzUan6hZeJ+CDJPJYL3W0r//J/qpaAKg==}
+  '@enonic-types/lib-project@8.0.3':
+    resolution: {integrity: sha512-Q0kWgynhHZeQjkPln+hLiJ2QaI1ggn5jEX8gKDvd5Pr2gqxO6vB5sw2CA683ET3iW4e6/w16wlELmLkJx+Bbag==}
 
   '@enonic/eslint-config@2.1.0':
     resolution: {integrity: sha512-K/Qygr9fxiDa0wCp+HXtbJLNmaQHTPeFfaNlXjUWT7a2smLZw9a24i8+xKW8YhEjqfBUzXc6AoObcRVxFNz2Qg==}
@@ -667,6 +667,9 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.30':
     resolution: {integrity: sha512-GQ7Nw5G2lTu/BtHTKfXhKHok2WGetd4XYcVKGx00SjAk8GMwgJM3zr6zORiPGuOE+/vkc90KtTosSSvaCjKb2Q==}
+
+  '@jridgewell/trace-mapping@0.3.31':
+    resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
   '@kwsites/file-exists@1.1.1':
     resolution: {integrity: sha512-m9/5YGR18lIwxSFDwfE3oA7bWuq9kdau6ugN4H2rJeyhFQZcG9AgSHkQtSD15a8WvTgfz9aikZMrKPHvbpqFiw==}
@@ -1384,6 +1387,9 @@ packages:
   brace-expansion@2.0.2:
     resolution: {integrity: sha512-Jt0vHyM+jmUBqojB7E1NIYadt0vI0Qxjxd2TErW94wDz+E2LAm5vKMXXwg6ZZBTHPuUlDgQHKXvjGBdfcF1ZDQ==}
 
+  brace-expansion@2.1.2:
+    resolution: {integrity: sha512-w5JZcKgdhDOgOwm8H+KgbosopHMuGcl6qbulwjtz3SM7I7P3yW1eAjzMPLrIE+NQ9vjgANKHWeMHnrT0OXW1oA==}
+
   braces@3.0.3:
     resolution: {integrity: sha512-yQbXgO/OSZVD2IsiLlro+7Hf6Q18EJrKSEsdoMzKePKXct3gvD8oLcOQdIzGupr5Fj+EDe8gO/lxc1BzfMpxvA==}
     engines: {node: '>=8'}
@@ -1804,8 +1810,8 @@ packages:
     resolution: {integrity: sha512-Uhdk5sfqcee/9H/rCOJikYz67o0a2Tw2hGRPOG2Y1R2dg7brRe1uG0yaNQDHu+TO/uQPF/5eCapvYSmHUjt7JQ==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  eslint-visitor-keys@5.0.0:
-    resolution: {integrity: sha512-A0XeIi7CXU7nPlfHS9loMYEKxUaONu/hTEzHTGba9Huu94Cq1hPivf+DE5erJozZOky0LfvXAyrV/tcswpLI0Q==}
+  eslint-visitor-keys@5.0.1:
+    resolution: {integrity: sha512-tD40eHxA35h0PEIZNeIjkHoDR4YjjJp34biM0mDvplBe//mB+IHCqHDGV7pxF+7MklTvighcCPPZC7ynWyjdTA==}
     engines: {node: ^20.19.0 || ^22.13.0 || >=24}
 
   eslint@9.33.0:
@@ -2562,6 +2568,10 @@ packages:
     resolution: {integrity: sha512-G6T0ZX48xgozx7587koeX9Ys2NYy6Gmv//P89sEte9V9whIapMNF4idKxnW2QtCcLiTWlb/wfCabAtAFWhhBow==}
     engines: {node: '>=16 || 14 >=14.17'}
 
+  minimatch@9.0.9:
+    resolution: {integrity: sha512-OBwBN9AL4dqmETlpS2zasx+vTeWclWzkblfZk7KTA5j3jeOONz/tRCnZomUyvNg83wL5Zv9Ss6HMJXAgL8R2Yg==}
+    engines: {node: '>=16 || 14 >=14.17'}
+
   minipass@7.1.2:
     resolution: {integrity: sha512-qOOzS1cBTWYF4BH8fVePDBOO9iptMnGUEZwNc/cMWnTV2nVLZ7VoNWEPHkYczZA0pdoA7dl6e7FL659nX9S2aw==}
     engines: {node: '>=16 || 14 >=14.17'}
@@ -2614,8 +2624,8 @@ packages:
   natural-compare@1.4.0:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
 
-  needle@3.3.1:
-    resolution: {integrity: sha512-6k0YULvhpw+RoLNiQCRKOl09Rv1dPLr8hHnVjHqdolKwDrdNyk+Hmrthi4lIGPPz3r39dLx0hsF5s40sZ3Us4Q==}
+  needle@3.5.0:
+    resolution: {integrity: sha512-jaQyPKKk2YokHrEg+vFDYxXIHTCBgiZwSHOoVx/8V3GIBS8/VN6NdVRmg8q1ERtPkMvmOvebsgga4sAj5hls/w==}
     engines: {node: '>= 4.4.x'}
     hasBin: true
 
@@ -3035,6 +3045,7 @@ packages:
     engines: {node: '>=0.6.0', teleport: '>=0.2.0'}
     deprecated: |-
       You or someone you depend on is using Q, the JavaScript Promise library that gave JavaScript developers strong feelings about promises. They can almost certainly migrate to the native JavaScript promise now. Thank you literally everyone for joining me in this bet against the odds. Be excellent to each other.
+
       (For a CapTP with native promises, see @endo/eventual-send and @endo/captp)
 
   query-selector-shadow-dom@1.0.1:
@@ -3365,6 +3376,12 @@ packages:
     peerDependencies:
       typescript: '>=4.8.4'
 
+  ts-api-utils@2.5.0:
+    resolution: {integrity: sha512-OJ/ibxhPlqrMM0UiNHJ/0CKQkoKF243/AEmplt3qpRgkW8VG7IfOS41h7V8TjITqdByHzrjcS/2si+y4lIh8NA==}
+    engines: {node: '>=18.12'}
+    peerDependencies:
+      typescript: '>=4.8.4'
+
   tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
 
@@ -3661,15 +3678,15 @@ snapshots:
       react: 19.2.5
       tslib: 2.8.1
 
-  '@enonic-types/core@8.0.2': {}
+  '@enonic-types/core@8.0.3': {}
 
-  '@enonic-types/lib-content@8.0.2':
+  '@enonic-types/lib-content@8.0.3':
     dependencies:
-      '@enonic-types/core': 8.0.2
+      '@enonic-types/core': 8.0.3
 
-  '@enonic-types/lib-project@8.0.2':
+  '@enonic-types/lib-project@8.0.3':
     dependencies:
-      '@enonic-types/core': 8.0.2
+      '@enonic-types/core': 8.0.3
 
   '@enonic/eslint-config@2.1.0(@typescript-eslint/parser@8.56.0(eslint@9.33.0(jiti@2.5.1))(typescript@5.9.2))(typescript-eslint@8.39.1(eslint@9.33.0(jiti@2.5.1))(typescript@5.9.2))(typescript@5.9.2)':
     dependencies:
@@ -4014,7 +4031,7 @@ snapshots:
   '@jridgewell/source-map@0.3.11':
     dependencies:
       '@jridgewell/gen-mapping': 0.3.13
-      '@jridgewell/trace-mapping': 0.3.30
+      '@jridgewell/trace-mapping': 0.3.31
     optional: true
 
   '@jridgewell/sourcemap-codec@1.5.5': {}
@@ -4023,6 +4040,12 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
+
+  '@jridgewell/trace-mapping@0.3.31':
+    dependencies:
+      '@jridgewell/resolve-uri': 3.1.2
+      '@jridgewell/sourcemap-codec': 1.5.5
+    optional: true
 
   '@kwsites/file-exists@1.1.1':
     dependencies:
@@ -4422,10 +4445,10 @@ snapshots:
       '@typescript-eslint/types': 8.56.0
       '@typescript-eslint/visitor-keys': 8.56.0
       debug: 4.4.3(supports-color@8.1.1)
-      minimatch: 9.0.5
+      minimatch: 9.0.9
       semver: 7.8.5
       tinyglobby: 0.2.17
-      ts-api-utils: 2.4.0(typescript@5.9.2)
+      ts-api-utils: 2.5.0(typescript@5.9.2)
       typescript: 5.9.2
     transitivePeerDependencies:
       - supports-color
@@ -4449,7 +4472,7 @@ snapshots:
   '@typescript-eslint/visitor-keys@8.56.0':
     dependencies:
       '@typescript-eslint/types': 8.56.0
-      eslint-visitor-keys: 5.0.0
+      eslint-visitor-keys: 5.0.1
 
   '@vitest/pretty-format@2.1.9':
     dependencies:
@@ -4795,6 +4818,10 @@ snapshots:
       concat-map: 0.0.1
 
   brace-expansion@2.0.2:
+    dependencies:
+      balanced-match: 1.0.2
+
+  brace-expansion@2.1.2:
     dependencies:
       balanced-match: 1.0.2
 
@@ -5266,7 +5293,7 @@ snapshots:
 
   eslint-visitor-keys@4.2.1: {}
 
-  eslint-visitor-keys@5.0.0: {}
+  eslint-visitor-keys@5.0.1: {}
 
   eslint@9.33.0(jiti@2.5.1):
     dependencies:
@@ -5799,7 +5826,7 @@ snapshots:
       image-size: 0.5.5
       make-dir: 5.1.0
       mime: 1.6.0
-      needle: 3.3.1
+      needle: 3.5.0
       source-map: 0.6.1
     optional: true
 
@@ -6007,6 +6034,10 @@ snapshots:
     dependencies:
       brace-expansion: 2.0.2
 
+  minimatch@9.0.9:
+    dependencies:
+      brace-expansion: 2.1.2
+
   minipass@7.1.2: {}
 
   minizlib@3.1.0:
@@ -6056,7 +6087,7 @@ snapshots:
 
   natural-compare@1.4.0: {}
 
-  needle@3.3.1:
+  needle@3.5.0:
     dependencies:
       iconv-lite: 0.6.3
       sax: 1.6.0
@@ -6806,6 +6837,10 @@ snapshots:
       is-number: 7.0.0
 
   ts-api-utils@2.4.0(typescript@5.9.2):
+    dependencies:
+      typescript: 5.9.2
+
+  ts-api-utils@2.5.0(typescript@5.9.2):
     dependencies:
       typescript: 5.9.2
 
