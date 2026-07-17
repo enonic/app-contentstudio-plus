@@ -68,7 +68,7 @@
     "postcss": "^8.5.6",
     "postcss-normalize": "^13.0.1",
     "postcss-sort-media-queries": "^5.2.0",
-    "tailwindcss": "4.1.13",
+    "tailwindcss": "4.3.3",
     "typescript": "^5.9.2",
     "typescript-eslint": "^8.39.1",
     "vite": "^7.1.2"
