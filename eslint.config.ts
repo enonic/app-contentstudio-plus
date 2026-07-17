@@ -68,6 +68,7 @@ export default [
             "node_modules/**/*",
             "**/.xp/**/*",
             "**/*.js",
+            "**/*.mjs",
             "**/*.d.ts",
             "**/spec/**/*",
         ]
