@@ -1,7 +1,6 @@
 packages:
   - .
   - testing
-  - .xp/dev/*
 
 ignore-workspace-root-check: true
 ignoredBuiltDependencies:
