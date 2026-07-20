@@ -1,6 +1,5 @@
 packages:
   - .
-  - testing
 
 ignore-workspace-root-check: true
 ignoredBuiltDependencies:
