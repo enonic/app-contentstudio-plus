@@ -26,7 +26,7 @@ export abstract class ArchiveDialog
 
     protected totalToProcess: number;
 
-    protected constructor(config: ModalDialogConfig = {} as ModalDialogConfig) {
+    protected constructor(config: ModalDialogConfig = {}) {
         super(config);
     }
 
