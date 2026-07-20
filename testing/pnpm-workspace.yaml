@@ -1,7 +1,7 @@
-allowBuilds:
-  edgedriver: false
-  esbuild: false
-  geckodriver: false
 onlyBuiltDependencies:
   - edgedriver
   - geckodriver
+
+overrides:
+  serialize-javascript@<7.0.5: '>=7.0.5'
+  serialize-javascript@<=7.0.2: '>=7.0.3'
