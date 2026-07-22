@@ -59,7 +59,7 @@
     "autoprefixer": "^10.5.4",
     "browserslist-config-enonic": "^1.0.8",
     "cross-env": "^10.1.0",
-    "cssnano": "^7.1.0",
+    "cssnano": "^8.0.2",
     "enonic-admin-artifacts": "^2.4.0",
     "eslint": "^9.39.5",
     "globals": "^17.7.0",
