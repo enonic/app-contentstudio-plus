@@ -133,7 +133,7 @@ const getContentCompareStatus = (contentId, projectId) => {
         },
         () => {
             const bean = __.newBean('com.enonic.xp.app.contentstudio.plus.widgets.layers.CompareStatusHandler');
-            bean.contentId = __.nullOrValue(contentId);
+            bean.setContentId(__.nullOrValue(contentId));
             return __.toNativeObject(bean.getCompareStatus());
         }
     );

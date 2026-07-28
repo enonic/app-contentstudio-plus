@@ -64,6 +64,12 @@ dependencies {
 
     devResources "com.enonic.lib:lib-admin-ui:${libAdminUiVersion}"
     devResources "com.enonic.lib:lib-contentstudio:${libContentStudioVersion}"
+
+    testImplementation libs.junit.jupiter
+    testImplementation libs.mockito.core
+    testImplementation "com.enonic.xp:testing:${xpVersion}"
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testRuntimeOnly libs.graalvm.js
 }
 
 repositories {
@@ -71,6 +77,22 @@ repositories {
     mavenCentral()
     xp.enonicRepo( 'dev' )
 }
+
+test {
+    useJUnitPlatform()
+}
+
+def testGraalJs = tasks.register( 'testGraalJs', Test ) {
+    group = 'verification'
+    description = 'Runs tests with the GraalJS script engine.'
+    useJUnitPlatform()
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    systemProperty 'xp.script-engine', 'GraalJS'
+    shouldRunAfter test
+}
+
+check.dependsOn testGraalJs
 
 tasks.register( 'checkTypes', PnpmTask ) {
     dependsOn tasks.named( 'pnpmInstall' )
