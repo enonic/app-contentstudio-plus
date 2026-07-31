@@ -7,7 +7,8 @@ import {resolveConfig} from '../../util/WidgetConfigResolver';
 import {getModuleScript, getRequiredAttribute, getOptionalAttribute} from '../../util/ModuleScriptHelper';
 import {Messages} from '@enonic/lib-admin-ui/util/Messages';
 import {whenProjectInitialized} from '@enonic/lib-contentstudio/v6/entities/project/activeProject.store';
-import {initProjects} from '@enonic/lib-contentstudio/v6/entities/project/projects.store';
+import {$projects, initProjects} from '@enonic/lib-contentstudio/v6/entities/project/projects.store';
+import {setActiveProjectResolver} from '@enonic/lib-contentstudio/v6/shared/lib/url/cms';
 
 void (() => {
     const currentScript = getModuleScript('layers');
@@ -19,6 +20,7 @@ void (() => {
     CONFIG.setConfig(resolveConfig(configScriptId));
     initConfig(configScriptId);
     Messages.addMessages(JSON.parse(CONFIG.getString('phrasesAsJson')) as object);
+    setActiveProjectResolver(() => $projects.get().activeProjectId);
     initProjects(projectName);
 
     const extensionContainer = Element.fromHtmlElement(
