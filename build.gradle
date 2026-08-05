@@ -64,12 +64,25 @@ dependencies {
 
     devResources "com.enonic.lib:lib-admin-ui:${libAdminUiVersion}"
     devResources "com.enonic.lib:lib-contentstudio:${libContentStudioVersion}"
+
+    testImplementation libs.junit.jupiter
+    testImplementation libs.mockito.core
+    testImplementation "com.enonic.xp:testing:${xpVersion}"
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 repositories {
     mavenLocal()
     mavenCentral()
     xp.enonicRepo( 'dev' )
+}
+
+test {
+    useJUnitPlatform()
+}
+
+xp {
+    scriptEngines = ['Nashorn', 'GraalJS']
 }
 
 tasks.register( 'checkTypes', PnpmTask ) {
@@ -107,6 +120,14 @@ tasks.register( 'pnpmBuild', PnpmTask ) {
     inputs.file 'vite.config.ts'
     inputs.file 'tsconfig.json'
     outputs.dir "${buildDir}/resources/main"
+}
+
+tasks.named( 'compileTestJava' ).configure {
+    mustRunAfter tasks.named( 'pnpmBuild' )
+}
+
+tasks.withType( Test ).configureEach {
+    mustRunAfter tasks.named( 'pnpmBuild' )
 }
 
 tasks.named( 'processResources' ).configure {

@@ -1,18 +1,26 @@
 [versions]
 
 enonicDefaults = "2.1.7"
-xpApp = "4.1.0"
+xpApp = "4.2.0"
 nodeGradle = "7.1.0"
 
 # App
 libMustache = "3.0.0"
 libLicense = "4.0.0"
 
+# Test
+junit = "6.1.2"
+mockito = "5.23.0"
+
 [libraries]
 
 # App
 lib-mustache = { module = "com.enonic.lib:lib-mustache", version.ref = "libMustache" }
 lib-license = { module = "com.enonic.lib:lib-license", version.ref = "libLicense" }
+
+# Test
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
+mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito" }
 
 [plugins]
 enonic-defaults = { id = "com.enonic.defaults", version.ref = "enonicDefaults" }
