@@ -122,6 +122,14 @@ tasks.register( 'pnpmBuild', PnpmTask ) {
     outputs.dir "${buildDir}/resources/main"
 }
 
+tasks.named( 'compileTestJava' ).configure {
+    mustRunAfter tasks.named( 'pnpmBuild' )
+}
+
+tasks.withType( Test ).configureEach {
+    mustRunAfter tasks.named( 'pnpmBuild' )
+}
+
 tasks.named( 'processResources' ).configure {
     // Don't need source files
     exclude 'assets/js/**'
