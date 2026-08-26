@@ -41,6 +41,7 @@ export const LayerCard = ({item, isCurrent, isInChain, level, isExpanded, onTogg
     const isRoot = level === 0;
     const project = item.getProject();
     const hasItem = item.hasItem();
+    const hasProjectAccess = !!project.getDisplayName();
     const content = hasItem ? item.getItem() : null;
     const fieldsetRef = useRef<HTMLFieldSetElement>(null);
     const buttonRef = useRef<HTMLButtonElement>(null);
@@ -175,7 +176,7 @@ export const LayerCard = ({item, isCurrent, isInChain, level, isExpanded, onTogg
 
                 {!hasItem && (
                     <div className="mt-2 text-center text-xs italic text-subtle">
-                        {i18n('dialog.layers.notAvailable')}
+                        {i18n(hasProjectAccess ? 'text.content.not.found' : 'dialog.layers.notAvailable')}
                     </div>
                 )}
             </fieldset>
