@@ -1,4 +1,4 @@
-import {IdProvider} from '@enonic/ui';
+import {AppRoot, IdProvider} from '@enonic/ui';
 import {render, unmountComponentAtNode} from 'react-dom';
 import {AppHelper} from '../../util/AppHelper';
 import {LayersWidget} from '../../v6/features/views/context/widget/layers/LayersWidget';
@@ -19,9 +19,11 @@ export class LayersExtension
         this.getHTMLElement().appendChild(this.reactRoot);
 
         render(
-            <IdProvider prefix="LayersWidget">
-                <LayersWidget contentId={this.contentId} />
-            </IdProvider>,
+            <AppRoot className="contents">
+                <IdProvider prefix="LayersWidget">
+                    <LayersWidget contentId={this.contentId} />
+                </IdProvider>
+            </AppRoot>,
             this.reactRoot,
         );
     }
