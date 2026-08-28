@@ -8,11 +8,18 @@ import {ContentBrowseFilterPanel} from '@enonic/lib-contentstudio/app/browse/fil
 import {ArchiveAggregationsFetcher} from './ArchiveAggregationsFetcher';
 import {ArchiveContentViewItem} from './ArchiveContentViewItem';
 import {AppHelper} from '@enonic/lib-admin-ui/util/AppHelper';
+import {AuthContext} from '@enonic/lib-admin-ui/auth/AuthContext';
+import {ArchiveAggregationsDisplayNamesResolver} from './ArchiveAggregationsDisplayNamesResolver';
 
 export class ArchiveFilterPanel
     extends ContentBrowseFilterPanel<ArchiveContentViewItem> {
 
     protected aggregationsFetcher: ArchiveAggregationsFetcher;
+
+    constructor() {
+        super();
+        this.displayNamesResolver = new ArchiveAggregationsDisplayNamesResolver();
+    }
 
     protected createAggregationFetcher(): ArchiveAggregationsFetcher {
         const aggregationsFetcher = new ArchiveAggregationsFetcher([
@@ -24,6 +31,16 @@ export class ArchiveFilterPanel
         aggregationsFetcher.setRootPath(ArchiveResourceRequest.ARCHIVE_PATH);
 
         return aggregationsFetcher;
+    }
+
+    protected getFilterableAggregations(): { name: string; idsToKeepOnTop?: string[] }[] {
+        return [
+            ...super.getFilterableAggregations(),
+            {
+                name: ArchiveAggregation.ARCHIVED_BY.toString(),
+                idsToKeepOnTop: [AuthContext.get().getUser().getKey().toString()],
+            },
+        ];
     }
 
     getExportOptions(): undefined {
