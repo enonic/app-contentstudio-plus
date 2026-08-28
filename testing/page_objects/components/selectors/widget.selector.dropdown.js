@@ -1,35 +1,63 @@
 /**
  * Created on 27.08.2024
  */
-const BaseDropdown = require('./base.dropdown');
-const lib = require('../../../libs/elements');
-const appConst = require('../../../libs/app_const');
+const Page = require('../../page');
+const {DROPDOWN, COMMON} = require('../../../libs/elements');
 
 const XPATH = {
-    container: "//div[contains(@id,'ExtensionFilterDropdown')]",
-    widgetDropdownListUL: "//ul[contains(@id,'ExtensionSelectorDropdown')]",
+    container: "//button[contains(@id,'WidgetSelector') and @role='combobox']",
+    widgetSelectorListbox: "//div[contains(@id,'WidgetsSelector') and @role='listbox']",
+    optionsNameSpan: "//div[contains(@role,'option')]//span",
 }
 
-class WidgetSelectorDropdown extends BaseDropdown {
+class WidgetSelectorDropdown extends Page {
 
     get container() {
         return XPATH.container;
     }
 
-    async selectFilteredWidgetItem(widgetDisplayName, parentElement) {
-        try {
-            await this.clickOnFilteredByDisplayNameItem(widgetDisplayName, parentElement);
-        } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_dropdown');
-            throw new Error('ExtensionFilterDropdown - Error during selecting the option, screenshot: ' + screenshot + ' ' + err);
-        }
+    get dropdownHandle() {
+        return this.container;
+    }
+
+    async getSelectedOption(parent = '') {
+        let selector = parent + COMMON.CONTEXT_WINDOW_WIDGET_SELECTOR_SEARCH_INPUT;
+        await this.waitForElementDisplayed(selector);
+        return await this.getTextInInput(selector);
+    }
+
+    async typeTextInSearchInput(widgetName) {
+        let selector = COMMON.CONTEXT_WINDOW_WIDGET_SELECTOR_SEARCH_INPUT;
+        await this.waitForElementDisplayed(selector);
+        return await this.typeTextInInput(selector,widgetName);
+    }
+
+    async clickOnOptionByDisplayName(optionDisplayName) {
+        let optionLocator = DROPDOWN.selectorListOptionByName(optionDisplayName);
+        //  Wait for the required option is displayed:
+        await this.waitForElementDisplayed(optionLocator);
+        // Click on the item:
+        await this.clickOnElement(optionLocator);
     }
 
     async getOptionsName() {
-        let locator = XPATH.container + XPATH.widgetDropdownListUL + lib.DROPDOWN_SELECTOR.DROPDOWN_LIST_ITEM + lib.H6_DISPLAY_NAME;
-        await this.waitUntilDisplayed(locator, appConst.mediumTimeout);
+        let locator = DROPDOWN.COMBOBOX_POPUP + XPATH.optionsNameSpan;
+        await this.waitUntilDisplayed(locator);
         await this.pause(300);
         return await this.getTextInDisplayedElements(locator);
+    }
+
+    async getSelectedOptionsInListOptions() {
+        let locator = DROPDOWN.COMBOBOX_POPUP +
+                      `//div[@data-component='Listbox.Item' and @aria-selected='true']` +
+                      `//span[contains(@class,'font-semibold')]`;
+        await this.waitForElementDisplayed(locator);
+        return await this.getTextInDisplayedElements(locator);
+    }
+
+    async clickOnDropdownHandle(parentLocator = '') {
+        await this.waitForElementDisplayed(parentLocator + this.dropdownHandle);
+        return await this.clickOnElement(parentLocator + this.dropdownHandle);
     }
 }
 

@@ -14,6 +14,9 @@ const COMMON = {
     CONTEXT_WINDOW_TOGGLE_BUTTON: `//button[@aria-label='Hide context panel' or @aria-label='Show context panel']`,
     CONTENT_APP_BAR_DIV: "//div[contains(@id,'BrowseAppBarElement')]",
     SELECT_ALL_CHECKBOX_LABEL: "//label[descendant::input[@type='checkbox' and @aria-label='Select all']]",
+    // The label of the 'Select all' checkbox switches to 'Clear selection' when there is a selection,
+    // so the checkbox is located by the id of the toolbar it belongs to, not by its label
+    selectAllCheckboxLabelByToolbar: (toolbarId) => `//label[starts-with(@for,'${toolbarId}')]`,
     menuItemByText: (text) => `//div[@role,'menuitem') and text()='${text}']`,
     WIDGET_SIDEBAR: {
         CONTAINER: "//nav[@aria-label='Sidebar']",
@@ -71,6 +74,8 @@ const COMMON = {
 };
 const ARCHIVE = {};
 const WIZARD = {
+    DISPLAY_NAME_CONTROL:
+        "//*[(self::button or self::textarea) and (@data-component='DisplayNameInput' or @placeholder='Display Name')]",
     DISPLAY_NAME_INPUT: "//textarea[@data-component='DisplayNameInput' or @placeholder='Display Name']",
     RENAME_CONTENT_SPAN: "//span[contains(@title,'Click to rename the content')]",
     PATH_INPUT: "//input[@name='name']",

@@ -65,6 +65,15 @@ class WizardContextWindowPanel extends BaseContextWindowPanel {
         }
     }
 
+    async openPublishReportWidget() {
+        try {
+            return await super.openPublishReportWidget();
+        } catch (err) {
+            //Workaround for issue with the empty selector:
+            await this.saveScreenshotUniqueName('err_widget');
+        }
+    }
+
     async openDependenciesWidget() {
         try {
             await super.openDependenciesWidget();

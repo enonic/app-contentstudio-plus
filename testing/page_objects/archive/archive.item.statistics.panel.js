@@ -9,7 +9,6 @@ const XPATH = {
     container: "//div[contains(@id,'ArchiveItemStatisticsPanel')]",
     noPreviewMessageSpan: "//div[contains(@class,'no-preview-message')]//span",
     archiveItemPreviewToolbar: "//div[@aria-label='Preview toolbar']",
-    contentStatus: "//span[@class='status']",
     divEmulatorDropdown: "//div[contains(@id,'EmulatorDropdown')]",
     divPreviewWidgetDropdown: "//div[contains(@id,'PreviewModeDropdown')]",
     previewToolbarMenuItem: (optionName) => {
@@ -18,10 +17,6 @@ const XPATH = {
 };
 
 class ArchiveItemStatisticsPanel extends Page {
-
-    get contentStatus() {
-        return XPATH.container + XPATH.archiveItemPreviewToolbar + XPATH.contentStatus;
-    }
 
     get liveViewFrame() {
         return XPATH.container + '//iframe';
@@ -35,23 +30,25 @@ class ArchiveItemStatisticsPanel extends Page {
         return XPATH.container + XPATH.archiveItemPreviewToolbar + BUTTONS.buttonAriaLabel('Open widget selector');
     }
 
+    get versionHistoryButton() {
+        return XPATH.archiveItemPreviewToolbar + BUTTONS.buttonAriaLabel('Open version history');
+    }
 
     get previewButton() {
         return XPATH.container + XPATH.archiveItemPreviewToolbar +
                "//button[contains(@id, 'ActionButton') and contains(@aria-label,'Preview')]";
     }
-
-    async getStatus() {
-        try {
-            await this.waitForElementDisplayed(this.contentStatus);
-            return await this.getText(this.contentStatus);
-        } catch (err) {
-            await this.handleError(`Archive Item Statistics Panel - tried to get the content status`, 'err_get_content_status', err);
-        }
+    async waitForItemPreviewToolbarNotDisplayed(){
+        return await this.waitForElementNotDisplayed(XPATH.archiveItemPreviewToolbar);
     }
 
-    async waitForContentStatusNotDisplayed() {
-        return await this.waitForElementNotDisplayed(this.contentStatus);
+    async getLabelInOpenVersionsHistoryButton() {
+        await this.waitForElementDisplayed(this.versionHistoryButton);
+        let result = await this.getDisplayedElements(this.versionHistoryButton + "//span");
+        if (result.length === 0) {
+            throw new Error("Versions History Button is not displayed: " );
+        }
+        return await result[0].getText();
     }
 
     async getSelectedOptionInEmulatorDropdown() {

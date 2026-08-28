@@ -2,7 +2,7 @@
  * Created on 20.08.2022
  */
 const SettingsBrowsePanel = require('../page_objects/project/settings.browse.panel');
-const ConfirmValueDialog = require('../page_objects/confirm.content.delete.dialog');
+const ConfirmValueDialog = require('../page_objects/confirm.value.dialog');
 const ProjectWizardDialogParentProjectStep = require('../page_objects/project/project-wizard-dialog/project.wizard.parent.project.step');
 const ProjectWizardDialogLanguageStep = require('../page_objects/project/project-wizard-dialog/project.wizard.language.step');
 const ProjectWizardDialogAccessModeStep = require('../page_objects/project/project-wizard-dialog/project.wizard.access.mode.step');

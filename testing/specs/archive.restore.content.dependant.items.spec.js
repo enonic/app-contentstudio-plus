@@ -1,5 +1,5 @@
 /**
- * Created on 17.11.2021
+ * Created on 17.11.2021 updated on 25.08.2026
  */
 const assert = require('node:assert');
 const webDriverHelper = require('../libs/WebDriverHelper');
@@ -8,12 +8,12 @@ const ContentBrowsePanel = require('../page_objects/browsepanel/content.browse.p
 const studioUtils = require('../libs/studio.utils.js');
 const DeleteContentDialog = require('../page_objects/delete.content.dialog');
 const ArchiveBrowsePanel = require('../page_objects/archive/archive.browse.panel');
-const ConfirmValueDialog = require('../page_objects/confirm.content.delete.dialog');
+const ConfirmValueDialog = require('../page_objects/confirm.value.dialog');
 const ArchiveRestoreDialog = require('../page_objects/archive/archive.restore.dialog');
 const ArchiveDeleteDialog = require('../page_objects/archive/archive.delete.dialog');
 const ArchiveFilterPanel = require('../page_objects/archive/archive.filter.panel');
 
-describe.skip('archive.restore.content.dependant.items.spec: tests for archive/restore folder with children', function () {
+describe('archive.restore.content.dependant.items.spec: tests for archive/restore folder with children', function () {
     this.timeout(appConst.SUITE_TIMEOUT);
     // setup standalone mode if WDIO is not defined:
     if (typeof browser === 'undefined') {
@@ -28,7 +28,7 @@ describe.skip('archive.restore.content.dependant.items.spec: tests for archive/r
     const ITEMS_TO_ARCHIVE = 12;
     const NUMBER_DEPENDANT_ITEMS = 11;
 
-    it(`GIVEN existing folder is archived WHEN 'Delete from Archive' dialog is opened THEN expected dependent items should be present in the dialog`,
+    it(`WHEN 'Delete from Archive' dialog is opened THEN expected dependent items should be present in the dialog`,
         async () => {
             let contentBrowsePanel = new ContentBrowsePanel();
             let deleteContentDialog = new DeleteContentDialog();
@@ -38,9 +38,9 @@ describe.skip('archive.restore.content.dependant.items.spec: tests for archive/r
             // 1. Select a folder
             await studioUtils.findContentAndClickCheckBox(FOLDER_DISPLAY_NAME);
             // 2. Archive this folder with children:
-            await contentBrowsePanel.clickOnArchiveButton();
+            await contentBrowsePanel.clickOnDeleteButton();
             await deleteContentDialog.waitForDialogOpened();
-            await deleteContentDialog.clickOnArchiveButton();
+            await deleteContentDialog.clickOnDeleteButton();
             await confirmValueDialog.waitForDialogOpened();
             await confirmValueDialog.typeNumberOrName(ITEMS_TO_ARCHIVE);
             await confirmValueDialog.clickOnConfirmButton();
@@ -60,7 +60,7 @@ describe.skip('archive.restore.content.dependant.items.spec: tests for archive/r
             assert.equal(result.length, NUMBER_DEPENDANT_ITEMS, 'Expected number of dependent items should be present in the dialog');
         });
 
-    it(`'Filter Panel' has been opened WHEN 'Executable' checkbox has been clicked THEN '4 hits' should be displayed in the panel`,
+    it(`'Filter Panel' has been opened WHEN 'Executable' checkbox has been clicked THEN '4 results' should be displayed in the panel`,
         async () => {
             let archiveBrowsePanel = new ArchiveBrowsePanel();
             let archiveFilterPanel = new ArchiveFilterPanel();
@@ -68,20 +68,20 @@ describe.skip('archive.restore.content.dependant.items.spec: tests for archive/r
             await studioUtils.openArchivePanel();
             await archiveBrowsePanel.clickOnSearchButton();
             await archiveFilterPanel.waitForOpened();
-            // 2. Verify the number in 'hits'
-            await studioUtils.saveScreenshot('issue_arch_filter_panel_hits');
+            // 2. Verify the number in 'results'
+            await studioUtils.saveScreenshot('issue_arch_filter_panel_results');
             // 3. Click on 'Executable' checkbox:
             await archiveFilterPanel.clickOnCheckboxInContentTypesBlock('Executable');
-            await studioUtils.saveScreenshot('issue_arch_filter_panel_hits_2');
+            await studioUtils.saveScreenshot('issue_arch_filter_panel_results_2');
             let result = await archiveBrowsePanel.getDisplayNamesInGrid();
             assert.equal(result.length, 4, 'Four items should be present in the grid');
             // 4. Verify that number in 'hits' is updated
             let hitsCounter2 = await archiveFilterPanel.getTextInHitsCounter();
-            assert.equal(hitsCounter2, '4 hits', 'Expected hits counter should be displayed');
+            assert.equal(hitsCounter2, '4 results', 'Expected results counter should be displayed');
             // 5. Click on 'Clear' button:
             await archiveFilterPanel.clickOnClearButton();
             await archiveFilterPanel.waitForClearLinkNotDisplayed();
-            await studioUtils.saveScreenshot('issue_arch_filter_panel_hits_3');
+            await studioUtils.saveScreenshot('issue_arch_filter_panel_results_3');
             let result2 = await archiveBrowsePanel.getDisplayNamesInGrid();
             assert.ok(result2.length != 4, 'Grid returns to the initial state');
             assert.ok(result2.includes(FOLDER_DISPLAY_NAME), 'Expected item should be present in the grid');
@@ -109,7 +109,7 @@ describe.skip('archive.restore.content.dependant.items.spec: tests for archive/r
             assert.ok(isSelected, 'Archived By checkbox should be selected');
         });
 
-    it(`GIVEN Filter Panel is opened WHEN content name has been typed in the search input THEN '1 hits' should appear in the filter panel`,
+    it(`GIVEN Filter Panel is opened WHEN content name has been typed in the search input THEN '1 results' should appear in the filter panel`,
         async () => {
             let archiveBrowsePanel = new ArchiveBrowsePanel();
             let archiveFilterPanel = new ArchiveFilterPanel();
@@ -123,7 +123,7 @@ describe.skip('archive.restore.content.dependant.items.spec: tests for archive/r
             await studioUtils.saveScreenshot('archive_filtered_by_name_grid');
             // 4. Verify the 'hits' number in the filtered grid
             let hitsCounter = await archiveFilterPanel.getTextInHitsCounter();
-            assert.equal(hitsCounter, '1 hit', 'Expected hits counter should be displayed');
+            assert.equal(hitsCounter, '1 results', 'Expected results counter should be displayed');
             // 5. Verify the item in the filtered grid
             let filteredItem = await archiveBrowsePanel.getDisplayNamesInGrid();
             assert.equal(filteredItem.length, 1, 'One item should be present in the filtered grid');
@@ -172,9 +172,9 @@ describe.skip('archive.restore.content.dependant.items.spec: tests for archive/r
         });
 
     beforeEach(async () => {
-        return await studioUtils.navigateToContentStudioCloseProjectSelectionDialog();
+        return await studioUtils.navigateToContentStudioApp();
     });
-    afterEach(() => studioUtils.doCloseAllWindowTabsAndSwitchToHome());
+    afterEach(() => studioUtils.doCloseAllWindowTabsAndNavigateToHome());
     before(() => {
         return console.log('specification is starting: ' + this.title);
     });

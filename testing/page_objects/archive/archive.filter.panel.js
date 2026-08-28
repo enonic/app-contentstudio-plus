@@ -3,68 +3,78 @@
  */
 const Page = require('../page');
 const appConst = require('../../libs/app_const');
-const lib = require('../../libs/elements');
+
 const XPATH = {
     container: "//div[contains(@id,'ArchiveFilterPanel')]",
-    selectorOptionItemByLabel: label => `//ul[contains(@id,'BucketListBox')]//div[contains(@class,'item-view-wrapper') and descendant::h6[contains(@class,'main-name') and contains(.,'${label}')]]`,
-    aggregationLabelByName: name => `//div[contains(@class,'checkbox') and child::label[contains(.,'${name}')]]//label`,
-    folderAggregation: () => `//div[contains(@class,'checkbox') and child::label[contains(.,'Folder') and not(contains(.,'Template'))]]//label`,
-    aggregationCheckboxByName: name => `//div[contains(@class,'checkbox') and child::label[contains(.,'${name}')]]` + lib.CHECKBOX_INPUT,
-    lastModifiedAggregationEntry:
-        time => `//div[@class='aggregation-group-view']/h2[text()='Last Modified']/..//div[contains(@class,'checkbox') and child::label]//label[contains(.,'${time}')]`,
+    // All controls of the panel are rendered by the BrowseFilter component. The legacy panel contains one more
+    // search input(it is not used any longer), so all locators are scoped to this container:
+    browseFilter: "//div[contains(@id,'BrowseFilterElement')]",
+    searchInput: "//input[@data-component='SearchField.Input']",
+    // 'Clear' button is displayed in the row with the 'Search' title, only when the filter is dirty:
+    clearFilterButton: "//div[child::h3[contains(@class,'font-semibold')]]//button",
+    // Number of hits - '12 results':
+    resultsCounter: "//span[contains(@class,'text-lg')]",
+    aggregationGroupTitle: "//h4[contains(@class,'font-semibold')]",
+    // Static aggregation groups(Content Types, Archived, Archived By) show the title in h4,
+    // filterable groups(with a combobox) show it in a div:
+    aggregationGroupByName: name => `//div[child::h4[contains(.,'${name}')] or child::div[contains(@class,'font-semibold') and contains(.,'${name}')]]`,
+    checkbox: `//div[@data-component='Checkbox']`,
+    checkboxByLabel: label => `//div[@data-component='Checkbox' and descendant::span[contains(.,'${label}')]]`,
+    // The input is 'sr-only', so it is not displayed. Its state is in the 'aria-checked' attribute:
+    checkboxInput: `//input[@type='checkbox']`,
+    checkboxLabel: `//label`,
+    folderCheckboxLabel: `//div[@data-component='Checkbox' and descendant::span[contains(.,'Folder') and not(contains(.,'Template'))]]//label`,
+    // 'Show more' / 'Show less' button is displayed in the aggregation group with more than 5 buckets:
+    showMoreButton: `//button[@data-component='Button' and @aria-label='Show more']`,
+    showLessButton: `//button[@data-component='Button' and @aria-label='Show less']`,
 };
 
 class ArchiveFilterPanel extends Page {
 
-    get clearFilterLink() {
-        return XPATH.container + lib.FILTER_PANEL.clearFilterLink;
+    get searchTextInput() {
+        return XPATH.container + XPATH.browseFilter + XPATH.searchInput;
     }
 
-    get showResultsButton() {
-        return XPATH.container + lib.FILTER_PANEL.showResultsButton;
+    get clearFilterLink() {
+        return XPATH.container + XPATH.browseFilter + XPATH.clearFilterButton;
+    }
+
+    get resultsCounter() {
+        return XPATH.container + XPATH.browseFilter + XPATH.resultsCounter;
     }
 
     get showMoreTypesButton() {
-        return XPATH.container + lib.FILTER_PANEL.aggregationGroupDiv('Content Types') + lib.FILTER_PANEL.showMoreButton;
+        return this.getAggregationGroupLocator(appConst.FILTER_PANEL_AGGREGATION_BLOCK.CONTENT_TYPES) + XPATH.showMoreButton;
     }
 
     get showLessTypesButton() {
-        return XPATH.container + lib.FILTER_PANEL.aggregationGroupDiv('Content Types') + lib.FILTER_PANEL.showLessButton;
+        return this.getAggregationGroupLocator(appConst.FILTER_PANEL_AGGREGATION_BLOCK.CONTENT_TYPES) + XPATH.showLessButton;
     }
 
-    get ownerDropdownHandle() {
-        return XPATH.container + lib.FILTER_PANEL.aggregationDropdown('Owner') + lib.DROP_DOWN_HANDLE;
+    getAggregationGroupLocator(blockName) {
+        return XPATH.container + XPATH.browseFilter + XPATH.aggregationGroupByName(blockName);
     }
 
-    get lastModifiedByDropdownHandle() {
-        return XPATH.container + lib.FILTER_PANEL.aggregationDropdown('Last Modified By') + lib.DROP_DOWN_HANDLE;
+    getCheckboxLabelLocator(blockName, label) {
+        return this.getAggregationGroupLocator(blockName) + XPATH.checkboxByLabel(label) + XPATH.checkboxLabel;
     }
 
-    get closeDependenciesSectionButtonLocator() {
-        return XPATH.container + lib.FILTER_PANEL.dependenciesSection + "//button[contains(@class,'btn-close')]";
+    getCheckboxInputLocator(blockName, label) {
+        return this.getAggregationGroupLocator(blockName) + XPATH.checkboxByLabel(label) + XPATH.checkboxInput;
     }
 
-    get searchTextInput() {
-        return XPATH.container + lib.FILTER_PANEL.searchInput;
+    async waitForOpened() {
+        try {
+            await this.waitForElementDisplayed(XPATH.container, appConst.mediumTimeout);
+            await this.waitForElementDisplayed(this.searchTextInput, appConst.mediumTimeout);
+            await this.pause(500);
+        } catch (err) {
+            await this.handleError('Archive Filter Panel was not opened', 'err_archive_filter_panel', err);
+        }
     }
 
-    waitForLastModifiedByDropdownHandleDisplayed() {
-        return this.waitForElementDisplayed(this.lastModifiedByDropdownHandle, appConst.mediumTimeout);
-    }
-
-    waitForOwnerDropdownHandleDisplayed() {
-        return this.waitForElementDisplayed(this.ownerDropdownHandle, appConst.mediumTimeout);
-    }
-
-    async clickOnOwnerDropdownHandle() {
-        await this.waitForOwnerDropdownHandleDisplayed();
-        await this.clickOnElement(this.ownerDropdownHandle);
-        await this.pause(500);
-    }
-
-    async clickOnLastModifiedByDropdownHandle() {
-        await this.waitForLastModifiedByDropdownHandleDisplayed();
-        return await this.clickOnElement(this.lastModifiedByDropdownHandle);
+    isPanelVisible() {
+        return this.isElementDisplayed(XPATH.container);
     }
 
     async typeSearchText(text) {
@@ -76,13 +86,148 @@ class ArchiveFilterPanel extends Page {
         }
     }
 
-    async waitForOpened() {
-        await this.waitForElementDisplayed(XPATH.container, appConst.mediumTimeout);
-        await this.pause(500);
+    async getTextInSearchInput() {
+        let input = await this.findElement(this.searchTextInput);
+        return await input.getValue();
     }
 
-    waitForShowResultsButtonDisplayed() {
-        return this.waitForElementDisplayed(this.showResultsButton, appConst.mediumTimeout);
+    async clearSearchInput() {
+        let input = await this.findElement(this.searchTextInput);
+        await input.clearValue();
+        return await this.pause(500);
+    }
+
+    // Returns the text in the results counter - '12 results'
+    async getTextInHitsCounter() {
+        await this.waitForElementDisplayed(this.resultsCounter, appConst.mediumTimeout);
+        return await this.getText(this.resultsCounter);
+    }
+
+    // Returns the number from the results counter
+    async getNumberInHitsCounter() {
+        let text = await this.getTextInHitsCounter();
+        return parseInt(text, 10);
+    }
+
+    waitForClearLinkDisplayed() {
+        return this.waitForElementDisplayed(this.clearFilterLink, appConst.mediumTimeout);
+    }
+
+    waitForClearLinkNotDisplayed() {
+        return this.waitForElementNotDisplayed(this.clearFilterLink, appConst.mediumTimeout);
+    }
+
+    async clickOnClearButton() {
+        await this.waitForClearLinkDisplayed();
+        await this.clickOnElement(this.clearFilterLink);
+        await this.pause(1000);
+    }
+
+    async waitForAggregationGroupDisplayed(blockName) {
+        try {
+            return await this.waitForElementDisplayed(this.getAggregationGroupLocator(blockName), appConst.mediumTimeout);
+        } catch (err) {
+            await this.handleError(`Filter Panel: aggregation group ${blockName}`, 'err_filter_panel_aggregation', err);
+        }
+    }
+
+    async waitForAggregationGroupNotDisplayed(blockName) {
+        return await this.waitForElementNotDisplayed(this.getAggregationGroupLocator(blockName), appConst.mediumTimeout);
+    }
+
+    // Titles of the aggregation groups: 'Content Types', 'Archived', 'Archived By'
+    async getAggregationGroupTitles() {
+        let locator = XPATH.container + XPATH.browseFilter + XPATH.aggregationGroupTitle;
+        return await this.getTextInDisplayedElements(locator);
+    }
+
+    async waitForCheckboxDisplayed(blockName, label) {
+        return await this.waitForElementDisplayed(this.getCheckboxLabelLocator(blockName, label), appConst.mediumTimeout);
+    }
+
+    async waitForCheckboxNotDisplayed(blockName, label) {
+        return await this.waitForElementNotDisplayed(this.getCheckboxLabelLocator(blockName, label), appConst.mediumTimeout);
+    }
+
+    async clickOnAggregationCheckbox(blockName, label) {
+        try {
+            let locator = this.getCheckboxLabelLocator(blockName, label);
+            await this.waitForCheckboxDisplayed(blockName, label);
+            await this.clickOnElement(locator);
+            return await this.pause(1200);
+        } catch (err) {
+            await this.handleError('Filter Panel, aggregation checkbox', 'err_filter_panel_checkbox', err);
+        }
+    }
+
+    // clicks on a checkbox in 'Content Types' aggregation block
+    async clickOnCheckboxInContentTypesBlock(contentType) {
+        try {
+            await this.pause(500);
+            let showMore = await this.getDisplayedElements(this.showMoreTypesButton);
+            if (showMore.length > 0) {
+                await this.clickOnShowMoreButton();
+            }
+            return await this.clickOnAggregationCheckbox(appConst.FILTER_PANEL_AGGREGATION_BLOCK.CONTENT_TYPES, contentType);
+        } catch (err) {
+            await this.handleError('Filter Panel, aggregation checkbox', 'err_filter_panel_checkbox', err);
+        }
+    }
+
+    // The input is 'sr-only', so the state is checked by the 'aria-checked' attribute
+    async isCheckboxSelected(blockName, label) {
+        try {
+            let locator = this.getCheckboxInputLocator(blockName, label);
+            await this.waitForExist(locator, appConst.mediumTimeout);
+            let value = await this.getAttribute(locator, 'aria-checked');
+            return value === 'true';
+        } catch (err) {
+            await this.handleError('Filter Panel, aggregation checkbox', 'err_filter_panel_checkbox', err);
+        }
+    }
+
+    // Labels of all checkboxes in the aggregation block: ['Executable (4)', 'Folder (2)', ...]
+    async getCheckboxesLabels(blockName) {
+        let locator = this.getAggregationGroupLocator(blockName) + XPATH.checkbox + XPATH.checkboxLabel;
+        await this.waitForElementDisplayed(locator, appConst.shortTimeout);
+        return await this.getTextInDisplayedElements(locator);
+    }
+
+    // Items in 'Content Types' block:
+    async geContentTypes() {
+        return await this.getCheckboxesLabels(appConst.FILTER_PANEL_AGGREGATION_BLOCK.CONTENT_TYPES);
+    }
+
+    // gets the number of items from a checkbox label in an aggregation block: 'Executable (4)' returns '4'
+    async getNumberOfItemsInAggregationView(blockName, checkboxLabel, showMore) {
+        if (typeof showMore !== 'undefined') {
+            if (showMore && await this.isShowMoreButtonDisplayed()) {
+                await this.clickOnShowMoreButton();
+            }
+        }
+        try {
+            let locator = this.getCheckboxLabelLocator(blockName, checkboxLabel);
+            await this.waitForElementDisplayed(locator, appConst.shortTimeout);
+            let label = await this.getText(locator);
+            return this.getNumberFromLabel(label);
+        } catch (err) {
+            await this.handleError('Filter Panel, number in aggregation checkbox', 'err_get_numb_in_aggregation', err);
+        }
+    }
+
+    // 'Folder' should not be mixed up with 'Template Folder' in the 'Content Types' block
+    async getNumberOfItemsInFolderAggregation() {
+        let locator = this.getAggregationGroupLocator(appConst.FILTER_PANEL_AGGREGATION_BLOCK.CONTENT_TYPES) +
+                      XPATH.folderCheckboxLabel;
+        await this.waitForElementDisplayed(locator, appConst.shortTimeout);
+        let label = await this.getText(locator);
+        return this.getNumberFromLabel(label);
+    }
+
+    getNumberFromLabel(label) {
+        let startIndex = label.indexOf('(');
+        let endIndex = label.indexOf(')');
+        return label.substring(startIndex + 1, endIndex);
     }
 
     waitForShowMoreButtonDisplayed() {
@@ -93,13 +238,14 @@ class ArchiveFilterPanel extends Page {
         return this.waitForElementNotDisplayed(this.showMoreTypesButton, appConst.shortTimeout);
     }
 
-    async clickOnShowMoreButton() {
-        await this.waitForShowMoreButtonDisplayed();
-        return await this.clickOnElement(this.showMoreTypesButton);
-    }
-
     isShowMoreButtonDisplayed() {
         return this.isElementDisplayed(this.showMoreTypesButton);
+    }
+
+    async clickOnShowMoreButton() {
+        await this.waitForShowMoreButtonDisplayed();
+        await this.clickOnElement(this.showMoreTypesButton);
+        return await this.pause(300);
     }
 
     waitForShowLessButtonDisplayed() {
@@ -110,195 +256,10 @@ class ArchiveFilterPanel extends Page {
         return this.waitForElementNotDisplayed(this.showLessTypesButton, appConst.shortTimeout);
     }
 
-    async clickOnShowResultsButton() {
-        await this.waitForShowResultsButtonDisplayed();
-        return await this.clickOnElement(this.showResultsButton);
-    }
-
-    waitForCloseDependenciesSectionButtonDisplayed() {
-        return this.waitForElementDisplayed(this.closeDependenciesSectionButtonLocator, appConst.mediumTimeout);
-    }
-
-    isPanelVisible() {
-        return this.isElementDisplayed(XPATH.container);
-    }
-
-    waitForClearLinkDisplayed() {
-        return this.waitForElementDisplayed(this.clearFilterLink, appConst.mediumTimeout)
-    }
-
-    waitForClearLinkNotDisplayed() {
-        return this.waitForElementNotDisplayed(this.clearFilterLink, appConst.mediumTimeout)
-    }
-
-    async waitForDependenciesSectionVisible(ms) {
-        try {
-            let timeout;
-            timeout = ms === undefined ? appConst.mediumTimeout : ms;
-            return await this.waitForElementDisplayed(XPATH.container + lib.FILTER_PANEL.dependenciesSection, timeout)
-        } catch (err) {
-            await this.handleError('Filter Panel: Dependencies section', 'err_wait_dependencies_section', err);
-        }
-    }
-
-    async clickOnClearButton() {
-        await this.waitForClearLinkDisplayed();
-        await this.clickOnElement(this.clearFilterLink)
-        await this.pause(1000);
-    }
-
-    // clicks on a checkbox in Content Types aggregation block
-    async clickOnCheckboxInContentTypesBlock(contentType) {
-        try {
-            let selector = lib.FILTER_PANEL.aggregationGroupDiv('Content Types') + XPATH.aggregationLabelByName(contentType);
-            await this.pause(500);
-            let result = await this.getDisplayedElements(this.showMoreTypesButton);
-            if (result.length > 0) {
-                await this.clickOnShowMoreButton();
-            }
-            await this.waitForElementDisplayed(selector, appConst.shortTimeout);
-            await this.clickOnElement(selector);
-            return await this.pause(1200);
-        } catch (err) {
-            await this.handleError('Filter Panel, aggregation checkbox', 'err_filter_panel_checkbox', err);
-        }
-    }
-
-    async waitForCheckboxDisplayed(blockName, label) {
-        let selector = lib.FILTER_PANEL.aggregationGroupDiv(blockName) + XPATH.aggregationLabelByName(label);
-        return await this.waitForElementDisplayed(selector, appConst.mediumTimeout);
-    }
-
-    async clickOnAggregationCheckbox(blockName, label) {
-        let locator = lib.FILTER_PANEL.aggregationGroupDiv(blockName) + XPATH.aggregationLabelByName(label);
-        await this.waitForCheckboxDisplayed(blockName, label);
-        await this.clickOnElement(locator);
-        await this.pause(500);
-    }
-
-    async isCheckboxSelected(blockName, label) {
-        try {
-            let locator = lib.FILTER_PANEL.aggregationGroupDiv(blockName) + XPATH.aggregationCheckboxByName(label);
-            await this.waitForElementDisplayed(locator, appConst.shortTimeout);
-            return await this.isSelected(locator);
-        } catch (err) {
-            await this.handleError('Filter Panel', 'err_filter_panel_checkbox', err);
-        }
-    }
-
-    async waitForAggregationGroupDisplayed(blockName) {
-        let selector = lib.FILTER_PANEL.aggregationGroupDiv(blockName);
-        return await this.waitForElementDisplayed(selector, appConst.mediumTimeout);
-    }
-
-    async waitForCheckboxNotDisplayed(blockName, checkBoxLabel) {
-        let selector = lib.FILTER_PANEL.aggregationGroupDiv(blockName) + XPATH.aggregationLabelByName(checkBoxLabel);
-        return await this.waitForElementNotDisplayed(selector, appConst.mediumTimeout);
-    }
-
-    //clicks on a checkbox in Workflow aggregation block
-    async clickOnCheckboxInWorkflowBlock(checkBoxLabel) {
-        try {
-            let selector = lib.FILTER_PANEL.aggregationGroupDiv(appConst.FILTER_PANEL_AGGREGATION_BLOCK.WORKFLOW) +
-                           XPATH.aggregationLabelByName(checkBoxLabel);
-            await this.waitForElementDisplayed(selector, appConst.shortTimeout);
-            await this.clickOnElement(selector);
-            return await this.pause(1200);
-        } catch (err) {
-            await this.saveScreenshotUniqueName("err_click_on_aggregation");
-            throw new Error("Error when click on the aggregation checkbox: " + err);
-        }
-    }
-
-    async clickOnCheckboxInLanguageBlock(checkBoxLabel) {
-        try {
-            let selector = lib.FILTER_PANEL.aggregationGroupDiv(appConst.FILTER_PANEL_AGGREGATION_BLOCK.LANGUAGE) +
-                           XPATH.aggregationLabelByName(checkBoxLabel);
-            await this.waitForElementDisplayed(selector, appConst.shortTimeout);
-            await this.clickOnElement(selector);
-            return await this.pause(1200);
-        } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_click_on_aggregation');
-            throw new Error(`Error when click on the aggregation checkbox, screenshot:${screenshot} ` + err);
-        }
-    }
-
-    // gets a number of items from a checkbox label in an aggregation block(Workflow,modifier)
-    async getNumberOfItemsInAggregationView(blockName, checkboxLabel, showMore) {
-        if (typeof showMore !== 'undefined') {
-            if (showMore && await this.isShowMoreButtonDisplayed()) {
-                await this.clickOnShowMoreButton();
-            }
-        }
-        try {
-            let locator = lib.FILTER_PANEL.aggregationGroupDiv(blockName) + XPATH.aggregationLabelByName(checkboxLabel);
-            await this.waitForElementDisplayed(locator, appConst.shortTimeout);
-            let label = await this.getText(locator);
-            let startIndex = label.indexOf('(');
-            let endIndex = label.indexOf(')');
-            return label.substring(startIndex + 1, endIndex);
-        } catch (err) {
-            await this.handleError('Filter Panel, number in aggregation checkbox', 'err_get_numb_in_aggregation', err);
-        }
-    }
-
-    async getNumberOfItemsInFolderAggregation() {
-        let locator = XPATH.folderAggregation();
-        await this.waitForElementDisplayed(locator, appConst.shortTimeout);
-        let label = await this.getText(locator);
-        let startIndex = label.indexOf('(');
-        let endIndex = label.indexOf(')');
-        return label.substring(startIndex + 1, endIndex);
-    }
-
-    //Gets items in "Content Types" block:
-    async geContentTypes() {
-        let locator = lib.FILTER_PANEL.aggregationGroupDiv('Content Types') + "//div[contains(@class,'checkbox')]//label";
-        await this.waitForElementDisplayed(locator, appConst.shortTimeout);
-        return await this.getTextInDisplayedElements(locator);
-    }
-
-    async getLastModifiedCount(timestamp) {
-        let locator = XPATH.lastModifiedAggregationEntry(timestamp);
-        await this.waitForElementDisplayed(locator, appConst.shortTimeout);
-        let label = await this.getText(locator);
-        let startIndex = label.indexOf('(');
-        let endIndex = label.indexOf(')');
-        return label.substring(startIndex + 1, endIndex);
-    }
-
-    async getOwnerNameInSelector() {
-        let owners = [];
-        let optionsLocator = lib.FILTER_PANEL.ownerAggregationGroupView + lib.FILTER_PANEL.selectorOptionItem + lib.H6_DISPLAY_NAME;
-        await this.waitForElementDisplayed(optionsLocator, appConst.shortTimeout);
-        let result = await this.getTextInDisplayedElements(optionsLocator);
-        result.map(item => {
-            let value = item.substring(0, item.indexOf('('));
-            owners.push(value.trim());
-        })
-        return owners;
-    }
-
-    async expandOwnerOptionsAndSelectItem(ownerName) {
-        try {
-            await this.clickOnOwnerDropdownHandle();
-            let checkboxLocator = lib.FILTER_PANEL.ownerAggregationGroupView + XPATH.selectorOptionItemByLabel(ownerName);
-            await this.waitForElementDisplayed(checkboxLocator, appConst.mediumTimeout);
-            await this.clickOnElement(checkboxLocator);
-            let okButton = lib.FILTER_PANEL.ownerAggregationGroupView + "//button[child::span[text()='OK']]";
-            await this.waitForElementDisplayed(okButton, appConst.mediumTimeout);
-            await this.clickOnElement(okButton);
-            await this.pause(300);
-        } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_filter_owner');
-            throw new Error(`Error when selecting an option in Owner Selector, screenshot ; ${screenshot} ` + err);
-        }
-    }
-
-    async getTextInHitsCounter() {
-        let locator = XPATH.container + "//span[@class='hits-counter']";
-        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
-        return await this.getText(locator);
+    async clickOnShowLessButton() {
+        await this.waitForShowLessButtonDisplayed();
+        await this.clickOnElement(this.showLessTypesButton);
+        return await this.pause(300);
     }
 }
 
