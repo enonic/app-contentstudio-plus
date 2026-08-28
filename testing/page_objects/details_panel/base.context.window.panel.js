@@ -25,10 +25,12 @@ class BaseContextWindowPanel extends Page {
             let selector = this.container + COMMON.CONTEXT_WINDOW_WIDGET_SELECTOR_SEARCH_INPUT;
             await this.waitForElementDisplayed(selector);
             return await this.getTextInInput(selector);
-        }catch (err){
-            await this.handleError('Cannot get selected option in widget selector dropdown', 'err_get_selected_option_widget_selector', err);
+        } catch (err) {
+            await this.handleError('Cannot get selected option in widget selector dropdown', 'err_get_selected_option_widget_selector',
+                err);
         }
     }
+
     //drop down menu for switching to Components, Details, Version History, Dependencies
     async clickOnWidgetSelectorDropdownHandle() {
         try {
@@ -63,6 +65,7 @@ class BaseContextWindowPanel extends Page {
             throw new Error(`Error occurred in widget selector dropdown, Version History, screenshot ${screenshot}: ` + err);
         }
     }
+
     async openPublishReportWidget() {
         try {
             let widgetSelectorDropdown = new WidgetSelectorDropdown();
@@ -71,8 +74,7 @@ class BaseContextWindowPanel extends Page {
             await widgetSelectorDropdown.clickOnOptionByDisplayName(appConst.WIDGET_SELECTOR_OPTIONS.PUBLISHING_REPORT);
             await this.pause(900);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_open_versions');
-            throw new Error(`Error occurred in widget selector dropdown, Version History, screenshot ${screenshot}: ` + err);
+            await this.handleError('Tried to open Publish Report widget', 'err_open_publish_report_widget', err);
         }
     }
 
@@ -126,7 +128,7 @@ class BaseContextWindowPanel extends Page {
             await this.clickOnWidgetSelectorDropdownHandle();
             await widgetSelectorDropdown.clickOnOptionByDisplayName(appConst.WIDGET_TITLE.VARIANTS);
         } catch (err) {
-            await this.handleError('Tried to open Variants Widget','err_variants', err);
+            await this.handleError('Tried to open Variants Widget', 'err_variants', err);
         }
     }
 
