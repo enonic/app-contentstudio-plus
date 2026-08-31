@@ -3,7 +3,7 @@
  */
 const Page = require('./page');
 const appConst = require('../libs/app_const');
-const {TREE_GRID} = require('../libs/elements');
+const {COMMON, TREE_GRID} = require('../libs/elements');
 const {Key} = require('webdriverio');
 
 const XPATH = {
@@ -41,25 +41,35 @@ class BaseBrowsePanel extends Page {
         return await this.getBrowser().keys(keyCombination);
     }
 
+    // The checkbox input is 'sr-only', so its state is read from the 'data-state' attribute:
+    // 'unchecked' | 'checked' | 'indeterminate'
+    get selectAllCheckboxInput() {
+        return this.selectAllCheckboxLabel + COMMON.INPUTS.CHECKBOX_INPUT;
+    }
+
+    getSelectAllCheckboxState() {
+        return this.getAttribute(this.selectAllCheckboxInput, 'data-state');
+    }
+
+    // The checkbox is a toggle: it selects all items when nothing is selected, otherwise it clears the selection
     async clickOnSelectAllCheckbox() {
         try {
+            await this.waitForElementDisplayed(this.selectAllCheckboxLabel, appConst.mediumTimeout);
+            let stateBeforeClick = await this.getSelectAllCheckboxState();
             await this.clickOnElement(this.selectAllCheckboxLabel);
-            return await this.pause(300);
+            // wait for the new state to be applied instead of pausing for a fixed time
+            return await this.getBrowser().waitUntil(async () => {
+                let state = await this.getSelectAllCheckboxState();
+                return state !== stateBeforeClick;
+            }, {
+                timeout: appConst.mediumTimeout,
+                timeoutMsg: `'Select all' checkbox state should not be '${stateBeforeClick}' after the click`,
+            });
         } catch (err) {
             await this.handleError('Browse Panel, tried to click on Select all checkbox. ', 'err_click_on_select_all', err);
         }
     }
 
-    // wait for the "Show Selection" circle appears in the toolbar
-    async waitForSelectionTogglerVisible() {
-        try {
-            await this.waitForElementDisplayed(this.selectionPanelToggler, appConst.mediumTimeout);
-            let attr = await this.getAttribute(this.selectionPanelToggler, 'class');
-            return attr.includes('any-selected');
-        } catch (err) {
-            return false;
-        }
-    }
 
     async waitForSelectionTogglerNotVisible() {
         try {
@@ -67,30 +77,6 @@ class BaseBrowsePanel extends Page {
         } catch (err) {
             await this.handleError('Selection toggle should not be visible. ', 'err_selection_toggler_should_not_visible', err);
         }
-    }
-
-    //Clicks on 'circle' (Show Selection tooltip)with a number and filters items in the grid:
-    async clickOnSelectionToggler() {
-        await this.waitForSelectionTogglerVisible();
-        await this.waitForElementDisplayed(this.selectionPanelToggler + "/div[@data-label='selected']", appConst.mediumTimeout);
-        await this.clickOnElement(this.selectionPanelToggler)
-            .catch(err => this.handleError('Tried to click on Selection Toggle...', 'err_clicking_selection_toggle', err));
-        return await this.pause(400);
-    }
-
-    //Wait for Selection Controller checkBox gets 'partial', then returns true, otherwise exception will be thrown
-    async waitForSelectionControllerPartial() {
-        let selector = this.selectionControllerCheckBox + "//input[@type='checkbox']";
-        await this.getBrowser().waitUntil(async () => {
-            let text = await this.getAttribute(selector, 'class');
-            return text.includes('partial');
-        }, {timeout: appConst.shortTimeout, timeoutMsg: "Selection Controller checkBox should displayed as partial"});
-    }
-
-    async isSelectionControllerPartial() {
-        let selector = this.selectionControllerCheckBox + "//input[@type='checkbox']";
-        let text = await this.getAttribute(selector, 'class');
-        return text.includes('partial');
     }
 
     // returns true if 'Selection Controller' checkbox is selected:

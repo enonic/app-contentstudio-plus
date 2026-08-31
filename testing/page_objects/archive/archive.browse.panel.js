@@ -10,9 +10,14 @@ const XPATH = {
     container: "//div[contains(@id,'ArchiveBrowsePanel')]",
     toolbar: "//div[@aria-label='Archive toolbar']",
     archiveTreeListDiv: "//div[@data-component='ArchiveTreeList']",
-    searchButton: "//button[contains(@aria-label, 'search panel')]",
+    clearSelectionCheckbox: `//label[child::input[contains(@aria-label,'Clear selection')]]`,
+    selectAllCheckboxLabel: COMMON.selectAllCheckboxLabelByToolbar('ArchiveTreeListToolbar'),
+    searchButton: BUTTONS.toolbarTooltipButtonAriaLabel('Search Panel'),
+    showSearchPanelButton: BUTTONS.toolbarTooltipButtonAriaLabel('Show Search Panel'),
+    hideSearchPanelButton: BUTTONS.toolbarTooltipButtonAriaLabel('Hide Search Panel'),
+    contextPanelToggleButton: BUTTONS.toolbarTooltipButtonAriaLabel('Context Panel'),
+    showContextPanelButton: BUTTONS.toolbarTooltipButtonAriaLabel('Show Context Panel'),
     highlightedRowNotChecked: `//div[@role='treeitem' and contains(@class,'bg-surface-selected') and descendant::div[@role='checkbox' and @aria-checked='false']]`,
-    hideSearchPanelButton: "//button[contains(@aria-label, 'Hide search panel')]",
     listBoxToolbar: `//div[contains(@id,'ListBoxToolbar')]`,
     selectionControllerCheckBox: `//div[contains(@id,'SelectionController')]`,
     checkedRows: `//div[contains(@class,'slick-viewport')]//div[contains(@class,'slick-cell-checkboxsel selected')]`,
@@ -44,6 +49,10 @@ class ArchiveBrowsePanel extends BaseBrowsePanel {
         return XPATH.container;
     }
 
+    get clearSelectionCheckbox() {
+        return XPATH.clearSelectionCheckbox;
+    }
+
     get deleteButton() {
         return XPATH.toolbar + BUTTONS.buttonAriaLabel('Delete');
     }
@@ -57,19 +66,25 @@ class ArchiveBrowsePanel extends BaseBrowsePanel {
     }
 
     get showContextPanelButton() {
-        return XPATH.container + BUTTONS.buttonAriaLabel('Show context panel');
+        return XPATH.toolbar + XPATH.showContextPanelButton;
+    }
+
+    // The same button opens and closes the Context Panel
+    get contextPanelToggleButton() {
+        return XPATH.toolbar + XPATH.contextPanelToggleButton;
     }
 
     get selectionControllerCheckBox() {
         return XPATH.container + XPATH.listBoxToolbar + XPATH.selectionControllerCheckBox;
     }
 
-    get selectionPanelToggler() {
-        return `${XPATH.container}${XPATH.listBoxToolbar}${lib.SELECTION_PANEL_TOGGLER}`;
-    }
-
+    // The same button opens and closes the Filter Panel
     get searchButton() {
         return XPATH.toolbar + XPATH.searchButton;
+    }
+
+    get showSearchPanelButton() {
+        return XPATH.toolbar + XPATH.showSearchPanelButton;
     }
 
     get hideSearchPanelButton() {
@@ -82,11 +97,9 @@ class ArchiveBrowsePanel extends BaseBrowsePanel {
         return XPATH.archiveTreeListDiv + TREE_GRID.VIRTUALIZED_TREE_ROW + TREE_GRID.CONTENT_LABEL_BLOCK + '//div[2]//span';
     }
 
-    // get displayNames() {
-    //     // div[1] contains the icon, div[2] contains the name
-    //     return XPATH.archiveTreeListDiv + TREE_GRID.TREE_LIST_DIV + TREE_GRID.TREE_LIST_ITEM_DIV + TREE_GRID.CONTENT_LABEL_BLOCK +
-    //            '//div[2]//span';
-    // }
+    get selectAllCheckboxLabel() {
+        return XPATH.container + XPATH.selectAllCheckboxLabel;
+    }
 
     waitForRestoreButtonEnabled() {
         return this.waitForElementEnabled(this.restoreButton);
@@ -111,6 +124,14 @@ class ArchiveBrowsePanel extends BaseBrowsePanel {
     async waitForDeleteButtonEnabled() {
         await this.waitForDeleteButtonDisplayed();
         return await this.waitForElementEnabled(this.deleteButton);
+    }
+
+    async waitForDeleteButtonDisabled() {
+        return await this.waitForElementDisabled(this.deleteButton);
+    }
+
+    async waitForRestoreButtonDisabled(){
+        return await this.waitForElementDisabled(this.restoreButton);
     }
 
     async waitForDeleteButtonDisplayed() {
@@ -220,6 +241,13 @@ class ArchiveBrowsePanel extends BaseBrowsePanel {
         return await this.isElementDisplayed(this.showContextPanelButton);
     }
 
+    // Opens/Closes the Context Panel
+    async clickOnDetailsPanelToggleButton() {
+        await this.waitForElementDisplayed(this.contextPanelToggleButton);
+        await this.clickOnElement(this.contextPanelToggleButton);
+        return await this.pause(400);
+    }
+
     async openContextWindow() {
         let archiveContextWindow = new ArchiveContextWindowPanel();
         let isDisplayed = await this.isShowContextPanelButtonDisplayed();
@@ -230,6 +258,15 @@ class ArchiveBrowsePanel extends BaseBrowsePanel {
         await archiveContextWindow.waitForSpinnerNotVisible(appConst.TIMEOUT_5);
         await this.pause(500);
         return archiveContextWindow;
+    }
+
+    async clickOnClearSelectionCheckbox() {
+        try {
+            await this.waitForElementDisplayed(this.clearSelectionCheckbox);
+            return await this.clickOnElement(this.clearSelectionCheckbox);
+        } catch (err) {
+            await this.handleError('Clicked on Clear Selection checkbox', 'err_clear_selection_checkbox', err);
+        }
     }
 }
 

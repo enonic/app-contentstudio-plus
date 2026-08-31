@@ -85,6 +85,10 @@ class ContentWizardPanel extends Page {
         return XPATH.container + WIZARD.DISPLAY_NAME_INPUT;
     }
 
+    get displayNameControl() {
+        return XPATH.container + WIZARD.DISPLAY_NAME_CONTROL;
+    }
+
     get modifyPathSpan() {
         return XPATH.wizardHeader + COMMON.RENAME_CONTENT_SPAN;
     }
@@ -136,6 +140,7 @@ class ContentWizardPanel extends Page {
     get thumbnailUploader() {
         return XPATH.container + XPATH.thumbnailUploader;
     }
+
 
     get unpublishButton() {
         return XPATH.container + BUTTONS.buttonAriaLabel('Unpublish');
@@ -249,7 +254,18 @@ class ContentWizardPanel extends Page {
             let versionPanel = new VersionsWidget();
             await this.openContextWindow();
             await wizardContextWindow.openVersionHistory();
-            await versionPanel.waitForLoaded();
+            await versionPanel.waitForVersionsLoaded();
+            return await this.pause(200);
+        } catch (err) {
+            await this.handleError('Versions History panel should be opened in Wizard', 'err_open_versions_panel', err);
+        }
+    }
+
+    async openPublishingReportWidget() {
+        try {
+            let wizardContextWindow = new WizardContextPanel();
+            await this.openContextWindow();
+            await wizardContextWindow.openPublishReportWidget();
             return await this.pause(200);
         } catch (err) {
             await this.handleError('Versions History panel should be opened in Wizard', 'err_open_versions_panel', err);
@@ -394,7 +410,7 @@ class ContentWizardPanel extends Page {
 
     async waitForOpened() {
         try {
-            await this.waitForElementDisplayed(this.displayNameInput, appConst.longTimeout);
+            await this.waitForElementDisplayed(this.displayNameControl, appConst.longTimeout);
             return await this.pause(200);
         } catch (err) {
             await this.handleError('Content wizard should be opened', 'err_wizard_opened', err);
