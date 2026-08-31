@@ -8,7 +8,7 @@ const studioUtils = require('../libs/studio.utils.js');
 const contentBuilder = require("../libs/content.builder");
 const DeleteContentDialog = require('../page_objects/delete.content.dialog');
 const ArchiveBrowsePanel = require('../page_objects/archive/archive.browse.panel');
-const ConfirmValueDialog = require('../page_objects/confirm.content.delete.dialog');
+const ConfirmValueDialog = require('../page_objects/confirm.value.dialog');
 const ArchiveRestoreDialog = require('../page_objects/archive/archive.restore.dialog');
 const assert = require('node:assert');
 const ArchiveBrowseContextPanel = require('../page_objects/archive/archive.browse.context.panel');
@@ -50,11 +50,11 @@ describe.skip('archive.muiltiselect.restore.spec: tests for restore several item
             await studioUtils.findContentAndClickCheckBox(FOLDER2.displayName);
             // 2. Click on 'Archive...' menu item in the Context menu
             await contentBrowsePanel.rightClickOnItemByDisplayName(FOLDER2.displayName);
-            await contentBrowsePanel.clickOnMenuItem(appConst.GRID_CONTEXT_MENU.ARCHIVE);
+            await contentBrowsePanel.clickOnMenuItem(appConst.GRID_CONTEXT_MENU.DELETE);
             await deleteContentDialog.waitForDialogOpened();
             await studioUtils.saveScreenshot('folder_to_archive2');
             // 3. Click on 'Archive' button in Archive/Delete modal dialog:
-            await deleteContentDialog.clickOnArchiveButton();
+            await deleteContentDialog.clickOnDeleteButton();
             // 4. Verify that 'Confirm Archive' dialog is loaded:
             await confirmValueDialog.waitForDialogOpened();
             await confirmValueDialog.typeNumberOrName(2);
@@ -87,7 +87,7 @@ describe.skip('archive.muiltiselect.restore.spec: tests for restore several item
             await archiveRestoreDialog.clickOnRestoreButton();
             await confirmValueDialog.waitForDialogOpened();
             // 5. Click on Cancel button in the modal dialog:
-            await confirmValueDialog.clickOnCancelButton();
+            await confirmValueDialog.clickOnCloseButton();
             // 6. Verify that both dialogs are closed:
             await confirmValueDialog.waitForDialogClosed();
             await archiveRestoreDialog.waitForClosed();
@@ -157,12 +157,12 @@ describe.skip('archive.muiltiselect.restore.spec: tests for restore several item
             // 1. Select a folder
             await studioUtils.findContentAndClickCheckBox(FOLDER_DISPLAY_NAME);
             // 2. Archive this folder with children:
-            await contentBrowsePanel.clickOnArchiveButton();
+            await contentBrowsePanel.clickOnDeleteButton();
             await deleteContentDialog.waitForDialogOpened();
             await deleteContentDialog.clickOnLogMessageLinkAndShowInput();
             // 3. Insert Archive message:
             await deleteContentDialog.typeTextInArchiveMessageInput(TEST_ARCHIVE_LOG_MSG);
-            await deleteContentDialog.clickOnArchiveButton();
+            await deleteContentDialog.clickOnDeleteButton();
             // 4. Confirm the archiving
             await confirmValueDialog.waitForDialogOpened();
             await confirmValueDialog.typeNumberOrName(11);
@@ -171,7 +171,7 @@ describe.skip('archive.muiltiselect.restore.spec: tests for restore several item
             await studioUtils.openArchivePanel();
             await archiveBrowsePanel.clickOnCheckboxAndSelectRowByName(FOLDER_NAME);
             await studioUtils.saveScreenshot('parent_folder_archived_message');
-            await archiveBrowsePanel.openContextWindowPanel();
+            await archiveBrowsePanel.openContextWindow();
             // 6. Open Versions widget:
             await archiveBrowseContextPanel.openVersionHistory();
             await studioUtils.saveScreenshot('parent_folder_archived_message_versions_widget');
@@ -199,7 +199,7 @@ describe.skip('archive.muiltiselect.restore.spec: tests for restore several item
             await archiveFilterPanel.pause(500);
             await archiveBrowsePanel.clickOnCheckboxAndSelectRowByName(CHILD_ARCHIVED_CONTENT_NAME);
             // 3. Open Versions widget
-            await archiveBrowsePanel.openContextWindowPanel();
+            await archiveBrowsePanel.openContextWindow();
             await archiveBrowseContextPanel.openVersionHistory();
             await studioUtils.saveScreenshot('child_image_archived_message_versions_widget');
             // 7. Verify that the Archive message is displayed for the child item in the Versions Widget:

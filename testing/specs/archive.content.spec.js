@@ -115,7 +115,7 @@ describe('archive.content.spec: tests for archiving content', function () {
             let message = await contentBrowsePanel.waitForNotificationMessage();
             await studioUtils.saveScreenshot('folder_to_restore_notification');
             let expectedMessage = appConst.itemIsRestored(FOLDER2.displayName);
-            //assert.equal(message, expectedMessage, 'Expected notification message should appear');
+            assert.equal(message, expectedMessage, 'Expected notification message should appear');
             await archiveBrowsePanel.waitForContentNotDisplayed(FOLDER2.displayName);
             // 5. Verify the content is present in Content Browse Panel
             await studioUtils.switchToContentMode();
@@ -187,7 +187,7 @@ describe('archive.content.spec: tests for archiving content', function () {
             // 5. Verify the notification message
             let message = await contentBrowsePanel.waitForNotificationMessage();
             let expectedMessage = appConst.itemIsDeleted(FOLDER1.displayName);
-            //assert.equal(message, expectedMessage, 'Expected notification message should appear');
+            assert.equal(message, expectedMessage, 'Expected notification message should appear');
         });
 
     beforeEach(async () => {

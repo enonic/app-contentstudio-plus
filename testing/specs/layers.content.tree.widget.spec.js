@@ -9,7 +9,7 @@ const SettingsBrowsePanel = require('../page_objects/project/settings.browse.pan
 const ContentBrowsePanel = require('../page_objects/browsepanel/content.browse.panel');
 const contentBuilder = require('../libs/content.builder');
 const appConst = require('../libs/app_const');
-const ConfirmValueDialog = require('../page_objects/confirm.content.delete.dialog');
+const ConfirmValueDialog = require('../page_objects/confirm.value.dialog');
 const ContentPublishDialog = require('../page_objects/content.publish.dialog');
 
 describe.skip('layers.content.tree.widget.spec - tests for Layers  Tree  in the widget', function () {

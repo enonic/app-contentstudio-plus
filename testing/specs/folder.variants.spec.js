@@ -100,7 +100,7 @@ describe.skip('folder.variants.spec - tests for Create Variant modal dialog', fu
             assert.equal(actualMessage, NOT_AVAILABLE_MESSAGE, "'Not available' message should appear in the dialog");
         });
 
-    it("GIVEN 'create variant dialog' is opened WHEN Cancel butoon has been clicked THEN the dialog should be closed",
+    it("GIVEN 'create variant dialog' is opened WHEN Cancel button has been clicked THEN the dialog should be closed",
         async () => {
             let createVariantDialog = new CreateVariantDialog();
             // 1. Select the folder and open Variants widget:

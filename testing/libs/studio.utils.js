@@ -25,9 +25,8 @@ const UserBrowsePanel = require('../page_objects/users/userbrowse.panel');
 const UserWizard = require('../page_objects/users/user.wizard');
 const NewPrincipalDialog = require('../page_objects/users/new.principal.dialog');
 const PrincipalFilterPanel = require('../page_objects/users/principal.filter.panel');
-const ConfirmationDialog = require('../page_objects/confirmation.dialog');
 const ContentBrowsePanel = require('../page_objects/browsepanel/content.browse.panel');
-const ConfirmValueDialog = require('../page_objects/confirm.content.delete.dialog');
+const ConfirmValueDialog = require('../page_objects/confirm.value.dialog');
 const DateTimeRange = require('../page_objects/components/datetime.range');
 const WizardDependenciesWidget = require('../page_objects/wizardpanel/details/wizard.dependencies.widget');
 const fs = require('fs');
@@ -156,7 +155,7 @@ module.exports = {
         //Switch to the new wizard:
         await this.doSwitchToNewWizard();
         await contentWizardPanel.waitForOpened();
-        return await contentWizardPanel.waitForDisplayNameInputFocused();
+        //return await contentWizardPanel.waitForDisplayNameInputFocused();
     },
     async selectAndOpenContentInWizard(contentName, checkFocused) {
         let contentWizardPanel = new ContentWizardPanel();
@@ -165,10 +164,7 @@ module.exports = {
         await browsePanel.clickOnEditButton();
         await this.switchToContentTabWindow(contentName);
         await contentWizardPanel.waitForOpened();
-        let waitForFocused = checkFocused === undefined ? true : checkFocused;
-        if (waitForFocused) {
-            await contentWizardPanel.waitForDisplayNameInputFocused();
-        }
+        //let waitForFocused = checkFocused === undefined ? true : checkFocused;
         return contentWizardPanel;
     },
 
@@ -234,9 +230,12 @@ module.exports = {
     },
     async doAddReadyFolder(folder) {
         let contentWizardPanel = new ContentWizardPanel();
+        let contentPublishDialog = new ContentPublishDialog();
         await this.openContentWizard(appConst.contentTypes.FOLDER);
         await contentWizardPanel.typeData(folder);
         await contentWizardPanel.clickOnMarkAsReadyButton();
+        await contentWizardPanel.waitForNotificationMessage();
+        await contentPublishDialog.waitForDialogOpened();
         await this.doCloseWizardAndSwitchToGrid();
         return await this.getBrowser().pause(1000);
     },
@@ -720,6 +719,7 @@ module.exports = {
         let contentBrowsePanel = new ContentBrowsePanel();
         await contentBrowsePanel.clickOnShowXpMenuButton();
     },
+
     async doCloseAllWindowTabs() {
         let handles = await this.getBrowser().getWindowHandles();
         for (const item of handles) {

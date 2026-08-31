@@ -168,7 +168,7 @@ class BaseVersionsWidget extends Page {
     // waits for Version Widget is loaded, Exception will be thrown after the timeout exceeded
     async waitForVersionsLoaded() {
         try {
-            await this.waitForElementDisplayed(this.versionsWidget, appConst.mediumTimeout)
+            await this.waitForElementDisplayed(this.versionsWidget);
         } catch (err) {
             await this.handleError('Version Widget was not loaded', 'err_load_versions_widget', err);
         }

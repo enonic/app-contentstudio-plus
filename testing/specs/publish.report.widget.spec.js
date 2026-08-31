@@ -38,7 +38,7 @@ describe.skip('publish.report.widget.spec: tests for publish report widget', fun
             // 1. Select and open the folder:
             await studioUtils.selectAndOpenContentInWizard(FOLDER1.displayName);
             // 2. Open 'Publish Report' widget:
-            await contentWizard.openPublishReportWidget();
+            await contentWizard.openPublishingReportWidget();
             await publishReportWidget.waitForWidgetLoaded();
             // 3. Verify that 'Generate' button should not be displayed:
             await publishReportWidget.waitForGenerateButtonNotDisplayed();
@@ -59,7 +59,7 @@ describe.skip('publish.report.widget.spec: tests for publish report widget', fun
             await contentPublishDialog.clickOnPublishNowButton();
             await contentWizard.waitForNotificationMessage();
             // 2. Open 'Publish Report' widget:
-            await contentWizard.openPublishReportWidget();
+            await contentWizard.openPublishingReportWidget();
             await publishReportWidget.waitForWidgetLoaded();
             // 3. Verify that 'Generate' button is displayed:
             await publishReportWidget.waitForGenerateButtonEnabled();
@@ -80,7 +80,7 @@ describe.skip('publish.report.widget.spec: tests for publish report widget', fun
             // 1. Select and open the existing published folder:
             await studioUtils.selectAndOpenContentInWizard(FOLDER1.displayName);
             // 2. Open 'Publish Report' widget:
-            await contentWizard.openPublishReportWidget();
+            await contentWizard.openPublishingReportWidget();
             await publishReportWidget.waitForWidgetLoaded();
             // 3. Enter a date in the future:
             await publishReportWidget.typeInFromDateInput(DATE_IN_FUTURE);
@@ -98,7 +98,7 @@ describe.skip('publish.report.widget.spec: tests for publish report widget', fun
             // 1. Select and open the existing published folder:
             await studioUtils.selectAndOpenContentInWizard(FOLDER1.displayName);
             // 2. Open 'Publish Report' widget:
-            await contentWizard.openPublishReportWidget();
+            await contentWizard.openPublishingReportWidget();
             await publishReportWidget.waitForWidgetLoaded();
             // 3. Enter an invalid date in the future:
             await publishReportWidget.typeInFromDateInput(INVALID_DATE);
@@ -116,7 +116,7 @@ describe.skip('publish.report.widget.spec: tests for publish report widget', fun
             // 1. Select and open the existing published folder:
             await studioUtils.selectAndOpenContentInWizard(FOLDER1.displayName);
             // 2. Open 'Publish Report' widget:
-            await contentWizard.openPublishReportWidget();
+            await contentWizard.openPublishingReportWidget();
             await publishReportWidget.waitForWidgetLoaded();
             // 3. Enter an invalid date in the future:
             await publishReportWidget.typeInFromDateInput(DATE_IN_PAST);

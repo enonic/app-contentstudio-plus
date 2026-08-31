@@ -2,14 +2,21 @@
  * Created on 02.08.2019.
  */
 const appConst = require('../../libs/app_const');
-const lib = require('../../libs/elements');
+const {BUTTONS} = require('../../libs/elements');
 const Page = require('../page');
 const XPATH = {
-    container: "//div[contains(@id,'DateTimeRange')]",
-    onlineFromDateTime: "//div[contains(@id,'DateTimePicker') and preceding-sibling::label[text()='Online from']]//input[contains(@id,'TextInput')]",
-    onlineFromPickerPopup: "//div[contains(@id,'DateTimePicker') and preceding-sibling::label[text()='Online from']]//div[contains(@id,'DateTimePickerPopup')]",
-    onlineToPickerPopup: "//div[contains(@id,'DateTimePicker') and preceding-sibling::label[text()='Online to']]//div[contains(@id,'DateTimePickerPopup')]",
-    onlineToDateTime: "//div[contains(@id,'DateTimePicker') and preceding-sibling::label[text()='Online to']]//input[contains(@id,'TextInput')]",
+    container: `//div[@data-component='PublishScheduleForm']`,
+    onlineFromDateTime: `//div[@data-component='DatePicker.Root' and descendant::label[contains(.,'Online from')]]//input`,
+    onlineToDateTime: `//div[@data-component='DatePicker.Root' and descendant::label[contains(.,'Online to')]]//input`,
+    onlineFromTrigger: `//div[@data-component='DatePicker.Root' and descendant::label[contains(.,'Online from')]]//button[@data-component='DatePicker.Trigger']`,
+    onlineToTrigger: `//div[@data-component='DatePicker.Root' and descendant::label[contains(.,'Online to')]]//button[@data-component='DatePicker.Trigger']`,
+    // Validation message (e.g. 'Invalid format. Use YYYY-MM-DD hh:mm') shown below each input:
+    onlineFromValidationRecord: `//div[@data-component='DatePicker.Root' and descendant::label[contains(.,'Online from')]]//div[contains(@class,'text-error')]`,
+    onlineToValidationRecord: `//div[@data-component='DatePicker.Root' and descendant::label[contains(.,'Online to')]]//div[contains(@class,'text-error')]`,
+    // The date picker dialog is portaled out of the form; each Content is matched to its own field
+    // by joining its @aria-labelledby to the corresponding trigger's @id:
+    onlineFromPickerPopup: `//div[@data-component='DatePicker.Content' and @data-state='open' and @aria-labelledby=//div[@data-component='DatePicker.Root' and descendant::label[contains(.,'Online from')]]//button[@data-component='DatePicker.Trigger']/@id]`,
+    onlineToPickerPopup: `//div[@data-component='DatePicker.Content' and @data-state='open' and @aria-labelledby=//div[@data-component='DatePicker.Root' and descendant::label[contains(.,'Online to')]]//button[@data-component='DatePicker.Trigger']/@id]`,
     validationRecording: `//div[contains(@id,'ValidationRecordingViewer')]//li`,
 };
 
@@ -29,21 +36,37 @@ class DateTimeRange extends Page {
         return this.parentContainer + XPATH.container + XPATH.onlineToDateTime;
     }
 
-    get validationRecord() {
-        return this.parentContainer + lib.FORM_VIEW + lib.OCCURRENCE_ERROR_BLOCK;
+    get onlineFromTriggerButton() {
+        return this.parentContainer + XPATH.container + XPATH.onlineFromTrigger;
+    }
+
+    get onlineToTriggerButton() {
+        return this.parentContainer + XPATH.container + XPATH.onlineToTrigger;
+    }
+
+    get onlineToValidationRecording() {
+        return this.parentContainer + XPATH.container + XPATH.onlineToValidationRecord;
+    }
+
+    get onlineFromValidationRecording() {
+        return this.parentContainer + XPATH.container + XPATH.onlineFromValidationRecord;
     }
 
     clearOnlineFrom() {
-        return this.clearTextInput(this.parentContainer + this.onlineFromDateTimeInput);
+        return this.clearInputText(this.parentContainer + this.onlineFromDateTimeInput);
     }
 
     async showOnlineToPickerPopup() {
-        await this.clickOnElement(this.onlineToDateTimeInput);
-        return await this.pause(300);
+        try {
+            await this.clickOnElement(this.onlineToTriggerButton);
+            return await this.pause(300);
+        } catch (err) {
+            await this.handleError('DateTimeRange - showOnlineToPickerPopup', 'err_show_online_to_picker_popup', err);
+        }
     }
 
     async showOnlineFromPickerPopup() {
-        await this.clickOnElement(this.onlineFromDateTimeInput);
+        await this.clickOnElement(this.onlineFromTriggerButton);
         return await this.pause(300);
     }
 
@@ -73,21 +96,36 @@ class DateTimeRange extends Page {
         return this.typeTextInInput(this.onlineToDateTimeInput, value);
     }
 
-
-    waitForValidationRecording(ms) {
-        return this.waitForElementDisplayed(this.validationRecord, ms);
+    async waitForOnlineToValidationRecording() {
+        return await this.waitForElementDisplayed(this.onlineToValidationRecording, appConst.mediumTimeout);
     }
 
-    isValidationRecordingDisplayed() {
-        return this.isElementDisplayed(this.validationRecord);
+    waitForOnlineFromValidationRecording() {
+        return this.waitForElementDisplayed(this.onlineFromValidationRecording, appConst.mediumTimeout);
     }
 
-    async getValidationRecord() {
+    waitForOnlineToValidationRecordingNotDisplayed() {
+        return this.waitForElementNotDisplayed(this.onlineToValidationRecording, appConst.shortTimeout);
+    }
+
+    waitForOnlineFromValidationRecordingNotDisplayed() {
+        return this.waitForElementNotDisplayed(this.onlineFromValidationRecording, appConst.shortTimeout);
+    }
+
+
+    async getOnlineToValidationRecord() {
         try {
-            return await this.getText(this.validationRecord);
+            return await this.getText(this.onlineToValidationRecording);
         } catch (err) {
-            await this.saveScreenshot('err_schedule_validation_record');
-            throw new Error('getting Validation text: ' + err);
+            await this.handleError('DateTimeRange - validation record.', 'err_schedule_validation_record', err);
+        }
+    }
+
+    async getOnlineFromValidationRecord() {
+        try {
+            return await this.getText(this.onlineFromValidationRecording);
+        } catch (err) {
+            await this.handleError('DateTimeRange - validation record.', 'err_schedule_validation_record', err);
         }
     }
 
@@ -99,7 +137,7 @@ class DateTimeRange extends Page {
         try {
             return await this.waitUntilDisplayed(XPATH.onlineFromPickerPopup, appConst.shortTimeout);
         } catch (err) {
-            throw new Error("Online from picker popup should be opened!" + err);
+            await this.handleError('DateTimeRange - Online from picker popup', 'err_online_from_picker_popup', err);
         }
     }
 
@@ -116,10 +154,14 @@ class DateTimeRange extends Page {
     }
 
     async clickOnHoursArrowOnlineFrom() {
-        let selector = XPATH.onlineFromPickerPopup + "//a[@class='next']/span";
-        let elems = await this.findElements(selector);
-        await elems[0].click();
-        return await this.pause(300);
+        try {
+            let selector = XPATH.onlineFromPickerPopup + "//a[@class='next']/span";
+            let elems = await this.findElements(selector);
+            await elems[0].click();
+            return await this.pause(300);
+        } catch (err) {
+            await this.handleError('DateTimeRange - try to click on HoursArrow online From', 'err_click_on_hours_arrow_online_from', err);
+        }
     }
 }
 

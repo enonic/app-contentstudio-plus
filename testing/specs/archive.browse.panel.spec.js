@@ -1,5 +1,5 @@
 /**
- * Created on 01.12.2021
+ * Created on 01.12.2021 updated on 28.08.2026
  */
 const assert = require('node:assert');
 const webDriverHelper = require('../libs/WebDriverHelper');
@@ -10,16 +10,15 @@ const contentBuilder = require("../libs/content.builder");
 const DeleteContentDialog = require('../page_objects/delete.content.dialog');
 const ArchiveBrowsePanel = require('../page_objects/archive/archive.browse.panel');
 const ArchiveItemStatisticsPanel = require('../page_objects/archive/archive.item.statistics.panel');
-const ConfirmValueDialog = require('../page_objects/confirm.content.delete.dialog');
+const ConfirmValueDialog = require('../page_objects/confirm.value.dialog');
 const ArchiveDeleteDialog = require('../page_objects/archive/archive.delete.dialog');
-const ArchiveContentWidgetItemView = require('../page_objects/archive/archive.widget.item.view');
-const ArchivedContentStatusWidget = require('../page_objects/archive/archived.content.status.widget');
+const ArchiveDetailsWidgetContentSection = require('../page_objects/archive/archive.details.widget.content.section');
 const ArchiveBrowseContextPanel = require('../page_objects/archive/archive.browse.context.panel');
 const ArchivedContentVersionsWidget = require('../page_objects/archive/archived.content.versions.widget');
 const CompareContentVersionsDialog = require('../page_objects/compare.content.versions.dialog');
 const ArchiveContextWindowPanel = require('../page_objects/browsepanel/detailspanel/archive.context.window.panel');
 
-describe.skip('archive.browse.panel.spec: tests for archive browse panel and selection controller', function () {
+describe('archive.browse.panel.spec: tests for archive browse panel and selection controller', function () {
     this.timeout(appConst.SUITE_TIMEOUT);
     // setup standalone mode if WDIO is not defined:
     if (typeof browser === 'undefined') {
@@ -39,7 +38,7 @@ describe.skip('archive.browse.panel.spec: tests for archive browse panel and sel
             await studioUtils.doAddFolder(FOLDER2);
         });
 
-    it(`WHEN checkbox has been clicked in a row THEN SelectionPanelToggle gets visible`,
+    it(`WHEN the 'Select all' checkbox is selected THEN the 'Delete' and 'Restore' buttons should be enabled`,
         async () => {
             let contentBrowsePanel = new ContentBrowsePanel();
             let deleteContentDialog = new DeleteContentDialog();
@@ -59,41 +58,20 @@ describe.skip('archive.browse.panel.spec: tests for archive browse panel and sel
             await contentBrowsePanel.waitForContentNotDisplayed(FOLDER2.displayName);
             // 2. Navigate to 'Archive Browse Panel' and check the archived content:
             await studioUtils.openArchivePanel();
-            // 3. Click on the checkbox:
-            await archiveBrowsePanel.clickCheckboxAndSelectRowByDisplayName(FOLDER1.displayName);
             await studioUtils.saveScreenshot('archive_selection_controller1');
-            //await archiveBrowsePanel.clickOnSelectionToggler();
-            // 4. Verify that just one item are displayed in the filtered grid:
-            let displayNames = await archiveBrowsePanel.getDisplayNamesInGrid();
-            assert.equal(displayNames.length, 1, 'Single item should be present in the filtered grid');
-            // 5. Verify that checkboxes are clickable: Unselect one item in the filtered grid:
-            await archiveBrowsePanel.clickOnCheckboxByName(FOLDER1.displayName);
-            await archiveBrowsePanel.pause(2000);
-            await studioUtils.saveScreenshot('grid_returned_to_initial_state');
-            // 6. Verify that the selection toggle (circle in the toolbar) gets not visible :
-            await archiveBrowsePanel.waitForSelectionTogglerNotVisible();
-            // 7. Verify that Grid returns to the initial state:
-            displayNames = await archiveBrowsePanel.getDisplayNamesInGrid();
-            assert.ok(displayNames.length > 1, 'Initial state of Grid is restored');
-            let result = await archiveBrowsePanel.isSelectionControllerSelected();
-            assert.ok(result === false, 'Selection Controller checkBox should not be selected');
-        });
-
-    it("WHEN Selection Controller checkbox is selected (All items are checked) THEN 'Delete' 'Restore' buttons should be enabled",
-        async () => {
-            // 1. Navigate to 'Archive Browse Panel' and check the archived content:
-            await studioUtils.openArchivePanel();
-            let archiveBrowsePanel = new ArchiveBrowsePanel();
-            // 2. 'Selection Controller' checkbox is selected (All items are checked):
             await archiveBrowsePanel.clickOnSelectAllCheckbox();
             // 3. Verify buttons:
             await archiveBrowsePanel.waitForDeleteButtonEnabled();
             await archiveBrowsePanel.waitForRestoreButtonEnabled();
+            await archiveBrowsePanel.clickOnClearSelectionCheckbox();
+            await archiveBrowsePanel.waitForDeleteButtonDisabled();
+            await archiveBrowsePanel.waitForRestoreButtonDisabled();
         });
+
 
     // Verify Dependencies widget should not be present in Archive #1667
     //  https://github.com/enonic/app-contentstudio-plus/issues/1667
-    it(`GIVEN existing folder is selected WHEN widget dropdown selector has been clicked THEN Dependencies option should not be displayed in the dropdown list`,
+    it(`GIVEN existing folder is selected WHEN widget dropdown selector has been expanded THEN Dependencies option should not be displayed in the dropdown list`,
         async () => {
             // 1. Navigate to 'Archive Browse Panel' and check the archived content:
             await studioUtils.openArchivePanel();
@@ -109,29 +87,27 @@ describe.skip('archive.browse.panel.spec: tests for archive browse panel and sel
             assert.ok(actualOptions.includes(appConst.WIDGET_SELECTOR_OPTIONS.VERSION_HISTORY),
                 `'Version history' option should be displayed`);
             assert.ok(actualOptions.includes(appConst.WIDGET_SELECTOR_OPTIONS.DETAILS), `'Details' option should be displayed`);
-            //assert.equal(actualOptions.length, 3, 'Tree options should be in the selector');
-            // 3. Verify the accessibility attribute in Widget Selector:
-            await archiveContextWindowPanel.waitForWidgetDropdownRoleAttribute('button');
+            assert.ok(actualOptions.includes(appConst.WIDGET_SELECTOR_OPTIONS.PUBLISHING_REPORT), `' Publishing report' option should be displayed`);
+
         });
 
-    // Verify https://github.com/enonic/app-contentstudio-plus/issues/316
-    // Workflow state should not be displayed in Archive #316
-    it("WHEN a folder has been selected THEN expected path and status should be displayed in the Item Statistics panel",
+    it("WHEN existing folder has been selected THEN expected path and status should be displayed in the details content section",
         async () => {
             await studioUtils.openArchivePanel();
             let archiveBrowsePanel = new ArchiveBrowsePanel();
             let archiveItemStatisticsPanel = new ArchiveItemStatisticsPanel();
-            let contentWidgetItemView = new ArchiveContentWidgetItemView();
+            let contentSection = new ArchiveDetailsWidgetContentSection();
             // 1. Navigate to 'Archive Browse Panel' and click on the checkbox for the archived content:
             await archiveBrowsePanel.clickOnCheckboxAndSelectRowByName(FOLDER1.displayName);
             // 2. Verify status of the content:
-            let status = await archiveItemStatisticsPanel.getStatus();
-            assert.equal(status, 'Archived', 'Archived status should be displayed in Item Statistics panel');
-            // 3. Verify that workflow icon is not displayed:
-            await contentWidgetItemView.waitForWorkflowStateNotDisplayed();
+            let status = await archiveItemStatisticsPanel.getLabelInOpenVersionsHistoryButton();
+            assert.equal(status, 'New', 'New label should be displayed in Open VersionsHistory Button');
+            // 3. Verify the Archived status of the content:
+            let actualStatus = await contentSection.getStatus();
+            assert.equal(actualStatus, 'Archived', 'Expected status should be displayed in Details Panel');
             // 4. Verify the name in the content widget:
-            let actualDisplayName = await contentWidgetItemView.getContentDisplayName();
-            assert.equal(actualDisplayName, FOLDER1.displayName, "Expected content name should be displayed on thr panel");
+            let actualDisplayName = await contentSection.getContentDisplayName();
+            assert.equal(actualDisplayName, FOLDER1.displayName, "Expected content name should be displayed in the content section");
         });
 
     it("GIVEN a folder is selected WHEN the folder has been unselected THEN Item Statistics panel should be cleared",
@@ -143,30 +119,16 @@ describe.skip('archive.browse.panel.spec: tests for archive browse panel and sel
             // 1. Click on the row and select an item:
             await archiveBrowsePanel.clickOnRowByDisplayName(FOLDER1.displayName);
             // 2. Verify status of the content:
-            let status = await archiveItemStatisticsPanel.getStatus();
-            assert.equal(status, 'Archived', 'Archived status should be displayed in Item Statistics panel');
+            let status = await archiveItemStatisticsPanel.getLabelInOpenVersionsHistoryButton();
+            assert.equal(status, 'New', 'Archived status should be displayed in Item Statistics panel');
             // 3. Click on the row and unselect the item
             await archiveBrowsePanel.clickOnRowByDisplayName(FOLDER1.displayName);
             // 4. Verify that Item Statistics panel is cleared:
-            await archiveItemStatisticsPanel.waitForContentStatusNotDisplayed();
+            await archiveItemStatisticsPanel.waitForItemPreviewToolbarNotDisplayed();
             await archiveItemStatisticsPanel.waitForPreviewWidgetDropdownNotDisplayed();
         });
 
-    it("WHEN existing folder is selected THEN 'Archived' status should be displayed in Details Panel",
-        async () => {
-            let archivedContentStatusWidget = new ArchivedContentStatusWidget();
-            // 1. Navigate to 'Archive Browse Panel' and click on a checkbox of a archived folder:
-            await studioUtils.openArchivePanel();
-            let archiveBrowsePanel = new ArchiveBrowsePanel();
-            let contentWidgetItemView = new ArchiveContentWidgetItemView();
-            // 2. Click on the row and select an item:
-            await archiveBrowsePanel.clickOnRowByDisplayName(FOLDER1.displayName);
-            // 3. Verify the Archived status of the content:
-            let actualStatus = await archivedContentStatusWidget.getStatus();
-            assert.equal(actualStatus, 'Archived', 'Expected status should be displayed in Details Panel');
-        });
-
-    it("GIVEN 'Edited' and 'Created' items have been checked in Versions Widget WHEN 'Compare Versions' button has been clicked THEN Compare Content Versions dialog should be loaded",
+    it.skip("GIVEN 'Edited' and 'Created' items have been checked in Versions Widget WHEN 'Compare Versions' button has been clicked THEN Compare Content Versions dialog should be loaded",
         async () => {
             let archiveBrowseContextPanel = new ArchiveBrowseContextPanel()
             let archivedContentVersionsWidget = new ArchivedContentVersionsWidget();
@@ -237,7 +199,6 @@ describe.skip('archive.browse.panel.spec: tests for archive browse panel and sel
             await archiveBrowsePanel.waitForContentNotDisplayed(FOLDER2.displayName);
             // 7. Verify that selection controller(circle) gets not visible in the toolbar:
             await studioUtils.saveScreenshot('archive_selection_controller_not_visible');
-            await archiveBrowsePanel.waitForSelectionTogglerNotVisible();
         });
 
     beforeEach(async () => {

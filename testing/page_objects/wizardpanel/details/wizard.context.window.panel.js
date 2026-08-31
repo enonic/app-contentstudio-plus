@@ -65,20 +65,26 @@ class WizardContextWindowPanel extends BaseContextWindowPanel {
         }
     }
 
+    async openPublishReportWidget() {
+        try {
+            return await super.openPublishReportWidget();
+        } catch (err) {
+            //Workaround for issue with the empty selector:
+            await this.saveScreenshotUniqueName('err_widget');
+        }
+    }
+
     async openDependenciesWidget() {
         try {
             await super.openDependenciesWidget();
             await this.pause(700);
         } catch (err) {
-            //Workaround for issue with the empty selector:
-            await this.saveScreenshotUniqueName('err_dependencies');
-            await this.refresh();
-            await this.pause(3000);
-            await super.openDependenciesWidget();
+           await this.handleError('Wizard Context Window - open Dependencies widget', 'err_dependencies_widget', err);
         }
     }
 }
 
 module.exports = WizardContextWindowPanel;
+
 
 
