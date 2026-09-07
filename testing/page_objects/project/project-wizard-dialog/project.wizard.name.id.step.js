@@ -81,7 +81,7 @@ class ProjectWizardDialogNameAndIdStep extends ProjectWizardDialog {
 
     async getProjectNameValidationMessage() {
         await this.waitForElementDisplayed(this.projectNameValidationMessage, appConst.shortTimeout);
-        return await this.getText(this.projectIdentifierValidationMessage);
+        return await this.getText(this.projectNameValidationMessage);
     }
 
     async waitForProjectIdentifierValidationMessageNotVisible() {

@@ -6,7 +6,6 @@ const XPATH = {
     dataComponent: "//div[@data-component='ComboBoxInput']",
     comboBoxListInput: "//div[contains(@id,'ComboBoxListInput')]",
     listItemViewer: "//div[contains(@id,'ComboBoxDisplayValueViewer')]",
-    comboboxList: "//ul[contains(@id,'ComboBoxList))",
     optionByText: text => {
         return `//div[contains(@id,'ComboBoxDisplayValueViewer') and text()='${text}']`
     },

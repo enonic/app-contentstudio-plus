@@ -22,7 +22,7 @@ class OccurrencesFormView extends Page {
 
     // Validation recording
     get showDetailsButton() {
-        return lib.FORM_VIEW + XPATH.validationBlock + XPATH.showDetailsButton;
+        return COMMON.INPUTS.FORM_RENDERER_DATA_COMPONENT + XPATH.validationBlock + XPATH.showDetailsButton;
     }
 
     get inputOccurrenceErrorRecording() {

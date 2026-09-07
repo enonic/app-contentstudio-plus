@@ -78,7 +78,7 @@ const COMMON = {
         formatDropDownHandle: `//span[contains(@class,'cke_combo__styles') and descendant::a[@class='cke_combo_button']]`,
     }
 };
-const ARCHIVE = {};
+
 const WIZARD = {
     DISPLAY_NAME_CONTROL:
         "//*[(self::button or self::textarea) and (@data-component='DisplayNameInput' or @placeholder='Display Name')]",

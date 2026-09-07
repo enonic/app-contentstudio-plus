@@ -40,8 +40,8 @@ class ContentDuplicateDialog extends Page {
 
     async isIncludeCheckboxSelected(displayName) {
         let locator = XPATH.container + XPATH.includeChildCheckboxByDisplayName(displayName) + "/input[@type='checkbox']";
-        let checkboxEl = await this.findElements(locator);
-        return checkboxEl[0].isSelected(locator);
+        let checkboxEls = await this.findElements(locator);
+        return checkboxEls.length > 0 ? await checkboxEls[0].isSelected() : false;
     }
 
     async waitForCloseButtonDisplayed() {
