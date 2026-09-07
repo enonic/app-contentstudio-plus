@@ -1,34 +1,25 @@
 const Page = require('../page');
-const lib = require('../../libs/elements');
+const { BUTTONS, COMMON } = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
 
 const XPATH = {
-    container: `//div[contains(@id,'IssueDetailsDialog')]`,
-    commentButton: `//button[contains(@id,'DialogButton') and child::span[text()='Comment']]`,
-    commentAndCloseRequestButton: `//button[contains(@id,'DialogButton') and child::span[text()='Comment & Close Request']]`,
-    commentAndCloseTaskButton: `//button[contains(@id,'DialogButton') and child::span[text()='Comment & Close Task']]`,
-    issueCommentTextArea: `//div[contains(@id,'IssueCommentTextArea')]`,
-
-    issueCommentsListItemByText:
-        text => `//div[contains(@id,'IssueCommentsListItem') and descendant::p[@class='inplace-text' and text()='${text}']]`,
+    container: `//div[@data-component='IssueDialogDetailsContent']`,
+    commentsPanelDiv: `//div[@role='tabpanel' and contains(@id,'comments')]`,
+    noCommentsMessage: "//div[text()='No comments yet']",
+    commentsListDiv: "//div[@data-component='IssueCommentsList']",
+    issueCommentsListItemByText: (text) =>
+        XPATH.commentsListDiv + `//div[@data-component='IssueCommentItem' and descendant::div[text()='${text}']]`,
+    // in the edit mode the comment text is shown in the textarea, so the item can not be located by its text:
+    commentItemInEditMode: "//div[@data-component='IssueCommentItem' and descendant::textarea[@aria-label='Comment']]",
 };
 
 class IssueDetailsDialogCommentsTab extends Page {
-
     get issueCommentTextArea() {
-        return XPATH.container + XPATH.issueCommentTextArea + lib.TEXT_AREA;
+        return XPATH.container + XPATH.commentsPanelDiv + COMMON.INPUTS.textAreaByName('comment');
     }
 
     get commentButton() {
-        return XPATH.container + XPATH.commentButton;
-    }
-
-    get commentAndCloseRequestButton() {
-        return XPATH.container + XPATH.commentAndCloseRequestButton;
-    }
-
-    get commentAndCloseTaskButton() {
-        return XPATH.container + XPATH.commentAndCloseTaskButton;
+        return XPATH.container + COMMON.FOOTER_ELEMENT + BUTTONS.buttonByLabel('Comment');
     }
 
     isCommentTextAreaDisplayed() {
@@ -39,10 +30,12 @@ class IssueDetailsDialogCommentsTab extends Page {
         return this.isElementDisplayed(this.commentButton);
     }
 
-    waitForCommentButtonEnabled() {
-        return this.waitForElementEnabled(this.commentButton).catch(err => {
-            throw  new Error('Issue Details Dialog,Comments tab  ' + err);
-        })
+    async waitForCommentButtonEnabled() {
+        try {
+            await this.waitForElementEnabled(this.commentButton);
+        } catch (err) {
+            throw new Error('Issue Details Dialog,Comments tab  ' + err);
+        }
     }
 
     async clickOnCommentButton() {
@@ -54,7 +47,7 @@ class IssueDetailsDialogCommentsTab extends Page {
         return this.typeTextInInput(this.issueCommentTextArea, text);
     }
 
-    isCommentPresent(text) {
+    isCommentDisplayed(text) {
         let selector = XPATH.issueCommentsListItemByText(text);
         return this.isElementDisplayed(selector);
     }
@@ -63,56 +56,91 @@ class IssueDetailsDialogCommentsTab extends Page {
         return this.isElementEnabled(this.commentButton);
     }
 
-    updateComment(comment, text) {
-        let commentTextArea = XPATH.issueCommentsListItemByText(comment) + `//textarea`;
-        return this.typeTextInInput(commentTextArea, text);
+    // clears the textarea of the comment that is being edited then types the new text (Edit menu item should be clicked before):
+    async updateComment(text) {
+        try {
+            let commentTextArea = XPATH.commentsListDiv + XPATH.commentItemInEditMode + '//textarea';
+            await this.waitForElementDisplayed(commentTextArea, appConst.shortTimeout);
+            await this.clearInputText(commentTextArea);
+            return await this.typeTextInInput(commentTextArea, text);
+        } catch (err) {
+            await this.handleError('Comments Tab - error when updating the comment', 'err_update_comment', err);
+        }
     }
 
-    async clickOnSaveCommentButton(text) {
-        let saveButton = XPATH.issueCommentsListItemByText(text) + `//button[contains(@id,'Button') and child::span[text()='Save']]`;
-        await this.clickOnElement(saveButton);
-        return await this.pause(500);
+    // clicks on 'Save' button in the comment that is being edited:
+    async clickOnSaveCommentButton() {
+        try {
+            let saveButton = XPATH.commentsListDiv + XPATH.commentItemInEditMode + BUTTONS.buttonByLabel('Save');
+            await this.waitForElementDisplayed(saveButton, appConst.shortTimeout);
+            await this.clickOnElement(saveButton);
+            return await this.pause(300);
+        } catch (err) {
+            await this.handleError(
+                `Comments Tab - error when clicking on 'Save' button in the comment`,
+                'err_save_comment',
+                err,
+            );
+        }
     }
 
     async clickOnEditCommentMenuItem(text) {
-        let selector = XPATH.issueCommentsListItemByText(text) + `//h6/i[contains(@class,'icon-menu')]`;
-        await this.waitForElementDisplayed(selector, appConst.shortTimeout);
-        //clicks on menu and opens menu items
-        await this.clickOnElement(selector);
-        await this.pause(700);
-        let editMenuItem = `//li[contains(@id,'MenuItem') and text()='Edit']`;
+        let menuButton = XPATH.issueCommentsListItemByText(text) + BUTTONS.BUTTON_MENU_POPUP;
+        await this.waitForElementDisplayed(menuButton, appConst.shortTimeout);
+        //click on menu button then click on menu item
+        await this.clickOnElement(menuButton);
+        await this.pause(300);
+        let editMenuItem = COMMON.menuItemByText('Edit');
         let elems = await this.getDisplayedElements(editMenuItem);
         await elems[0].click();
-        await this.pause(500);
+        await this.pause(300);
     }
 
     async clickOnDeleteCommentMenuItem(text) {
-        let selector = XPATH.issueCommentsListItemByText(text) + `//h6/i[contains(@class,'icon-menu')]`;
-        await this.waitForElementDisplayed(selector, appConst.shortTimeout);
-        await this.clickOnElement(selector);
-        await this.pause(500);
-        let deleteMenuItem = `//li[contains(@id,'MenuItem') and text()='Delete']`;
+        let menuButton = XPATH.issueCommentsListItemByText(text) + BUTTONS.BUTTON_MENU_POPUP;
+        await this.waitForElementDisplayed(menuButton, appConst.shortTimeout);
+        // click on menu button then click on menu item
+        await this.clickOnElement(menuButton);
+        await this.pause(300);
+        let deleteMenuItem = COMMON.menuItemByText('Delete');
         let elems = await this.getDisplayedElements(deleteMenuItem);
         await elems[0].click();
-        await this.pause(500);
+        await this.pause(300);
     }
 
-    waitForCommentAndCloseRequestButtonDisplayed() {
-        return this.waitForElementDisplayed(this.commentAndCloseRequestButton, appConst.shortTimeout).catch(err => {
-            throw new Error('Comments Tab   ' + err);
-        })
+    async waitForCommentButtonDisabled() {
+        try {
+            return await this.waitForElementDisabled(this.commentButton, appConst.shortTimeout);
+        } catch (err) {
+            await this.handleError('Comments Tab, Comment button should be disabled', 'err_comment_btn_disabled', err);
+        }
     }
 
-    waitForCommentAndCloseTaskButtonDisplayed() {
-        return this.waitForElementDisplayed(this.commentAndCloseTaskButton, appConst.shortTimeout).catch(err => {
-            throw  new Error('Comments Tab   ' + err);
-        })
+    async waitForNoCommentsYetMessageDisplayed() {
+        try {
+            let locator = XPATH.commentsListDiv + XPATH.noCommentsMessage;
+            return await this.waitForElementDisplayed(locator);
+        } catch (err) {
+            await this.handleError(
+                'Comments Tab, wait for "No comments yet" message displayed',
+                'err_no_comments_message',
+                err,
+            );
+        }
     }
 
-    waitForCommentButtonDisabled() {
-        return this.waitForElementDisabled(this.commentButton, appConst.shortTimeout).catch(err => {
-            throw  new Error('Issue Details Dialog  ' + err);
-        })
+    async waitForNoCommentsYetMessageNotDisplayed() {
+        try {
+            let locator = XPATH.commentsListDiv + XPATH.noCommentsMessage;
+            return this.waitForElementNotDisplayed(locator);
+        } catch (err) {
+            await this.handleError(
+                'Comments Tab, wait for "No comments yet" message not displayed',
+                'err_no_comments_msg',
+                err,
+            );
+        }
     }
 }
+
 module.exports = IssueDetailsDialogCommentsTab;

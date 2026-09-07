@@ -1,19 +1,19 @@
 /**
  * Created on 12/2/2017.
  */
-const LauncherPanel = require('../page_objects/launcher.panel');
 const HomePage = require('../page_objects/home.page');
 const LoginPage = require('../page_objects/login.page');
 const BrowsePanel = require('../page_objects/browsepanel/content.browse.panel');
 const FilterPanel = require('../page_objects/browsepanel/content.filter.panel');
 const appConst = require('./app_const');
-const {BUTTONS, COMMON} = require('./elements');
+const { BUTTONS, COMMON } = require('./elements');
 const NewContentDialog = require('../page_objects/browsepanel/new.content.dialog');
 const ContentWizardPanel = require('../page_objects/wizardpanel/content.wizard.panel');
 const webDriverHelper = require('./WebDriverHelper');
 const IssueListDialog = require('../page_objects/issue/issue.list.dialog');
 const CreateIssueDialog = require('../page_objects/issue/create.issue.dialog');
 const DeleteContentDialog = require('../page_objects/delete.content.dialog');
+const InsertLinkDialog = require('../page_objects/wizardpanel/html-area/insert.link.modal.dialog.cke');
 const ContentPublishDialog = require('../page_objects/content.publish.dialog');
 const BrowseContextWindowPanel = require('../page_objects/browsepanel/detailspanel/browse.context.window.panel');
 const BrowseDependenciesWidget = require('../page_objects/browsepanel/detailspanel/browse.dependencies.widget');
@@ -25,21 +25,25 @@ const UserBrowsePanel = require('../page_objects/users/userbrowse.panel');
 const UserWizard = require('../page_objects/users/user.wizard');
 const NewPrincipalDialog = require('../page_objects/users/new.principal.dialog');
 const PrincipalFilterPanel = require('../page_objects/users/principal.filter.panel');
+const ConfirmationDialog = require('../page_objects/confirmation.dialog');
 const ContentBrowsePanel = require('../page_objects/browsepanel/content.browse.panel');
-const ConfirmValueDialog = require('../page_objects/confirm.value.dialog');
+const ConfirmValueDialog = require('../page_objects/confirm.content.delete.dialog');
 const DateTimeRange = require('../page_objects/components/datetime.range');
 const WizardDependenciesWidget = require('../page_objects/wizardpanel/details/wizard.dependencies.widget');
 const fs = require('fs');
 const path = require('path');
-const PropertiesWidgetItem = require('../page_objects/browsepanel/detailspanel/properties.widget.itemview');
-const ArchiveBrowsePanel = require('../page_objects/archive/archive.browse.panel');
+const DetailsWidgetInfoSection = require('../page_objects/browsepanel/detailspanel/details.widget.info.section');
 const EditSettingDialog = require('../page_objects/details_panel/edit.settings.dialog');
+const InsertLinkDialogContentPanel = require('../page_objects/wizardpanel/html-area/insert.link.modal.dialog.content.panel');
+const InsertLinkDialogUrlPanel = require('../page_objects/wizardpanel/html-area/insert.link.modal.dialog.url.panel');
+const PageInspectionPanel = require('../page_objects/wizardpanel/liveform/inspection/page.inspection.panel');
+const LiveFormPanel = require('../page_objects/wizardpanel/liveform/live.form.panel');
 const BrowseLayersWidget = require('../page_objects/browsepanel/detailspanel/browse.layers.widget');
 const VariantsExtension = require('../page_objects/details_panel/variants.extension');
 const WizardContextPanel = require('../page_objects/wizardpanel/details/wizard.context.window.panel');
+const ArchiveBrowsePanel = require("../page_objects/archive/archive.browse.panel");
 
 module.exports = {
-
     getBrowser() {
         if (typeof browser !== 'undefined') {
             return browser;
@@ -56,25 +60,48 @@ module.exports = {
         return await this.getBrowser().execute(script2);
     },
 
-    insertTextInCKE: function (id, text) {
+    insertTextInCKE(id, text) {
         let script = `CKEDITOR.instances['${id}'].insertText('${text}')`;
-        return this.getBrowser().execute(script).then(() => {
-            let script2 = `CKEDITOR.instances['${id}'].fire('change')`;
-            return this.getBrowser().execute(script2);
-        })
+        return this.getBrowser()
+            .execute(script)
+            .then(() => {
+                let script2 = `CKEDITOR.instances['${id}'].fire('change')`;
+                return this.getBrowser().execute(script2);
+            });
+    },
+    setTextInCKE(id, text) {
+        let script = `CKEDITOR.instances['${id}'].setData('${text}')`;
+        return this.getBrowser()
+            .execute(script)
+            .then(() => {
+                let script2 = `CKEDITOR.instances['${id}'].fire('change')`;
+                return this.getBrowser().execute(script2);
+            });
+    },
+    async getTextFromShadow(hostSelector, innerSelector) {
+        try {
+            return await this.getBrowser().$(hostSelector).shadow$(innerSelector).getText();
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_shadow_dom');
+            throw new Error(`Error when getting text from shadow DOM: ${screenshot} ` + err);
+        }
     },
     async waitForElementDisplayed(selector, ms) {
         let element = await this.getBrowser().$(selector);
         return await element.waitForDisplayed(ms);
     },
+    async waitForElementNotDisplayed(selector, ms) {
+        let element = await this.getBrowser().$(selector);
+        return await element.waitForDisplayed(ms);
+    },
     async clickOnElement(selector) {
         let el = await this.getBrowser().$(selector);
-        await el.waitForDisplayed({timeout: 2000});
+        await el.waitForDisplayed({ timeout: 2000 });
         return await el.click();
     },
     async getText(selector) {
         let el = await this.getBrowser().$(selector);
-        await el.waitForDisplayed({timeout: 2000});
+        await el.waitForDisplayed({ timeout: 2000 });
         return await el.getText();
     },
 
@@ -86,6 +113,16 @@ module.exports = {
         return this.getBrowser().getPageSource();
     },
 
+    async switchToFrameBySrc(src) {
+        try {
+            let selector = `//iframe[contains(@src,'${src}')]`;
+            let el = await this.getBrowser().$(selector);
+            await el.waitForDisplayed({ timeout: 2000 });
+            await this.getBrowser().switchFrame(el);
+        } catch (err) {
+            throw new Error('Error when switch to frame  ' + err);
+        }
+    },
     getTitle() {
         return this.getBrowser().getTitle();
     },
@@ -97,11 +134,59 @@ module.exports = {
     scrollViewPort(viewportElement, step) {
         return this.getBrowser().execute('arguments[0].scrollTop=arguments[1]', viewportElement, step);
     },
+    async insertUrlLinkInCke(text, url) {
+        let insertLinkDialog = new InsertLinkDialog();
+        let insertLinkDialogUrlPanel = new InsertLinkDialogUrlPanel();
+        await insertLinkDialog.clickOnBarItem('URL');
+        await insertLinkDialog.typeInLinkTextInput(text);
+        await insertLinkDialogUrlPanel.typeUrl(url);
+        await insertLinkDialog.clickOnInsertButtonAndWaitForClosed();
+        return await this.getBrowser().pause(200);
+    },
+    async insertTellLinkInCke(text, tel) {
+        let insertLinkDialog = new InsertLinkDialog();
+        let insertLinkDialogUrlPanel = new InsertLinkDialogUrlPanel();
+        await insertLinkDialog.clickOnBarItem('URL');
+        await insertLinkDialog.typeInLinkTextInput(text);
+        await insertLinkDialogUrlPanel.clickOnUrlTypeMenuOption(appConst.URL_TYPE_OPTION.TEL);
+        await insertLinkDialogUrlPanel.typeUrl(tel);
+        await insertLinkDialog.clickOnInsertButtonAndWaitForClosed();
+        return await this.getBrowser().pause(200);
+    },
+    async insertEmailLinkInCke(text, email) {
+        let insertLinkDialog = new InsertLinkDialog();
+        await insertLinkDialog.clickOnBarItem('Email');
+        await insertLinkDialog.typeInLinkTextInput(text);
+        await insertLinkDialog.typeTextInEmailInput(email);
+        await this.saveScreenshot('email_link_dialog');
+        await insertLinkDialog.clickOnInsertButtonAndWaitForClosed();
+        return await insertLinkDialog.pause(200);
+    },
 
+    async insertContentLinkInCke(text, contentDisplayName, entireProject) {
+        try {
+            let insertLinkDialog = new InsertLinkDialog();
+            let insertLinkDialogContentPanel = new InsertLinkDialogContentPanel();
+            await insertLinkDialog.typeInLinkTextInput(text);
+            if (entireProject) {
+                await insertLinkDialogContentPanel.clickOnShowContentFromEntireProjectCheckbox();
+            }
+            await insertLinkDialogContentPanel.selectTargetInContentSelector(contentDisplayName);
+            // After inserting a search text the dropdown should be switched to 'Flat mode', click on the folder(don't need to click on 'Apply' button):
+            //await insertLinkDialogContentPanel.clickOnOptionByDisplayName(contentDisplayName);
+            await this.saveScreenshot('content_link_dialog');
+            await insertLinkDialog.clickOnInsertButton();
+            return await insertLinkDialog.pause(700);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_insert_content_link');
+            throw new Error(`Error when insert content link in CKE, screenshot: ${screenshot} ` + err);
+        }
+    },
     async doCloseCurrentBrowserTab() {
         let title = await this.getBrowser().getTitle();
-        if (title != 'Enonic XP Home') {
-            return await this.getBrowser().closeWindow();
+        if (title !== 'Enonic XP Home') {
+            //return await this.getBrowser().closeWindow();
+            return await this.getBrowser().execute('window.close();');
         }
     },
     async openIssuesListDialog() {
@@ -111,7 +196,19 @@ module.exports = {
         await issueListDialog.waitForDialogOpened();
         return await issueListDialog.pause(300);
     },
-
+    async openCreateIssueDialog() {
+        try {
+            let browsePanel = new BrowsePanel();
+            let createIssueDialog = new CreateIssueDialog();
+            let issueListDialog = new IssueListDialog();
+            await browsePanel.clickOnShowIssuesListButton();
+            await issueListDialog.waitForDialogOpened();
+            await issueListDialog.clickOnNewIssueButton();
+            return await createIssueDialog.waitForDialogLoaded();
+        } catch (err) {
+            throw new Error("Error when opening 'Create Issue Dialog' " + err);
+        }
+    },
     async createPublishRequest(text) {
         try {
             let browsePanel = new BrowsePanel();
@@ -119,8 +216,7 @@ module.exports = {
             await browsePanel.openPublishMenuSelectItem(appConst.PUBLISH_MENU.REQUEST_PUBLISH);
             await createRequestPublishDialog.waitForDialogLoaded();
             await createRequestPublishDialog.pause(300);
-            await createRequestPublishDialog.clickOnNextButton();
-            await createRequestPublishDialog.typeInChangesInput(text);
+            await createRequestPublishDialog.typeInTitleInput(text);
             return await createRequestPublishDialog.clickOnCreateRequestButton();
         } catch (err) {
             throw new Error("Error when create 'Publish Request' " + err);
@@ -134,19 +230,18 @@ module.exports = {
     },
     async openBrowseDetailsPanel() {
         let browsePanel = new BrowsePanel();
-        let browseContextWindowPanel = new BrowseContextWindowPanel();
-        let result = await browseContextWindowPanel.isPanelVisible();
-        if (!result) {
+        let browseContextWindow = new BrowseContextWindowPanel();
+        let result = await browsePanel.isShowContextPanelButtonDisplayed();
+        if (result) {
             await browsePanel.clickOnDetailsPanelToggleButton();
         }
-        await browseContextWindowPanel.waitForLoaded();
+        await browseContextWindow.waitForLoaded();
         await browsePanel.waitForSpinnerNotVisible(appConst.TIMEOUT_5);
         return await browsePanel.pause(1000);
     },
     async openContentWizard(contentType) {
         let browsePanel = new BrowsePanel();
         let newContentDialog = new NewContentDialog();
-        let contentWizardPanel = new ContentWizardPanel();
         await browsePanel.waitForNewButtonEnabled(appConst.mediumTimeout);
         await browsePanel.clickOnNewButton();
         await newContentDialog.waitForOpened();
@@ -154,7 +249,6 @@ module.exports = {
         await newContentDialog.clickOnContentType(contentType);
         //Switch to the new wizard:
         await this.doSwitchToNewWizard();
-        await contentWizardPanel.waitForOpened();
         //return await contentWizardPanel.waitForDisplayNameInputFocused();
     },
     async selectAndOpenContentInWizard(contentName, checkFocused) {
@@ -164,7 +258,10 @@ module.exports = {
         await browsePanel.clickOnEditButton();
         await this.switchToContentTabWindow(contentName);
         await contentWizardPanel.waitForOpened();
-        //let waitForFocused = checkFocused === undefined ? true : checkFocused;
+        let waitForFocused = checkFocused === undefined ? true : checkFocused;
+        if (waitForFocused) {
+            //await contentWizardPanel.waitForDisplayNameInputFocused();
+        }
         return contentWizardPanel;
     },
 
@@ -175,10 +272,10 @@ module.exports = {
         await browsePanel.clickOnEditButton();
         await this.switchToContentTabWindow(contentDisplayName);
         await contentWizardPanel.waitForOpened();
-        let waitForFocused = checkFocused === undefined ? true : checkFocused;
-        if (waitForFocused) {
-            await contentWizardPanel.waitForDisplayNameInputFocused();
-        }
+        // let waitForFocused = checkFocused === undefined ? true : checkFocused;
+        // if (waitForFocused) {
+        //     await contentWizardPanel.waitForDisplayNameInputFocused();
+        // }
         return contentWizardPanel;
     },
 
@@ -192,7 +289,7 @@ module.exports = {
         //timeout = ms === undefined ? appConst.longTimeout : ms;
         let waitForFocused = checkFocused === undefined ? true : checkFocused;
         if (waitForFocused) {
-            await contentWizardPanel.waitForDisplayNameInputFocused();
+            //await contentWizardPanel.waitForDisplayNameInputFocused();
         }
         return contentWizardPanel;
     },
@@ -218,11 +315,12 @@ module.exports = {
     },
     async doAddPublishedShortcut(shortcut) {
         let contentWizardPanel = new ContentWizardPanel();
-        //Open new shortcut-wizard:
+        // Open new shortcut-wizard:
         await this.openContentWizard(appConst.contentTypes.SHORTCUT);
         await contentWizardPanel.typeData(shortcut);
         await contentWizardPanel.clickOnMarkAsReadyButton();
         let contentPublishDialog = new ContentPublishDialog();
+        await contentPublishDialog.waitForDialogOpened();
         await contentPublishDialog.clickOnPublishNowButton();
         await contentPublishDialog.waitForDialogClosed();
         await contentWizardPanel.waitForNotificationMessage();
@@ -245,6 +343,7 @@ module.exports = {
         await contentWizardPanel.typeData(folder);
         await contentWizardPanel.clickOnMarkAsReadyButton();
         let contentPublishDialog = new ContentPublishDialog();
+        await contentPublishDialog.waitForDialogOpened();
         await contentPublishDialog.clickOnPublishNowButton();
         await contentPublishDialog.waitForDialogClosed();
         await contentWizardPanel.waitForNotificationMessage();
@@ -257,7 +356,11 @@ module.exports = {
         await this.openContentWizard(appConst.contentTypes.FOLDER);
         await contentWizardPanel.typeData(folder);
         // 2. Save the folder:
-        await contentWizardPanel.waitAndClickOnSave();
+        // TODO workaround
+        if (!(await contentWizardPanel.isSaveButtonDisabled())) {
+            await contentWizardPanel.waitAndClickOnSave();
+        }
+
         // 3.Close the wizard:
         await this.doCloseWizardAndSwitchToGrid();
         return await this.getBrowser().pause(1000);
@@ -266,26 +369,23 @@ module.exports = {
         await this.doCloseCurrentBrowserTab();
         return await this.doSwitchToContentBrowsePanel();
     },
-    async switchToTab(title) {
-        let handles = await this.getBrowser().getWindowHandles();
-        for (const handle of handles) {
-            await this.getBrowser().switchToWindow(handle);
-            let currentTitle = await this.getBrowser().getTitle();
-            if (currentTitle === title) {
-                return handle;
-            }
-        }
-        throw new Error('Browser tab with title ' + title + ' was not found');
+    async doCloseWizardAndSwitchContentStudioTab() {
+        await this.doCloseCurrentBrowserTab();
+        let browsePanel = new BrowsePanel();
+        await this.switchToTab(appConst.BROWSER_XP_TITLES.CONTENT_STUDIO);
+        await browsePanel.pause(400);
     },
-
     async doAddSite(site, noControllers) {
         let contentWizardPanel = new ContentWizardPanel();
-        //1. Open new site-wizard:
+        let pageInspectionPanel = new PageInspectionPanel();
+        // 1. Open new site-wizard:
         await this.openContentWizard(appConst.contentTypes.SITE);
         await contentWizardPanel.typeData(site);
-        //2. Type the data and save:
+        // 2. Type the data and save:
         if (site.data.controller) {
-            await contentWizardPanel.selectPageDescriptor(site.data.controller);
+            let wizardContextWindow = await contentWizardPanel.openContextWindow();
+            await wizardContextWindow.selectItemInWidgetSelector(appConst.WIDGET_SELECTOR_OPTIONS.PAGE);
+            await pageInspectionPanel.selectPageTemplateOrController(site.data.controller);
         }
         if (noControllers) {
             await contentWizardPanel.waitAndClickOnSave();
@@ -293,7 +393,6 @@ module.exports = {
         await this.doCloseCurrentBrowserTab();
         await this.doSwitchToContentBrowsePanel();
         return await this.getBrowser().pause(1000);
-
     },
     async doAddReadySite(site) {
         let contentWizardPanel = new ContentWizardPanel();
@@ -329,10 +428,15 @@ module.exports = {
 
     async doAddPageTemplate(siteName, template) {
         let contentWizardPanel = new ContentWizardPanel();
+        let liveFormPanel = new LiveFormPanel();
         await this.doOpenPageTemplateWizard(siteName);
         await contentWizardPanel.typeData(template);
-        // auto saving should be here:
-        await contentWizardPanel.selectPageDescriptor(template.data.controllerDisplayName);
+        // auto-saving of template should be after selecting a controller:
+        let pageInspectionPanel = new PageInspectionPanel();
+        let wizardContextWindow = await contentWizardPanel.openContextWindow();
+        await wizardContextWindow.selectItemInWidgetSelector(appConst.WIDGET_SELECTOR_OPTIONS.PAGE);
+        await pageInspectionPanel.selectPageTemplateOrController(template.data.controllerDisplayName);
+        await contentWizardPanel.waitForNotificationMessage();
         await this.saveScreenshot(template.displayName + '_created');
         await this.doCloseCurrentBrowserTab();
         await this.doSwitchToContentBrowsePanel();
@@ -402,20 +506,18 @@ module.exports = {
         await contentWizardPanel.waitAndClickOnSave();
         await this.doCloseCurrentBrowserTab();
         await this.doSwitchToContentBrowsePanel();
-        return await this.getBrowser().pause(1000);
+        return await this.getBrowser().pause(500);
     },
     async findAndSelectItem(name) {
         try {
             let browsePanel = new BrowsePanel();
             await this.typeNameInFilterPanel(name);
             await browsePanel.waitForRowByNameVisible(name);
-            await browsePanel.pause(200);
             await browsePanel.clickOnRowByName(name);
-            await browsePanel.waitForSpinnerNotVisible(appConst.longTimeout);
-            return await browsePanel.pause(300);
+            //await browsePanel.waitForSpinnerNotVisible(appConst.longTimeout);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_select_item');
-            throw new Error(`Select a item, error screenshot:${screenshot} ` + err);
+            throw new Error(`Select the item in grid, screenshot:${screenshot} ` + err);
         }
     },
     async saveScreenshotUniqueName(namePart) {
@@ -434,7 +536,7 @@ module.exports = {
             return await browsePanel.pause(300);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_select_item');
-            throw new Error(`Select a item, error screenshot, screenshot: ${screenshot} ` + err);
+            throw new Error(`Select the item in grid, screenshot:${screenshot} ` + err);
         }
     },
 
@@ -442,23 +544,24 @@ module.exports = {
     async doDeleteContent(name) {
         let browsePanel = new BrowsePanel();
         let deleteContentDialog = new DeleteContentDialog();
-        await this.findAndSelectItem(name);
+        await this.findContentAndClickCheckBox(name);
         // Open modal dialog:
         await browsePanel.clickOnDeleteButton();
         await deleteContentDialog.waitForDialogOpened();
         // Click on 'Delete' menu item in the modal dialog:
         await deleteContentDialog.clickOnDeleteButton();
-        return await deleteContentDialog.waitForDialogClosed();
+        await deleteContentDialog.waitForDialogClosed();
+        await browsePanel.pause(1000);
     },
     async doDeleteContentByDisplayName(displayName) {
         let browsePanel = new BrowsePanel();
         let deleteContentDialog = new DeleteContentDialog();
         await this.findAndSelectItemByDisplayName(displayName);
         // Open modal dialog:
-        await browsePanel.clickOnArchiveButton();
+        await browsePanel.clickOnDeleteButton();
         await deleteContentDialog.waitForDialogOpened();
         // Click on 'Delete' menu item in the modal dialog:
-        await deleteContentDialog.clickOnDeleteMenuItem();
+        await deleteContentDialog.clickOnDeleteButton();
         return await deleteContentDialog.waitForDialogClosed();
     },
     async selectContentAndOpenWizard(name) {
@@ -473,9 +576,8 @@ module.exports = {
         //switch to the opened wizard:
         await this.switchToContentTabWindow(displayName);
         await contentWizardPanel.waitForOpened();
-        await contentWizardPanel.waitForSpinnerNotVisible(appConst.longTimeout);
-        await contentWizardPanel.waitForDisplayNameInputFocused();
-        await contentWizardPanel.pause(300);
+        //await contentWizardPanel.waitForDisplayNameInputFocused();
+        await contentWizardPanel.pause(100);
     },
     async findContentAndClickCheckBox(displayName) {
         let browsePanel = new BrowsePanel();
@@ -484,24 +586,36 @@ module.exports = {
         return await browsePanel.clickCheckboxAndSelectRowByDisplayName(displayName);
     },
     async selectSiteAndOpenNewWizard(siteName, contentType) {
-        let browsePanel = new BrowsePanel();
-        let newContentDialog = new NewContentDialog();
-        await this.findAndSelectItem(siteName);
-        await browsePanel.waitForNewButtonEnabled();
-        await browsePanel.clickOnNewButton();
-        await newContentDialog.waitForOpened();
-        return await this.clickOnItemInNewContentDialog(contentType);
+        try {
+            let browsePanel = new BrowsePanel();
+            let newContentDialog = new NewContentDialog();
+            await this.findContentAndClickCheckBox(siteName);
+            await browsePanel.waitForNewButtonEnabled();
+            await browsePanel.clickOnNewButton();
+            await newContentDialog.waitForOpened();
+            return await this.clickOnItemInNewContentDialog(contentType);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_new_content');
+            throw new Error(
+                `Error occurred while selecting the item in New Content dialog, screenshot: ${screenshot}` + err,
+            );
+        }
     },
     async clickOnItemInNewContentDialog(contentType) {
-        let newContentDialog = new NewContentDialog();
-        let contentWizard = new ContentWizardPanel();
-        await newContentDialog.waitForOpened();
-        await newContentDialog.typeSearchText(contentType);
-        await newContentDialog.clickOnContentType(contentType);
-        await this.doSwitchToNewWizard();
-        await contentWizard.waitForOpened();
-        await contentWizard.waitForDisplayNameInputFocused();
-        return contentWizard;
+        try {
+            let newContentDialog = new NewContentDialog();
+            let contentWizard = new ContentWizardPanel();
+            await newContentDialog.waitForOpened();
+            await newContentDialog.waitForItemsLoaded();
+            await newContentDialog.typeSearchText(contentType);
+            await newContentDialog.clickOnContentType(contentType);
+            await this.doSwitchToNewWizard();
+            await contentWizard.waitForOpened();
+            return contentWizard;
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_new_content_dlg');
+            throw new Error(`Error in New content dialog, screenshot:  ${screenshot} ` + err);
+        }
     },
     // Open delete dialog, click on 'Delete' button then type a number to delete
     async doDeleteNowAndConfirm(numberOfContents) {
@@ -527,8 +641,13 @@ module.exports = {
             let filterPanel = new FilterPanel();
             let result = await filterPanel.isPanelVisible();
             if (!result) {
+                console.log(`The Filter panel is closed, click on 'Search Panel' button`);
                 await browsePanel.clickOnSearchButton();
                 await filterPanel.waitForOpened();
+            }
+            let isDisplayed = await filterPanel.isClearButtonDisplayed();
+            if (isDisplayed) {
+                await filterPanel.clearSearchInput();
             }
             await filterPanel.typeSearchText(name);
             await browsePanel.waitForSpinnerNotVisible(appConst.longTimeout);
@@ -549,23 +668,22 @@ module.exports = {
             throw new Error('Error when opening Filter Panel! ' + err);
         }
     },
+
     async openProjectSelectionDialogAndSelectContext(context) {
         try {
             let browsePanel = new BrowsePanel();
             return await browsePanel.selectContext(context);
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_select_context');
-            throw new Error(`Error during selecting a context, screenshot:${screenshot} ` + err);
+            throw new Error(`Error occurred while selecting the context, screenshot: ${screenshot}` + err);
         }
     },
 
     async doLogout() {
-        let launcherPanel = new LauncherPanel();
         let loginPage = new LoginPage();
-        let isDisplayed = await launcherPanel.isPanelOpened();
-        if (isDisplayed) {
-            await launcherPanel.clickOnLogoutLink();
-        }
+        let homePage = new HomePage();
+        await homePage.clickOnAvatarButton();
+        await homePage.clickOnLogoutDropdownMenuItem();
         return await loginPage.waitForPageLoaded();
     },
     async navigateToContentStudioApp(userName, password) {
@@ -576,8 +694,67 @@ module.exports = {
             await this.waitForBrowsePanelAndSelectDefaultContext();
         } catch (err) {
             let screenshot = await this.saveScreenshotUniqueName('err_navigate_cs');
-            throw new Error(`Error occurred after clicking on Content Studio link in Launcher Panel,  screenshot:${screenshot}  ` + err);
+            throw new Error(`Error occurred after clicking on Content Studio link ,  screenshot:${screenshot}  ` + err);
         }
+    },
+    async navigateToContentStudioAppMobile(userName, password) {
+        await this.navigateToContentStudioApp(userName, password);
+    },
+    async doLogin(userName, password) {
+        let loginPage = new LoginPage();
+        let result = await loginPage.isLoaded();
+        if (result) {
+            await loginPage.doLogin(userName, password);
+        }
+        let homePage = new HomePage();
+        await homePage.waitForContentLinkDisplayed();
+    },
+
+
+    // Clicks on Cancel button and switches to Default project
+    async closeProjectSelectionDialog() {
+        let projectSelectionDialog = new ProjectSelectionDialog();
+        let isLoaded = await projectSelectionDialog.isDialogLoaded();
+        if (isLoaded) {
+            await projectSelectionDialog.pause(200);
+            await projectSelectionDialog.clickOnCloseButton();
+            await projectSelectionDialog.waitForDialogClosed();
+            return await this.getBrowser().pause(200);
+        }
+    },
+
+    async doSwitchToContentBrowsePanel() {
+        try {
+            let browsePanel = new BrowsePanel();
+            await this.switchToTab(appConst.BROWSER_XP_TITLES.CONTENT_STUDIO);
+            console.log('switched to content browse panel...');
+            await browsePanel.waitForGridLoaded(appConst.longTimeout);
+            return browsePanel;
+        } catch (err) {
+            throw new Error('Error when switching to Content Studio App ' + err);
+        }
+    },
+    async switchToTab(title) {
+        let handles = await this.getBrowser().getWindowHandles();
+        for (const handle of handles) {
+            await this.getBrowser().switchToWindow(handle);
+            let currentTitle = await this.getBrowser().getTitle();
+            if (currentTitle === title) {
+                return handle;
+            }
+        }
+        throw new Error('Browser tab with title ' + title + ' was not found');
+    },
+    async switchToTabContains(text) {
+        let handles = await this.getBrowser().getWindowHandles();
+        for (const handle of handles) {
+            await this.getBrowser().switchToWindow(handle);
+            let currentTitle = await this.getBrowser().getTitle();
+            if (currentTitle.includes(text)) {
+                return handle;
+            }
+        }
+        throw new Error('Browser tab with title ' + text + ' was not found');
     },
     async waitForBrowsePanelAndSelectDefaultContext() {
         try {
@@ -598,50 +775,11 @@ module.exports = {
         }
     },
 
-    async doLogin(userName, password) {
-        let loginPage = new LoginPage();
-        let result = await loginPage.isLoaded();
-        if (result) {
-            await loginPage.doLogin(userName, password);
-        }
+    async clickOnXpMenuButton() {
+        console.log('testUtils:switching to Home page...');
         let homePage = new HomePage();
-        await homePage.waitForContentLinkDisplayed();
+        let host = await homePage.getXpMenuShadowHost();
     },
-
-    async navigateToContentStudioCloseProjectSelectionDialog(userName, password) {
-        try {
-            await this.doLogin(userName, password);
-            let homePage = new HomePage();
-            await homePage.clickOnContentStudioLink();
-            await this.closeProjectSelectionDialog();
-        } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_navigate_to_studio');
-            throw new Error(`Error when navigating to Content Studio. Screenshot: ${screenshot}` + err);
-        }
-    },
-    //Clicks on Cancel button and switches to Default project
-    async closeProjectSelectionDialog() {
-        let projectSelectionDialog = new ProjectSelectionDialog();
-        let isLoaded = await projectSelectionDialog.isDialogLoaded();
-        if (isLoaded) {
-            await projectSelectionDialog.pause(200);
-            await projectSelectionDialog.clickOnCloseButton();
-            await projectSelectionDialog.waitForDialogClosed();
-            return await this.getBrowser().pause(200);
-        }
-    },
-    async doSwitchToContentBrowsePanel() {
-        try {
-            let browsePanel = new BrowsePanel();
-            await this.switchToTab(appConst.BROWSER_XP_TITLES.CONTENT_STUDIO);
-            console.log('switched to content browse panel...');
-            await browsePanel.waitForGridLoaded(appConst.longTimeout);
-            return browsePanel;
-        } catch (err) {
-            throw new Error('Error when switching to Content Studio App ' + err);
-        }
-    },
-
     async doCloseWindowTabAndSwitchToBrowsePanel() {
         await this.getBrowser().closeWindow();
         return await this.doSwitchToContentBrowsePanel();
@@ -650,31 +788,21 @@ module.exports = {
     async saveAndCloseWizard() {
         let contentWizardPanel = new ContentWizardPanel();
         await contentWizardPanel.waitAndClickOnSave();
-        await contentWizardPanel.pause(300);
+        await contentWizardPanel.pause(500);
         return await this.doCloseWindowTabAndSwitchToBrowsePanel();
     },
-    async switchToTabContains(text) {
-        let handles = await this.getBrowser().getWindowHandles();
-        for (const handle of handles) {
-            await this.getBrowser().switchToWindow(handle);
-            let currentTitle = await this.getBrowser().getTitle();
-            if (currentTitle.includes(text)) {
-                return handle;
-            }
-        }
-        throw new Error('Browser tab with title ' + text + ' was not found');
-    },
+
     async switchToContentTabWindow(contentDisplayName) {
         try {
             await this.switchToTabContains(contentDisplayName);
             let contentWizardPanel = new ContentWizardPanel();
             return await contentWizardPanel.waitForSpinnerNotVisible();
         } catch (err) {
-            await this.getBrowser().pause(1500);
+            let screenshot = await this.saveScreenshotUniqueName('err_switch_window');
+            await this.getBrowser().pause(1000);
             await this.getBrowser().switchWindow(contentDisplayName);
         }
     },
-
     async doPressBackspace() {
         await this.getBrowser().keys('\uE003');
         return await this.getBrowser().pause(200);
@@ -685,73 +813,118 @@ module.exports = {
     doPressEnter() {
         return this.getBrowser().keys('Enter');
     },
+    async doPressEscape() {
+        try {
+            let closeButtons = await this.getBrowser().$$("button[aria-label='Close']");
+            for (let btn of closeButtons) {
+                try {
+                    await btn.click();
+                    await this.getBrowser().pause(100);
+                } catch (e) {}
+            }
+        } catch (e) {}
+        let confirmationDialog = new ConfirmationDialog();
+        let res = await confirmationDialog.isDialogVisible();
+        if (res) {
+            await confirmationDialog.clickOnConfirmButton();
+            await confirmationDialog.waitForDialogClosed();
+        }
+        await this.getBrowser().keys('Escape');
+        await this.getBrowser().pause(200);
+    },
 
     async doSwitchToNewWizard() {
-        console.log('testUtils:switching to the new wizard tab...');
-        let contentWizardPanel = new ContentWizardPanel();
-        let tabs = await this.getBrowser().getWindowHandles();
-        await this.getBrowser().switchToWindow(tabs[tabs.length - 1]);
-        return await contentWizardPanel.waitForOpened();
+        try {
+            let contentWizardPanel = new ContentWizardPanel();
+            await this.doSwitchToNewTab();
+            return await contentWizardPanel.waitForOpened();
+        } catch (err) {
+            throw new Error('Error when switching to the new wizard tab ' + err);
+        }
     },
-    async doSwitchToTabByIndex(index) {
-        let tabs = await this.getBrowser().getWindowHandles();
-        await this.getBrowser().switchToWindow(tabs[index]);
-    },
-    async doSwitchToNextTab() {
+    async doSwitchToNewTab() {
         try {
             console.log('testUtils:switching to the new wizard tab...');
             let tabs = await this.getBrowser().getWindowHandles();
             await this.getBrowser().switchToWindow(tabs[tabs.length - 1]);
         } catch (err) {
+            throw new Error('Error when switching to the new browser tab ' + err);
+        }
+    },
+
+    async doSwitchToTabByIndex(index) {
+        try {
+            let tabs = await this.getBrowser().getWindowHandles();
+            await this.getBrowser().switchToWindow(tabs[index]);
+        } catch (err) {
             throw new Error('Error occurred during switching to the new browser tab ' + err);
         }
     },
-    async doSwitchToPrevTab() {
+    async doSwitchToNextTab() {
         let tabs = await this.getBrowser().getWindowHandles();
-        return await this.getBrowser().switchToWindow(tabs[tabs.length - 2]);
+        return await this.getBrowser().switchToWindow(tabs[tabs.length - 1]);
+    },
+    async doSwitchToPrevTab() {
+        try {
+            let tabs = await this.getBrowser().getWindowHandles();
+            return await this.getBrowser().switchToWindow(tabs[tabs.length - 2]);
+        } catch (err) {
+            throw new Error('Error occurred while switching to the new browser tab' + err);
+        }
+    },
+
+    async doCloseAllWindowTabsAndAndClickOnOpenXP_menu() {
+        await this.doCloseAllWindowTabs();
+        let contentBrowsePanel = new ContentBrowsePanel();
+        await contentBrowsePanel.clickOnShowXpMenuButton();
     },
     async doCloseAllWindowTabsAndNavigateToHome() {
         await this.doCloseAllWindowTabs();
         await this.navigateToHomePage();
     },
-    async doCloseAllWindowTabsAndSwitchToHome() {
-        await this.doCloseAllWindowTabs();
-        let contentBrowsePanel = new ContentBrowsePanel();
-        await contentBrowsePanel.clickOnShowXpMenuButton();
+    async navigateToHomePage() {
+        await this.getBrowser().url('http://localhost:8080/admin/');
+        await this.getBrowser().pause(500);
     },
+    async doCloseAllWindowTabs(keepTitle1 = 'Enonic XP Admin', keepTitle2 = 'Settings') {
+        const handles = await this.getBrowser().getWindowHandles();
+        const keepTitles = [keepTitle1, keepTitle2].filter(Boolean);
 
-    async doCloseAllWindowTabs() {
-        let handles = await this.getBrowser().getWindowHandles();
-        for (const item of handles) {
-            let result = await this.switchAndCheckTitle(item, ["Enonic XP Admin", "Archive"]);
-            if (!result) {
+        for (const handle of handles) {
+            await this.getBrowser().switchToWindow(handle);
+            const title = await this.getBrowser().getTitle();
+
+            const shouldKeep = keepTitles.some((keepTitle) => title.includes(keepTitle));
+            if (!shouldKeep) {
+                // Closing the last remaining window would terminate the WebDriver session,
+                // so keep it open - the caller navigates it to the home page afterwards:
+                const remaining = await this.getBrowser().getWindowHandles();
+                if (remaining.length === 1) {
+                    break;
+                }
                 await this.getBrowser().closeWindow();
                 await this.getBrowser().pause(100);
             }
         }
+        // After closeWindow() the driver still points to the closed window - switch to a live one:
+        const remainingHandles = await this.getBrowser().getWindowHandles();
+        await this.getBrowser().switchToWindow(remainingHandles[remainingHandles.length - 1]);
     },
-    async navigateToHomePage() {
-        await this.getBrowser().url('http://localhost:8080/admin/');
-        await this.getBrowser().pause(100);
-    },
-    switchAndCheckTitle(handle, reqTitle) {
-        return this.getBrowser().switchToWindow(handle).then(() => {
-            return this.getBrowser().getTitle().then(title => {
-                if (Array.isArray(reqTitle)) {
-                    return reqTitle.some(titlePart => title.includes(titlePart));
-                }
-                return title.includes(reqTitle);
-            }).catch(err => {
-                console.log('Error when getting Title' + err);
-                throw new Error('Error  ' + err);
-            })
-        });
+    async switchAndCheckTitle(handle, reqTitle) {
+        try {
+            await this.getBrowser().switchToWindow(handle);
+            let title = await this.getBrowser().getTitle();
+            return title.includes(reqTitle);
+        } catch (err) {
+            console.log('Error occurred during  checking the  title' + err);
+            throw new Error('Error  ' + err);
+        }
     },
     async saveScreenshot(name, that) {
         try {
             let screenshotsDir = path.join(__dirname, '/../build/reports/screenshots/');
             if (!fs.existsSync(screenshotsDir)) {
-                fs.mkdirSync(screenshotsDir, {recursive: true});
+                fs.mkdirSync(screenshotsDir, { recursive: true });
             }
             await this.getBrowser().saveScreenshot(screenshotsDir + name + '.png');
             console.log('screenshot is saved ' + name);
@@ -759,24 +932,29 @@ module.exports = {
             return console.log('screenshot was not saved ' + err);
         }
     },
-
+    async openDependencyWidgetInBrowsePanel() {
+        let browsePanel = new BrowsePanel();
+        let browseDependenciesWidget = new BrowseDependenciesWidget();
+        let browseContextWindow = new BrowseContextWindowPanel();
+        await browsePanel.openContextWindow();
+        await browseContextWindow.openDependenciesWidget();
+        return await browseDependenciesWidget.waitForWidgetLoaded();
+    },
     isStringEmpty(str) {
-        return (!str || 0 === str.length);
+        return !str || 0 === str.length;
     },
-
-    async openContentStudioMenu() {
-        let result = await this.isContentStudioMenuOpened();
-        if (!result) {
-            await this.waitForElementDisplayed(lib.APP_MODE_SWITCHER_TOGGLER);
-            await this.clickOnElement(lib.APP_MODE_SWITCHER_TOGGLER);
-            return await this.getBrowser().pause(200);
-        }
-    },
-
-    async isContentStudioMenuOpened() {
-        let element = await this.getBrowser().$("//div[contains(@id,'AppWrapper')]");
-        let atrValue = await element.getAttribute('class');
-        return atrValue.includes('sidebar-expanded');
+    sendRequestGetHeaders() {
+        return this.getBrowser().executeAsync(
+            'var callback = arguments[arguments.length - 1];' +
+            'var xhr = new XMLHttpRequest();' +
+            "xhr.open('GET', '', true);" +
+            'xhr.onreadystatechange = function() {' +
+            '  if (xhr.readyState == 4) {' +
+            '    callback(xhr.getAllResponseHeaders());' +
+            '  }' +
+            '};' +
+            'xhr.send();',
+        );
     },
     async openSettingsPanel() {
         try {
@@ -788,8 +966,8 @@ module.exports = {
             await settingsBrowsePanel.waitForGridLoaded(appConst.mediumTimeout);
             return settingsBrowsePanel;
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_open_settings');
-            throw new Error(`Settings Panel was not opened:screenshot: ${screenshot} ` + err);
+            await this.saveScreenshotUniqueName('err_open_settings');
+            throw new Error('Settings Panel was not opened: ' + err);
         }
     },
     async switchToContentMode() {
@@ -815,24 +993,45 @@ module.exports = {
     async waitForUsersBrowsePanelLoaded() {
         try {
             let browsePanel = new UserBrowsePanel();
-            console.log("Users app loads...");
+            console.log('Users app loads...');
             await browsePanel.waitForSpinnerNotVisible();
             return browsePanel.waitForUsersGridLoaded(appConst.mediumTimeout);
         } catch (err) {
-            throw new Error("Tried to navigate to Users App " + err);
+            throw new Error('Tried to navigate to Users App ' + err);
         }
     },
-    doSwitchToUsersApp() {
-        console.log('testUtils:switching to users app...');
-        let browsePanel = new UserBrowsePanel();
-        return this.getBrowser().switchWindow('Users - Enonic XP Admin').then(() => {
+    async navigateToApplications(userName, password) {
+        try {
+            //let launcherPanel = new LauncherPanel();
+            //let isDisplayed = await launcherPanel.isDisplayed(appConst.mediumTimeout);
+            if (true) {
+                console.log('Launcher Panel is opened, click on the `Users` link...');
+                //await launcherPanel.pause(300);
+                //await launcherPanel.clickOnApplicationsLink();
+            } else {
+                console.log('Login Page is opened, type a password and name...');
+                let loginPage = new LoginPage();
+                await loginPage.doLogin(userName, password);
+                //await launcherPanel.clickOnApplicationsLink();
+            }
+            await this.doSwitchToApplicationsBrowsePanel();
+        } catch (err) {
+            await this.saveScreenshotUniqueName('err_navigate_to_users');
+            throw new Error('error when navigate to Applications app ' + err);
+        }
+    },
+    async doSwitchToUsersApp() {
+        try {
+            console.log('testUtils:switching to users app...');
+            let browsePanel = new UserBrowsePanel();
+            await this.getBrowser().switchWindow('Users - Enonic XP Admin');
             console.log('switched to Users app...');
-            return browsePanel.waitForSpinnerNotVisible();
-        }).then(() => {
+            await browsePanel.waitForSpinnerNotVisible();
             return browsePanel.waitForUsersGridLoaded(appConst.mediumTimeout);
-        }).catch(err => {
-            throw new Error('Error when switching to Users App ' + err);
-        })
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_switch_to_users_app');
+            throw new Error(`Error during switching to Users App , screenshot:${screenshot} ` + err);
+        }
     },
     async addSystemUser(userData) {
         let userWizard = new UserWizard();
@@ -840,9 +1039,20 @@ module.exports = {
         await this.clickOnSystemOpenUserWizard();
         // 2. Type the data:
         await userWizard.typeData(userData);
+        await userWizard.clickOnRolesAndGroupsLink();
         await this.saveScreenshot(appConst.generateRandomName('user'));
         // 3. Save the data and close the wizard:
         return await this.saveAndCloseUserWizard(userData.displayName);
+    },
+    async selectAndDeleteUserItem(name) {
+        let userBrowsePanel = new UserBrowsePanel();
+        let confirmationDialog = new ConfirmationDialog();
+        await this.findAndSelectUserItem(name);
+        await userBrowsePanel.waitForDeleteButtonEnabled();
+        await userBrowsePanel.clickOnDeleteButton();
+        await confirmationDialog.waitForDialogOpened();
+        await confirmationDialog.clickOnYesButton();
+        return await userBrowsePanel.waitForSpinnerNotVisible();
     },
     async typeNameInUserFilterPanel(name) {
         let browsePanel = new UserBrowsePanel();
@@ -859,15 +1069,17 @@ module.exports = {
         await userBrowsePanel.pause(400);
         await userBrowsePanel.waitForRowByNameVisible(name);
         await userBrowsePanel.clickOnRowByName(name);
-        return await userBrowsePanel.pause(800);
+        return await userBrowsePanel.pause(300);
     },
     // Click on 'Save' button and close the wizard:
     async saveAndCloseUserWizard(displayName) {
         let wizardPanel = new UserWizard();
         let browsePanel = new UserBrowsePanel();
+        await wizardPanel.pause(200);
         await wizardPanel.waitAndClickOnSave();
+        await wizardPanel.waitForChangePasswordButtonDisplayed();
         //await wizardPanel.waitForNotificationMessage();
-        await wizardPanel.pause(2000);
+        await wizardPanel.pause(1000);
         //Click on Close icon and close the wizard:
         return await browsePanel.closeTabAndWaitForGrid(displayName);
     },
@@ -896,17 +1108,20 @@ module.exports = {
         if (elements.length === 0) {
             return [];
         }
-        let pr = elements.map(el => el.isDisplayed());
-        return await Promise.all(pr).then(result => {
+        let pr = elements.map((el) => el.isDisplayed());
+        return await Promise.all(pr).then((result) => {
             return elements.filter((el, i) => result[i]);
         });
     },
     waitUntilDisplayed(selector, ms) {
-        return this.getBrowser().waitUntil(() => {
-            return this.getDisplayedElements(selector).then(result => {
-                return result.length > 0;
-            })
-        }, {timeout: ms, timeoutMsg: 'Timeout exception. Element ' + selector + ' still not visible in: ' + ms});
+        return this.getBrowser().waitUntil(
+            () => {
+                return this.getDisplayedElements(selector).then((result) => {
+                    return result.length > 0;
+                });
+            },
+            { timeout: ms, timeoutMsg: 'Timeout exception. Element ' + selector + ' still not visible in: ' + ms },
+        );
     },
     async scheduleContent(contentName, date) {
         let contentBrowsePanel = new ContentBrowsePanel();
@@ -930,21 +1145,21 @@ module.exports = {
     async openResourceInDraft(res) {
         let currentUrl = await this.getBrowser().getUrl();
         let base = currentUrl.substring(0, currentUrl.indexOf('admin'));
-        let url = base + 'admin/site/preview/default/draft/' + res;
+        let url = base + 'admin/com.enonic.app.contentstudio/site/preview/default/draft/' + res;
         await this.loadUrl(url);
         return await this.getBrowser().pause(2000);
     },
     async loadServiceURL(serviceName, appName) {
         let currentUrl = await this.getBrowser().getUrl();
         let base = currentUrl.substring(0, currentUrl.indexOf('admin'));
-        let url = base + `/site/default/draft/_/service/${appName}/${serviceName}`;
+        let url = base + `/com.enonic.app.contentstudio/site/default/draft/_/service/${appName}/${serviceName}`;
         await this.loadUrl(url);
         return await this.getBrowser().pause(2000);
     },
     async openResourceInMaster(res) {
         let currentUrl = await this.getBrowser().getUrl();
         let base = currentUrl.substring(0, currentUrl.indexOf('admin'));
-        let url = base + 'admin/site/preview/default/master/' + res;
+        let url = base + 'admin/com.enonic.app.contentstudio/site/preview/default/master/' + res;
         await this.loadUrl(url);
         return await this.getBrowser().pause(2000);
     },
@@ -953,31 +1168,19 @@ module.exports = {
     },
 
     async openEditSettingDialog() {
-        let propertiesWidgetItem = new PropertiesWidgetItem();
+        let detailsWidgetInfoSection = new DetailsWidgetInfoSection();
         let editSettingsDialog = new EditSettingDialog();
         // 3. Click on Edit Settings :
-        await propertiesWidgetItem.clickOnEditSettingsButton();
+        await detailsWidgetInfoSection.clickOnEditSettingsButton();
         await editSettingsDialog.waitForLoaded();
         return editSettingsDialog;
     },
-    async openArchivePanel() {
-        try {
-            let archiveBrowsePanel = new ArchiveBrowsePanel();
-            let buttonLocator = COMMON.WIDGET_SIDEBAR.CONTAINER + BUTTONS.buttonAriaLabel('Archive');
-            await this.waitForElementDisplayed(buttonLocator, appConst.mediumTimeout);
-            await this.clickOnElement(buttonLocator);
-            await this.getBrowser().pause(300);
-            await archiveBrowsePanel.waitForGridLoaded(appConst.mediumTimeout);
-        } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_open_settings');
-            throw new Error(`Error Open Archive Panel:${screenshot} ` + err);
-        }
-    },
+
     async openLayersWidgetInBrowsePanel() {
         let browsePanel = new BrowsePanel();
         let browseContextWindowPanel = new BrowseContextWindowPanel();
         let browseLayersWidget = new BrowseLayersWidget();
-        await browsePanel.openContextWindowPanel();
+        await browsePanel.openContextWindow();
         await browseContextWindowPanel.openLayers();
         await browseLayersWidget.waitForWidgetLoaded();
         return browseLayersWidget;
@@ -995,5 +1198,23 @@ module.exports = {
         let locator = `//span[@class='key' and contains(.,'${keyText}')]/following-sibling::span[@class='string'][1]`;
         await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
         return await this.getText(locator);
-    }
+    },
+
+    async openArchivePanel() {
+        try {
+            let archiveBrowsePanel = new ArchiveBrowsePanel();
+            let buttonLocator = COMMON.WIDGET_SIDEBAR.CONTAINER + BUTTONS.buttonAriaLabel('Archive');
+            await this.waitForElementDisplayed(buttonLocator, appConst.mediumTimeout);
+            await this.clickOnElement(buttonLocator);
+            await this.getBrowser().pause(300);
+            await archiveBrowsePanel.waitForGridLoaded(appConst.mediumTimeout);
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_open_settings');
+            throw new Error(`Error Open Archive Panel:${screenshot} ` + err);
+        }
+    },
+
+    async saveScreen(name) {
+        await this.getBrowser().saveScreen();
+    },
 };

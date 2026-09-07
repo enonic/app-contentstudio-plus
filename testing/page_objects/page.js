@@ -363,6 +363,10 @@ class Page {
         }
     }
 
+    async isNotificationMessageDisplayed() {
+        return await this.isElementDisplayed(COMMON.NOTIFICATION_TEXT);
+    }
+
     async waitForNotificationMessage() {
         try {
             let notificationXpath = COMMON.NOTIFICATION_TEXT;

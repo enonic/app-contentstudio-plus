@@ -129,9 +129,9 @@ describe.skip('publish.report.widget.spec: tests for publish report widget', fun
         });
 
     beforeEach(async () => {
-        return await studioUtils.navigateToContentStudioCloseProjectSelectionDialog();
+        return await studioUtils.navigateToContentStudioApp();
     });
-    afterEach(() => studioUtils.doCloseAllWindowTabsAndSwitchToHome());
+    afterEach(() => studioUtils.doCloseAllWindowTabsAndNavigateToHome());
     before(() => {
         return console.log('specification is starting: ' + this.title);
     });

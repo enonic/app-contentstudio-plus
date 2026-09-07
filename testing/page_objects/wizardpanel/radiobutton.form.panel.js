@@ -1,29 +1,31 @@
 /**
- * Created on 07.09.2021
+ * Created on 07.09.2021 updated 24.04.2026
  */
 const Page = require('../page');
-const lib = require('../../libs/elements');
-const appConst = require('../../libs/app_const');
-const XPATH = {
-    radioInputs: "//div[contains(@id,'RadioButton')]//input[@type='radio']",
-    radioByName: optionName => {
-        return `//span[contains(@class,'radio-button') and child::label[text()='${optionName}']]//input`
-    },
+const {BUTTONS} = require('../../libs/elements');
 
+const XPATH = {
+    radioDataComponent:"//div[@data-component='RadioButtonInput']",
 };
 
 class RadioButtonForm extends Page {
 
     async clickOnRadio(label) {
-        let locator = XPATH.radioByName(label);
-        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
-        return await this.clickOnElement(locator);
+        try {
+            let locator = XPATH.radioDataComponent+ BUTTONS.radioButtonByLabel(label);
+            await this.waitForElementDisplayed(locator);
+            await this.clickOnElement(locator);
+            await this.pause(200);
+        }catch(err){
+            await this.handleError(`Radio button with label "${label}" is not found.`,'err_click_on_radio', err);
+        }
     }
 
     async isRadioSelected(label) {
-        let locator = XPATH.radioByName(label);
+        let locator = XPATH.radioDataComponent + BUTTONS.radioButtonByLabel(label);
         await this.waitForElementDisplayed(locator);
-        return await this.isSelected(locator);
+        let ariaChecked = await this.getAttribute(locator, 'aria-checked');
+        return ariaChecked === 'true';
     }
 }
 

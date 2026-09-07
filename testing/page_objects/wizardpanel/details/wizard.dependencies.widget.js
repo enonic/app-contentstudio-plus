@@ -5,9 +5,9 @@ const BaseDependenciesWidget = require('../../details_panel/base.dependencies.wi
 const appConst = require('../../../libs/app_const');
 
 const xpath = {
-    widget: `//div[contains(@id,'ContentWizardPanel')]//div[contains(@id,'ExtensionDependencyItemView')]`,
-    showOutboundButton: `//button/span[contains(.,'Show Outbound')]`,
-    showInboundButton: `//button/span[contains(.,'Show Inbound')]`
+    widget: `//div[contains(@id,'ContentWizardPanel')]//div[@data-component='DependenciesWidget']`,
+    showAllOutgoingButton: `//button[contains(@aria-label,'Show all outgoing')]`,
+    showAllIncomingButton: `//button[contains(@aria-label,'Show all incoming')]`,
 };
 
 class WizardDependenciesWidget extends BaseDependenciesWidget {
@@ -16,19 +16,19 @@ class WizardDependenciesWidget extends BaseDependenciesWidget {
         return xpath.widget;
     }
 
-    get showOutboundButton() {
-        return xpath.widget + xpath.showOutboundButton;
+    get showAllOutgoingButton() {
+        return xpath.widget + xpath.showAllOutgoingButton;
     }
 
-    get showInboundButton() {
-        return xpath.widget + xpath.showInboundButton;
+    get showAllIncomingButton() {
+        return xpath.widget + xpath.showAllIncomingButton;
     }
 
     isWidgetVisible() {
         return this.isElementDisplayed(this.dependenciesWidget);
     }
 
-     //waits for Dependencies Widget is loaded, returns false after the timeout exceeded
+    //waits for Dependencies Widget is loaded, returns false after the timeout exceeded
     isWidgetLoaded() {
         return this.waitForElementDisplayed(this.dependenciesWidget, appConst.shortTimeout).catch(err => {
             return false
@@ -36,12 +36,14 @@ class WizardDependenciesWidget extends BaseDependenciesWidget {
     }
 
     //waits for Version Widget is loaded, Exception will be thrown after the timeout exceeded
-    waitForWidgetLoaded() {
-        return this.waitForElementDisplayed(this.dependenciesWidget, appConst.shortTimeout).catch(err => {
-            throw new Error('Wizard: Dependencies Widget was not loaded in ' + appConst.shortTimeout);
-        });
+    async waitForWidgetLoaded() {
+        try {
+            await this.waitForElementDisplayed(this.dependenciesWidget, appConst.shortTimeout);
+            await this.pause(500);
+        } catch (err) {
+            await this.handleError('Wizard: Dependencies Widget', 'err_dependencies_widget_loaded', err);
+        }
     }
 }
+
 module.exports = WizardDependenciesWidget;
-
-

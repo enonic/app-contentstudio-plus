@@ -1,130 +1,64 @@
 /**
- * Created  on 20/11/2019
+ * Created  on 20/11/2019 updated on 20.07.2026
  */
 const Page = require('./page');
-const lib = require('../libs/elements');
 const appConst = require('../libs/app_const');
-const CompareDropdown = require('../page_objects/components/selectors/compare.versions.dropdown');
+
 const XPATH = {
-    container: `//div[contains(@id,'CompareContentVersionsDialog')]`,
-    containerLeft: `//div[contains(@class,'container left')]`,
-    containerRight: `//div[contains(@class,'container right')]`,
-    containerBottom: `//div[@class='container bottom']`,
-    revertMenuButton: "//button[contains(@id,'Button') and descendant::li[contains(@id,'MenuItem') and text()='Revert']]",
-    revertMenuItem: "//ul[contains(@id,'Menu')]/li[contains(@id,'MenuItem') and text()='Revert']",
-    showEntireContentCheckboxDiv: "//div[contains(@id,'Checkbox') and child::label[text()='Show the entire content']]",
-    listItemNameAndIconView: "//div[contains(@id,'NamesAndIconView') and not(descendant::h6[contains(.,'version')])]",
-    contentPanel: "//div[contains(@id,'ModalDialogContentPanel')]",
+    container: `//div[@data-component='CompareVersionsDialog']`,
+    dialogTitle: `//h2[@data-component='Dialog.Title']`,
+    closeButton: `//button[@data-component='Dialog.DefaultClose']`,
+    dialogBody: `//div[@data-component='Dialog.Body']`,
+    dialogFooter: `//footer[@data-component='Dialog.Footer']`,
+    // Version card in the dialog body - the column with 'Older' or 'Newer' label:
+    versionCardByLabel: label => `//div[child::span[text()='${label}']]`,
+    showEntireContentCheckboxDiv: `//div[@data-component='Checkbox' and descendant::span[text()='Show the entire content']]`,
+    versionsIdenticalMessage: `//div[@data-component='Dialog.Body']//h3[text()='Versions are identical']`,
+    // Diff entries - located by the exact 'data-key' attribute ('_name', 'language', 'workflow'...):
+    modifiedProperty: key => `//li[contains(@class,'jsondiffpatch-modified') and @data-key='${key}']`,
+    addedProperty: key => `//li[contains(@class,'jsondiffpatch-added') and @data-key='${key}']`,
+    unchangedProperty: key => `//li[contains(@class,'jsondiffpatch-unchanged') and @data-key='${key}']`,
+    // Diff entry that contains nested properties ('x', 'page'...):
+    nodeProperty: key => `//li[contains(@class,'jsondiffpatch-child-node-type-object') and @data-key='${key}']`,
 };
 
 class CompareContentVersionsDialog extends Page {
 
-    get leftRevertMenuButton() {
-        return XPATH.container + XPATH.containerLeft + XPATH.revertMenuButton;
-    }
-
-    get leftDropdownHandle() {
-        return XPATH.container + XPATH.containerLeft + lib.DROP_DOWN_HANDLE;
-    }
-
-    get rightRevertMenuButton() {
-        return XPATH.container + XPATH.containerRight + XPATH.revertMenuButton;
-    }
-
-    get rightDropdownHandle() {
-        return XPATH.container + XPATH.containerRight + lib.DROP_DOWN_HANDLE;
-    }
-
-    get olderVersionDropdownHandle() {
-        return XPATH.container + XPATH.containerLeft + lib.DROP_DOWN_HANDLE;
-    }
-
-    get cancelButtonTop() {
-        return XPATH.container + lib.CANCEL_BUTTON_TOP;
-    }
-
-    get newerVersionDropdownHandle() {
-        return XPATH.container + XPATH.containerRight + lib.DROP_DOWN_HANDLE;
+    get closeButton() {
+        return XPATH.container + XPATH.closeButton;
     }
 
     get showEntireContentCheckbox() {
         return XPATH.container + XPATH.showEntireContentCheckboxDiv + '//label';
     }
 
-    async expandLeftDropdownAndClickOnModifiedOption(index) {
-
-        let locator = XPATH.container + XPATH.containerLeft +
-                      "//div[contains(@id,'NamesAndIconView') and descendant::div[contains(@class,'version-modified')]]";
-        await this.clickOnElement(this.leftDropdownHandle);
-        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
-        let res = await this.findElements(locator);
-        await res[index].click();
-        return await this.pause(500);
-    }
-
-    async clickOnOKAndApplySelection() {
-        let compareDropdown = new CompareDropdown();
-        await compareDropdown.clickOnApplySelectionButton(XPATH.container);
-    }
-
-    async clickOnLeftRevertMenuButton() {
-        await this.waitForLeftRevertButtonDisplayed();
-        await this.clickOnElement(this.leftRevertMenuButton);
-        return await this.pause(300);
-    }
-
-    async waitForLeftRevertMenuItemDisplayed() {
+    async waitForDialogOpened() {
         try {
-            let selector = XPATH.container + XPATH.containerLeft + XPATH.revertMenuItem;
-            return await this.waitForElementDisplayed(selector, appConst.mediumTimeout);
+            await this.waitForElementDisplayed(XPATH.container);
         } catch (err) {
-            await this.handleError('Compare Content Versions Dialog', 'err_left_revert_menu_item', err);
+            await this.handleError('CompareContentVersions Dialog', 'err_compare_content_versions_dialog_loaded', err);
         }
     }
 
-    async waitForLeftRevertButtonDisplayed() {
-        return await this.waitForElementDisplayed(this.leftRevertMenuButton, appConst.mediumTimeout);
+
+    async waitForDialogClosed() {
+        try {
+            return await this.waitForElementNotDisplayed(XPATH.container);
+        } catch (err) {
+            await this.handleError('CompareContentVersions Dialog', 'err_compare_content_versions_dialog_closed', err);
+        }
     }
 
-    async waitForRightRevertMenuButtonDisplayed() {
-        return await this.waitForElementDisplayed(this.rightRevertMenuButton, appConst.mediumTimeout);
+    async getDialogTitle() {
+        let locator = XPATH.container + XPATH.dialogTitle;
+        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+        return await this.getText(locator);
     }
 
-    async waitForRightRevertMenuButtonDisabled() {
-        return await this.waitForElementDisabled(this.rightRevertMenuButton, appConst.mediumTimeout);
-    }
-
-    async waitForRightRevertMenuButtonEnabled() {
-        return await this.waitForElementEnabled(this.rightRevertMenuButton, appConst.mediumTimeout);
-    }
-
-    async waitForLeftRevertMenuButtonEnabled() {
-        return await this.waitForElementEnabled(this.leftRevertMenuButton, appConst.mediumTimeout);
-    }
-
-    async waitForLeftRevertMenuButtonDisabled() {
-        return await this.waitForElementDisabled(this.leftRevertMenuButton, appConst.mediumTimeout);
-    }
-
-    async clickOnRightRevertButton() {
-        await this.waitForElementDisplayed(this.leftRevertMenuButton, appConst.mediumTimeout);
-        return await this.clickOnElement(this.leftRevertMenuButton);
-    }
-
-    waitForDialogOpened() {
-        return this.waitForElementDisplayed(XPATH.container, appConst.mediumTimeout).catch(err => {
-            throw new Error("CompareContentVersions Dialog is not loaded " + err);
-        })
-    }
-
-    waitForDialogClosed() {
-        return this.waitForElementNotDisplayed(XPATH.container, appConst.mediumTimeout).catch(err => {
-            throw new Error("CompareContentVersions Dialog must be closed " + err);
-        })
-    }
-
+    // Clicks on the 'Close' button in the dialog header:
     async clickOnCancelButtonTop() {
-        await this.clickOnElement(this.cancelButtonTop);
+        await this.waitForElementDisplayed(this.closeButton, appConst.mediumTimeout);
+        await this.clickOnElement(this.closeButton);
         return await this.waitForDialogClosed();
     }
 
@@ -132,6 +66,12 @@ class CompareContentVersionsDialog extends Page {
         await this.waitForElementDisplayed(this.showEntireContentCheckbox, appConst.mediumTimeout);
         await this.clickOnElement(this.showEntireContentCheckbox);
         await this.pause(500);
+    }
+
+    async isShowEntireContentCheckboxSelected() {
+        let checkBoxInput = XPATH.container + XPATH.showEntireContentCheckboxDiv + "//input[@type='checkbox']";
+        await this.waitForElementDisplayed(this.showEntireContentCheckbox, appConst.mediumTimeout);
+        return await this.isSelected(checkBoxInput);
     }
 
     async getTypeProperty() {
@@ -146,75 +86,165 @@ class CompareContentVersionsDialog extends Page {
         return await this.getText(locator);
     }
 
-    async clickOnLeftDropdownHandle() {
-        await this.waitForElementDisplayed(this.leftDropdownHandle, appConst.mediumTimeout);
-        await this.clickOnElement(this.leftDropdownHandle);
-        return await this.pause(300);
-    }
-
-    async getSortedOptionsInDropdownList() {
-        let locator = XPATH.containerLeft + "//div[contains(@id,'NamesAndIconView')]//div[contains(@class,'icon-sort')]";
+    async getPathProperty() {
+        let locator = XPATH.container + "//li[@data-key='_path']/div[contains(@class,'right-value')]//pre";
         await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
-        return await this.findElements(locator);
+        let text = await this.getText(locator);
+        return text.replace(/^"|"$/g, '');
     }
 
-    async getPermissionsUpdatedOptionsInDropdownList() {
-        let locator = XPATH.containerLeft + XPATH.listItemNameAndIconView + "//div[contains(@class, 'icon-masks')]";
-        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
-        return await this.findElements(locator);
-    }
-
-    async clickOnRightDropdownHandle() {
-        await this.waitForElementDisplayed(this.rightDropdownHandle, appConst.mediumTimeout);
-        await this.clickOnElement(this.rightDropdownHandle);
-        return await this.pause(300);
-    }
-
-    async getSortedOptionsInLeftDropdownList() {
-        let locator = XPATH.containerLeft + XPATH.listItemNameAndIconView + "//div[contains(@class,'icon-sort')]";
-        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
-        return await this.findElements(locator);
-    }
-
-    async getSortedOptionsInRightDropdownList() {
-        let locator = XPATH.containerRight + XPATH.listItemNameAndIconView + "//div[contains(@class,'icon-sort')]";
-        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
-        return await this.findElements(locator);
-    }
-
-    async getChangedOptionsInDropdownList() {
-        let locator = XPATH.containerLeft + XPATH.listItemNameAndIconView + "//div[contains(@class, 'icon-checkmark')]";
-        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
-        return await this.findElements(locator);
-    }
-
+    // Returns the message that is displayed when the compared versions are identical:
     async waitForVersionsIdenticalMessage() {
-        let locator = XPATH.container + XPATH.contentPanel + "//div[contains(@class,'jsondiffpatch-delta empty')]";
-        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
-        return await this.getText(locator + "//h3");
+        let locator = XPATH.container + XPATH.versionsIdenticalMessage;
+        await this.waitForElementDisplayed(locator);
+        return await this.getText(locator);
     }
 
-    async isShowEntireContentCheckboxSelected() {
-        let checkBoxInput = XPATH.container + XPATH.showEntireContentCheckboxDiv + lib.CHECKBOX_INPUT;
-        await this.waitForElementDisplayed(this.showEntireContentCheckbox, appConst.mediumTimeout);
-        return await this.isSelected(checkBoxInput);
-    }
-
-    async getArchivedOptionsInDropdownList() {
-        let locator = XPATH.containerLeft + XPATH.listItemNameAndIconView + "//div[contains(@class, 'icon-archive')]";
-        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
-        return await this.findElements(locator);
-    }
-
-    async clickOnRightDropdownHandle() {
+    async waitForModifiedPropertyDisplayed(propertyKey) {
         try {
-            await this.waitForElementDisplayed(this.rightDropdownHandle, appConst.mediumTimeout);
-            await this.clickOnElement(this.rightDropdownHandle);
-            return await this.pause(300);
+            let locator = XPATH.container + XPATH.modifiedProperty(propertyKey);
+            return await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
         } catch (err) {
-            await this.handleError('Compare Content Versions Dialog', 'err_compare_right_dropdown', err);
+            await this.handleError('Compare Versions dialog, modified property: ' + propertyKey, 'err_modified_prop', err);
         }
+    }
 
+    async waitForModifiedPropertyNotDisplayed(propertyKey) {
+        try {
+            let locator = XPATH.container + XPATH.modifiedProperty(propertyKey);
+            return await this.waitForElementNotDisplayed(locator, appConst.mediumTimeout);
+        } catch (err) {
+            await this.handleError('Compare Versions dialog, modified property: ' + propertyKey, 'err_modified_prop', err);
+        }
+    }
+
+    async waitForAddedPropertyDisplayed(propertyKey) {
+        try {
+            let locator = XPATH.container + XPATH.addedProperty(propertyKey);
+            return await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+        } catch (err) {
+            await this.handleError('Compare Versions dialog, added property: ' + propertyKey, 'err_added_prop', err);
+        }
+    }
+
+    async waitForAddedPropertyNotDisplayed(propertyKey) {
+        try {
+            let locator = XPATH.container + XPATH.addedProperty(propertyKey);
+            return await this.waitForElementNotDisplayed(locator, appConst.mediumTimeout);
+        } catch (err) {
+            await this.handleError('Compare Versions dialog, added property: ' + propertyKey, 'err_added_prop', err);
+        }
+    }
+
+    async waitForUnchangedPropertyDisplayed(propertyKey) {
+        try {
+            let locator = XPATH.container + XPATH.unchangedProperty(propertyKey);
+            return await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+        } catch (err) {
+            await this.handleError('Compare Versions dialog, unchanged property: ' + propertyKey, 'err_unchanged_prop', err);
+        }
+    }
+
+    // Returns the left (old) value of a modified property:
+    async getModifiedPropertyOldValue(propertyKey) {
+        let locator = XPATH.container + XPATH.modifiedProperty(propertyKey) + "//div[contains(@class,'left-value')]//pre";
+        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+        return await this.getText(locator);
+    }
+
+    // Returns the right (new) value of a modified property:
+    async getModifiedPropertyNewValue(propertyKey) {
+        let locator = XPATH.container + XPATH.modifiedProperty(propertyKey) + "//div[contains(@class,'right-value')]//pre";
+        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+        return await this.getText(locator);
+    }
+
+    async getAddedPropertyValue(propertyKey) {
+        let locator = XPATH.container + XPATH.addedProperty(propertyKey) + "//div[contains(@class,'jsondiffpatch-value')]//pre";
+        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+        return await this.getText(locator);
+    }
+
+    async getUnchangedPropertyValue(propertyKey) {
+        let locator = XPATH.container + XPATH.unchangedProperty(propertyKey) + "//div[contains(@class,'jsondiffpatch-value')]//pre";
+        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+        return await this.getText(locator);
+    }
+
+    // Returns the value of a property added inside a nested node, e.g. ('x', 'com-enonic-uitest-contenttypes'):
+    async getAddedPropertyValueInNode(nodeKey, propertyKey) {
+        let locator = XPATH.container + XPATH.nodeProperty(nodeKey) + XPATH.addedProperty(propertyKey) +
+                      "//div[contains(@class,'jsondiffpatch-value')]//pre";
+        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+        return await this.getText(locator);
+    }
+
+    // Returns the time (e.g. '13:06:12') shown in the 'Older' version card:
+    async getOlderVersionTime() {
+        return await this.getVersionCardTime('Older');
+    }
+
+    // Returns the time (e.g. '13:06:12') shown in the 'Newer' version card:
+    async getNewerVersionTime() {
+        return await this.getVersionCardTime('Newer');
+    }
+
+    async getVersionCardTime(cardLabel) {
+        let locator = XPATH.container + XPATH.dialogBody + XPATH.versionCardByLabel(cardLabel) +
+                      "//div[contains(@class,'gap-1')]/span[1]";
+        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+        return await this.getText(locator);
+    }
+
+    // Returns the operation label ('Edited', 'Renamed'...) shown in the 'Older' version card:
+    async getOlderVersionOperation() {
+        return await this.getVersionCardOperation('Older');
+    }
+
+    // Returns the operation label ('Edited', 'Renamed'...) shown in the 'Newer' version card:
+    async getNewerVersionOperation() {
+        return await this.getVersionCardOperation('Newer');
+    }
+
+    async getVersionCardOperation(cardLabel) {
+        let locator = XPATH.container + XPATH.dialogBody + XPATH.versionCardByLabel(cardLabel) +
+                      "//div[contains(@class,'gap-1')]/span[last()]";
+        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+        return await this.getText(locator);
+    }
+
+    // Returns the modifier text (e.g. 'By Super User') shown in the 'Older' version card:
+    async getOlderVersionModifier() {
+        return await this.getVersionCardModifier('Older');
+    }
+
+    // Returns the modifier text (e.g. 'By Super User') shown in the 'Newer' version card:
+    async getNewerVersionModifier() {
+        return await this.getVersionCardModifier('Newer');
+    }
+
+    async getVersionCardModifier(cardLabel) {
+        let locator = XPATH.container + XPATH.dialogBody + XPATH.versionCardByLabel(cardLabel) +
+                      "//div[contains(@class,'text-xs')]";
+        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+        return await this.getText(locator);
+    }
+
+    // Returns the status badge text (e.g. 'Online') shown in the 'Older' version card:
+    async getOlderVersionStatus() {
+        return await this.getVersionCardStatus('Older');
+    }
+
+    // Returns the status badge text (e.g. 'Online') shown in the 'Newer' version card:
+    async getNewerVersionStatus() {
+        return await this.getVersionCardStatus('Newer');
+    }
+
+    async getVersionCardStatus(cardLabel) {
+        let locator = XPATH.container + XPATH.dialogBody + XPATH.versionCardByLabel(cardLabel) +
+                      "//div[contains(@class,'truncate')]";
+        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+        return await this.getText(locator);
     }
 }
 
