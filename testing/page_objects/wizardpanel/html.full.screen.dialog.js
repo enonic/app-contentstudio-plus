@@ -132,11 +132,11 @@ class HtmlFullScreenDialog extends Page {
     }
 
     async waitForDecreaseIndentButtonDisplayed() {
-        return await this.waitForElementDisplayed(this.decreaseIndentButton());
+        return await this.waitForElementDisplayed(this.decreaseIndentButton);
     }
 
     async waitForIncreaseIndentButtonDisplayed() {
-        return await this.waitForElementDisplayed(this.increaseIndentButton());
+        return await this.waitForElementDisplayed(this.increaseIndentButton);
     }
 
     waitForBoldButtonDisplayed() {

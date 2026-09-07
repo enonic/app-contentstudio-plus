@@ -52,7 +52,7 @@ class DateTimeForm extends OccurrencesFormView {
     }
 
     waitForValidationRecording() {
-        return this.waitForElementDisplayed(this.validationRecord, appConst.shortTimeout);
+        return this.waitForElementDisplayed(this.formValidationRecording, appConst.shortTimeout);
     }
 
     async showPicker(index = 0) {
