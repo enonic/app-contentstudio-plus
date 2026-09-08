@@ -29,6 +29,7 @@ const XPATH = {
 };
 
 class BrowseFilterPanel extends Page {
+
     get clearFilterLink() {
         return XPATH.container + BUTTONS.buttonAriaLabel('Clear');
     }

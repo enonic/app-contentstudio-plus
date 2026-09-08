@@ -38,7 +38,7 @@ describe('archive.content.check.duplicates.spec: tests for archiving content', f
             let deleteContentDialog = new DeleteContentDialog();
             let archiveBrowsePanel = new ArchiveBrowsePanel();
             // 1. Select the first folder and move it to archive:
-            await studioUtils.findContentAndClickCheckBox(FOLDER1.displayName);
+            await contentBrowsePanel.clickOnRowByDisplayName(FOLDER1.displayName);
             await contentBrowsePanel.clickOnDeleteButton();
             await deleteContentDialog.waitForDialogOpened();
             await deleteContentDialog.clickOnDeleteButton();
@@ -53,7 +53,7 @@ describe('archive.content.check.duplicates.spec: tests for archiving content', f
             assert.ok(hasDuplicates === false, 'There should be no duplicates in the Archive Grid');
             // 4. Switch to 'Content' mode and move to archive the second folder:
             await studioUtils.switchToContentMode();
-            await studioUtils.findContentAndClickCheckBox(FOLDER2.displayName);
+            await contentBrowsePanel.clickOnRowByDisplayName(FOLDER2.displayName);
             await contentBrowsePanel.clickOnDeleteButton();
             await deleteContentDialog.waitForDialogOpened();
             await deleteContentDialog.clickOnDeleteButton();

@@ -756,6 +756,39 @@ module.exports = {
         }
         throw new Error('Browser tab with title ' + text + ' was not found');
     },
+    // A tab can be opened asynchronously, e.g. by a server event, and it may appear either before or after this
+    // call. Comparing the window handles is therefore not reliable, the tab is looked up by its title instead.
+    // The browse panel title is built from the widget name ('Content Studio - ...') and never contains a content
+    // name, so only a wizard tab can match. Note that the wizard tab title is the content displayName: a variant
+    // shares it with its original, so pass the displayName of the original, not the name of the variant.
+    async waitForNewTabAndSwitch(expectedTitlePart) {
+        let matchedHandle = null;
+        try {
+            await this.getBrowser().waitUntil(async () => {
+                let handles = await this.getBrowser().getWindowHandles();
+                for (const handle of handles) {
+                    try {
+                        await this.getBrowser().switchToWindow(handle);
+                        let currentTitle = await this.getBrowser().getTitle();
+                        if (currentTitle.includes(expectedTitlePart)) {
+                            matchedHandle = handle;
+                            return true;
+                        }
+                    } catch (err) {
+                        // the tab is not ready yet or has been closed
+                    }
+                }
+                return false;
+            }, {
+                timeout: appConst.longTimeout,
+                timeoutMsg: `A browser tab with the title containing '${expectedTitlePart}' was not opened`,
+            });
+            return matchedHandle;
+        } catch (err) {
+            let screenshot = await this.saveScreenshotUniqueName('err_new_tab_switch');
+            throw new Error(`Error when switching to the new browser tab: ${err} [screenshot]: ${screenshot}`);
+        }
+    },
     async waitForBrowsePanelAndSelectDefaultContext() {
         try {
             let projectSelectionDialog = new ProjectSelectionDialog();
