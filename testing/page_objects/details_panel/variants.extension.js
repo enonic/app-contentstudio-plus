@@ -51,12 +51,41 @@ class VariantsExtension extends Page {
         return await button.waitForDisplayed({timeout: appConst.mediumTimeout, reverse: true});
     }
 
+    // The widget renders a loading placeholder first, so wait until it settles into one of the two shapes:
+    // the widget level 'Create Variant' button when the original has no variants, or the Original card when it has
+    async isVariantsListEmpty() {
+        const host = await this.getShadowHost();
+        let isEmpty = false;
+        await this.getBrowser().waitUntil(async () => {
+            try {
+                const widgetLevelButton = await host.shadow$(selectors.createVariantWidgetButton);
+                if (await widgetLevelButton.isDisplayed()) {
+                    isEmpty = true;
+                    return true;
+                }
+                const originalCard = await host.shadow$(selectors.originalCard);
+                return await originalCard.isDisplayed();
+            } catch {
+                // the widget is not rendered yet
+                return false;
+            }
+        }, {
+            timeout: appConst.mediumTimeout,
+            timeoutMsg: `Neither the widget level 'Create Variant' button nor the Original card was displayed in the widget`,
+        });
+        return isEmpty;
+    }
+
+    // 'Create Variant' is rendered either as the only content of the widget, when the original has no variants yet,
+    // or as a button in the expanded Original card
     async clickOnCreateVariantWidgetButton() {
         try {
-            const host = await this.getShadowHost();
-            const button = await host.shadow$(selectors.createVariantWidgetButton);
-            await button.waitForDisplayed({timeout: appConst.mediumTimeout});
-            return await button.click();
+            if (await this.isVariantsListEmpty()) {
+                const host = await this.getShadowHost();
+                const button = await host.shadow$(selectors.createVariantWidgetButton);
+                return await button.click();
+            }
+            return await this.clickOnCreateVariantButtonInOriginalItem();
         } catch (err) {
             await this.handleError(`Tried to click on 'Create Variant' button in the widget`, 'err_click_create_variant_widget', err);
         }
