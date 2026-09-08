@@ -60,7 +60,7 @@ describe('publish.report.dialog.spec: tests for publish report dialog', function
             assert.equal(actualText, ITEM_ONLINE_TEXT, `'Item went online' - this text should be displayed in the single comparison block`);
         });
 
-    it.skip(`GIVEN existing folder has been unpublished in the wizard WHEN 'Publish report' modal dialog has been opened THEN 'Item went offline' text should appear`,
+    it(`GIVEN existing folder has been unpublished in the wizard WHEN 'Publish report' modal dialog has been opened THEN 'Item went offline' text should appear`,
         async () => {
             let contentWizard = new ContentWizardPanel();
             let publishReportWidget = new PublishReportWidget();
@@ -89,9 +89,12 @@ describe('publish.report.dialog.spec: tests for publish report dialog', function
             // 7. Verify  that the comparison block remains visible -  'Item went online' text should be in the header of the single comparison block
             actualText = await publishReportDialog.getHeaderInComparisonBlock(0);
             assert.equal(actualText, ITEM_ONLINE_TEXT, 'Item went online - this text should be displayed in the comparison block');
+            //actualText = await publishReportDialog.getHeaderInComparisonBlock(1);
         });
 
-    it.skip(`GIVEN existing folder has been published in the second time WHEN 'Publish report' modal dialog has been opened THEN 'Comparing' text should appear in the modal dialog`,
+     /// TODO https://github.com/enonic/app-contentstudio-plus/issues/1905
+    it.skip(
+        `GIVEN existing folder has been published in the second time WHEN 'Publish report' modal dialog has been opened THEN 'Comparing' text should appear in the modal dialog`,
         async () => {
             let contentWizard = new ContentWizardPanel();
             let publishReportWidget = new PublishReportWidget();
