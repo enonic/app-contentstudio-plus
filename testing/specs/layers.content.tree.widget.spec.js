@@ -19,14 +19,17 @@ describe.skip('layers.content.tree.widget.spec - tests for Layers  Tree  in the 
         webDriverHelper.setupBrowser();
     }
     const TEST_FOLDER_DISPLAY_NAME = studioUtils.generateRandomName('folder');
-    const PROJECT_DISPLAY_NAME = studioUtils.generateRandomName('project');
+    const PROJECT_DISPLAY_NAME = studioUtils.generateRandomName('proj');
     const LAYER1_DISPLAY_NAME = studioUtils.generateRandomName('layer');
     const LAYER2_DISPLAY_NAME = studioUtils.generateRandomName('layer');
 
     it('Preconditions: new project with folder should be added',
         async () => {
             //1. Navigate to Settings Panel and save new project:
-            await projectUtils.saveTestProject(PROJECT_DISPLAY_NAME, 'description', null, null);
+            await projectUtils.saveTestProject({
+                name: PROJECT_DISPLAY_NAME,
+                accessMode: appConst.PROJECT_ACCESS_MODE.PRIVATE,
+            });
             let contentBrowsePanel = new ContentBrowsePanel();
             await studioUtils.switchToContentMode();
             await contentBrowsePanel.selectContext(PROJECT_DISPLAY_NAME);
@@ -78,7 +81,7 @@ describe.skip('layers.content.tree.widget.spec - tests for Layers  Tree  in the 
         async () => {
             let contentBrowsePanel = new ContentBrowsePanel();
             await studioUtils.switchToContentMode();
-            await contentBrowsePanel.selectContext(LAYER1_DISPLAY_NAME);//"layer43177");
+            await contentBrowsePanel.selectContext(LAYER1_DISPLAY_NAME);
             // 1. Select the folder and open Layers widget:
             await studioUtils.findAndSelectItem(TEST_FOLDER_DISPLAY_NAME);
             let browseLayersWidget = await studioUtils.openLayersWidgetInBrowsePanel();
@@ -169,10 +172,10 @@ describe.skip('layers.content.tree.widget.spec - tests for Layers  Tree  in the 
         });
 
     beforeEach(async () => {
-        await studioUtils.navigateToContentStudioCloseProjectSelectionDialog();
+        await studioUtils.navigateToContentStudioApp();
         return await studioUtils.openSettingsPanel();
     });
-    afterEach(() => studioUtils.doCloseAllWindowTabsAndSwitchToHome());
+    afterEach(() => studioUtils.doCloseAllWindowTabsAndNavigateToHome());
     before(() => {
         return console.log('specification is starting: ' + this.title);
     });

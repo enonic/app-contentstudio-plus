@@ -2,69 +2,75 @@
  * Created on 15.10.2021
  */
 const Page = require('../page');
-const lib = require('../../libs/elements');
+const {COMMON} = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
+const ComboBoxListInput = require('../components/selectors/combobox.list.input');
 
 const XPATH = {
     container: "//div[contains(@id,'ComboBox')]",
-    InputViewValidationDiv: "//div[contains(@id,'InputViewValidationViewer')]",
-    optionByName: option => {
-        return `//div[contains(@class,'slick-viewport')]//div[contains(@id,'ComboBoxDisplayValueViewer') and text()='${option}']`
-
-    },
+    comboBoxListInputDiv: "//div[contains(@class,'combobox-list-input')]",
+    comboboxUL: "//ul[contains(@id,'ComboBoxList')]",
+    inputViewValidationDiv: "//div[contains(@id,'InputViewValidationViewer')]",
+    comboBoxSelectedOptionViewDiv: "//div[contains(@id,'ComboBoxSelectedOptionView')]"
 };
 
 class ComboBoxFormPanel extends Page {
 
-    get optionFilterInput() {
-        return lib.CONTENT_WIZARD_STEP_FORM + XPATH.container + lib.COMBO_BOX_OPTION_FILTER_INPUT;
+    get formValidationRecording() {
+        return COMMON.INPUTS.FORM_RENDERER_DATA_COMPONENT + COMMON.INPUTS.VALIDATION_RECORDING;
     }
 
-    get removeOptionIcon() {
-        return lib.CONTENT_WIZARD_STEP_FORM + XPATH.container + lib.BASE_SELECTED_OPTION + lib.REMOVE_ICON;
+    async selectFilteredOption(option) {
+        let comboBoxListInput = new ComboBoxListInput();
+        await comboBoxListInput.selectFilteredOption(option);
     }
 
-    async typeInFilterAndClickOnOption(option) {
-        let optionLocator = XPATH.optionByName(option);
-        await this.typeTextInInput(this.optionFilterInput, option);
-        await this.waitForElementDisplayed(optionLocator, appConst.mediumTimeout);
-        await this.clickOnElement(optionLocator);
-        return await this.pause(200);
+    // Multiselect combo box has 'Apply' button in the dropdown, so after clicking on the option, we need to click on 'Apply' button to apply the selection.
+    async selectFilteredOptionAndApply(option) {
+        let comboBoxListInput = new ComboBoxListInput();
+        await comboBoxListInput.selectFilteredOptionAndClickOnApply(option);
     }
 
-    async clickOnRemoveSelectedOptionButton(index) {
-        let removeButtons = await this.getDisplayedElements(this.removeOptionIcon);
-        if (removeButtons.length === 0) {
-            throw new Error("ComboBox Form - Remove buttons were not found!");
-        }
-        await removeButtons[index].click();
-        return await this.pause(500);
+    async clickOnRemoveSelectedOptionButton(option) {
+        let comboBoxListInput = new ComboBoxListInput(COMMON.CONTENT_WIZARD_DATA_COMPONENT);
+        await comboBoxListInput.clickOnRemoveSelectedOptionButton(option);
     }
 
-    waitForOptionFilterInputEnabled() {
-        return this.waitForElementEnabled(this.optionFilterInput, appConst.mediumTimeout);
+    async waitForOptionFilterInputDisplayed() {
+        let comboBoxListInput = new ComboBoxListInput(COMMON.CONTENT_WIZARD_DATA_COMPONENT);
+        return await  comboBoxListInput.waitForOptionFilterInputDisplayed();
     }
 
-    waitForOptionFilterInputDisabled() {
-        return this.waitForElementDisabled(this.optionFilterInput, appConst.mediumTimeout);
+    async waitForOptionFilterInputNotDisplayed() {
+        let comboBoxListInput = new ComboBoxListInput(COMMON.CONTENT_WIZARD_DATA_COMPONENT);
+        return await  comboBoxListInput.waitForOptionFilterInputNotDisplayed();
     }
 
     async getComboBoxValidationMessage() {
-        let locator = lib.CONTENT_WIZARD_STEP_FORM + lib.FORM_VIEW + XPATH.InputViewValidationDiv;
-        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
-        return await this.getText(locator);
+        try {
+            return this.getTextInDisplayedElements(this.formValidationRecording);
+        } catch (err) {
+            await this.handleError('ComboBoxFormPanel - getComboBoxValidationMessage:', 'err_get_combobox_validation_message', err);
+        }
     }
+
+    async waitForFormValidationRecordingDisplayed() {
+        await this.getBrowser().waitUntil(async () => {
+            let elements = await this.getDisplayedElements(this.formValidationRecording);
+            return elements.length > 0;
+        }, {timeout: appConst.mediumTimeout, timeoutMsg: 'Form Validation recording should be displayed'});
+    }
+
 
     async getSelectedOptionValues() {
-        let locator = lib.FORM_VIEW + "//div[@class='selected-option']//div[@class='option-value']";
-        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
-        return await this.getTextInDisplayedElements(locator);
+        try {
+            let comboBoxListInput = new ComboBoxListInput(COMMON.CONTENT_WIZARD_DATA_COMPONENT);
+            return await comboBoxListInput.getSelectedOptionsDisplayName();
+        } catch (err) {
+            await this.handleError('ComboBoxFormPanel - getSelectedOptionValues:', 'err_get_selected_option_values', err);
+        }
     }
 
-    waitForNoOptionsSelected() {
-        let locator = lib.FORM_VIEW + "//div[@class='selected-option']//div[@class='option-value']";
-        return this.waitForElementNotDisplayed(locator, appConst.mediumTimeout);
-    }
 }
 
 module.exports = ComboBoxFormPanel;

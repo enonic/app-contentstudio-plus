@@ -1,49 +1,58 @@
 /**
- * Created on 08.01.2024
+ * Created on 08.01.2024 updated 21.04.2026
  */
-const lib = require('../../../libs/elements');
 const appConst = require('../../../libs/app_const');
 const BaseDropdown = require('./base.dropdown');
+const {DROPDOWN, TREE_GRID} = require('../../../libs/elements');
+
 const XPATH = {
-    container: "//div[contains(@id,'ImageSelectorDropdown')]",
-    imageContentListBoxUL: "//ul[contains(@id,'ImageContentListBox')]",
-    contentListElement: "//li[contains(@id,'ContentListElement')]",
-    expanderIconByName: name => {
-        return `//div[contains(@id,'NamesView') and child::p[contains(@class,'sub-name') and contains(.,'${name}')]]` +
-               `//ancestor::li[contains(@id,'ContentListElement')]//div[contains(@class,'toggle icon-arrow_drop_up')]`;
-    },
-    imageByDisplayNameInTreeMode: displayName => {
-        return lib.DROPDOWN_SELECTOR.CONTENTS_TREE_LIST_UL + lib.DROPDOWN_SELECTOR.OPTIONS_LI_ELEMENT +
-               `//h6[contains(@class,'main-name') and contains(text(),'${displayName}')]`;
-    }
+    dataComponentDiv: "//div[@data-component='ImageSelectorDropdown']",
+    imageByDisplayNameInTreeMode: displayName =>
+        `//div[@role='treeitem']//div[@data-component='ContentLabel' and descendant::span[text()='${displayName}']]`,
 };
 
 class ImageSelectorDropdown extends BaseDropdown {
 
+    constructor(parentElementXpath) {
+        super();
+        this._container = parentElementXpath;
+    }
+
     get container() {
-        return XPATH.container;
+        return this._container;
+    }
+
+    get dataComponentDiv() {
+        return "//div[@data-component='ImageSelector']";
+    }
+
+    get uploadButton() {
+        return this.dataComponentDiv + DROPDOWN.SELECTOR_UPLOAD_BUTTON;
+    }
+
+    async waitForUploadButtonDisplayed() {
+        await this.waitForElementDisplayed(this.uploadButton);
+    }
+
+    async waitForUploadButtonEnabled() {
+        return await this.waitForElementEnabled(this.uploadButton);
+    }
+
+    async waitForUploadButtonDisabled(){
+        return await this.waitForElementDisabled(this.uploadButton);
     }
 
     async insertTextInOptionsFilterInput(text, parentLocator) {
-        await this.filterItem(text, parentLocator);
+        await this.doFilterItem(text, parentLocator);
     }
 
-    async selectFilteredImageInFlatMode(imageDisplayName, parentLocator) {
+    async selectFilteredImageInFlatMode(imageDisplayName) {
         try {
-            // parentLocator = modal dialog or wizard panel...
-            await this.clickOnFilteredByDisplayNameItem(imageDisplayName, parentLocator);
+            await this.clickOnOptionByDisplayName(imageDisplayName);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_img_selector_flat');
-            throw new Error(`Image selector - Error during selecting the option, screenshot: ${screenshot} ` + err);
+            await this.handleError(`ImageSelectorDropdown - Error during selecting the option: ${imageDisplayName} in flat mode`,
+                'err_img_selector_flat', err);
         }
-    }
-
-    buildLocatorForOptionByDisplayName(optionDisplayName, parentLocator) {
-        if (parentLocator === undefined) {
-            parentLocator = '';
-        }
-        let containerUL = parentLocator + XPATH.imageContentListBoxUL;
-        return lib.DROPDOWN_SELECTOR.flatModeDropdownImgItemByDisplayName(containerUL, optionDisplayName);
     }
 
     // Click on images and select options in the expanded dropdown(Flat-mode)
@@ -56,18 +65,29 @@ class ImageSelectorDropdown extends BaseDropdown {
         }
     }
 
-    async clickOnImageInDropdownListTreeMode(imageDisplayName, parentLocator) {
-        let locator = parentLocator + XPATH.imageByDisplayNameInTreeMode(imageDisplayName);
-        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+    // Overrides BaseDropdown: v6 image items use span.font-semibold inside ImageSelectorItemView
+    async clickOnOptionByDisplayName(displayName) {
+        try {
+            let locator = `//div[@data-component='ImageSelectorItemView' and descendant::span[contains(@class,'font-semibold') and text()='${displayName}']]`;
+            await this.waitForElementDisplayed(locator);
+            await this.clickOnElement(locator);
+        } catch (err) {
+            await this.handleError(`ImageSelectorDropdown - tried to click on option: ${displayName}`, 'err_click_img_option', err);
+        }
+    }
+
+    async clickOnImageInDropdownListTreeMode(imageDisplayName) {
+        let locator = XPATH.imageByDisplayNameInTreeMode(imageDisplayName);
+        await this.waitForElementDisplayed(locator);
         await this.clickOnElement(locator);
     }
 
 
-    // Gets all content-statuses in the expanded dropdown list
+    // Gets all content-statuses in the expanded dropdown list (tree mode)
     async getImagesStatusInOptions() {
-        let statusEl = XPATH.contentListElement + lib.H6_DISPLAY_NAME + "/following::div[contains(@class,'status')]";
-        await this.waitForElementDisplayed(statusEl, appConst.mediumTimeout);
-        return await this.getTextInDisplayedElements(statusEl);
+        const locator = `//div[@role='treeitem']` + TREE_GRID.CONTENT_STATUS;
+        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+        return await this.getTextInDisplayedElements(locator);
     }
 
     // Gets content-status by displayName in the expanded dropdown list
@@ -77,23 +97,28 @@ class ImageSelectorDropdown extends BaseDropdown {
         return await this.getTextInElements(statusEl);
     }
 
-    async getOptionsDisplayNameInFlatMode(parentXpath) {
-        if (parentXpath === undefined) {
-            parentXpath = '';
-        }
-        let locator = parentXpath + XPATH.imageContentListBoxUL + lib.DROPDOWN_SELECTOR.IMG_DROPDOWN_OPT_DISPLAY_NAME_FLAT_MODE;
-        await this.waitForElementDisplayed(parentXpath + XPATH.imageContentListBoxUL, appConst.mediumTimeout);
-        await this.pause(500);
-        return await this.getTextInElements(locator);
+    async scrollDownInDropdownList(parentXpath, deltaY) {
+        const elementForScroll = await this.findElement(parentXpath + XPATH.imageContentListBoxUL);
+        await this.performScrollWithWheelActions(elementForScroll, deltaY);
+        await this.pause(1000);
     }
 
-    async getOptionsDisplayNameInTreeMode(parentXpath) {
-        if (parentXpath === undefined) {
-            parentXpath = '';
-        }
-        let locator = parentXpath + lib.DROPDOWN_SELECTOR.CONTENTS_TREE_LIST_UL + lib.DROPDOWN_SELECTOR.OPTIONS_LI_ELEMENT +
-                      lib.H6_DISPLAY_NAME;
-        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+    async getOptionsDisplayNameInTreeMode() {
+        const locator = DROPDOWN.CONTENT_LABEL_OPTIONS_NAME;
+        await this.waitForElementDisplayed(locator);
+        await this.pause(500);
+        return await this.getTextInDisplayedElements(locator);
+    }
+
+    async getImageItemsPathsInFlatMode() {
+        const locator = `//div[@data-component='ImageSelectorItemView']//bdi`;
+        await this.waitForElementDisplayed(locator);
+        return await this.getTextInDisplayedElements(locator);
+    }
+
+    async getOptionsDisplayNameInFlatMode() {
+        const locator = `//div[@data-component='ImageSelectorItemView']//span[contains(@class,'font-semibold') and contains(@class,'text-base')]`;
+        await this.waitForElementDisplayed(locator);
         await this.pause(500);
         return await this.getTextInDisplayedElements(locator);
     }

@@ -1,90 +1,85 @@
 /**
- * Created  on 01.04.2023
+ * Created  on 01.04.2023 updated on 31.08.2026
  */
 const Page = require('../page');
-const appConst = require('../../libs/app_const');
+
+const DIALOG = `div[data-component="CreateVariantDialog"]`;
 
 const selectors = {
-    container: 'div[id*="CreateVariantDialog"]',
-    variantNameInput: 'div[id*="VariantNameInput"] input[type="text"]',
-    cancelButtonTop: 'div.cancel-button-top',
-    validationStatus: 'div.status.invalid',
+    dialog: DIALOG,
+    title: `${DIALOG} h2[data-component="Dialog.Title"]`,
+    closeButton: `${DIALOG} button[data-component="Dialog.DefaultClose"]`,
+    variantNameInput: `${DIALOG} div[data-component="Input"] input`,
+    validationMessage: `${DIALOG} div[data-component="Input"] div[class*="text-error"]`,
+    createButton: `${DIALOG} footer[data-component="Dialog.Footer"] button[data-component="Button"]`,
 };
 
 class CreateVariantDialog extends Page {
 
-    async findCreateVariantButton() {
-        const host = await this.getShadowHost();
-        const buttons = await host.shadow$$('button[id*="DialogButton"]');
-        for (const btn of buttons) {
-            const text = await btn.getText();
-            if (text.includes('Create Variant')) {
-                return btn;
-            }
-        }
-        throw new Error('Create Variant button not found in the dialog');
+    async typeTextInVariantNameInput(text) {
+        await this.clearVariantNameInput();
+        const input = await this.findElement(selectors.variantNameInput);
+        await input.addValue(text);
+        return await this.pause(300);
     }
 
-    async typeTextInVariantNameInput(text) {
-        const host = await this.getShadowHost();
-        const input = await host.shadow$(selectors.variantNameInput);
-        await input.waitForDisplayed({timeout: appConst.mediumTimeout});
-        return await input.setValue(text);
+    async clearVariantNameInput() {
+        await this.waitForElementDisplayed(selectors.variantNameInput);
+        return await this.clearInputText(selectors.variantNameInput);
+    }
+
+    async getTextInVariantNameInput() {
+        return await this.getTextInInput(selectors.variantNameInput);
     }
 
     async waitForCreateVariantButtonEnabled() {
-        const button = await this.findCreateVariantButton();
-        await button.waitForDisplayed({timeout: appConst.mediumTimeout});
-        return await button.waitForEnabled({timeout: appConst.mediumTimeout});
+        await this.waitForElementDisplayed(selectors.createButton);
+        return await this.waitForElementEnabled(selectors.createButton);
     }
 
     async waitForCreateVariantButtonDisabled() {
-        const button = await this.findCreateVariantButton();
-        await button.waitForDisplayed({timeout: appConst.mediumTimeout});
-        return await button.waitForEnabled({timeout: appConst.mediumTimeout, reverse: true});
-    }
-
-    async waitForValidationPathMessageDisplayed() {
-        const host = await this.getShadowHost();
-        const div = await host.shadow$(selectors.validationStatus);
-        await div.waitForDisplayed({timeout: appConst.mediumTimeout});
-        return await div.getText();
+        await this.waitForElementDisplayed(selectors.createButton);
+        return await this.waitForElementDisabled(selectors.createButton);
     }
 
     async clickOnCreateVariantButton() {
-        const button = await this.findCreateVariantButton();
-        await button.waitForDisplayed({timeout: appConst.mediumTimeout});
-        await button.waitForEnabled({timeout: appConst.mediumTimeout});
-        return await button.click();
+        await this.waitForCreateVariantButtonEnabled();
+        return await this.clickOnElement(selectors.createButton);
     }
 
-    async clickOnCancelButtonTop() {
-        const host = await this.getShadowHost();
-        const button = await host.shadow$(selectors.cancelButtonTop);
-        await button.waitForDisplayed({timeout: appConst.shortTimeout});
-        await button.click();
+    async waitForValidationPathMessageDisplayed() {
+        try {
+            await this.waitForElementDisplayed(selectors.validationMessage);
+            return await this.getText(selectors.validationMessage);
+        } catch (err) {
+            await this.handleError(`Create Variant Dialog - validation message is not displayed`, 'err_variants_dlg_validation', err);
+        }
+    }
+
+    async getDialogTitle() {
+        return await this.getText(selectors.title);
+    }
+
+    async clickOnCloseButton() {
+        await this.waitForElementDisplayed(selectors.closeButton);
+        await this.clickOnElement(selectors.closeButton);
         return await this.waitForDialogClosed();
     }
 
     async waitForDialogLoaded() {
         try {
-            const host = await this.getShadowHost();
-            const dialog = await host.shadow$(selectors.container);
-            await dialog.waitForDisplayed({timeout: appConst.mediumTimeout});
+            await this.waitForElementDisplayed(selectors.dialog);
+            await this.waitForElementDisplayed(selectors.variantNameInput);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_variants_dlg');
-            throw new Error(`Create Variant Dialog is not loaded ${screenshot} ` + err);
+            await this.handleError(`Create Variant Dialog is not loaded`, 'err_variants_dlg', err);
         }
     }
 
     async waitForDialogClosed() {
         try {
-            const host = await this.getShadowHost();
-            const dialog = await host.shadow$(selectors.container);
-            return await dialog.waitForDisplayed({timeout: appConst.shortTimeout, reverse: true});
+            return await this.waitForElementNotDisplayed(selectors.dialog);
         } catch (err) {
-            let screenshot = await this.saveScreenshotUniqueName('err_variants_dlg');
-            throw new Error(`Create Variant Dialog is not closed ${screenshot} ` + err);
+            await this.handleError(`Create Variant Dialog is not closed`, 'err_variants_dlg', err);
         }
     }
 }

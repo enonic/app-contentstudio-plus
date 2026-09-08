@@ -115,7 +115,7 @@ class Page {
         let inputElement = await this.findElement(selector);
         for (const ch of text) {
             await inputElement.addValue(ch);
-            await this.pause(20);
+            await this.pause(40);
         }
     }
     async typeTextInInput(selector, text) {
@@ -361,6 +361,10 @@ class Page {
             let screenshot = await this.saveScreenshotUniqueName('err_remove_notif_msg');
             throw new Error(`Error after removing the notification message, screenshot:${screenshot} ` + err);
         }
+    }
+
+    async isNotificationMessageDisplayed() {
+        return await this.isElementDisplayed(COMMON.NOTIFICATION_TEXT);
     }
 
     async waitForNotificationMessage() {

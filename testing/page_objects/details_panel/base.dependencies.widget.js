@@ -6,80 +6,94 @@ const appConst = require('../../libs/app_const');
 
 class BaseDependenciesWidget extends Page {
 
-    async clickOnShowOutboundButton() {
+    async clickOnShowAllOutgoingButton() {
         try {
-            await this.waitForElementDisplayed(this.showOutboundButton, appConst.shortTimeout);
-            await this.waitForElementEnabled(this.showOutboundButton, appConst.shortTimeout);
-            await this.clickOnElement(this.showOutboundButton);
-            return await this.pause(2000);
+            await this.waitForElementDisplayed(this.showAllOutgoingButton);
+            await this.waitForElementEnabled(this.showAllOutgoingButton);
+            await this.clickOnElement(this.showAllOutgoingButton);
+            return await this.pause(3000);
         } catch (err) {
-            await this.saveScreenshot('err_outbound_button');
-            throw new Error('Show Outbound button is not visible in ' + err);
+            await this.handleError('Show all outgoing button is not visible', 'err_outgoing_button', err);
         }
     }
 
-    async clickOnShowInboundButton() {
-        await this.clickOnElement(this.showInboundButton);
-        await this.pause(1000);
+    async clickOnShowAllIncomingButton() {
+        try {
+            await this.clickOnElement(this.showAllIncomingButton);
+            await this.pause(1000);
+        } catch (err) {
+            await this.handleError('Show all incoming button is not visible', 'err_incoming_button', err);
+        }
     }
 
-    waitForNoOutgoingDependenciesMessage() {
-        return this.waitForElementDisplayed("//div[@class='dependencies-container outbound no-dependencies']", appConst.mediumTimeout);
+    async waitForNoOutgoingDependenciesMessage() {
+        try {
+            let locator = this.dependenciesWidget + "//span[@data-component='DependenciesWidgetFlowSection'][2]";
+            return await this.waitForElementDisplayed(locator);
+        } catch (err) {
+            await this.handleError('No outgoing dependencies message is not visible', 'err_no_outgoing_dependencies', err);
+        }
     }
 
-    waitForNoIncomingDependenciesMessage() {
-        return this.waitForElementDisplayed("//div[contains(@class,'inbound no-dependencies')]", appConst.mediumTimeout);
+    async waitForNoIncomingDependenciesMessage() {
+        try {
+            let locator = this.dependenciesWidget + "//span[@data-component='DependenciesWidgetFlowSection'][1]";
+            return await this.waitForElementDisplayed(locator);
+        } catch (err) {
+            await this.handleError('No incoming dependencies message is not visible', 'err_no_incoming_dependencies', err);
+        }
     }
 
-    getContentDisplayName() {
-        let locator = this.dependenciesWidget + "//div[contains(@id,'NamesView')]//h6[contains(@class,'main-name')]";
+    getContentPath() {
+        let locator = this.dependenciesWidget + "//p[contains(@class,'text-center')][2]";
         return this.getText(locator);
     }
 
     getContentName() {
-        let locator = this.dependenciesWidget + "//p[contains(@class,'sub-name')]";
+        let locator = this.dependenciesWidget + "//p[contains(@class,'text-center')][1]";
         return this.getText(locator);
     }
 
-    async getNumberOutboundItems() {
-        await this.waitForElementDisplayed(this.showOutboundButton, appConst.shortTimeout);
-        let text = await this.getText(this.showOutboundButton);
-        let startIndex = text.indexOf('(');
-        let endIndex = text.indexOf(')');
-        return text.substring(startIndex + 1, endIndex);
-    }
-
-    async waitForOutboundButtonNotVisible() {
+    async getNumberOutgoingItems() {
         try {
-            await this.waitForElementNotDisplayed(this.showOutboundButton, appConst.shortTimeout)
+            await this.waitForElementDisplayed(this.showAllOutgoingButton);
+            let text = await this.getText(this.showAllOutgoingButton);
+            let startIndex = text.indexOf('(');
+            let endIndex = text.indexOf(')');
+            return text.substring(startIndex + 1, endIndex);
         } catch (err) {
-            let screenshot = await this.saveScreenshot('err_outbound_button_should_be_hidden');
-            throw new Error('show Outbound Button is visible, screenshot' + screenshot + ' ' + err);
+            await this.handleError('Show all outgoing button is not visible', 'err_outgoing_button', err);
         }
     }
 
-    isInboundButtonVisible() {
-        return this.isElementDisplayed(this.showInboundButton);
+    async waitForAllOutgoingButtonNotVisible() {
+        try {
+            await this.waitForElementNotDisplayed(this.showAllOutgoingButton);
+        } catch (err) {
+            await this.handleError('Show all outgoing button should be hidden', 'err_outgoing_button_should_be_hidden', err);
+        }
     }
 
-    async waitForOutboundButtonVisible() {
+    isAllIncomingButtonVisible() {
+        return this.isElementDisplayed(this.showAllIncomingButton);
+    }
+
+    async waitForAllOutgoingButtonVisible() {
         try {
-            await this.waitForElementDisplayed(this.showOutboundButton, appConst.shortTimeout);
+            await this.waitForElementDisplayed(this.showAllOutgoingButton);
             await this.pause(500);
         } catch (err) {
-            await this.saveScreenshotUniqueName('err_outbound_button');
-            throw new Error('showOutboundButton is not visible in ' + err);
+            await this.handleError('showAllOutgoingButton is not visible', 'err_outgoing_button', err);
         }
     }
 
-    waitForInboundButtonVisible() {
-        return this.waitForElementDisplayed(this.showInboundButton, appConst.shortTimeout).catch(err => {
-            this.saveScreenshot('err_inbound_button');
-            throw new Error('showInboundButton: is not visible in ' + err);
-        });
+    async waitForAllIncomingButtonVisible() {
+        try {
+            await this.waitForElementDisplayed(this.showAllIncomingButton, appConst.shortTimeout);
+        } catch (err) {
+            await this.handleError('showAllIncomingButton is not visible', 'err_incoming_button', err);
+        }
     }
 }
 
 module.exports = BaseDependenciesWidget;
-
-

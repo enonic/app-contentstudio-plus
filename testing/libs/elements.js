@@ -24,18 +24,24 @@ const COMMON = {
 
     INPUTS: {
         CHECKBOX_INPUT: "//input[@type='checkbox']",
+        DATA_COMPONENT_INPUT: "//div[@data-component='Input']",
         FORM_RENDERER_DATA_COMPONENT: "//div[@data-component='FormRenderer']",
         DATA_COMPONENT_INPUT_FIELD: "//div[@data-component='InputField']",
-        inputFieldByLabel: (label) => `//div[@data-component='InputField' and descendant::div[@data-component='InputLabel' and contains(.,'${label}')]]`,
+        inputFieldByLabel: (label) =>
+            `//div[@data-component='InputField' and descendant::div[@data-component='InputLabel' and contains(.,'${label}')]]`,
         OCCURRENCES_DATA_COMPONENT: "//div[@data-component='OccurrenceList']",
         VALIDATION_RECORDING: "//div[contains(@class,'text-error')]",
         CHECKBOX_INPUT_CHECKED: "//input[@type='checkbox' and @aria-checked='true']",
         TEXT: "//input[@type='text']",
-        TEXTAREA: "//textarea",
-        INPUT: "//input",
+        TEXTAREA: '//textarea',
+        INPUT: '//input',
         DIV_BUTTON: "//div[@role='button']",
         textAreaByName: (name) => `//textarea[@name='${name}']`,
         inputByAriaLabel: (ariaLabel) => `//input[@aria-label='${ariaLabel}']`,
+        dataComponentInputByLabel: (label) =>
+            `//div[@data-component='Input' and descendant::label[contains(.,'${label}')]]`,
+        dataComponentRadioByLabel: (label) =>
+            `//button[@data-component='RadioGroup.Item' and descendant::span[contains(.,'${label}')]]`,
     },
     CKE: {
         textAreaElement: "//textarea[contains(@id,'htmlarea')]",
@@ -72,7 +78,7 @@ const COMMON = {
         formatDropDownHandle: `//span[contains(@class,'cke_combo__styles') and descendant::a[@class='cke_combo_button']]`,
     }
 };
-const ARCHIVE = {};
+
 const WIZARD = {
     DISPLAY_NAME_CONTROL:
         "//*[(self::button or self::textarea) and (@data-component='DisplayNameInput' or @placeholder='Display Name')]",
@@ -119,6 +125,7 @@ const LIVE_VIEW = {
     MINIMIZE_BUTTON: `//div[contains(@class,'minimize-edit')]`,
     PAGE_EDITOR_TOGGLE_BUTTON: "//button[contains(@id, 'CycleButton')]",
     HIDE_PAGE_EDITOR_BUTTON: "//button[contains(@id,'ContentActionCycleButton') and @title='Hide Page Editor']",
+    EXPAND_CONTENT_BUTTON: `//button[@data-component='ToggleFormButton' and @aria-label='Expand content form']`,
 };
 const TREE_GRID = {
     DIV_ROLE_GRID: "//div[@role='grid']",
@@ -161,7 +168,7 @@ const DROPDOWN = {
     CONTENT_LABEL_OPTIONS_NAME: "//div[@role='treeitem']//div[@data-component='ContentLabel']/div[2]/span",
     CONTENT_LABEL_OPTIONS_NAME_FLAT_MODE: "//div[@role='treeitem' and @aria-level='0']//div[@data-component='ContentLabel']/div[2]/span",
     COMBOBOX_POPUP: "//div[@data-combobox-popup='' or @data-combobox-popup]",
-    buttonComboboxByLabel: (label) => `//span[contains(.,'${label}')]/following-sibling::button[@role='combobox']`,
+    SELECTOR_TRIGGER: "//button[@role='combobox' and descendant::span[@data-component='Selector.Value']]",
     CONTENT_COMBOBOX: "//div[@data-component='ContentCombobox')]",
     DROPDOWN_HANDLE: "//button[@aria-label='Toggle']",
     LISTBOX_OPTIONS_DIV: "//div[contains(@role,'listbox')]",
@@ -217,6 +224,9 @@ const DIALOG_ITEMS = {
     DEPENDANTS_SELECT_ALL_INPUT: "//input[@data-component='DependantsSelectAll']",
     DEPENDANTS_SELECT_ALL_LABEL: "//label[.//input[@data-component='DependantsSelectAll']]",
 };
+const PROJECTS = {
+    PROJECT_STEP_COMPONENT: `//div[@data-component='Dialog.StepContent']`,
+};
 const SELECTION_STATUS_BAR = {
     COMPONENT_DIV: "//div[@data-component='SelectionStatusBar']",
     BUTTON_APPLY: "//button[@data-component='StatusBarEntryButton' and text()='Apply']",
@@ -233,5 +243,6 @@ module.exports = Object.freeze({
     DROPDOWN,
     ISSUE,
     DIALOG_ITEMS,
-    SELECTION_STATUS_BAR
+    SELECTION_STATUS_BAR,
+    PROJECTS
 });

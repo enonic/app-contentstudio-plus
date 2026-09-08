@@ -1,22 +1,25 @@
 /**
  * Created on 09.07.2020.
  */
-
 const Page = require('../page');
-const lib = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
-const LoaderComboBox = require('../components/loader.combobox');
+const ContentSelectorDropdown = require('../components/selectors/content.selector.dropdown');
+const {COMMON} = require("../../libs/elements");
 
 class BaseSelectorForm extends Page {
 
     get selectorValidationRecording() {
-        return lib.FORM_VIEW + lib.INPUT_VALIDATION_VIEW;
+        return COMMON.INPUTS.FORM_RENDERER_DATA_COMPONENT + COMMON.INPUTS.VALIDATION_RECORDING;
     }
 
     async getSelectorValidationMessage() {
-        let locator = lib.CONTENT_WIZARD_STEP_FORM + this.selectorValidationRecording;
-        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
-        return await this.getText(locator);
+        try {
+            await this.waitForElementDisplayed(this.selectorValidationRecording);
+            let recordingElements = await this.getDisplayedElements(this.selectorValidationRecording);
+            return await recordingElements[0].getText();
+        } catch (err) {
+            await this.handleError("Selector Validation message should be displayed in the form", 'err_validation_message', err);
+        }
     }
 
     async waitForSelectorValidationMessageNotDisplayed() {
@@ -25,12 +28,10 @@ class BaseSelectorForm extends Page {
             return elements.length === 0;
         }, {timeout: appConst.mediumTimeout, timeoutMsg: "Selector Validation recording should not be displayed"});
     }
-    //Selects an option by the display name
-    async selectOption(optionDisplayName) {
-        let loaderComboBox = new LoaderComboBox();
-        await this.typeTextInInput(this.optionsFilterInput, optionDisplayName);
-        await loaderComboBox.selectOption(optionDisplayName);
-        return await loaderComboBox.pause(300);
+
+    async clearOptionsFilterInput() {
+        await this.clearInputText(this.optionsFilterInput);
+        await this.pause(1000);
     }
 
     async typeTextInOptionsFilterInput(text) {
@@ -38,34 +39,34 @@ class BaseSelectorForm extends Page {
         return await this.pause(500);
     }
 
-    //Selects an option by the name
-    async selectOptionByName(optionName) {
-        let loaderComboBox = new LoaderComboBox();
-        await this.typeTextInInput(this.optionsFilterInput, optionName);
-        await loaderComboBox.selectOptionByName(optionName);
-        return await loaderComboBox.pause(300);
+    async clickInOptionsFilterInput() {
+        await this.clickOnElement(this.optionsFilterInput);
+        return await this.pause(500);
     }
 
     async swapOptions(sourceName, destinationName) {
-        let sourceElem = this.selectedOptionByDisplayName(sourceName);
-        let destinationElem = this.selectedOptionByDisplayName(destinationName);
-        let source = await this.findElement(sourceElem);
-        let destination = await this.findElement(destinationElem);
+        let sourceLocator = this.selectedOptionByDisplayName(sourceName);
+        let destinationLocator = this.selectedOptionByDisplayName(destinationName);
+        let source1 = await this.findElements(sourceLocator);
+        let source = await this.findElement(sourceLocator);
+        let destination = await this.findElement(destinationLocator);
         await source.dragAndDrop(destination);
         return await this.pause(1000);
     }
 
-    isOptionFilterDisplayed() {
-        return this.isElementDisplayed(this.optionsFilterInput);
-    }
-
     async waitForEmptyOptionsMessage() {
         try {
-            return await this.waitForElementDisplayed(lib.EMPTY_OPTIONS_DIV, appConst.longTimeout);
+            let locator = "//div[@data-combobox-popup]//span[contains(@class,'text-subtle') and contains(text(),'No matching items')]"
+            return await this.waitForElementDisplayed(locator);
         } catch (err) {
-            await this.saveScreenshot(appConst.generateRandomName("err_empty_opt"));
-            throw new Error("Empty options text is not visible " + err);
+            await this.handleError(`Image Selector - 'No matching items' text should appear`, 'err_img_sel_empty_opt', err);
         }
+    }
+
+
+    async clickOnExpanderIconInOptionsList(optionName) {
+        let contentSelector = new ContentSelectorDropdown();
+        return await contentSelector.clickOnExpanderIconInOptionsList(optionName);
     }
 }
 
