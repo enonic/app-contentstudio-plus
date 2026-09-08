@@ -1,5 +1,5 @@
 /**
- * Created on 04/07/2018.
+ * Created on 04/07/2018. updated on 31.08.2026
  */
 const Page = require('../page');
 const {COMMON} = require('../../libs/elements');
@@ -78,10 +78,23 @@ class BaseContextWindowPanel extends Page {
         }
     }
 
+    async openWidgetOption(displayName) {
+        try {
+            let widgetSelectorDropdown = new WidgetSelectorDropdown();
+            await this.clickOnWidgetSelectorDropdownHandle();
+            await widgetSelectorDropdown.typeTextInSearchInput(displayName)
+            await widgetSelectorDropdown.clickOnOptionByDisplayName(displayName);
+            await this.pause(900);
+        } catch (err) {
+            await this.handleError('Tried to open Publish Report widget', 'err_open_publish_report_widget', err);
+        }
+    }
+
 
     async selectItemInWidgetSelector(itemName) {
         let widgetSelectorDropdown = new WidgetSelectorDropdown();
         await this.clickOnWidgetSelectorDropdownHandle();
+        await widgetSelectorDropdown.typeTextInSearchInput(itemName)
         await widgetSelectorDropdown.clickOnOptionByDisplayName(itemName);
     }
 
@@ -126,7 +139,8 @@ class BaseContextWindowPanel extends Page {
         try {
             let widgetSelectorDropdown = new WidgetSelectorDropdown();
             await this.clickOnWidgetSelectorDropdownHandle();
-            await widgetSelectorDropdown.clickOnOptionByDisplayName(appConst.WIDGET_TITLE.VARIANTS);
+            await widgetSelectorDropdown.typeTextInSearchInput(appConst.WIDGET_SELECTOR_OPTIONS.VARIANTS)
+            await widgetSelectorDropdown.clickOnOptionByDisplayName(appConst.WIDGET_SELECTOR_OPTIONS.VARIANTS);
         } catch (err) {
             await this.handleError('Tried to open Variants Widget', 'err_variants', err);
         }

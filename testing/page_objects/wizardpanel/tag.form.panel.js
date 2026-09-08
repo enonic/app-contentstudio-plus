@@ -2,51 +2,74 @@
  * Created on 22.03.2019.
  */
 const Page = require('../page');
-const lib = require('../../libs/elements');
+const {COMMON} = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
 const utils = require('../../libs/studio.utils');
 
+
 const xpath = {
-    suggestions: "//ul[contains(@id,'TagSuggestions')]/li",
+    dataComponent: "//div[@data-component='TagInput']",
+    suggestions: "//ul[contains(@class,'flex-wrap')]/li",
     removeTagIcon: "//ul/li[contains(@id,'Tag')]/a",
 };
 
 class TagForm extends Page {
 
     get tagValidationRecording() {
-        return lib.FORM_VIEW + lib.INPUT_VALIDATION_VIEW;
+        return COMMON.INPUTS.FORM_RENDERER_DATA_COMPONENT + COMMON.INPUTS.VALIDATION_RECORDING;
     }
 
     get tagInput() {
-        return lib.FORM_VIEW + lib.TEXT_INPUT;
+        return COMMON.INPUTS.FORM_RENDERER_DATA_COMPONENT + xpath.dataComponent;
     }
 
     get removeTagIcon() {
-        return lib.FORM_VIEW + xpath.removeTagIcon;
+        return COMMON.INPUTS.FORM_RENDERER_DATA_COMPONENT + xpath.dataComponent +
+               `//ul/li//button[@aria-label='Remove occurrence']`;
+    }
+
+    async clickOnTagInput() {
+        await this.clickOnElement(this.tagInput);
+    }
+
+    async clickInTagInput(){
+        await this.clickOnElement(this.tagInput);
     }
 
     async typeInTagInput(text) {
-        await this.clickOnElement(this.tagInput);
-        await this.pause(700);
-        return await this.getBrowser().keys(text);
+        let locator = COMMON.INPUTS.FORM_RENDERER_DATA_COMPONENT + xpath.dataComponent + COMMON.INPUTS.INPUT;
+        let inputs = await this.getDisplayedElements(locator);
+        if (inputs.length === 0) {
+            throw new Error("Tag input is not displayed - the maximum number of tags may have been reached");
+        }
+        await inputs[0].click();
+        await this.pause(300);
+        for (const ch of text) {
+            await inputs[0].addValue(ch);
+        }
     }
 
-    waitForTagInputNotDisplayed() {
-        return this.waitForElementNotDisplayed(this.tagInput, appConst.mediumTimeout);
+    async waitForNewTagInputNotDisplayed() {
+        let locator = COMMON.INPUTS.FORM_RENDERER_DATA_COMPONENT + xpath.dataComponent + COMMON.INPUTS.INPUT;
+        return await this.waitForElementNotDisplayed(locator, appConst.mediumTimeout);
+    }
+
+    async waitForNewTagInputDisplayed() {
+        let locator = COMMON.INPUTS.FORM_RENDERER_DATA_COMPONENT + xpath.dataComponent + COMMON.INPUTS.INPUT;
+        return await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
     }
 
     waitForTagInputDisplayed() {
-        return this.waitForElementDisplayed(this.tagInput, appConst.mediumTimeout);
+        return this.waitForElementDisplayed(COMMON.INPUTS.FORM_RENDERER_DATA_COMPONENT + xpath.dataComponent);
     }
 
 
     async doAddTag(text) {
         try {
-            await this.waitForTagInputDisplayed();
             await this.typeInTagInput(text)
-            await this.pause(200);
+            await this.pause(400);
             await utils.doPressEnter();
-            return await this.pause(200);
+            return await this.pause(500);
         } catch (err) {
             throw new Error("Error when typing the tag:  " + err);
         }
@@ -69,8 +92,8 @@ class TagForm extends Page {
     }
 
     async getTagValidationMessage() {
-        let locator = lib.CONTENT_WIZARD_STEP_FORM + this.tagValidationRecording;
-        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
+        let locator = this.tagValidationRecording;
+        await this.waitForElementDisplayed(locator);
         return await this.getText(locator);
     }
 
@@ -85,12 +108,12 @@ class TagForm extends Page {
         try {
             let elements = await this.findElements(this.removeTagIcon);
             if (elements.length === 0) {
-                throw new Error("Remove a tag icon was not found:");
+                throw new Error("The remove tag icon was not found:");
             }
             return await elements[index].click();
         } catch (err) {
-            await this.saveScreenshot('err_remove_tag_icon');
-            throw new Error('Remove tag icon: ' + err);
+            let screenshot = await this.saveScreenshotUniqueName('err_remove_tag_icon');
+            throw new Error(`Remove tag icon: screenshot:${screenshot} ` + err);
         }
     }
 

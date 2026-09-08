@@ -3,128 +3,261 @@
  */
 const Page = require('../page');
 const appConst = require('../../libs/app_const');
-const lib = require('../../libs/elements');
 const LayersContentTreeDialog = require('../project/layers.content.tree.dialog');
 
-const xpath = {
-    showAllButton: "//button[contains(@class,'show-all-button')]",
-    layersItemViewDiv: "//div[contains(@class,'layers-item-view-data')]",
-    localizeButton: "//div[contains(@class,'data-footer')]//button[child::span[text()='Localize']]",
-    editButton: "//div[contains(@class,'data-footer')]//button[child::span[text()='Edit']]",
-    openButton: "//div[contains(@class,'data-footer')]//button[child::span[text()='Open']]",
-    layerDetailsDiv: "//div[contains(@id,'LayerContentViewHeader')]/div[contains(@class,'layer-details')]",
-    layerLanguageDiv: "//div[@class='layer-language']",
-    layerNameDiv: "//div[@class='layer-name']",
-    layerViewByName: layerName => `//div[contains(@class,'layers-item-view-data') and descendant::div[@class='layer-name' and text()='${layerName}']]`,
+const LAYERS_WIDGET = 'div[data-component="LayersWidget"]';
+
+const selectors = {
+    layersWidget: LAYERS_WIDGET,
+    // Every layer card is a fieldset wrapped in a row div, the rows are in the cards container
+    layerCards: `${LAYERS_WIDGET} > div > div > fieldset`,
+    // 'Show all' is the only button that is not nested in a card
+    showAllButton: `${LAYERS_WIDGET} > div > button`,
+    // The selectors below are relative to a layer card.
+    // The header row is the only row with 'justify-between', it holds the layer label and the content status
+    layerLabel: 'div.justify-between > span:first-child',
+    contentStatus: 'div.justify-between > span:nth-child(2)',
+    contentDisplayName: 'div.truncate.text-base.font-semibold',
+    contentPath: 'div.truncate.text-sm.text-subtle',
+    // The localisation state is an indicator, its aria-label is 'Localised' or 'Not localised'
+    localisationIndicator: 'span[data-component="Tooltip"]',
+    // The card has a single action button, it is rendered only in the expanded card
+    actionButton: 'button[data-component="Button"]',
+    currentLayerLegend: 'legend',
+    actionButtonByLabel: label => `button[aria-label="${label}"]`,
+};
+
+// The expanded card is the only card with a shadow
+const EXPANDED_CLASS = 'shadow-md';
+
+// The same icon is rendered in both states, only the aria-label and the opacity differ
+const LOCALISATION_LABEL = {
+    LOCALISED: 'Localised',
+    NOT_LOCALISED: 'Not localised',
+};
+
+// The layer label holds the language as well: 'layer274425 (no)' -> {name: 'layer274425', language: '(no)'}
+const parseLayerLabel = label => {
+    const text = label.trim();
+    const match = /^(.*)\s(\(.+\))$/.exec(text);
+    return match ? {name: match[1], language: match[2]} : {name: text, language: ''};
 };
 
 class BaseLayersWidget extends Page {
 
-    get showAllButton() {
-        return this.layersWidget + xpath.showAllButton;
+    // Returns the cards as they are, an empty array means the widget has no layers to show
+    async findLayerCards() {
+        const host = await this.getShadowHost();
+        return await host.shadow$$(selectors.layerCards);
     }
 
-    isWidgetVisible() {
-        return this.isElementDisplayed(this.layersWidget);
-    }
-
-    async clickOnShowAllButton() {
-        let layersContentTreeDialog = new LayersContentTreeDialog();
-        await this.waitForElementDisplayed(this.showAllButton, appConst.mediumTimeout);
-        await this.clickOnElement(this.showAllButton);
-        await layersContentTreeDialog.waitForDialogLoaded();
-        return layersContentTreeDialog;
+    // The cards are rendered only after the layers data is loaded, so the query is retried
+    async getLayerCards() {
+        let cards = [];
+        try {
+            await this.getBrowser().waitUntil(async () => {
+                try {
+                    cards = await this.findLayerCards();
+                } catch {
+                    // the widget is not in the DOM yet
+                    return false;
+                }
+                return cards.length > 0;
+            }, {
+                timeout: appConst.mediumTimeout,
+                timeoutMsg: 'Layer cards were not rendered in the Layers Widget',
+            });
+        } catch (err) {
+            await this.handleError('Layers Widget, get the layer cards', 'err_widget_layer_cards', err);
+        }
+        return cards;
     }
 
     async waitForWidgetLoaded() {
         try {
             const host = await this.getShadowHost();
-            const div = await host.shadow$(`div[id*='LayersExtension']`);
-            await div.waitForDisplayed({timeout: appConst.mediumTimeout});
+            const widget = await host.shadow$(selectors.layersWidget);
+            await widget.waitForDisplayed({timeout: appConst.mediumTimeout});
         } catch (err) {
-            await this.handleError('Layer Widget was not loaded', 'err_layer_widget_loaded', err);
+            await this.handleError('Layers Widget was not loaded', 'err_layer_widget_loaded', err);
         }
     }
 
-    async findLayerItemViewDataByName(layerName) {
-        let host = await this.getShadowHost();
-        const items = await host.shadow$$('div.layers-item-view-data');
-        for (const item of items) {
-            const nameEl = await item.$('div.layer-name');
-            if (await nameEl.isExisting()) {
-                const text = await nameEl.getText();
-                if (text.trim() === layerName) {
-                    return item;
+    async isWidgetVisible() {
+        const host = await this.getShadowHost();
+        const widget = await host.shadow$(selectors.layersWidget);
+        return await widget.isDisplayed();
+    }
+
+    // 'Show all' is displayed only when the widget shows fewer layers than the content has
+    async waitForShowAllButtonDisplayed() {
+        try {
+            const host = await this.getShadowHost();
+            const button = await host.shadow$(selectors.showAllButton);
+            await button.waitForDisplayed({timeout: appConst.mediumTimeout});
+        } catch (err) {
+            await this.handleError(`'Show all' button should be displayed in the widget`, 'err_widget_show_all_btn', err);
+        }
+    }
+
+    async clickOnShowAllButton() {
+        try {
+            const layersContentTreeDialog = new LayersContentTreeDialog();
+            const host = await this.getShadowHost();
+            const button = await host.shadow$(selectors.showAllButton);
+            await button.waitForDisplayed({timeout: appConst.mediumTimeout});
+            await button.click();
+            await layersContentTreeDialog.waitForDialogLoaded();
+            return layersContentTreeDialog;
+        } catch (err) {
+            await this.handleError(`Tried to click on 'Show all' button`, 'err_widget_show_all_btn', err);
+        }
+    }
+
+    // The layer label also contains the language, so only the name part is compared
+    async getLayerCardByName(layerName) {
+        const cards = await this.getLayerCards();
+        for (const card of cards) {
+            const labelElement = await card.$(selectors.layerLabel);
+            if (await labelElement.isExisting()) {
+                const label = await labelElement.getText();
+                if (parseLayerLabel(label).name === layerName) {
+                    return card;
                 }
             }
         }
-        return null;
+        throw new Error(`Layer card with the name '${layerName}' was not found`);
     }
 
     async clickOnWidgetItem(layerName) {
         try {
-            let element = await this.findLayerItemViewDataByName(layerName);
-            await element.click();
+            const card = await this.getLayerCardByName(layerName);
+            await card.waitForDisplayed({timeout: appConst.mediumTimeout});
+            return await card.click();
         } catch (err) {
-            await this.handleError(`Tried to click on widget item for layer: ${layerName}`, 'err_widget_item', err);
+            await this.handleError(`Tried to click on the widget item for the layer '${layerName}'`, 'err_widget_item', err);
         }
     }
 
     async waitForLayerItemExpanded(layerName) {
-        let locator = this.widgetItemView + xpath.layerViewByName(layerName) + `/ancestor::li[1]`;
-        await this.waitForElementDisplayed(locator, appConst.mediumTimeout);
-        let attrClass = await this.getAttribute(locator, 'class');
-        return attrClass.includes('expanded');
+        const card = await this.getLayerCardByName(layerName);
+        await card.waitForDisplayed({timeout: appConst.mediumTimeout});
+        const attrClass = await card.getAttribute('class');
+        return attrClass.includes(EXPANDED_CLASS);
+    }
+
+    async isCurrentLayer(layerName) {
+        const card = await this.getLayerCardByName(layerName);
+        const legend = await card.$(selectors.currentLayerLegend);
+        return await legend.isExisting();
     }
 
     async getLayersName() {
         try {
-            let host = await this.getShadowHost();
-            let elements = await host.shadow$$('div[id*="LayerContentViewHeader"] > .layer-details .layer-name');
-            const names = []
-            for (const el of elements) {
-                let text = await el.getText();
-                names.push(text);
+            const cards = await this.getLayerCards();
+            const names = [];
+            for (const card of cards) {
+                const label = await (await card.$(selectors.layerLabel)).getText();
+                names.push(parseLayerLabel(label).name);
             }
             return names;
         } catch (err) {
-            await this.handleError('Tried to get layers names', 'err_widget_layers_names', err);
+            await this.handleError('Tried to get the layers names', 'err_widget_layers_names', err);
         }
     }
 
+    // Returns the language in parentheses, e.g. '(no)', or an empty string when the layer has no language
     async getLayerLanguage(layerName) {
         try {
-            const item = await this.findLayerItemViewDataByName(layerName);
-            const el = await item.$('.//div[@class="layer-language"]');
-            return el.getText();
+            const card = await this.getLayerCardByName(layerName);
+            const label = await (await card.$(selectors.layerLabel)).getText();
+            return parseLayerLabel(label).language;
         } catch (err) {
-            await this.handleError(`Tried to get layer language for layer: ${layerName}`, 'err_widget_layer_language', err);
+            await this.handleError(`Tried to get the language for the layer '${layerName}'`, 'err_widget_layer_language', err);
         }
     }
 
-    async waitForLocalizeButtonEnabled(layerName) {
+    // The status is not displayed when the content does not exist in the layer
+    async getContentStatus(layerName) {
         try {
-            const item = await this.findLayerItemViewDataByName(layerName);
-            const button = await item.$('.//div[contains(@id,"LayerContentViewFooter")]//button[.//span[text()="Localize"]]');
-            await button.waitForDisplayed({timeout: appConst.mediumTimeout});
-            return await button.waitForEnabled({timeout: appConst.mediumTimeout});
+            const card = await this.getLayerCardByName(layerName);
+            const status = await card.$(selectors.contentStatus);
+            await status.waitForDisplayed({timeout: appConst.mediumTimeout});
+            return await status.getText();
         } catch (err) {
-            await this.handleError(`Layers Widget - 'Localize' button should be displayed and enabled`, 'err_widget_localize_btn', err);
+            await this.handleError(`Tried to get the content status for the layer '${layerName}'`, 'err_widget_content_status', err);
         }
     }
 
-    async waitForLocalizeButtonDisabled(layerName) {
-        const item = await this.findLayerItemViewDataByName(layerName);
-        const button = await item.$('.//div[contains(@id,"LayerContentViewFooter")]//button[.//span[text()="Localize"]]');
+    async getContentDisplayName(layerName) {
+        try {
+            const card = await this.getLayerCardByName(layerName);
+            const displayName = await card.$(selectors.contentDisplayName);
+            await displayName.waitForDisplayed({timeout: appConst.mediumTimeout});
+            return await displayName.getText();
+        } catch (err) {
+            await this.handleError(`Tried to get the content display name for the layer '${layerName}'`, 'err_widget_content_name', err);
+        }
+    }
+
+    async getContentPath(layerName) {
+        try {
+            const card = await this.getLayerCardByName(layerName);
+            const path = await card.$(selectors.contentPath);
+            await path.waitForDisplayed({timeout: appConst.mediumTimeout});
+            return await path.getText();
+        } catch (err) {
+            await this.handleError(`Tried to get the content path for the layer '${layerName}'`, 'err_widget_content_path', err);
+        }
+    }
+
+    // Returns 'Localised' or 'Not localised'. The root layer has no indicator, so the call fails for it
+    async getLocalisationState(layerName) {
+        try {
+            const card = await this.getLayerCardByName(layerName);
+            const indicator = await card.$(selectors.localisationIndicator);
+            await indicator.waitForDisplayed({timeout: appConst.mediumTimeout});
+            return await indicator.getAttribute('aria-label');
+        } catch (err) {
+            await this.handleError(`Tried to get the localisation state for the layer '${layerName}'`, 'err_widget_localisation', err);
+        }
+    }
+
+    // Both states render the same icon, so the state is taken from its aria-label
+    async isContentLocalised(layerName) {
+        const state = await this.getLocalisationState(layerName);
+        if (state === LOCALISATION_LABEL.LOCALISED) {
+            return true;
+        }
+        if (state === LOCALISATION_LABEL.NOT_LOCALISED) {
+            return false;
+        }
+        throw new Error(`Unexpected localisation state '${state}' in the layer '${layerName}'`);
+    }
+
+    // The label is 'Edit' in the current layer and 'Open' in the other layers
+    async getActionButtonLabel(layerName) {
+        try {
+            const card = await this.getLayerCardByName(layerName);
+            const button = await card.$(selectors.actionButton);
+            await button.waitForDisplayed({timeout: appConst.mediumTimeout});
+            return await button.getAttribute('aria-label');
+        } catch (err) {
+            await this.handleError(`Tried to get the action button label for the layer '${layerName}'`, 'err_widget_action_btn', err);
+        }
+    }
+
+    // The action button is rendered only in the expanded card, so the card has to be clicked beforehand
+    async getActionButtonByLabel(layerName, label) {
+        const card = await this.getLayerCardByName(layerName);
+        const button = await card.$(selectors.actionButtonByLabel(label));
         await button.waitForDisplayed({timeout: appConst.mediumTimeout});
-        return await button.waitForEnabled({timeout: appConst.mediumTimeout, reverse: true});
+        return button;
     }
 
     async waitForEditButtonEnabled(layerName) {
         try {
-            const item = await this.findLayerItemViewDataByName(layerName);
-            const button = await item.$('.//div[contains(@id,"LayerContentViewFooter")]//button[.//span[text()="Edit"]]');
-            await button.waitForDisplayed({timeout: appConst.mediumTimeout});
+            const button = await this.getActionButtonByLabel(layerName, 'Edit');
             return await button.waitForEnabled({timeout: appConst.mediumTimeout});
         } catch (err) {
             await this.handleError(`Layers Widget - 'Edit' button should be enabled, layer: ${layerName}`, 'err_widget_edit_btn', err);
@@ -133,60 +266,28 @@ class BaseLayersWidget extends Page {
 
     async waitForOpenButtonEnabled(layerName) {
         try {
-            const item = await this.findLayerItemViewDataByName(layerName);
-            const button = await item.$('.//div[contains(@id,"LayerContentViewFooter")]//button[.//span[text()="Open"]]');
-            await button.waitForDisplayed({timeout: appConst.mediumTimeout});
+            const button = await this.getActionButtonByLabel(layerName, 'Open');
             return await button.waitForEnabled({timeout: appConst.mediumTimeout});
         } catch (err) {
-            throw new Error("Error getting button in the layer view item: " + err);
+            await this.handleError(`Layers Widget - 'Open' button should be enabled, layer: ${layerName}`, 'err_widget_open_btn', err);
         }
     }
 
-    async clickOnLocalizeButton(layerName) {
+    async clickOnEditButton(layerName) {
         try {
-            const item = await this.findLayerItemViewDataByName(layerName);
-            const button = await item.$('.//div[contains(@id,"LayerContentViewFooter")]//button[.//span[text()="Localize"]]');
-            await button.waitForDisplayed({timeout: appConst.mediumTimeout});
+            const button = await this.getActionButtonByLabel(layerName, 'Edit');
             return await button.click();
         } catch (err) {
-            await this.handleError(`Tried to click on Localize button for layer: ${layerName}`, 'err_widget_localize_btn', err);
-        }
-    }
-
-    // Gets the string 'layer611610(en)' from the layer-item  for the current selected content
-    async getContentNameWithLanguage(layerName) {
-        const item = await this.findLayerItemViewDataByName(layerName);
-        const baseXpath = './/div[contains(@id,"LayerContentViewBody")]//div[contains(@id,"LangBasedContentSummaryViewer")]' +
-                          lib.H6_DISPLAY_NAME;
-        const baseEl = await item.$(baseXpath);
-        await baseEl.waitForDisplayed({timeout: appConst.shortTimeout});
-        const displayName = await (await item.$(baseXpath + '//span[@class="display-name"]')).getText();
-        const postfix = await (await item.$(baseXpath + '//span[@class="display-name-postfix"]')).getText();
-        return displayName + postfix;
-    }
-
-    async getContentStatus(layerName) {
-        try {
-            const item = await this.findLayerItemViewDataByName(layerName);
-            const host = await this.getShadowHost();
-            const el = await item.$('div[id*="LayerContentViewHeader"] div[class*="status"]');
-            await el.waitForDisplayed();
-            return el.getText();
-        } catch (err) {
-            await this.handleError(`Tried to get content status for layer: ${layerName}`, 'err_widget_content_status', err);
+            await this.handleError(`Tried to click on 'Edit' button for the layer '${layerName}'`, 'err_widget_item_edit', err);
         }
     }
 
     async clickOnOpenButton(layerName) {
         try {
-
-            const item = await this.findLayerItemViewDataByName(layerName);
-            const button = await item.$('.//div[contains(@id,"LayerContentViewFooter")]//button[.//span[text()="Open"]]');
-            await button.waitForDisplayed({timeout: appConst.mediumTimeout});
+            const button = await this.getActionButtonByLabel(layerName, 'Open');
             return await button.click();
-            await this.pause(700);
         } catch (err) {
-            await this.handleError(`Tried to click on Open button for layer: ${layerName}`, 'err_widget_item_open', err);
+            await this.handleError(`Tried to click on 'Open' button for the layer '${layerName}'`, 'err_widget_item_open', err);
         }
     }
 }
