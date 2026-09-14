@@ -789,6 +789,7 @@ class Page {
         try {
             const host = await this.findElement(lib.WIDGETS.SHADOW_HOST);
             await host.waitForExist({timeout: ms});
+            await this.pause(300);
             return host;
         } catch (err) {
             await this.handleError('Layer Widget - failed to get shadow root', 'err_layer_widget_shadow_root', err);
