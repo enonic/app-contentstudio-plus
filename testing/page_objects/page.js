@@ -785,9 +785,10 @@ class Page {
             await this.handleError('Home page, xp menu - failed to get shadow root', 'err_home_page_shadow', err);
         }
     }
-    async getShadowHost() {
+    async getShadowHost(ms = appConst.mediumTimeout) {
         try {
             const host = await this.findElement(lib.WIDGETS.SHADOW_HOST);
+            await host.waitForExist({timeout: ms});
             return host;
         } catch (err) {
             await this.handleError('Layer Widget - failed to get shadow root', 'err_layer_widget_shadow_root', err);
