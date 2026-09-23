@@ -31,10 +31,6 @@ export const Comparisons = ({contentId, versions, from, to}: ComparisonsProps): 
         return <div className="px-4 text-sm text-subtle">{noPublishInPeriodMsg}</div>;
     }
 
-    if (plan.mode === 'single-publish') {
-        return <ComparisonBlock contentId={contentId} newer={plan.version} />;
-    }
-
     const hasFooter = !!plan.footerOfflineAt;
     const lastItemIndex = plan.items.length - 1;
 

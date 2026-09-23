@@ -114,6 +114,32 @@ class PublishReportDialog extends Page {
         }
     }
 
+    // Returns the whole text of the header row of the comparison block, e.g. 'Comparing <date> with <date>'
+    async getHeaderRowTextInComparisonBlock(index) {
+        try {
+            const rows = await this.getTextAndDateRowsInBlock(index);
+            await rows[0].waitForDisplayed({timeout: appConst.mediumTimeout});
+            return await rows[0].getText();
+        } catch (err) {
+            await this.handleError('PublishReport modal dialog, header row', 'err_publish_report_comparison_header_row', err);
+        }
+    }
+
+    // Returns all dates in the header of the comparison block: one date for 'Item went online', two dates for 'Comparing ... with ...'
+    async getDatesInHeaderOfComparisonBlock(index) {
+        try {
+            const rows = await this.getTextAndDateRowsInBlock(index);
+            const dates = await rows[0].$$(selectors.date);
+            const texts = [];
+            for (const date of dates) {
+                texts.push(await date.getText());
+            }
+            return texts;
+        } catch (err) {
+            await this.handleError('PublishReport modal dialog, dates in the header block', 'err_publish_report_dates_header', err);
+        }
+    }
+
     // Returns the date in the header of the comparison block
     async getDateInHeaderOfComparisonBlock(index) {
         try {

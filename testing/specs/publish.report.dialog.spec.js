@@ -20,6 +20,7 @@ describe('publish.report.dialog.spec: tests for publish report dialog', function
     }
 
     let FOLDER1;
+    //const IMPORTED_FOLDER_NAME = 'test-data';
     const ITEM_OFFLINE_TEXT = 'Item went offline';
     const ITEM_ONLINE_TEXT = 'Item went online';
     const ITEM_REPUBLISHED_HEADER = 'Comparing';
@@ -33,7 +34,7 @@ describe('publish.report.dialog.spec: tests for publish report dialog', function
             await studioUtils.doAddReadyFolder(FOLDER1);
         });
 
-    it(`GIVEN existing folder has been published in the wizard WHEN  'Generate' button has been pressed in 'Publish report' widget THEN publish report modal dialog should appear`,
+    it(`GIVEN existing folder has been published in the wizard WHEN 'Generate' button has been pressed in 'Publish report' widget THEN publish report modal dialog should appear`,
         async () => {
             let contentWizard = new ContentWizardPanel();
             let publishReportWidget = new PublishReportWidget();
@@ -54,7 +55,7 @@ describe('publish.report.dialog.spec: tests for publish report dialog', function
             await publishReportDialog.waitForDialogLoaded();
             await publishReportDialog.waitForPrintButtonEnabled();
             // 5. 'Show entire content' checkbox should not be displayed:
-            //await publishReportDialog.waitForShowEntireContentCheckboxNotDisplayed();
+            await publishReportDialog.waitForShowEntireContentCheckboxNotDisplayed();
             // 6. Verify the 'Item went online' in the header of the single comparison block:
             let actualText = await publishReportDialog.getHeaderInComparisonBlock(0);
             assert.equal(actualText, ITEM_ONLINE_TEXT, `'Item went online' - this text should be displayed in the single comparison block`);
@@ -80,21 +81,21 @@ describe('publish.report.dialog.spec: tests for publish report dialog', function
             // 4. Click on 'Generate' button:
             await publishReportWidget.clickOnGenerateButton();
             await publishReportDialog.waitForDialogLoaded();
-            // 5. Verify that the Comparisons-block with 'Item went offline' text gets visible in the modal dialog:
-            let actualText = await publishReportDialog.getAllComparisonsBlockHeader();
-            //assert.equal(actualText, ITEM_OFFLINE_TEXT, `'Item went offline' should be displayed in the modal dialog`);
-            // 6. Verify the date in the 'Item went offline' block:
+            // 5. Verify that the 'Item went offline' row is displayed above the comparison block:
+            let offlineRows = await publishReportDialog.getOfflineAfterMessages();
+            assert.equal(offlineRows.length, 1, `A single 'Item went offline' row should be displayed in the modal dialog`);
+            assert.ok(offlineRows[0].includes(ITEM_OFFLINE_TEXT), `'Item went offline' should be displayed in the modal dialog`);
+            // 6. Verify the date in the 'Item went offline' row, it is the first TextAndDate row in the dialog:
             let actualDate = await publishReportDialog.getAllComparisonsDate();
             assert.ok(actualDate[0].includes(CURRENT_DATE), 'Current date should be displayed in the text and date block');
-            // 7. Verify  that the comparison block remains visible -  'Item went online' text should be in the header of the single comparison block
-            actualText = await publishReportDialog.getHeaderInComparisonBlock(0);
+            // 7. Verify that the single comparison block remains visible with 'Item went online' text in its header:
+            let numberOfBlocks = await publishReportDialog.getNumberOfComparisonBlocks();
+            assert.equal(numberOfBlocks, 1, 'A single comparison block should be displayed in the modal dialog');
+            let actualText = await publishReportDialog.getHeaderInComparisonBlock(0);
             assert.equal(actualText, ITEM_ONLINE_TEXT, 'Item went online - this text should be displayed in the comparison block');
-            //actualText = await publishReportDialog.getHeaderInComparisonBlock(1);
         });
 
-     /// TODO https://github.com/enonic/app-contentstudio-plus/issues/1905
-    it.skip(
-        `GIVEN existing folder has been published in the second time WHEN 'Publish report' modal dialog has been opened THEN 'Comparing' text should appear in the modal dialog`,
+    it(`GIVEN previously unpublished folder has been published again WHEN 'Publish report' modal dialog has been opened THEN single block with 'Comparing' header and 'NB: Item was offline from' subtitle should be displayed`,
         async () => {
             let contentWizard = new ContentWizardPanel();
             let publishReportWidget = new PublishReportWidget();
@@ -113,15 +114,25 @@ describe('publish.report.dialog.spec: tests for publish report dialog', function
             // 4. Open 'Publish Report' modal dialog:
             await publishReportWidget.clickOnGenerateButton();
             await publishReportDialog.waitForDialogLoaded();
-            // 5. Verify 'Comparing' text in the header of the single comparison block:
-            let actualText = await publishReportDialog.getHeaderInComparisonBlock(0);
-            assert.equal(actualText, ITEM_REPUBLISHED_HEADER, `'Comparing' - this text should be displayed in the single comparison block`);
-            let actualDate = await publishReportDialog.getDateInHeaderOfComparisonBlock(0);
-            assert.ok(actualDate.includes(CURRENT_DATE), 'Current date should be displayed in the text and date block');
-            // 6. Verify the text in the subtitle of the single comparison block - 'NB: Item was offline from'
+            // 5. Two publishes are in the period, so a single block compares the first published version with the second one:
+            let numberOfBlocks = await publishReportDialog.getNumberOfComparisonBlocks();
+            assert.equal(numberOfBlocks, 1, 'A single comparison block should be displayed in the modal dialog');
+            let headerText = await publishReportDialog.getHeaderRowTextInComparisonBlock(0);
+            assert.ok(headerText.startsWith(ITEM_REPUBLISHED_HEADER),
+                `'Comparing' - the header of the comparison block should start with this text, actual: '${headerText}'`);
+            // Both dates in the header - the older and the newer publish - should be the current date:
+            let headerDates = await publishReportDialog.getDatesInHeaderOfComparisonBlock(0);
+            assert.equal(headerDates.length, 2, `Two dates should be displayed in the 'Comparing' header`);
+            assert.ok(headerDates.every(date => date.includes(CURRENT_DATE)), 'Current date should be displayed in both dates of the header');
+            assert.notEqual(headerDates[0], headerDates[1], 'The dates of the compared versions should be different');
+            // 6. The unpublish happened between the two publishes, so it is displayed in the subtitle of the block, not as a separate row:
             let subTitle = await publishReportDialog.getSubtitleInComparisonBlock(0);
             assert.equal(subTitle, ITEM_REPUBLISHED_SUBTITLE,
                 `'NB: Item was offline from' - should be displayed in the subtitle of the comparison block`);
+            let subTitleDate = await publishReportDialog.getDateInSubtitleOfComparisonBlock(0);
+            assert.ok(subTitleDate.includes(CURRENT_DATE), 'Current date should be displayed in the subtitle of the comparison block');
+            let offlineRows = await publishReportDialog.getOfflineAfterMessages();
+            assert.equal(offlineRows.length, 0, `'Item went offline' rows should not be displayed outside of the comparison block`);
             // 7. Verify that 'Show entire content' checkbox is displayed and not selected:
             let isSelected = await publishReportDialog.isShowEntireContentCheckboxSelected(0);
             assert.ok(isSelected === false, `'Show entire content' checkbox should not be selected`);

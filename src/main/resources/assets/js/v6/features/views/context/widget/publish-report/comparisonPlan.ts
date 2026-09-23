@@ -1,4 +1,6 @@
 import type {ContentVersion} from '@enonic/lib-contentstudio/app/ContentVersion';
+import type {ContentVersionAction} from '@enonic/lib-contentstudio/app/ContentVersionAction';
+import {ContentOperation} from '@enonic/lib-contentstudio/v6/entities/content/version/versionOperations';
 
 export type ComparisonItem = {
     newer: ContentVersion;
@@ -9,7 +11,6 @@ export type ComparisonItem = {
 export type ComparisonPlan =
     | {mode: 'no-publish-versions'}
     | {mode: 'no-publish-in-period'}
-    | {mode: 'single-publish'; version: ContentVersion}
     | {
           mode: 'comparisons';
           headingOfflineAt?: Date;
@@ -17,11 +18,24 @@ export type ComparisonPlan =
           items: ComparisonItem[];
       };
 
-const isPublishedVersion = (v: ContentVersion): boolean =>
-    v.hasPublishInfo() && v.isPublished() && !v.isScheduled();
+const findAction = (v: ContentVersion, operation: string): ContentVersionAction | undefined =>
+    v.getActions().find((a) => a.getOperation() === operation);
 
-const getVersionTimestamp = (v: ContentVersion): Date =>
-    v.hasPublishInfo() ? v.getPublishInfo().getTime() : v.getTimestamp();
+const hasActions = (v: ContentVersion): boolean => v.getActions().length > 0;
+
+const isPublishedVersion = (v: ContentVersion): boolean => {
+    if (hasActions(v) && !findAction(v, ContentOperation.PUBLISH)) return false;
+    return v.hasPublishInfo() && v.isPublished() && !v.isScheduled();
+};
+
+const isUnpublishedVersion = (v: ContentVersion): boolean =>
+    hasActions(v) ? !!findAction(v, ContentOperation.UNPUBLISH) : v.isUnpublished();
+
+const getVersionTimestamp = (v: ContentVersion): Date => {
+    const unpublishTime = findAction(v, ContentOperation.UNPUBLISH)?.getOpTime();
+    if (unpublishTime) return unpublishTime;
+    return v.hasPublishInfo() && v.getPublishInfo().getTime() ? v.getPublishInfo().getTime() : v.getTimestamp();
+};
 
 export function buildComparisonPlan(
     versions: ContentVersion[],
@@ -67,7 +81,7 @@ export function buildComparisonPlan(
                 }
                 newerVersion = v;
                 offlineInBetween = null;
-            } else if (v.isUnpublished()) {
+            } else if (isUnpublishedVersion(v)) {
                 if (lastBeforeTo === null) {
                     lastBeforeTo = {isPublished: false, timestamp: ts};
                 }
@@ -76,7 +90,7 @@ export function buildComparisonPlan(
         } else if (lastBeforeFrom === null) {
             if (pub) {
                 lastBeforeFrom = {isPublished: true, timestamp: ts, version: v};
-            } else if (v.isUnpublished()) {
+            } else if (isUnpublishedVersion(v)) {
                 lastBeforeFrom = {isPublished: false, timestamp: ts};
             }
         }
@@ -95,7 +109,7 @@ export function buildComparisonPlan(
     if (!hasAnyPublished) return {mode: 'no-publish-versions'};
     if (totalPublishedWithin === 0) return {mode: 'no-publish-in-period'};
     if (totalPublishedWithin === 1 && newerVersion) {
-        return {mode: 'single-publish', version: newerVersion};
+        items.push({newer: newerVersion});
     }
 
     return {
