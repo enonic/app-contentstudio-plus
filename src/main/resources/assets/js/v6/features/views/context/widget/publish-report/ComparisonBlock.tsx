@@ -26,6 +26,7 @@ export const ComparisonBlock = ({contentId, newer, older, offlineFrom}: Comparis
     const cId = useMemo(() => new ContentId(contentId), [contentId]);
     const [showAll, setShowAll] = useState<boolean>(!older);
     const [diffHtml, setDiffHtml] = useState<string>('');
+    const [identical, setIdentical] = useState<boolean>(false);
     const diffRef = useRef<HTMLDivElement>(null);
     const showAllId = usePrefixedId(null, 'pr-show-all-');
 
@@ -48,8 +49,10 @@ export const ComparisonBlock = ({contentId, newer, older, offlineFrom}: Comparis
                 const patcher = new DiffPatcher();
                 if (older && olderJson) {
                     const delta = patcher.diff(olderJson, newerJson);
-                    setDiffHtml(delta ? format(delta, newerJson) : `<h3>${identicalText}</h3>`);
+                    setIdentical(!delta);
+                    setDiffHtml(format(delta ?? {}, newerJson));
                 } else {
+                    setIdentical(false);
                     setDiffHtml(format({}, newerJson));
                 }
             })
@@ -58,7 +61,7 @@ export const ComparisonBlock = ({contentId, newer, older, offlineFrom}: Comparis
         return () => {
             cancelled = true;
         };
-    }, [cId, newer, older, identicalText]);
+    }, [cId, newer, older]);
 
     useEffect(() => {
         if (!diffRef.current) return;
@@ -100,11 +103,14 @@ export const ComparisonBlock = ({contentId, newer, older, offlineFrom}: Comparis
                     entries={[{text: compareSubtitle, date: DateHelper.formatDateTime(offlineFrom)}]}
                 />
             )}
-            <div
-                ref={diffRef}
-                className="jsondiffpatch-delta"
-                dangerouslySetInnerHTML={{__html: diffHtml}}
-            />
+            {identical && <div className="text-sm text-subtle">{identicalText}</div>}
+            {(!identical || showAll) && (
+                <div
+                    ref={diffRef}
+                    className="jsondiffpatch-delta"
+                    dangerouslySetInnerHTML={{__html: diffHtml}}
+                />
+            )}
         </div>
     );
 };
