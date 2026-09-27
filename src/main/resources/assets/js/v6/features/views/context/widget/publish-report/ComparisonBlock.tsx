@@ -72,7 +72,7 @@ export const ComparisonBlock = ({contentId, newer, older, offlineFrom}: Comparis
     const olderDate = older ? DateHelper.formatDateTime(older.getPublishInfo().getTime()) : null;
 
     return (
-        <div className="flex flex-col gap-2.5 px-4 py-3">
+        <div data-component="ComparisonBlock" className="flex flex-col gap-2.5 px-4 py-3">
             <div className="flex items-center justify-between gap-3">
                 {olderDate ? (
                     <TextAndDate
