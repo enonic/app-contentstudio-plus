@@ -19,16 +19,18 @@ export const ArchiveBrowseToolbar = ({toggleFilterPanelAction, actions}: Archive
         <Toolbar data-component={ARCHIVE_BROWSE_TOOLBAR_NAME}>
             <Toolbar.Container
                 aria-label="Archive toolbar"
-                className="bg-surface-neutral h-15 px-5 py-2 flex items-center gap-2 border-b border-bdr-soft"
+                className="bg-surface-neutral h-15 px-3.5 max-sm:pr-4 sm:px-5 py-2 flex items-center gap-2.5 sm:gap-2 border-b border-bdr-soft"
             >
+                <div className="flex min-w-fit items-center gap-2">
                 <SearchToggle action={toggleFilterPanelAction} />
                 <ActionGroup>
                     {actions.map((action) => (
                         <ToolbarActionButton key={action.getLabel()} action={action} />
                     ))}
                 </ActionGroup>
+                </div>
                 <div className="flex-1" />
-                <ContextToggle className="shrink-0" />
+                <ContextToggle className="shrink-0 size-7.5 sm:size-9" />
             </Toolbar.Container>
         </Toolbar>
     );
