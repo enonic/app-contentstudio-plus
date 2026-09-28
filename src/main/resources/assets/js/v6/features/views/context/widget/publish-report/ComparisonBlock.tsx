@@ -72,16 +72,20 @@ export const ComparisonBlock = ({contentId, newer, older, offlineFrom}: Comparis
     const olderDate = older ? DateHelper.formatDateTime(older.getPublishInfo().getTime()) : null;
 
     return (
-        <div data-component="ComparisonBlock" className="flex flex-col gap-2.5 px-4 py-3">
-            <div className="flex items-center justify-between gap-3">
+        <div data-component="ComparisonBlock" className="flex flex-col gap-2.5 px-2 sm:px-4 py-3">
+            <div className="flex max-sm:flex-col sm:items-center justify-between gap-2 sm:gap-3">
                 {olderDate ? (
-                    <TextAndDate
-                        icon={<GitCompare size={ICON_SIZE} />}
-                        entries={[
-                            {text: compareTitlePart1, date: olderDate},
-                            {text: compareTitlePart2, date: newerDate},
-                        ]}
-                    />
+                    <div className="grid grid-cols-[auto_1fr] items-center text-left text-sm sm:flex gap-2">
+                        <span className="inline-flex shrink-0">
+                            <GitCompare size={ICON_SIZE} />
+                        </span>
+                        <span className="text-subtle">{compareTitlePart1}</span>
+                        <div className="col-span-2 flex items-center gap-2 whitespace-nowrap sm:contents">
+                            <span className="font-medium">{olderDate}</span>
+                            <span className="text-subtle">{compareTitlePart2}</span>
+                            <span className="font-medium">{newerDate}</span>
+                        </div>
+                    </div>
                 ) : (
                     <TextAndDate
                         icon={<CircleCheck size={ICON_SIZE} />}
@@ -94,6 +98,7 @@ export const ComparisonBlock = ({contentId, newer, older, offlineFrom}: Comparis
                         label={showEntireLabel}
                         checked={showAll}
                         onCheckedChange={(checked) => setShowAll(checked === true)}
+                        className="max-sm:text-sm max-sm:[&_[data-slot=checkbox-indicator]]:size-3.5"
                     />
                 )}
             </div>

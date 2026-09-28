@@ -38,7 +38,7 @@ export const Comparisons = ({contentId, versions, from, to}: ComparisonsProps): 
         <div className="flex flex-col">
             {plan.headingOfflineAt && (
                 <TextAndDate
-                    className="border-b border-bdr-subtle px-4 py-3"
+                    className="border-b border-bdr-subtle px-2 sm:px-4 py-3"
                     icon={<CircleOff size={ICON_SIZE} />}
                     entries={[{text: offlineAfterLabel, date: DateHelper.formatDateTime(plan.headingOfflineAt)}]}
                 />
