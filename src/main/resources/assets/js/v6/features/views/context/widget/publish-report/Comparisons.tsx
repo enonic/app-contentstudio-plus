@@ -24,11 +24,11 @@ export const Comparisons = ({contentId, versions, from, to}: ComparisonsProps): 
     const offlineAfterLabel = useI18n('widget.publishReport.state.offline.after');
 
     if (plan.mode === 'no-publish-versions') {
-        return <div className="px-4 text-sm text-subtle">{noPublishVersionsMsg}</div>;
+        return <div className="px-2 sm:px-4 text-sm text-subtle">{noPublishVersionsMsg}</div>;
     }
 
     if (plan.mode === 'no-publish-in-period') {
-        return <div className="px-4 text-sm text-subtle">{noPublishInPeriodMsg}</div>;
+        return <div className="px-2 sm:px-4 text-sm text-subtle">{noPublishInPeriodMsg}</div>;
     }
 
     const hasFooter = !!plan.footerOfflineAt;
@@ -58,7 +58,7 @@ export const Comparisons = ({contentId, versions, from, to}: ComparisonsProps): 
             ))}
             {plan.footerOfflineAt && (
                 <TextAndDate
-                    className="px-4 py-3"
+                    className="px-2 sm:px-4 py-3"
                     icon={<CircleOff size={ICON_SIZE} />}
                     entries={[{text: offlineAfterLabel, date: DateHelper.formatDateTime(plan.footerOfflineAt)}]}
                 />

@@ -1,13 +1,7 @@
 <div class="cs-plus-extension-container">
     <link rel="stylesheet" href="{{stylesUri}}" type="text/css" media="all"/>
 
-    {{#isNoPublishMode}}
-    <div class="error">{{neverPublishedError}}</div>
-    {{/isNoPublishMode}}
-
-    {{^isNoPublishMode}}
     <script type="application/json" id="{{configScriptId}}">{{{configAsJson}}}</script>
     <script type="module" src="{{jsUri}}" data-config-script-id="{{configScriptId}}" data-content-id="{{contentId}}" data-publish-first="{{publishFirst}}" data-archived="{{isArchived}}" data-project="{{project}}"></script>
-    {{/isNoPublishMode}}
 
 </div>

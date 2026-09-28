@@ -3,7 +3,6 @@
 const portal = require('/lib/xp/portal');
 const contentLib = require('/lib/xp/content');
 const contextLib = require('/lib/xp/context');
-const i18n = require('/lib/xp/i18n');
 const mustache = require('/lib/mustache');
 const configLib = require('/lib/config');
 
@@ -40,7 +39,6 @@ const getBaseParams = (locales) => {
         }) + '?v=' + Date.now(),
         configScriptId: 'extension-pr-config-json',
         configAsJson: JSON.stringify(configLib.getConfig(locales), null, 4).replace(/<(\/?script|!--)/gi, "\\u003C$1"),
-        isNoPublishMode: false,
         isArchived: false,
         contentId: '',
         publishFirst: '',
@@ -93,12 +91,7 @@ const getViewParams = (req) => {
         if (content) {
             params.isArchived = isArchived;
             params.contentId = content._id;
-            params.publishFirst = content.publish.first;
-            params.isNoPublishMode = !content.publish.first;
-            params.neverPublishedError = i18n.localize({
-                key: 'widget.publishReport.neverPublished',
-                bundles: ['i18n/cs-plus']
-            })
+            params.publishFirst = content.publish.first || '';
         }
     }
 
