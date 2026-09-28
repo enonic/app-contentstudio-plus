@@ -12,9 +12,9 @@ const selectors = {
     closeButton: `div[data-component="PublishReportDialog"] button[data-component="Dialog.DefaultClose"]`,
     body: `div[data-component="PublishReportDialog"] div[data-component="Dialog.Body"]`,
     printButton: `div[data-component="PublishReportDialog"] footer[data-component="Dialog.Footer"] button[data-component="Button"]`,
-    // ComparisonBlock has no data-component attribute: every block wraps exactly one diff container,
-    // so the block is the closest non-diff div around 'div.jsondiffpatch-delta'
-    comparisonBlock: `div[data-component="PublishReportDialog"] div:not([class*="jsondiffpatch"]):has(> div.jsondiffpatch-delta)`,
+    // The diff container is not rendered for identical versions until 'Show entire content' is checked,
+    // so the block is located by its own data-component attribute:
+    comparisonBlock: `div[data-component="PublishReportDialog"] div[data-component="ComparisonBlock"]`,
     // 'text' and 'date' spans in a TextAndDate row, the header of a block contains two pairs, when versions are compared:
     textAndDateRow: `div[class*="text-sm"]`,
     text: `span[class*="text-subtle"]`,
