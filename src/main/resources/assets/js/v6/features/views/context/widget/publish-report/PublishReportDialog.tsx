@@ -68,10 +68,10 @@ export const PublishReportDialog = ({
                 <Dialog.Overlay />
                 <Dialog.Content
                     data-component={PUBLISH_REPORT_DIALOG_NAME}
-                    className="w-full h-full gap-5 sm:h-fit md:max-h-[85vh]"
+                    className="w-full h-full text-main gap-5 sm:h-fit max-sm:p-3 md:max-h-[85vh]"
                     style={{minWidth: 'min(736px, 100%)', maxWidth: '880px'}}
                 >
-                    <Dialog.DefaultHeader title={title} description={path} withClose />
+                    <Dialog.DefaultHeader className="max-sm:p-2" title={title} description={path} withClose />
                     <Dialog.Body className="flex flex-col gap-5 min-h-0">
                         <div className="flex-1 min-h-0 overflow-auto bg-surface-neutral py-3">
                             {versions && (
