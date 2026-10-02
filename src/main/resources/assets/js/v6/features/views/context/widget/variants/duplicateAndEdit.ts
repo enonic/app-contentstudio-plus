@@ -30,7 +30,7 @@ export const duplicateAndEdit = (params: ContentDuplicateParams, expectedVariant
         });
         if (created) {
             cleanup();
-            ContentEventsProcessor.handleEdit(new EditContentEvent([created]));
+            ContentEventsProcessor.handleEdit(new EditContentEvent([created]).setDisplayAsNew(true));
         }
     };
 

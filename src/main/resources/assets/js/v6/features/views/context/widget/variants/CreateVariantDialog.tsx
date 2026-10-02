@@ -59,7 +59,6 @@ export const CreateVariantDialog = ({
             .setName(trimmed);
 
         duplicateAndEdit(params, original.getId(), trimmed);
-
         onOpenChange(false);
     }, [original, name, validation.valid, onOpenChange]);
 

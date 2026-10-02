@@ -125,7 +125,7 @@ export const VariantsWidget = ({contentId}: VariantsWidgetProps): ReactElement =
         <div
             ref={containerRef}
             data-component={VARIANTS_WIDGET_NAME}
-            className={`${AppHelper.getCommonExtensionContainerClass()} flex w-full max-w-full min-w-0 flex-col gap-4`}
+            className={`${AppHelper.getCommonExtensionContainerClass()} flex w-full max-w-full min-w-0 flex-col gap-4 text-main`}
             onKeyDown={handleKeyDown}
             onClick={handleClick}
         >
