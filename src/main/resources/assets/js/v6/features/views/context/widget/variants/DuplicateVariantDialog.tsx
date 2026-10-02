@@ -37,7 +37,6 @@ export const DuplicateVariantDialog = ({
             .setName(name);
 
         duplicateAndEdit(params, variantOf, name);
-
         onOpenChange(false);
     }, [variant, siblings, onOpenChange]);
 
