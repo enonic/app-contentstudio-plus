@@ -47,10 +47,9 @@ type DateInputProps = {
     onChange: (date: Date | null) => void;
     onError?: (error: string | undefined) => void;
     error?: string;
-    portalContainer: HTMLElement | null;
 };
 
-const DateInput = ({label, value, onChange, onError, error, portalContainer}: DateInputProps): ReactElement => {
+const DateInput = ({label, value, onChange, onError, error}: DateInputProps): ReactElement => {
     const [open, setOpen] = useState(false);
     const [text, setText] = useState(formatDate(value));
     const inputRef = useRef<HTMLInputElement>(null);
@@ -138,7 +137,7 @@ const DateInput = ({label, value, onChange, onError, error, portalContainer}: Da
                     }
                 />
             </div>
-            <DatePicker.Portal container={portalContainer}>
+            <DatePicker.Portal>
                 <DatePicker.Content ref={contentRef} className="max-w-100" align="end" anchorRef={wrapperRef}>
                     <div className="flex flex-col gap-2">
                         <DatePicker.Header />
@@ -207,13 +206,7 @@ export const PublishReportWidget = ({
 
     const isValid = !!from && !!to && !fromError && !toError && !validationError;
 
-    const rootRef = useRef<HTMLDivElement>(null);
-    const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(null);
     const [dialogState, setDialogState] = useState<{from: Date; to: Date} | null>(null);
-
-    useEffect(() => {
-        setPortalContainer(rootRef.current);
-    }, []);
 
     const handleGenerate = (): void => {
         if (!from || !to) return;
@@ -226,11 +219,7 @@ export const PublishReportWidget = ({
 
     if (!firstPublishedStart) {
         return (
-            <div
-                ref={rootRef}
-                data-component={PUBLISH_REPORT_WIDGET_NAME}
-                className={AppHelper.getCommonExtensionContainerClass()}
-            >
+            <div data-component={PUBLISH_REPORT_WIDGET_NAME} className={AppHelper.getCommonExtensionContainerClass()}>
                 <div className="text-sm text-subtle">{neverPublishedMsg}</div>
             </div>
         );
@@ -240,7 +229,6 @@ export const PublishReportWidget = ({
 
     return (
         <div
-            ref={rootRef}
             data-component={PUBLISH_REPORT_WIDGET_NAME}
             className={`${AppHelper.getCommonExtensionContainerClass()} flex flex-col gap-4`}
         >
@@ -254,7 +242,6 @@ export const PublishReportWidget = ({
                     onChange={setFrom}
                     onError={setFromError}
                     error={fromError}
-                    portalContainer={portalContainer}
                 />
                 <DateInput
                     label={labelTo}
@@ -262,7 +249,6 @@ export const PublishReportWidget = ({
                     onChange={setTo}
                     onError={setToError}
                     error={toError}
-                    portalContainer={portalContainer}
                 />
                 {hasRangeError && <div className="text-sm text-error">{validationError}</div>}
             </div>
@@ -281,7 +267,6 @@ export const PublishReportWidget = ({
                 isArchived={isArchived}
                 from={dialogState?.from ?? new Date()}
                 to={dialogState?.to ?? new Date()}
-                portalContainer={injected ? portalContainer : undefined}
                 injected={injected}
             />
         </div>

@@ -3,6 +3,7 @@ import {render, unmountComponentAtNode} from 'react-dom';
 import {AppHelper} from '../../util/AppHelper';
 import {PublishReportWidget} from '../../v6/features/views/context/widget/publish-report/PublishReportWidget';
 import {Extension} from '../Extension';
+import {ExtensionRoot} from '../ExtensionRoot';
 
 export class PublishReportExtension
     extends Extension {
@@ -29,14 +30,16 @@ export class PublishReportExtension
         this.getHTMLElement().appendChild(this.reactRoot);
 
         render(
-            <IdProvider prefix="PublishReportWidget">
-                <PublishReportWidget
-                    contentId={this.contentId}
-                    firstPublished={firstPublished}
-                    isArchived={this.isContentArchived}
-                    injected
-                />
-            </IdProvider>,
+            <ExtensionRoot>
+                <IdProvider prefix="PublishReportWidget">
+                    <PublishReportWidget
+                        contentId={this.contentId}
+                        firstPublished={firstPublished}
+                        isArchived={this.isContentArchived}
+                        injected
+                    />
+                </IdProvider>
+            </ExtensionRoot>,
             this.reactRoot,
         );
     }

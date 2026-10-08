@@ -3,6 +3,7 @@ import {render, unmountComponentAtNode} from 'react-dom';
 import {AppHelper} from '../../util/AppHelper';
 import {VariantsWidget} from '../../v6/features/views/context/widget/variants/VariantsWidget';
 import {Extension} from '../Extension';
+import {ExtensionRoot} from '../ExtensionRoot';
 
 export class VariantsExtension
     extends Extension {
@@ -19,9 +20,11 @@ export class VariantsExtension
         this.getHTMLElement().appendChild(this.reactRoot);
 
         render(
-            <IdProvider prefix="VariantsWidget">
-                <VariantsWidget contentId={this.contentId} />
-            </IdProvider>,
+            <ExtensionRoot>
+                <IdProvider prefix="VariantsWidget">
+                    <VariantsWidget contentId={this.contentId} />
+                </IdProvider>
+            </ExtensionRoot>,
             this.reactRoot,
         );
     }
