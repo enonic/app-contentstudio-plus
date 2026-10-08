@@ -78,8 +78,8 @@ importers:
         specifier: ^1.5.1
         version: 1.5.1
       react-resizable-panels:
-        specifier: 4.14.1
-        version: 4.14.1(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+        specifier: 4.14.2
+        version: 4.14.2(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       react-virtuoso:
         specifier: ^4.18.16
         version: 4.18.16(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
@@ -2067,8 +2067,8 @@ packages:
     peerDependencies:
       react: ^19.2.5
 
-  react-resizable-panels@4.14.1:
-    resolution: {integrity: sha512-OB1bXDNTLcGgTTbaX6Dn5efZhlMboSnkfr1w4xpsJTHPEbRJpACBhXpgRCXozgPO1ztgFeZRUe5J3mFNCVKm5g==}
+  react-resizable-panels@4.14.2:
+    resolution: {integrity: sha512-s35mfXhwpPEPnB+BKPCZJ9VZU0CHb1I9trm9tijEGBNv1Srl0HzIweENeXnsQvd0Xm9BeOBkEzDGVJOZM2mkEQ==}
     peerDependencies:
       react: ^18.0.0 || ^19.0.0
       react-dom: ^18.0.0 || ^19.0.0
@@ -3883,7 +3883,7 @@ snapshots:
       react: 19.2.5
       scheduler: 0.27.0
 
-  react-resizable-panels@4.14.1(react-dom@19.2.5(react@19.2.5))(react@19.2.5):
+  react-resizable-panels@4.14.2(react-dom@19.2.5(react@19.2.5))(react@19.2.5):
     dependencies:
       react: 19.2.5
       react-dom: 19.2.5(react@19.2.5)
