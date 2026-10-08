@@ -35,7 +35,7 @@ export const LayersDialog = ({open, onOpenChange, rows, title, description}: Lay
             <Dialog.Portal>
                 <Dialog.Overlay />
                 <Dialog.Content
-                    className="sm:h-fit md:max-w-180 md:max-h-[85vh] lg:max-w-220 h-full w-full gap-5"
+                    className="h-full w-full max-sm:max-h-none sm:h-fit md:max-w-180 md:max-h-[85vh] lg:max-w-220 gap-5"
                     data-component={LAYERS_DIALOG_NAME}
                 >
                     <Dialog.DefaultHeader title={title} description={description} withClose />

@@ -1,8 +1,9 @@
-import {AppRoot, IdProvider} from '@enonic/ui';
+import {IdProvider} from '@enonic/ui';
 import {render, unmountComponentAtNode} from 'react-dom';
 import {AppHelper} from '../../util/AppHelper';
 import {LayersWidget} from '../../v6/features/views/context/widget/layers/LayersWidget';
 import {Extension} from '../Extension';
+import {ExtensionRoot} from '../ExtensionRoot';
 
 export class LayersExtension
     extends Extension {
@@ -19,11 +20,11 @@ export class LayersExtension
         this.getHTMLElement().appendChild(this.reactRoot);
 
         render(
-            <AppRoot className="contents">
+            <ExtensionRoot>
                 <IdProvider prefix="LayersWidget">
                     <LayersWidget contentId={this.contentId} />
                 </IdProvider>
-            </AppRoot>,
+            </ExtensionRoot>,
             this.reactRoot,
         );
     }

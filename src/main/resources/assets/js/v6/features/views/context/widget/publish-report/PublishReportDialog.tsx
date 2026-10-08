@@ -17,7 +17,6 @@ export type PublishReportDialogProps = {
     isArchived: boolean;
     from: Date;
     to: Date;
-    portalContainer?: HTMLElement | null;
     injected?: boolean;
 };
 
@@ -28,7 +27,6 @@ export const PublishReportDialog = ({
     isArchived,
     from,
     to,
-    portalContainer,
     injected = false,
 }: PublishReportDialogProps): ReactElement => {
     const [path, setPath] = useState<string | undefined>(undefined);
@@ -64,11 +62,11 @@ export const PublishReportDialog = ({
 
     return (
         <Dialog.Root open={open} onOpenChange={handleOpenChange}>
-            <Dialog.Portal container={portalContainer ?? undefined}>
+            <Dialog.Portal>
                 <Dialog.Overlay />
                 <Dialog.Content
                     data-component={PUBLISH_REPORT_DIALOG_NAME}
-                    className="w-full h-full text-main gap-5 sm:h-fit max-sm:p-3 md:max-h-[85vh]"
+                    className="w-full h-full max-sm:max-h-none gap-5 sm:h-fit max-sm:p-3 md:max-h-[85vh]"
                     style={{minWidth: 'min(736px, 100%)', maxWidth: '880px'}}
                 >
                     <Dialog.DefaultHeader className="max-sm:p-2" title={title} description={path} withClose />

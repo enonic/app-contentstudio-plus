@@ -7,6 +7,7 @@ import {i18n} from '@enonic/lib-admin-ui/util/Messages';
 import Q from 'q';
 import {HasValidLicenseRequest} from '../resource/HasValidLicenseRequest';
 import {Element} from '@enonic/lib-admin-ui/dom/Element';
+import {$hostTheme, type HostTheme} from './hostTheme';
 
 const DARK_CLASS = 'dark';
 
@@ -15,14 +16,13 @@ export class Extension
 
     protected contentId?: string;
     private noItemsBlock?: Element;
-    private themeObserver?: MutationObserver;
+    private unsubscribeTheme?: () => void;
 
     constructor(contentId: string, cls?: string) {
         super(`${AppHelper.getCommonExtensionClass()}${cls ? ` ${cls}` : ''}`);
 
         this.setContentId(contentId);
-        this.syncTheme();
-        this.observeOuterTheme();
+        this.unsubscribeTheme = $hostTheme.subscribe((theme: HostTheme) => this.syncTheme(theme));
 
         this.hasLicenseValid().then((isValid: boolean) => {
             if (isValid) {
@@ -33,8 +33,8 @@ export class Extension
         }).catch(DefaultErrorHandler.handle);
     }
 
-    private syncTheme(): void {
-        const isDark = document.documentElement.classList.contains(DARK_CLASS);
+    private syncTheme(theme: HostTheme): void {
+        const isDark = theme === 'dark';
 
         this.getHTMLElement().classList.toggle(DARK_CLASS, isDark);
 
@@ -42,15 +42,6 @@ export class Extension
         if (root instanceof ShadowRoot) {
             root.host.classList.toggle(DARK_CLASS, isDark);
         }
-    }
-
-    private observeOuterTheme(): void {
-        this.themeObserver?.disconnect();
-        this.themeObserver = new MutationObserver(() => this.syncTheme());
-        this.themeObserver.observe(document.documentElement, {
-            attributes: true,
-            attributeFilter: ['class'],
-        });
     }
 
     setContentId(contentId: string): void {
@@ -89,8 +80,8 @@ export class Extension
     }
 
     cleanUp(): void {
-        this.themeObserver?.disconnect();
-        this.themeObserver = undefined;
+        this.unsubscribeTheme?.();
+        this.unsubscribeTheme = undefined;
     }
 
     static getContainer(el: Element): Element {
