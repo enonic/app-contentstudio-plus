@@ -22,6 +22,9 @@ updates:
       enonic-types:
         patterns:
           - "@enonic-types/*"
+    ignore:
+      - dependency-name: "preact"
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: "npm"
     directory: "/testing"
     schedule:

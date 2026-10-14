@@ -4,7 +4,7 @@ import {Attachments} from '@enonic/lib-contentstudio/app/attachment/Attachments'
 import {ContentId} from '@enonic/lib-contentstudio/app/content/ContentId';
 import {ContentPath} from '@enonic/lib-contentstudio/app/content/ContentPath';
 import {$projects} from '@enonic/lib-contentstudio/v6/entities/project/projects.store';
-import {requestJson} from '@enonic/lib-contentstudio/v6/shared/api/client';
+import {requestJson} from '@enonic/ui-utils/request';
 import {getCmsRestUri} from '@enonic/lib-contentstudio/v6/shared/lib/url/cms';
 import {$archiveContextContent} from '../store/archive-selection';
 
