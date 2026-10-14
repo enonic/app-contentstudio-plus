@@ -1,7 +1,7 @@
 import type {TaskId} from '@enonic/lib-admin-ui/task/TaskId';
 import type {ContentSummary} from '@enonic/lib-contentstudio/app/content/ContentSummary';
 import {useAnimatedEllipsis} from '@enonic/lib-contentstudio/v6/shared/lib/hooks/useAnimatedEllipsis';
-import {useI18n} from '@enonic/lib-contentstudio/v6/shared/lib/hooks/useI18n';
+import {useI18n} from '../../../../../shared/i18n';
 import {useInfiniteScroll} from '@enonic/lib-contentstudio/v6/shared/lib/hooks/useInfiniteScroll';
 import {useTaskProgress} from '@enonic/lib-contentstudio/v6/entities/task/useTaskProgress';
 import {ContentLabel} from '@enonic/lib-contentstudio/v6/entities/content/ui/content/ContentLabel';

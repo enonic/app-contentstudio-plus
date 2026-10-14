@@ -1,5 +1,5 @@
 import {DateTimeFormatter} from '@enonic/lib-admin-ui/ui/treegrid/DateTimeFormatter';
-import {i18n} from '@enonic/lib-admin-ui/util/Messages';
+import {i18n} from '../shared/i18n';
 import {
     ExtensionBasePropertiesItemViewHelper,
 } from '@enonic/lib-contentstudio/app/view/context/extension/details/ExtensionBasePropertiesItemViewHelper';

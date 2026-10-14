@@ -1,6 +1,7 @@
-import {AppRoot} from '@enonic/ui';
+import {AppRoot, I18nProvider} from '@enonic/ui';
 import {useStore} from '@nanostores/preact';
 import type {ReactElement, ReactNode} from 'react';
+import {translate} from '../shared/i18n';
 import {$hostTheme} from './hostTheme';
 
 export type ExtensionRootProps = {
@@ -11,9 +12,11 @@ export const ExtensionRoot = ({children}: ExtensionRootProps): ReactElement => {
     const theme = useStore($hostTheme);
 
     return (
-        <AppRoot theme={theme} className="contents">
-            {children}
-        </AppRoot>
+        <I18nProvider translate={translate}>
+            <AppRoot theme={theme} className="contents">
+                {children}
+            </AppRoot>
+        </I18nProvider>
     );
 };
 

@@ -3,9 +3,10 @@ import {initConfig} from '@enonic/lib-contentstudio/v6/shared/config/config.stor
 import {AppHelper} from '../../util/AppHelper';
 import {LayersExtension} from './LayersExtension';
 import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
+import type {Phrases} from '@enonic/ui-utils';
 import {resolveConfig} from '../../util/WidgetConfigResolver';
 import {getModuleScript, getRequiredAttribute, getOptionalAttribute} from '../../util/ModuleScriptHelper';
-import {Messages} from '@enonic/lib-admin-ui/util/Messages';
+import {setPhrases} from '../../shared/i18n';
 import {whenProjectInitialized} from '@enonic/lib-contentstudio/v6/entities/project/activeProject.store';
 import {$projects, initProjects} from '@enonic/lib-contentstudio/v6/entities/project/projects.store';
 import {setActiveProjectResolver} from '@enonic/lib-contentstudio/v6/shared/lib/url/cms';
@@ -19,7 +20,7 @@ void (() => {
 
     CONFIG.setConfig(resolveConfig(configScriptId));
     initConfig(configScriptId);
-    Messages.addMessages(JSON.parse(CONFIG.getString('phrasesAsJson')) as object);
+    setPhrases(JSON.parse(CONFIG.getString('phrasesAsJson')) as Phrases);
     setActiveProjectResolver(() => $projects.get().activeProjectId);
     initProjects(projectName);
 

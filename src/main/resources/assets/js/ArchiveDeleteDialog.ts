@@ -1,4 +1,4 @@
-import {i18n} from '@enonic/lib-admin-ui/util/Messages';
+import {i18n} from './shared/i18n';
 import {DeleteContentRequest} from '@enonic/lib-contentstudio/app/resource/DeleteContentRequest';
 import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import {ArchiveResourceRequest} from './resource/ArchiveResourceRequest';

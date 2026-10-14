@@ -5,7 +5,7 @@ import type {ContentSummaryAndCompareStatus}
 import type {ExtensionItemViewType}
     from '@enonic/lib-contentstudio/app/view/context/ExtensionItemView';
 import {fetchVersion} from '@enonic/lib-contentstudio/v6/entities/content/api/versions.api';
-import {LegacyElement} from '@enonic/lib-contentstudio/v6/shared/ui/LegacyElement';
+import {LegacyElement} from '../../../../../../shared/LegacyElement';
 import {$activeWidgetId, $isContextOpen}
     from '@enonic/lib-contentstudio/v6/widgets/context-panel/model/contextWidgets.store';
 import {getVersionsWidgetKey}

@@ -1,4 +1,4 @@
-import {i18n} from '@enonic/lib-admin-ui/util/Messages';
+import {i18n} from '../../../../../../shared/i18n';
 import {ContentSummaryAndCompareStatus} from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import {Button} from '@enonic/ui';
 import {type ReactElement, useCallback, useEffect, useMemo, useState} from 'react';

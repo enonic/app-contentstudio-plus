@@ -1,5 +1,5 @@
-import {useI18n} from '@enonic/lib-contentstudio/v6/shared/lib/hooks/useI18n';
-import {LegacyElement} from '@enonic/lib-contentstudio/v6/shared/ui/LegacyElement';
+import {useI18n} from '../../../../../shared/i18n';
+import {LegacyElement} from '../../../../../shared/LegacyElement';
 import {useStore} from '@nanostores/preact';
 import {type ReactElement} from 'react';
 import {
