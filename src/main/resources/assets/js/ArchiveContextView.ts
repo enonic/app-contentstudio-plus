@@ -1,6 +1,6 @@
 import {Extension} from '@enonic/lib-admin-ui/extension/Extension';
 import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
-import {i18n} from '@enonic/lib-admin-ui/util/Messages';
+import {i18n} from './shared/i18n';
 import {ContextView} from '@enonic/lib-contentstudio/app/view/context/ContextView';
 import {ExtensionView} from '@enonic/lib-contentstudio/app/view/context/ExtensionView';
 import {History, List, Newspaper} from 'lucide-react';

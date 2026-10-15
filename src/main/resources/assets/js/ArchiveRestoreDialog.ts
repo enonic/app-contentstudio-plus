@@ -1,4 +1,4 @@
-import {i18n} from '@enonic/lib-admin-ui/util/Messages';
+import {i18n} from './shared/i18n';
 import {RestoreArchivedRequest} from './resource/RestoreArchivedRequest';
 import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import {TaskId} from '@enonic/lib-admin-ui/task/TaskId';

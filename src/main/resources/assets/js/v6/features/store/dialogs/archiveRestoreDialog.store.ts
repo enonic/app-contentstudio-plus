@@ -1,7 +1,7 @@
 import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import {NotifyManager} from '@enonic/lib-admin-ui/notify/NotifyManager';
 import type {TaskId} from '@enonic/lib-admin-ui/task/TaskId';
-import {i18n} from '@enonic/lib-admin-ui/util/Messages';
+import {i18n} from '../../../../shared/i18n';
 import type {ContentId} from '@enonic/lib-contentstudio/app/content/ContentId';
 import type {ContentSummary} from '@enonic/lib-contentstudio/app/content/ContentSummary';
 import {GetDescendantsOfContentsRequest} from '@enonic/lib-contentstudio/app/resource/GetDescendantsOfContentsRequest';

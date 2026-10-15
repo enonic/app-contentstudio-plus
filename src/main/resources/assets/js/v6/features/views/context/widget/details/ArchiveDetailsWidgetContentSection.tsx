@@ -1,7 +1,7 @@
 import {useStore} from '@nanostores/preact';
 import type {ReactElement} from 'react';
 import {Path} from '@enonic/lib-admin-ui/rest/Path';
-import {useI18n} from '@enonic/lib-contentstudio/v6/shared/lib/hooks/useI18n';
+import {useI18n} from '../../../../../../shared/i18n';
 import {ContentIcon} from '@enonic/lib-contentstudio/v6/shared/ui/icons/ContentIcon';
 import {$archiveContextContent} from '../../../../store/archive-selection';
 

@@ -2,7 +2,7 @@ import {DivEl} from '@enonic/lib-admin-ui/dom/DivEl';
 import {ArchiveContentViewer} from './ArchiveContentViewer';
 import Q from 'q';
 import {ArchiveContentViewItem} from './ArchiveContentViewItem';
-import {i18n} from '@enonic/lib-admin-ui/util/Messages';
+import {i18n} from './shared/i18n';
 import {SpanEl} from '@enonic/lib-admin-ui/dom/SpanEl';
 
 export class ArchiveListItemViewer extends DivEl {

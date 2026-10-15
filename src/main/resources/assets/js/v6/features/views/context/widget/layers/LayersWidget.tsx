@@ -1,4 +1,4 @@
-import {i18n} from '@enonic/lib-admin-ui/util/Messages';
+import {i18n} from '../../../../../../shared/i18n';
 import {getActiveProjectName} from '@enonic/lib-contentstudio/v6/entities/project/activeProject.store';
 import {Button} from '@enonic/ui';
 import {type ReactElement, useCallback, useEffect, useMemo, useState} from 'react';

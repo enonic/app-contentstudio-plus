@@ -1,4 +1,4 @@
-import {i18n} from '@enonic/lib-admin-ui/util/Messages';
+import {i18n} from '../../../../../../shared/i18n';
 import {ContentEventsProcessor} from '@enonic/lib-contentstudio/app/ContentEventsProcessor';
 import {EditContentEvent} from '@enonic/lib-contentstudio/app/event/EditContentEvent';
 import {PublishStatus} from '@enonic/lib-contentstudio/app/publish/PublishStatus';

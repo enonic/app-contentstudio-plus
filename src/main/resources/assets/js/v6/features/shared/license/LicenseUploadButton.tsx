@@ -1,4 +1,4 @@
-import {i18n} from '@enonic/lib-admin-ui/util/Messages';
+import {i18n} from '../../../../shared/i18n';
 import {Button, type ButtonSize, type ButtonVariant} from '@enonic/ui';
 import {UploadIcon} from 'lucide-react';
 import {type ChangeEvent, type ReactElement, useCallback, useRef, useState} from 'react';

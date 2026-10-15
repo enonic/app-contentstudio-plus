@@ -3,7 +3,7 @@ import {DivEl} from '@enonic/lib-admin-ui/dom/DivEl';
 import {NoLicenseBannerElement} from '../v6/features/shared/license/NoLicenseBanner';
 import {AppHelper} from '../util/AppHelper';
 import {SpanEl} from '@enonic/lib-admin-ui/dom/SpanEl';
-import {i18n} from '@enonic/lib-admin-ui/util/Messages';
+import {i18n} from '../shared/i18n';
 import Q from 'q';
 import {HasValidLicenseRequest} from '../resource/HasValidLicenseRequest';
 import {Element} from '@enonic/lib-admin-ui/dom/Element';

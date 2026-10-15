@@ -1,5 +1,5 @@
 import {NotifyManager} from '@enonic/lib-admin-ui/notify/NotifyManager';
-import {i18n} from '@enonic/lib-admin-ui/util/Messages';
+import {i18n} from '../../../../shared/i18n';
 import {ValidLicenseLoadedEvent} from '../../../../event/ValidLicenseLoadedEvent';
 import {UploadLicenseRequest} from '../../../../resource/UploadLicenseRequest';
 

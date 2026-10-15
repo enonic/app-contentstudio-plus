@@ -4,7 +4,10 @@ import {initConfig} from '@enonic/lib-contentstudio/v6/shared/config/config.stor
 import {whenProjectInitialized} from '@enonic/lib-contentstudio/v6/entities/project/activeProject.store';
 import {$projects, initProjects} from '@enonic/lib-contentstudio/v6/entities/project/projects.store';
 import {setActiveProjectResolver} from '@enonic/lib-contentstudio/v6/shared/lib/url/cms';
+import type {Phrases} from '@enonic/ui-utils';
+import {setPhrases} from './shared/i18n';
 import {getModuleScript, getRequiredAttribute} from './util/ModuleScriptHelper';
+import {resolveConfig} from './util/WidgetConfigResolver';
 
 // ! Import the app container lazily so v6 config is initialized (initConfig below)
 // ! before modules such as liveViewWidgets.store run their import-time widget fetch.
@@ -22,7 +25,9 @@ void (() => {
 
     const body: Body = Body.get();
     const widgetEl: Element = body.findChildById(elemId, true);
-    initConfig(getRequiredAttribute(currentScript, 'data-config-script-id'));
+    const configScriptId = getRequiredAttribute(currentScript, 'data-config-script-id');
+    setPhrases(JSON.parse(resolveConfig(configScriptId).phrasesAsJson as string) as Phrases);
+    initConfig(configScriptId);
     setActiveProjectResolver(() => $projects.get().activeProjectId);
     initProjects();
 

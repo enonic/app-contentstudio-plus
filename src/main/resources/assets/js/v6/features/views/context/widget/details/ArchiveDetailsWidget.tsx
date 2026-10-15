@@ -5,7 +5,7 @@ import type {ContentSummaryAndCompareStatus}
     from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import type {ExtensionItemViewType}
     from '@enonic/lib-contentstudio/app/view/context/ExtensionItemView';
-import {LegacyElement} from '@enonic/lib-contentstudio/v6/shared/ui/LegacyElement';
+import {LegacyElement} from '../../../../../../shared/LegacyElement';
 import {$activeWidgetId, $isContextOpen} from '@enonic/lib-contentstudio/v6/widgets/context-panel/model/contextWidgets.store';
 import {getDetailsWidgetKey} from '@enonic/lib-contentstudio/v6/shared/lib/widget/details';
 import {$archiveContextContent} from '../../../../store/archive-selection';

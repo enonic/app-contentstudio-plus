@@ -1,5 +1,5 @@
 import {type Action} from '@enonic/lib-admin-ui/ui/Action';
-import {LegacyElement} from '@enonic/lib-contentstudio/v6/shared/ui/LegacyElement';
+import {LegacyElement} from './shared/LegacyElement';
 import {ActionGroup} from '@enonic/lib-contentstudio/v6/widgets/browse-toolbar/ActionGroup';
 import {ContextToggle} from '@enonic/lib-contentstudio/v6/widgets/browse-toolbar/ContextToggle';
 import {SearchToggle} from '@enonic/lib-contentstudio/v6/widgets/browse-toolbar/SearchToggle';
