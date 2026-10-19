@@ -86,6 +86,7 @@ describe('folder.variants.spec - tests for Create Variant modal dialog', functio
             // the variant inherits the displayName of its original, so the new tab is identified by that name
             await studioUtils.waitForNewTabAndSwitch(IMPORTED_FOLDER_NAME);
             await contentWizardPanel.waitForOpened();
+            await studioUtils.saveScreenshot('new_variant_wizard_panel');
             let result = await contentWizardPanel.getDisplayName();
             let path =  await contentWizardPanel.getNameInToolbar();
             assert.ok(path.includes('variant'),'New variant should be loaded in the wizard panel');
