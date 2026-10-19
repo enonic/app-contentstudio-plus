@@ -49,7 +49,7 @@ const XPATH = {
     },
     openRenameDialogButton: (name) =>
         `//button[span[@data-component='ContentWizardToolbar.ContentName' and text()='${name}']]`,
-    nameInToolbarButton: `//button[@data-component='Tooltip' and contains(@id,'toolbar-item')]/span`,
+    nameInToolbarButton: `//span[@data-component='ContentWizardToolbar.ContentName']`,
     publishMenuItemByName(name) {
         return `//div[@data-component='Menu.Item' and child::span[text()='${name}']]`;
     },
