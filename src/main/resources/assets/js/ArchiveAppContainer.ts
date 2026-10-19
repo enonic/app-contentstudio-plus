@@ -14,6 +14,8 @@ import {ArchiveCompareVersionsDialogElement} from './v6/features/views/context/w
 export class ArchiveAppContainer
     extends AppContainer {
 
+    private noLicenseBanner?: NoLicenseBannerElement;
+
     constructor() {
         super('archive-app-container');
 
@@ -50,17 +52,22 @@ export class ArchiveAppContainer
     }
 
     private renderNoLicense(): void {
-        this.appendChild(new NoLicenseBannerElement({variant: 'full'}));
+        this.noLicenseBanner = new NoLicenseBannerElement({variant: 'full'});
+        this.appendChild(this.noLicenseBanner);
 
-        ValidLicenseLoadedEvent.on(() => {
+        const handler = (): void => {
+            ValidLicenseLoadedEvent.un(handler);
             this.handleValidLicenseLoaded();
-        });
+        };
+        ValidLicenseLoadedEvent.on(handler);
 
         new NoLicenseDialogElement().open();
     }
 
     private handleValidLicenseLoaded(): void {
         this.removeClass('no-license');
+        this.noLicenseBanner?.remove();
+        this.noLicenseBanner = undefined;
         super.initElements();
 
         this.whenRendered(() => {
