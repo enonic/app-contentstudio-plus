@@ -12,6 +12,7 @@ const ContentWizard = require('../page_objects/wizardpanel/content.wizard.panel'
 const appConst = require('../libs/app_const');
 const ConfirmationDialog = require("../page_objects/confirmation.dialog");
 const WizardLayersWidget = require("../page_objects/wizardpanel/details/wizard.layers.widget");
+const DetailsWidgetInfoSection = require('../page_objects/browsepanel/detailspanel/details.widget.info.section');
 
 describe('layers.widget.localize.button.spec - checks Localize button in browse toolbar and Layers widget', function () {
     this.timeout(appConst.SUITE_TIMEOUT);
@@ -69,6 +70,7 @@ describe('layers.widget.localize.button.spec - checks Localize button in browse 
     it("GIVEN inherited content has been opened WHEN 'Localize' button in the wizard toolbar has been clicked THEN the language should be updated",
         async () => {
             let contentWizard = new ContentWizard();
+            let propertiesWidget = new DetailsWidgetInfoSection();
             await studioUtils.openProjectSelectionDialogAndSelectContext(LAYER_DISPLAY_NAME);
             // 1. Select the folder in layer and open Layers widget:
             await studioUtils.findAndSelectItem(FOLDER_NAME);
@@ -81,6 +83,7 @@ describe('layers.widget.localize.button.spec - checks Localize button in browse 
             await contentWizard.waitForSaveButtonNotDisplayed();
             // 4. Click on Localize button:
             await contentWizard.clickOnLocalizeButton();
+            await propertiesWidget.waitForLanguageVisible();
             let actualDisplayName = await contentWizard.getDisplayName();
             let actualProjectName = await contentWizard.getProjectDisplayName();
             // 4. Open 'Edit Setting' modal dialog:

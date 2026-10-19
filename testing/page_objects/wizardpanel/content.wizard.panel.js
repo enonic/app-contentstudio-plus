@@ -47,7 +47,8 @@ const XPATH = {
     previewToolbarMenuItem: (optionName) => {
         return `//div[contains(@id,'PreviewToolbar') and @role='menu']//div[@role='menuitemradio' and descendant::span[text()='${optionName}']]`;
     },
-    openRenameDialogButton: (name) => `//button[@data-component='Tooltip' and child::span[text()='${name}']]`,
+    openRenameDialogButton: (name) =>
+        `//button[span[@data-component='ContentWizardToolbar.ContentName' and text()='${name}']]`,
     nameInToolbarButton: `//button[@data-component='Tooltip' and contains(@id,'toolbar-item')]/span`,
     publishMenuItemByName(name) {
         return `//div[@data-component='Menu.Item' and child::span[text()='${name}']]`;
