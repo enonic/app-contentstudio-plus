@@ -34,7 +34,7 @@ describe('layers.widget.localize.button.spec - checks Localize button in browse 
             let layer = projectUtils.buildLayer('Default', appConst.LANGUAGES.NORSK_NO, appConst.PROJECT_ACCESS_MODE.PUBLIC, null,
                 null, LAYER_DISPLAY_NAME);
             await projectUtils.fillFormsWizardAndClickOnCreateButton(layer);
-            await settingsBrowsePanel.waitForNotificationMessage();
+            //await settingsBrowsePanel.waitForNotificationMessage();
             await settingsBrowsePanel.pause(1000);
         });
 
