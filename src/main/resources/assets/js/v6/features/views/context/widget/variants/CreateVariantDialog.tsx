@@ -5,6 +5,7 @@ import {ContentIcon} from '@enonic/lib-contentstudio/v6/shared/ui/icons/ContentI
 import {Button, Dialog, Input} from '@enonic/ui';
 import {type ChangeEvent, type ReactElement, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {resolveContentDisplay} from '../../../../shared/content/contentDisplay';
+import {useDialogInitialFocus} from '../../../../shared/lib/hooks/useDialogInitialFocus';
 import {duplicateAndEdit} from './duplicateAndEdit';
 import {getNextAvailableVariantName, isVariantNameOccupied} from './variantName';
 
@@ -25,6 +26,8 @@ export const CreateVariantDialog = ({
 }: CreateVariantDialogProps): ReactElement => {
     const [name, setName] = useState<string>('');
     const prevOpenRef = useRef(false);
+    const nameInputRef = useRef<HTMLInputElement>(null);
+    const handleOpenAutoFocus = useDialogInitialFocus(nameInputRef);
 
     useEffect(() => {
         if (open && !prevOpenRef.current) {
@@ -76,6 +79,7 @@ export const CreateVariantDialog = ({
                 <Dialog.Content
                     className="sm:h-fit md:max-w-180 md:max-h-[85vh] w-full gap-5"
                     data-component={CREATE_VARIANT_DIALOG_NAME}
+                    onOpenAutoFocus={handleOpenAutoFocus}
                 >
                     <Dialog.DefaultHeader
                         title={i18n('widget.variants.create.text')}
@@ -99,22 +103,25 @@ export const CreateVariantDialog = ({
                         </div>
 
                         <Input
+                            ref={nameInputRef}
                             label={i18n('widget.variants.dialog.create.input.name.label')}
                             value={name}
                             onChange={handleNameChange}
                             error={validation.error}
-                            autoFocus
                         />
                     </Dialog.Body>
                     <Dialog.Footer>
-                        <Button
-                            className="self-end"
-                            size="lg"
-                            variant="solid"
-                            label={i18n('widget.variants.create.text')}
-                            disabled={!validation.valid}
-                            onClick={handleCreate}
-                        />
+                        <Dialog.Shortcut asChild>
+                            <Button
+                                data-component="Button"
+                                className="self-end"
+                                size="lg"
+                                variant="solid"
+                                label={i18n('widget.variants.create.text')}
+                                disabled={!validation.valid}
+                                onClick={handleCreate}
+                            />
+                        </Dialog.Shortcut>
                     </Dialog.Footer>
                 </Dialog.Content>
             </Dialog.Portal>
