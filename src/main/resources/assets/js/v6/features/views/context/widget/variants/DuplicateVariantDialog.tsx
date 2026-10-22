@@ -3,8 +3,9 @@ import {ContentSummaryAndCompareStatus} from '@enonic/lib-contentstudio/app/cont
 import {ContentDuplicateParams} from '@enonic/lib-contentstudio/app/resource/ContentDuplicateParams';
 import {ContentIcon} from '@enonic/lib-contentstudio/v6/shared/ui/icons/ContentIcon';
 import {Button, Dialog} from '@enonic/ui';
-import {type ReactElement, useCallback} from 'react';
+import {type ReactElement, useCallback, useRef} from 'react';
 import {resolveContentDisplay} from '../../../../shared/content/contentDisplay';
+import {useDialogInitialFocus} from '../../../../shared/lib/hooks/useDialogInitialFocus';
 import {duplicateAndEdit} from './duplicateAndEdit';
 import {getNextAvailableVariantName} from './variantName';
 
@@ -23,6 +24,9 @@ export const DuplicateVariantDialog = ({
     variant,
     siblings,
 }: DuplicateVariantDialogProps): ReactElement => {
+    const duplicateButtonRef = useRef<HTMLButtonElement>(null);
+    const handleOpenAutoFocus = useDialogInitialFocus(duplicateButtonRef);
+
     const handleDuplicate = useCallback((): void => {
         if (!variant) return;
 
@@ -54,6 +58,7 @@ export const DuplicateVariantDialog = ({
                 <Dialog.Content
                     className="sm:h-fit md:max-w-180 md:max-h-[85vh] w-full gap-5"
                     data-component={DUPLICATE_VARIANT_DIALOG_NAME}
+                    onOpenAutoFocus={handleOpenAutoFocus}
                 >
                     <Dialog.DefaultHeader
                         title={i18n('action.duplicate')}
@@ -72,13 +77,17 @@ export const DuplicateVariantDialog = ({
                         </div>
                     </Dialog.Body>
                     <Dialog.Footer>
-                        <Button
-                            className="self-end"
-                            size="lg"
-                            variant="solid"
-                            label={i18n('action.duplicate')}
-                            onClick={handleDuplicate}
-                        />
+                        <Dialog.Shortcut asChild>
+                            <Button
+                                ref={duplicateButtonRef}
+                                data-component="Button"
+                                className="self-end"
+                                size="lg"
+                                variant="solid"
+                                label={i18n('action.duplicate')}
+                                onClick={handleDuplicate}
+                            />
+                        </Dialog.Shortcut>
                     </Dialog.Footer>
                 </Dialog.Content>
             </Dialog.Portal>
