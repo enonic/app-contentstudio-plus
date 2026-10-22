@@ -3,7 +3,8 @@ import type {ContentVersion} from '@enonic/lib-contentstudio/app/ContentVersion'
 import {useI18n} from '@enonic/lib-contentstudio/v6/shared/lib/hooks/useI18n';
 import {Button, Dialog} from '@enonic/ui';
 import {Printer} from 'lucide-react';
-import {type ReactElement, useEffect, useState} from 'react';
+import {type ReactElement, useEffect, useRef, useState} from 'react';
+import {useDialogInitialFocus} from '../../../../shared/lib/hooks/useDialogInitialFocus';
 import {fetchPublishReportData} from '../../../../api/publish-report';
 import {Comparisons} from './Comparisons';
 import {printReport} from './printReport';
@@ -34,6 +35,8 @@ export const PublishReportDialog = ({
 
     const title = useI18n('widget.publishReport.dialog.title');
     const printLabel = useI18n('widget.publishReport.dialog.button.print');
+    const printButtonRef = useRef<HTMLButtonElement>(null);
+    const handleOpenAutoFocus = useDialogInitialFocus(printButtonRef);
 
     useEffect(() => {
         if (!open) {
@@ -66,6 +69,7 @@ export const PublishReportDialog = ({
                 <Dialog.Overlay />
                 <Dialog.Content
                     data-component={PUBLISH_REPORT_DIALOG_NAME}
+                    onOpenAutoFocus={handleOpenAutoFocus}
                     className="w-full h-full max-sm:max-h-none gap-5 sm:h-fit max-sm:p-3 md:max-h-[85vh]"
                     style={{minWidth: 'min(736px, 100%)', maxWidth: '880px'}}
                 >
@@ -78,13 +82,17 @@ export const PublishReportDialog = ({
                         </div>
                     </Dialog.Body>
                     <Dialog.Footer className="flex items-center justify-end gap-2.5">
-                        <Button
-                            startIcon={Printer}
-                            variant="outline"
-                            size="lg"
-                            label={printLabel}
-                            onClick={injected ? printReport : () => window.print()}
-                        />
+                        <Dialog.Shortcut asChild>
+                            <Button
+                                ref={printButtonRef}
+                                data-component="Button"
+                                startIcon={Printer}
+                                variant="outline"
+                                size="lg"
+                                label={printLabel}
+                                onClick={injected ? printReport : () => window.print()}
+                            />
+                        </Dialog.Shortcut>
                     </Dialog.Footer>
                 </Dialog.Content>
             </Dialog.Portal>

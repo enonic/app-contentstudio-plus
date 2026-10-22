@@ -3,9 +3,9 @@ import {ContentEventsProcessor} from '@enonic/lib-contentstudio/app/ContentEvent
 import {EditContentEvent} from '@enonic/lib-contentstudio/app/event/EditContentEvent';
 import {PublishStatus} from '@enonic/lib-contentstudio/app/publish/PublishStatus';
 import {ProjectIcon} from '@enonic/lib-contentstudio/v6/shared/ui/icons/ProjectIcon';
-import {Button, Tooltip, cn} from '@enonic/ui';
+import {Button, Dialog, Tooltip, cn} from '@enonic/ui';
 import {Layers2} from 'lucide-react';
-import {type MouseEvent, type ReactElement, useCallback, useLayoutEffect, useMemo, useRef} from 'react';
+import {type MouseEvent, type ReactElement, type RefObject, useCallback, useLayoutEffect, useMemo, useRef} from 'react';
 import {LayerContent} from '../../../../../../extension/layers/LayerContent';
 import {resolveContentDisplay} from '../../../../shared/content/contentDisplay';
 import type {CardEntry} from '../shared/useCardListKeyboard';
@@ -19,6 +19,8 @@ export type LayerCardProps = {
     onToggle: () => void;
     index?: number;
     registerEntry?: (index: number, entry: CardEntry | null) => void;
+    actionButtonRef?: RefObject<HTMLButtonElement | null>;
+    dialogShortcut?: boolean;
 };
 
 const LEVEL_INDENT_PX = 24;
@@ -36,7 +38,9 @@ const STATUS_TONE: Record<string, string> = {
 
 const getStatusTone = (statusClass: string): string => STATUS_TONE[statusClass] ?? 'text-subtle';
 
-export const LayerCard = ({item, isCurrent, isInChain, level, isExpanded, onToggle, index, registerEntry}: LayerCardProps): ReactElement => {
+export const LayerCard = ({
+    item, isCurrent, isInChain, level, isExpanded, onToggle, index, registerEntry, actionButtonRef, dialogShortcut = false,
+}: LayerCardProps): ReactElement => {
     const isChild = level > 0;
     const isRoot = level === 0;
     const project = item.getProject();
@@ -44,7 +48,8 @@ export const LayerCard = ({item, isCurrent, isInChain, level, isExpanded, onTogg
     const hasProjectAccess = !!project.getDisplayName();
     const content = hasItem ? item.getItem() : null;
     const fieldsetRef = useRef<HTMLFieldSetElement>(null);
-    const buttonRef = useRef<HTMLButtonElement>(null);
+    const internalButtonRef = useRef<HTMLButtonElement>(null);
+    const buttonRef = actionButtonRef ?? internalButtonRef;
 
     const statusText = content?.getStatusText() ?? '';
     const statusClass = content?.getPublishStatus() === PublishStatus.ONLINE
@@ -81,7 +86,18 @@ export const LayerCard = ({item, isCurrent, isInChain, level, isExpanded, onTogg
             buttonEls: isExpanded && buttonRef.current ? [buttonRef.current] : [],
         });
         return () => registerEntry(index, null);
-    }, [registerEntry, index, isExpanded]);
+    }, [registerEntry, index, isExpanded, buttonRef]);
+
+    const actionButton = (
+        <Button
+            ref={buttonRef}
+            data-component="Button"
+            size="sm"
+            variant="solid"
+            label={i18n(actionLabelKey)}
+            onClick={handleAction}
+        />
+    );
 
     return (
         <div
@@ -162,13 +178,7 @@ export const LayerCard = ({item, isCurrent, isInChain, level, isExpanded, onTogg
 
                         {isExpanded && (
                             <div className="col-start-2 flex">
-                                <Button
-                                    ref={buttonRef}
-                                    size="sm"
-                                    variant="solid"
-                                    label={i18n(actionLabelKey)}
-                                    onClick={handleAction}
-                                />
+                                {dialogShortcut ? <Dialog.Shortcut asChild>{actionButton}</Dialog.Shortcut> : actionButton}
                             </div>
                         )}
                     </div>

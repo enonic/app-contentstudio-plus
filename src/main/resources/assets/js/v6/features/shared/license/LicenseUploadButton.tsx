@@ -1,19 +1,23 @@
 import {i18n} from '@enonic/lib-admin-ui/util/Messages';
-import {Button, type ButtonSize, type ButtonVariant} from '@enonic/ui';
+import {Button, Dialog, type ButtonSize, type ButtonVariant} from '@enonic/ui';
 import {UploadIcon} from 'lucide-react';
-import {type ChangeEvent, type ReactElement, useCallback, useRef, useState} from 'react';
+import {type ChangeEvent, type ReactElement, type RefObject, useCallback, useRef, useState} from 'react';
 import {uploadLicense} from './uploadLicense';
 
 export type LicenseUploadButtonProps = {
     size?: ButtonSize;
     variant?: ButtonVariant;
     onUploadFinished?: (isValid: boolean) => void;
+    buttonRef?: RefObject<HTMLButtonElement | null>;
+    dialogShortcut?: boolean;
 };
 
 export const LicenseUploadButton = ({
     size = 'md',
     variant = 'solid',
     onUploadFinished,
+    buttonRef,
+    dialogShortcut = false,
 }: LicenseUploadButtonProps): ReactElement => {
     const label = i18n('action.license.upload');
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -37,6 +41,20 @@ export const LicenseUploadButton = ({
         }
     }, [onUploadFinished]);
 
+    const uploadButton = (
+        <Button
+            ref={buttonRef}
+            data-component="Button"
+            size={size}
+            variant={variant}
+            onClick={handleClick}
+            disabled={busy}
+            label={label}
+            aria-label={label}
+            startIcon={UploadIcon}
+        />
+    );
+
     return (
         <>
             <input
@@ -47,15 +65,7 @@ export const LicenseUploadButton = ({
                 className="sr-only"
                 tabIndex={-1}
             />
-            <Button
-                size={size}
-                variant={variant}
-                onClick={handleClick}
-                disabled={busy}
-                label={label}
-                aria-label={label}
-                startIcon={UploadIcon}
-            />
+            {dialogShortcut ? <Dialog.Shortcut asChild>{uploadButton}</Dialog.Shortcut> : uploadButton}
         </>
     );
 };

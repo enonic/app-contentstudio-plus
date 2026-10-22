@@ -32,6 +32,10 @@ export const ArchiveRestoreDialog = (): ReactElement => {
     const ready = open && !loading && !submitting && items.length > 0;
     const actionButtonLabel = total > 1 ? `${actionLabel} (${total})` : actionLabel;
 
+    if (!open) {
+        return null;
+    }
+
     return (
         <ArchiveDialogShell
             data-component={ARCHIVE_RESTORE_DIALOG_NAME}

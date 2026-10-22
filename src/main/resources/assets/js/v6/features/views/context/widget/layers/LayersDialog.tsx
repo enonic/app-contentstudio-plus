@@ -1,5 +1,6 @@
 import {Dialog} from '@enonic/ui';
-import {type ReactElement, useCallback, useEffect, useMemo, useState} from 'react';
+import {type ReactElement, useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {useDialogInitialFocus} from '../../../../shared/lib/hooks/useDialogInitialFocus';
 import {LayerCard} from './LayerCard';
 import {type LayerRow} from './layersTree';
 
@@ -19,11 +20,11 @@ export const LayersDialog = ({open, onOpenChange, rows, title, description}: Lay
         [rows],
     );
     const [expandedKey, setExpandedKey] = useState<string | null>(currentKey);
+    const actionButtonRef = useRef<HTMLButtonElement>(null);
+    const handleOpenAutoFocus = useDialogInitialFocus(actionButtonRef);
 
     useEffect(() => {
-        if (open) {
-            setExpandedKey(currentKey);
-        }
+        setExpandedKey(currentKey);
     }, [open, currentKey]);
 
     const handleToggle = useCallback((key: string): void => {
@@ -37,6 +38,7 @@ export const LayersDialog = ({open, onOpenChange, rows, title, description}: Lay
                 <Dialog.Content
                     className="h-full w-full max-sm:max-h-none sm:h-fit md:max-w-180 md:max-h-[85vh] lg:max-w-220 gap-5"
                     data-component={LAYERS_DIALOG_NAME}
+                    onOpenAutoFocus={handleOpenAutoFocus}
                 >
                     <Dialog.DefaultHeader title={title} description={description} withClose />
                     <Dialog.Body className="flex flex-col gap-5 overflow-y-auto">
@@ -49,6 +51,8 @@ export const LayersDialog = ({open, onOpenChange, rows, title, description}: Lay
                                 level={row.level}
                                 isExpanded={expandedKey === row.key}
                                 onToggle={() => handleToggle(row.key)}
+                                actionButtonRef={row.isCurrent ? actionButtonRef : undefined}
+                                dialogShortcut
                             />
                         ))}
                     </Dialog.Body>

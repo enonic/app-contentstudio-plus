@@ -9,7 +9,8 @@ import {DialogPresetGatedConfirmContent} from '@enonic/lib-contentstudio/v6/shar
 import {ProgressDialogContent} from '@enonic/lib-contentstudio/v6/shared/ui/dialogs/ProgressDialogContent';
 import {InboundStatusBar} from '@enonic/lib-contentstudio/v6/shared/ui/dialogs/status-bar/InboundStatusBar';
 import {Button, Dialog, ListItem, Separator} from '@enonic/ui';
-import {type ReactElement, useCallback, useEffect, useState} from 'react';
+import {type ReactElement, useCallback, useEffect, useRef, useState} from 'react';
+import {useDialogInitialFocus} from '../../lib/hooks/useDialogInitialFocus';
 import {ArchiveContentViewItem} from '../../../../../ArchiveContentViewItem';
 
 type View = 'main' | 'confirmation' | 'progress';
@@ -78,6 +79,8 @@ export const ArchiveDialogShell = ({
     'data-component': dataComponent,
 }: ArchiveDialogShellProps): ReactElement => {
     const [view, setView] = useState<View>('main');
+    const actionButtonRef = useRef<HTMLButtonElement>(null);
+    const handleOpenAutoFocus = useDialogInitialFocus(actionButtonRef, ready && view === 'main');
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const handleLoadMore = useCallback((): void => {
         if (isLoadingMore || !onLoadMoreDescendants) {
@@ -144,6 +147,7 @@ export const ArchiveDialogShell = ({
                 {view === 'main' && (
                     <Dialog.Content
                         data-component={dataComponent}
+                        onOpenAutoFocus={handleOpenAutoFocus}
                         className="w-full h-full gap-10 sm:h-fit md:min-w-180 md:max-w-184 md:max-h-[85vh] lg:max-w-220"
                     >
                         <Dialog.DefaultHeader title={title} description={description} withClose />
@@ -183,13 +187,17 @@ export const ArchiveDialogShell = ({
                             )}
                         </Dialog.Body>
                         <Dialog.Footer className="flex items-center gap-2.5">
-                            <Button
-                                variant="solid"
-                                size="lg"
-                                label={actionButtonLabel}
-                                disabled={!ready}
-                                onClick={() => void handleAction()}
-                            />
+                            <Dialog.Shortcut asChild>
+                                <Button
+                                    ref={actionButtonRef}
+                                    data-component="Button"
+                                    variant="solid"
+                                    size="lg"
+                                    label={actionButtonLabel}
+                                    disabled={!ready}
+                                    onClick={() => void handleAction()}
+                                />
+                            </Dialog.Shortcut>
                         </Dialog.Footer>
                     </Dialog.Content>
                 )}
