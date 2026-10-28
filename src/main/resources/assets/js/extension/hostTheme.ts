@@ -1,6 +1,7 @@
+import type {ResolvedTheme} from '@enonic/ui-types';
 import {atom, onMount, type ReadableAtom} from 'nanostores';
 
-export type HostTheme = 'light' | 'dark';
+export type HostTheme = ResolvedTheme;
 
 const DARK_CLASS = 'dark';
 

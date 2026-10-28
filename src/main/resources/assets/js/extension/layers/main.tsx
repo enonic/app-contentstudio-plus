@@ -1,12 +1,12 @@
-import {Element} from '@enonic/lib-admin-ui/dom/Element';
-import {AppHelper} from '../../util/AppHelper';
-import {LayersExtension} from './LayersExtension';
-import {initConfig} from '../../shared/config';
-import {getModuleScript, getRequiredAttribute, getOptionalAttribute} from '../../util/ModuleScriptHelper';
-import {setPhrases} from '../../shared/i18n';
 import {whenProjectInitialized} from '@enonic/lib-contentstudio/v6/entities/project/activeProject.store';
 import {$projects, initProjects} from '@enonic/lib-contentstudio/v6/entities/project/projects.store';
 import {setActiveProjectResolver} from '@enonic/lib-contentstudio/v6/shared/lib/url/cms';
+import {initConfig} from '../../shared/config';
+import {setPhrases} from '../../shared/i18n';
+import {AppHelper} from '../../util/AppHelper';
+import {getModuleScript, getOptionalAttribute, getRequiredAttribute} from '../../util/ModuleScriptHelper';
+import {LayersWidget} from '../../v6/features/views/context/widget/layers/LayersWidget';
+import {mountExtension} from '../mountExtension';
 
 void (() => {
     const currentScript = getModuleScript('layers');
@@ -19,15 +19,10 @@ void (() => {
     setActiveProjectResolver(() => $projects.get().activeProjectId);
     initProjects(projectName);
 
-    const extensionContainer = Element.fromHtmlElement(
-        document.querySelector(`.${AppHelper.getCommonExtensionContainerClass()}`),
-        true
-    );
-
-    extensionContainer
-        .render()
-        .then(() => whenProjectInitialized(() => {
-            extensionContainer.appendChild(new LayersExtension(contentId));
-        }));
-
+    whenProjectInitialized(() => mountExtension({
+        className: AppHelper.getLayersExtensionClass(),
+        idPrefix: 'LayersWidget',
+        contentId,
+        children: <LayersWidget contentId={contentId} />,
+    }));
 })();
