@@ -1,5 +1,4 @@
 import {i18n} from '../../../../shared/i18n';
-import {LegacyElement} from '../../../../shared/LegacyElement';
 import {KeyRound} from 'lucide-react';
 import {type ReactElement} from 'react';
 import {LicenseUploadButton} from './LicenseUploadButton';
@@ -39,10 +38,3 @@ export const NoLicenseBanner = ({variant = 'compact'}: NoLicenseBannerProps): Re
 };
 
 NoLicenseBanner.displayName = NO_LICENSE_BANNER_NAME;
-
-export class NoLicenseBannerElement extends LegacyElement<typeof NoLicenseBanner, NoLicenseBannerProps> {
-
-    constructor(props: NoLicenseBannerProps = {}) {
-        super(props, NoLicenseBanner);
-    }
-}

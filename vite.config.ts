@@ -69,9 +69,9 @@ export default defineConfig(({mode}) => {
           ],
           input: {
             'js/archive': path.join(IN_PATH, 'js/archive.ts'),
-            'js/extension/layers': path.join(IN_PATH, 'js/extension/layers/main.ts'),
-            'js/extension/variants': path.join(IN_PATH, 'js/extension/variants/main.ts'),
-            'js/extension/publish-report': path.join(IN_PATH, 'js/extension/publish-report/main.ts'),
+            'js/extension/layers': path.join(IN_PATH, 'js/extension/layers/main.tsx'),
+            'js/extension/variants': path.join(IN_PATH, 'js/extension/variants/main.tsx'),
+            'js/extension/publish-report': path.join(IN_PATH, 'js/extension/publish-report/main.tsx'),
           },
           output: {
             format: 'es',

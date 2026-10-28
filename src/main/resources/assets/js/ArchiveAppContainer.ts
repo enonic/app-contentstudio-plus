@@ -4,7 +4,7 @@ import {ArchiveAppPanel} from './ArchiveAppPanel';
 import {Body} from '@enonic/lib-admin-ui/dom/Body';
 import {fetchHasValidLicense} from './v6/features/api/license';
 import {handleError} from './shared/errors';
-import {NoLicenseBannerElement} from './v6/features/shared/license/NoLicenseBanner';
+import {NoLicenseBannerElement} from './v6/features/shared/license/NoLicenseBannerElement';
 import {NoLicenseDialogElement} from './v6/features/shared/license/NoLicenseDialog';
 import {ValidLicenseLoadedEvent} from './event/ValidLicenseLoadedEvent';
 import {ArchiveDeleteDialogElement} from './v6/features/shared/dialogs/archive/ArchiveDeleteDialog';
