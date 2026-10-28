@@ -1,6 +1,6 @@
-import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
+import {handleError} from '../../../../shared/errors';
 import {NotifyManager} from '@enonic/lib-admin-ui/notify/NotifyManager';
-import type {TaskId} from '@enonic/lib-admin-ui/task/TaskId';
+import {TaskId} from '@enonic/lib-admin-ui/task/TaskId';
 import {i18n} from '../../../../shared/i18n';
 import type {ContentId} from '@enonic/lib-contentstudio/app/content/ContentId';
 import type {ContentSummary} from '@enonic/lib-contentstudio/app/content/ContentSummary';
@@ -9,8 +9,8 @@ import {computed, map} from 'nanostores';
 import {ArchiveContentFetcher} from '../../../../ArchiveContentFetcher';
 import {ArchiveContentViewItem} from '../../../../ArchiveContentViewItem';
 import {ArchiveHelper} from '../../../../ArchiveHelper';
-import {ArchiveResourceRequest} from '../../../../resource/ArchiveResourceRequest';
-import {RestoreArchivedRequest} from '../../../../resource/RestoreArchivedRequest';
+import {restoreArchived} from '../../api/archive';
+import {ARCHIVE_ROOT} from '../../api/cms';
 
 type ArchiveRestoreDialogState = {
     open: boolean;
@@ -95,7 +95,7 @@ export async function executeArchiveRestoreDialog(): Promise<boolean> {
     try {
         const ids = (ArchiveHelper.filterTopMostItems(state.items) as ArchiveContentViewItem[])
             .map((item) => item.getId());
-        const taskId = await new RestoreArchivedRequest(ids).sendAndParse();
+        const taskId = TaskId.fromString(await restoreArchived(ids));
 
         $archiveRestoreDialog.set({
             ...$archiveRestoreDialog.get(),
@@ -106,7 +106,7 @@ export async function executeArchiveRestoreDialog(): Promise<boolean> {
         });
         return true;
     } catch (error) {
-        DefaultErrorHandler.handle(error);
+        handleError(error);
         NotifyManager.get().showError(i18n('notify.restore.failed'));
         cancelArchiveRestoreDialog();
         return false;
@@ -181,7 +181,7 @@ async function loadDescendants(currentInstance: number): Promise<void> {
         const items = $archiveRestoreDialog.get().items;
         const descendantIds = await new GetDescendantsOfContentsRequest()
             .setContentPaths(items.map((item) => item.getContentSummary().getPath()))
-            .setContentRootPath(ArchiveResourceRequest.ARCHIVE_PATH)
+            .setContentRootPath(ARCHIVE_ROOT)
             .sendAndParse();
 
         if (currentInstance !== instanceId) return;
@@ -203,6 +203,6 @@ async function loadDescendants(currentInstance: number): Promise<void> {
     } catch (error) {
         if (currentInstance !== instanceId) return;
         $archiveRestoreDialog.set({...$archiveRestoreDialog.get(), loading: false, failed: true});
-        DefaultErrorHandler.handle(error);
+        handleError(error);
     }
 }

@@ -1,4 +1,4 @@
-import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
+import {handleError} from '../../../../../../shared/errors';
 import type {ContentVersion} from '@enonic/lib-contentstudio/app/ContentVersion';
 import {useI18n} from '../../../../../../shared/i18n';
 import {Button, Dialog} from '@enonic/ui';
@@ -52,7 +52,7 @@ export const PublishReportDialog = ({
                 setPath(nextPath);
                 setVersions(nextVersions);
             })
-            .catch((reason: unknown) => DefaultErrorHandler.handle(reason));
+            .catch((reason: unknown) => handleError(reason));
 
         return () => {
             cancelled = true;

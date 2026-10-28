@@ -1,11 +1,11 @@
 import {NotifyManager} from '@enonic/lib-admin-ui/notify/NotifyManager';
 import {i18n} from '../../../../shared/i18n';
 import {ValidLicenseLoadedEvent} from '../../../../event/ValidLicenseLoadedEvent';
-import {UploadLicenseRequest} from '../../../../resource/UploadLicenseRequest';
+import {postLicense} from '../../api/license';
 
 export async function uploadLicense(file: File): Promise<boolean> {
     try {
-        const isValid = await new UploadLicenseRequest(file).sendAndParse();
+        const isValid = await postLicense(file);
         if (isValid) {
             new ValidLicenseLoadedEvent().fire();
             window.dispatchEvent(new CustomEvent('ReloadActiveExtensionEvent'));

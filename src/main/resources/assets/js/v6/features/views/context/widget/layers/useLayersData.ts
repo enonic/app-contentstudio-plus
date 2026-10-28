@@ -1,5 +1,4 @@
-import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
-import {ContentId} from '@enonic/lib-contentstudio/app/content/ContentId';
+import {handleError} from '../../../../../../shared/errors';
 import {ContentServerEventsHandler} from '@enonic/lib-contentstudio/app/event/ContentServerEventsHandler';
 import {ProjectCreatedEvent} from '@enonic/lib-contentstudio/app/settings/event/ProjectCreatedEvent';
 import {ProjectDeletedEvent} from '@enonic/lib-contentstudio/app/settings/event/ProjectDeletedEvent';
@@ -7,7 +6,7 @@ import {ProjectUpdatedEvent} from '@enonic/lib-contentstudio/app/settings/event/
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {LayerContent} from '../../../../../../extension/layers/LayerContent';
 import {MultiLayersContentFilter} from '../../../../../../extension/layers/MultiLayersContentFilter';
-import {GetLayersRequest} from '../../../../../../resource/GetLayersRequest';
+import {fetchLayers} from '../../../../api/layers';
 
 export type LayersData = {
     items: LayerContent[];
@@ -35,8 +34,7 @@ export const useLayersData = (contentId: string): LayersData => {
         setLoading(true);
         setError(null);
 
-        new GetLayersRequest(new ContentId(contentId))
-            .sendAndParse()
+        fetchLayers(contentId)
             .then((rawItems: LayerContent[]) => {
                 if (requestId !== requestIdRef.current) return;
                 const filtered = new MultiLayersContentFilter().filter(rawItems);
@@ -44,7 +42,7 @@ export const useLayersData = (contentId: string): LayersData => {
             })
             .catch((err: unknown) => {
                 if (requestId !== requestIdRef.current) return;
-                DefaultErrorHandler.handle(err);
+                handleError(err);
                 setError(err instanceof Error ? err.message : String(err));
             })
             .finally(() => {

@@ -9,7 +9,7 @@ import {GetDescendantsOfContentsRequest} from '@enonic/lib-contentstudio/app/res
 import {computed, map} from 'nanostores';
 import {ArchiveContentFetcher} from '../../../../ArchiveContentFetcher';
 import {ArchiveContentViewItem} from '../../../../ArchiveContentViewItem';
-import {ArchiveResourceRequest} from '../../../../resource/ArchiveResourceRequest';
+import {ARCHIVE_ROOT} from '../../api/cms';
 
 type ArchiveDeleteDialogState = {
     open: boolean;
@@ -93,7 +93,7 @@ export async function executeArchiveDeleteDialog(): Promise<boolean> {
 
     try {
         const request = new DeleteContentRequest();
-        request.setContentRootPath(ArchiveResourceRequest.ARCHIVE_PATH);
+        request.setContentRootPath(ARCHIVE_ROOT);
         state.items.forEach((item) => request.addContentPath(item.getPath()));
         const taskId = await request.sendAndParse();
 
@@ -181,7 +181,7 @@ async function loadDescendants(currentInstance: number): Promise<void> {
         const items = $archiveDeleteDialog.get().items;
         const descendantIds = await new GetDescendantsOfContentsRequest()
             .setContentPaths(items.map((item) => item.getContentSummary().getPath()))
-            .setContentRootPath(ArchiveResourceRequest.ARCHIVE_PATH)
+            .setContentRootPath(ARCHIVE_ROOT)
             .sendAndParse();
 
         if (currentInstance !== instanceId) return;
