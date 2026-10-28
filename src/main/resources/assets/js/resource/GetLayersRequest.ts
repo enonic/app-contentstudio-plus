@@ -1,7 +1,7 @@
 import {JsonResponse} from '@enonic/lib-admin-ui/rest/JsonResponse';
 import {Path} from '@enonic/lib-admin-ui/rest/Path';
 import {ResourceRequest} from '@enonic/lib-admin-ui/rest/ResourceRequest';
-import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
+import {$config} from '../shared/config';
 import {ContentId} from '@enonic/lib-contentstudio/app/content/ContentId';
 import {getActiveProjectName} from '@enonic/lib-contentstudio/v6/entities/project/activeProject.store';
 import {LayerContent} from '../extension/layers/LayerContent';
@@ -26,7 +26,7 @@ export class GetLayersRequest
     }
 
     getRequestPath(): Path {
-        return Path.fromString(CONFIG.getString('services.layersUrl'));
+        return Path.fromString($config.get().services.layersUrl);
     }
 
     protected parseResponse(response: JsonResponse<LayerContentJson[]>): LayerContent[] {

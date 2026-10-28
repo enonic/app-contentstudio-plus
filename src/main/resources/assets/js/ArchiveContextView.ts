@@ -1,5 +1,5 @@
 import {Extension} from '@enonic/lib-admin-ui/extension/Extension';
-import {CONFIG} from '@enonic/lib-admin-ui/util/Config';
+import {$config} from './shared/config';
 import {i18n} from './shared/i18n';
 import {ContextView} from '@enonic/lib-contentstudio/app/view/context/ContextView';
 import {ExtensionView} from '@enonic/lib-contentstudio/app/view/context/ExtensionView';
@@ -22,7 +22,7 @@ export function createArchiveContextView(): ContextView {
 }
 
 function createPropertiesWidget(contextView: ContextView): ExtensionView {
-    const appId = CONFIG.getString('appId');
+    const {appId} = $config.get();
 
     return ExtensionView.create()
         .setExtension(Extension.create().setExtensionDescriptorKey(`${appId}:details`).build())
@@ -37,7 +37,7 @@ function createPropertiesWidget(contextView: ContextView): ExtensionView {
 }
 
 function createPublishReportWidget(contextView: ContextView): ExtensionView {
-    const appId = CONFIG.getString('appId');
+    const {appId} = $config.get();
 
     return ExtensionView.create()
         .setExtension(Extension.create().setExtensionDescriptorKey(`${appId}:publish-report`).build())
@@ -50,7 +50,7 @@ function createPublishReportWidget(contextView: ContextView): ExtensionView {
 }
 
 function createVersionsWidget(contextView: ContextView): ExtensionView {
-    const appId = CONFIG.getString('appId');
+    const {appId} = $config.get();
 
     return ExtensionView.create()
         .setExtension(Extension.create().setExtensionDescriptorKey(`${appId}:versions`).build())

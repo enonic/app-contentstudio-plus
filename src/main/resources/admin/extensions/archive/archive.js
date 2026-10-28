@@ -8,9 +8,6 @@ function handleGet(req) {
     const view = resolve('./archive.html');
 
     const params = {
-        bootstrapAssetsUri: portal.assetUrl({
-            path: 'js/archive-bootstrap.js'
-        }) + '?v=' + Date.now(),
         assetsUri: portal.assetUrl({
             path: 'js/archive.js'
         }) + '?v=' + Date.now(),
