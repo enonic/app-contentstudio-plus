@@ -8,7 +8,7 @@ import {ContentBrowseFilterPanel} from '@enonic/lib-contentstudio/app/browse/fil
 import {ArchiveAggregationsFetcher} from './ArchiveAggregationsFetcher';
 import {ArchiveContentViewItem} from './ArchiveContentViewItem';
 import {AppHelper} from '@enonic/lib-admin-ui/util/AppHelper';
-import {AuthContext} from '@enonic/lib-admin-ui/auth/AuthContext';
+import {$config} from './shared/config';
 import {ArchiveAggregationsDisplayNamesResolver} from './ArchiveAggregationsDisplayNamesResolver';
 
 export class ArchiveFilterPanel
@@ -38,7 +38,7 @@ export class ArchiveFilterPanel
             ...super.getFilterableAggregations(),
             {
                 name: ArchiveAggregation.ARCHIVED_BY.toString(),
-                idsToKeepOnTop: [AuthContext.get().getUser().getKey().toString()],
+                idsToKeepOnTop: [$config.get().user.key],
             },
         ];
     }

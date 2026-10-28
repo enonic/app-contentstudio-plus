@@ -68,7 +68,6 @@ export default defineConfig(({mode}) => {
             }),
           ],
           input: {
-            'js/archive-bootstrap': path.join(IN_PATH, 'js/archiveBootstrap.ts'),
             'js/archive': path.join(IN_PATH, 'js/archive.ts'),
             'js/extension/layers': path.join(IN_PATH, 'js/extension/layers/main.ts'),
             'js/extension/variants': path.join(IN_PATH, 'js/extension/variants/main.ts'),
