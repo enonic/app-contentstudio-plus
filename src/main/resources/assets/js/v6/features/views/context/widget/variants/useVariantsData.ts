@@ -1,11 +1,11 @@
-import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
+import {handleError} from '../../../../../../shared/errors';
 import {ContentId} from '@enonic/lib-contentstudio/app/content/ContentId';
 import {ContentSummaryAndCompareStatus} from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import {ContentServerChangeItem} from '@enonic/lib-contentstudio/app/event/ContentServerChangeItem';
 import {ContentServerEventsHandler} from '@enonic/lib-contentstudio/app/event/ContentServerEventsHandler';
 import {ContentSummaryAndCompareStatusFetcher} from '@enonic/lib-contentstudio/app/resource/ContentSummaryAndCompareStatusFetcher';
 import {useCallback, useEffect, useRef, useState} from 'react';
-import {GetContentVariantsRequest} from '../../../../../../extension/variants/resource/request/GetContentVariantsRequest';
+import {fetchVariants} from '../../../../api/variants';
 
 export type VariantsData = {
     original: ContentSummaryAndCompareStatus | null;
@@ -51,8 +51,7 @@ export const useVariantsData = (contentId: string): VariantsData => {
             .then((orig) => {
                 if (!orig || requestId !== requestIdRef.current) return;
                 setOriginal(orig);
-                return new GetContentVariantsRequest(orig.getId())
-                    .fetchWithCompareStatus()
+                return fetchVariants(orig.getId())
                     .then((items) => {
                         if (requestId !== requestIdRef.current) return;
                         setVariants(items);
@@ -60,7 +59,7 @@ export const useVariantsData = (contentId: string): VariantsData => {
             })
             .catch((err: unknown) => {
                 if (requestId !== requestIdRef.current) return;
-                DefaultErrorHandler.handle(err);
+                handleError(err);
                 setError(err instanceof Error ? err.message : String(err));
             })
             .finally(() => {

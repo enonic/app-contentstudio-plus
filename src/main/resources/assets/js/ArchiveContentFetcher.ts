@@ -9,7 +9,7 @@ import {ContentSummaryAndCompareStatus} from '@enonic/lib-contentstudio/app/cont
 import {CompareStatus} from '@enonic/lib-contentstudio/app/content/CompareStatus';
 import {ContentQuery} from '@enonic/lib-contentstudio/app/content/ContentQuery';
 import {ContentPath} from '@enonic/lib-contentstudio/app/content/ContentPath';
-import {ArchiveResourceRequest} from './resource/ArchiveResourceRequest';
+import {ARCHIVE_ROOT} from './v6/features/api/cms';
 import {FetchResponse} from './FetchResponse';
 import {ContentId} from '@enonic/lib-contentstudio/app/content/ContentId';
 import {ContentResponse} from '@enonic/lib-contentstudio/app/resource/ContentResponse';
@@ -20,7 +20,7 @@ export class ArchiveContentFetcher
     static readonly FETCH_SIZE: number = 10;
 
     constructor() {
-        super(ArchiveResourceRequest.ARCHIVE_PATH);
+        super(ARCHIVE_ROOT);
     }
 
     fetchByQuery(filterQuery: ContentQuery): Q.Promise<FetchResponse> {

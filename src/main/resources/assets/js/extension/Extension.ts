@@ -1,11 +1,10 @@
-import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
+import {handleError} from '../shared/errors';
 import {DivEl} from '@enonic/lib-admin-ui/dom/DivEl';
 import {NoLicenseBannerElement} from '../v6/features/shared/license/NoLicenseBanner';
 import {AppHelper} from '../util/AppHelper';
 import {SpanEl} from '@enonic/lib-admin-ui/dom/SpanEl';
 import {i18n} from '../shared/i18n';
-import Q from 'q';
-import {HasValidLicenseRequest} from '../resource/HasValidLicenseRequest';
+import {fetchHasValidLicense} from '../v6/features/api/license';
 import {Element} from '@enonic/lib-admin-ui/dom/Element';
 import {$hostTheme, type HostTheme} from './hostTheme';
 
@@ -24,13 +23,13 @@ export class Extension
         this.setContentId(contentId);
         this.unsubscribeTheme = $hostTheme.subscribe((theme: HostTheme) => this.syncTheme(theme));
 
-        this.hasLicenseValid().then((isValid: boolean) => {
+        fetchHasValidLicense().then((isValid: boolean) => {
             if (isValid) {
                 this.renderWidget();
             } else {
                 this.renderNoLicense();
             }
-        }).catch(DefaultErrorHandler.handle);
+        }).catch(handleError);
     }
 
     private syncTheme(theme: HostTheme): void {
@@ -56,10 +55,6 @@ export class Extension
         }
 
         this.noItemsBlock.show();
-    }
-
-    protected hasLicenseValid(): Q.Promise<boolean> {
-        return new HasValidLicenseRequest().sendAndParse();
     }
 
     protected renderWidget(): void {

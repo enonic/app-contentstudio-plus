@@ -2,8 +2,8 @@ import {AppContainer} from '@enonic/lib-contentstudio/app/AppContainer';
 import {AppPanel} from '@enonic/lib-admin-ui/app/AppPanel';
 import {ArchiveAppPanel} from './ArchiveAppPanel';
 import {Body} from '@enonic/lib-admin-ui/dom/Body';
-import {HasValidLicenseRequest} from './resource/HasValidLicenseRequest';
-import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
+import {fetchHasValidLicense} from './v6/features/api/license';
+import {handleError} from './shared/errors';
 import {NoLicenseBannerElement} from './v6/features/shared/license/NoLicenseBanner';
 import {NoLicenseDialogElement} from './v6/features/shared/license/NoLicenseDialog';
 import {ValidLicenseLoadedEvent} from './event/ValidLicenseLoadedEvent';
@@ -29,9 +29,9 @@ export class ArchiveAppContainer
     }
 
     protected initElements(): void {
-        new HasValidLicenseRequest().sendAndParse().then((isValid: boolean) => {
+        fetchHasValidLicense().then((isValid: boolean) => {
             this.handleValidationCheckResult(isValid);
-        }).catch(DefaultErrorHandler.handle);
+        }).catch(handleError);
     }
 
     protected appendElements(): void {

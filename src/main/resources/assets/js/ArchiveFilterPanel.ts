@@ -2,7 +2,7 @@ import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import {Aggregation} from '@enonic/lib-admin-ui/aggregation/Aggregation';
 import {ContentAggregation} from '@enonic/lib-contentstudio/app/browse/filter/ContentAggregation';
 import {ArchiveServerEvent} from '@enonic/lib-contentstudio/app/event/ArchiveServerEvent';
-import {ArchiveResourceRequest} from './resource/ArchiveResourceRequest';
+import {ARCHIVE_ROOT} from './v6/features/api/cms';
 import {ArchiveAggregation} from './ArchiveAggregation';
 import {ContentBrowseFilterPanel} from '@enonic/lib-contentstudio/app/browse/filter/ContentBrowseFilterPanel';
 import {ArchiveAggregationsFetcher} from './ArchiveAggregationsFetcher';
@@ -28,7 +28,7 @@ export class ArchiveFilterPanel
             ContentAggregation.LANGUAGE.toString(),
             ArchiveAggregation.ARCHIVED_BY.toString(),
         ]);
-        aggregationsFetcher.setRootPath(ArchiveResourceRequest.ARCHIVE_PATH);
+        aggregationsFetcher.setRootPath(ARCHIVE_ROOT);
 
         return aggregationsFetcher;
     }

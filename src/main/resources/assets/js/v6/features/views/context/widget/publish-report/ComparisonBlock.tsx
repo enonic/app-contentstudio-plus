@@ -1,4 +1,4 @@
-import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
+import {handleError} from '../../../../../../shared/errors';
 import type {ContentVersion} from '@enonic/lib-contentstudio/app/ContentVersion';
 import {ContentId} from '@enonic/lib-contentstudio/app/content/ContentId';
 import {DateHelper} from '@enonic/lib-admin-ui/util/DateHelper';
@@ -56,7 +56,7 @@ export const ComparisonBlock = ({contentId, newer, older, offlineFrom}: Comparis
                     setDiffHtml(format({}, newerJson));
                 }
             })
-            .catch((reason: unknown) => DefaultErrorHandler.handle(reason));
+            .catch((reason: unknown) => handleError(reason));
 
         return () => {
             cancelled = true;

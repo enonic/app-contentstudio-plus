@@ -1,4 +1,4 @@
-import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
+import {handleError} from '../../../../../../shared/errors';
 import {NotifyManager} from '@enonic/lib-admin-ui/notify/NotifyManager';
 import type {ContentSummaryAndCompareStatus}
     from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
@@ -33,7 +33,7 @@ const createArchiveVersionsConfig = (): VersionsConfig => ({
     notify: {
         showSuccess: (message) => NotifyManager.get().showSuccess(message),
     },
-    handleError: (err) => DefaultErrorHandler.handle(err),
+    handleError,
 });
 
 export const ArchiveVersionsWidget = (): ReactElement | null => {
