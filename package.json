@@ -64,7 +64,7 @@
     "autoprefixer": "^10.6.1",
     "browserslist-config-enonic": "^1.0.8",
     "cross-env": "^10.1.0",
-    "cssnano": "^9.2.2",
+    "cssnano": "^9.3.2",
     "enonic-admin-artifacts": "^2.4.0",
     "eslint": "^10.13.0",
     "globals": "^17.13.0",
