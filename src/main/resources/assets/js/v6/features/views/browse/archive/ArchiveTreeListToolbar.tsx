@@ -38,7 +38,7 @@ const ArchiveTreeListToolbar = ({enabled = true}: ArchiveTreeListToolbarProps): 
         return 'indeterminate';
     }, [isAllSelected, isNoneSelected]);
 
-    const handleCheckboxClick = (): void => {
+    const handleCheckedChange = (): void => {
         if (isNoneSelected) {
             selectAll();
         } else {
@@ -55,7 +55,7 @@ const ArchiveTreeListToolbar = ({enabled = true}: ArchiveTreeListToolbarProps): 
                     defaultChecked={false}
                     checked={checkedStatus}
                     disabled={!enabled}
-                    onClick={handleCheckboxClick}
+                    onCheckedChange={handleCheckedChange}
                 />
             </div>
 
