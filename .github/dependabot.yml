@@ -25,6 +25,8 @@ updates:
     ignore:
       - dependency-name: "preact"
         update-types: ["version-update:semver-major"]
+      - dependency-name: "@nanostores/preact"
+        versions: [">=1.1.1"]
   - package-ecosystem: "npm"
     directory: "/testing"
     schedule:
