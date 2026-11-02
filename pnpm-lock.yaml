@@ -98,10 +98,10 @@ importers:
     devDependencies:
       '@enonic-types/lib-content':
         specifier: ^8
-        version: 8.1.1
+        version: 8.1.2
       '@enonic-types/lib-project':
         specifier: ^8
-        version: 8.1.1
+        version: 8.1.2
       '@enonic/eslint-config':
         specifier: ^3.0.0
         version: 3.0.0(@typescript-eslint/parser@8.72.1(eslint@10.13.0(jiti@2.7.0))(typescript@5.9.3))(eslint@10.13.0(jiti@2.7.0))(typescript-eslint@8.72.1(eslint@10.13.0(jiti@2.7.0))(typescript@5.9.3))(typescript@5.9.3)
@@ -213,14 +213,14 @@ packages:
     peerDependencies:
       react: '>=16.8.0'
 
-  '@enonic-types/core@8.1.1':
-    resolution: {integrity: sha512-doqfZ7GSm5Q0IIZYED+J/b6KalGAYIcCkTjE6wCzFIVJivlUiJIQMg6hw18G280Vx7ovtVj5oOZgPjPou8SCNw==}
+  '@enonic-types/core@8.1.2':
+    resolution: {integrity: sha512-iQ4y9u0ol3iu5Oby6SP5JSpTx5062Do4rtzDDKDVPi3pZgQTpb2fyjmrjaeMUcOKS5pYxuszL/QjRZZPmujjtA==}
 
-  '@enonic-types/lib-content@8.1.1':
-    resolution: {integrity: sha512-PjqWvM/ExUqR4eEyFy9WZQcPuUXgKOGFwYSUs+uC3Xts0vz2nFpFncvqFMgvhwNakbs1auMMGbLEnq8Cgll0/g==}
+  '@enonic-types/lib-content@8.1.2':
+    resolution: {integrity: sha512-Vfz/TxKDaIXNlyb/mcxl1hDCAlYcbxjRNW39gMWcJ9iic+VNikqsBMAiKkvvIGT6a6jCew9KZM8DIjv37pavGQ==}
 
-  '@enonic-types/lib-project@8.1.1':
-    resolution: {integrity: sha512-RFhfFSgJFRIjD1GBTwCxBTTIhjAUgdFWN7vcc5FeIN6hfHNrGkJZcR8eAQtEjX33sY58R0wUIhLQWLvMADQBgA==}
+  '@enonic-types/lib-project@8.1.2':
+    resolution: {integrity: sha512-MfOnJd8AcsgJS/X4oZxqAR2X9q6ENeRaBOZqrbWgxZuCfD5LlOpsBxpXX60ytqCQmXaDQNpJw7p2eNB+nh4Omg==}
 
   '@enonic/eslint-config@3.0.0':
     resolution: {integrity: sha512-sV3F7G96F+Sbj4I9a7K3kjMik1BOS+ngY0S2cTBF1DcUzO1fuT+adhfD5wTGbD6OTEXFozlIaze2cgpMV7i3Aw==}
@@ -2081,15 +2081,15 @@ snapshots:
       react: 19.2.5
       tslib: 2.8.1
 
-  '@enonic-types/core@8.1.1': {}
+  '@enonic-types/core@8.1.2': {}
 
-  '@enonic-types/lib-content@8.1.1':
+  '@enonic-types/lib-content@8.1.2':
     dependencies:
-      '@enonic-types/core': 8.1.1
+      '@enonic-types/core': 8.1.2
 
-  '@enonic-types/lib-project@8.1.1':
+  '@enonic-types/lib-project@8.1.2':
     dependencies:
-      '@enonic-types/core': 8.1.1
+      '@enonic-types/core': 8.1.2
 
   '@enonic/eslint-config@3.0.0(@typescript-eslint/parser@8.72.1(eslint@10.13.0(jiti@2.7.0))(typescript@5.9.3))(eslint@10.13.0(jiti@2.7.0))(typescript-eslint@8.72.1(eslint@10.13.0(jiti@2.7.0))(typescript@5.9.3))(typescript@5.9.3)':
     dependencies:
