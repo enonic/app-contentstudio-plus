@@ -6,7 +6,7 @@ import {
     isUnpublished,
     PUBLISH_OPERATION,
     UNPUBLISH_OPERATION,
-} from './contentVersion';
+} from '../../../../shared/content/contentVersion';
 
 export type ComparisonItem = {
     newer: ContentVersion;

@@ -1,4 +1,4 @@
-import {isChildOf, type LayerContent} from './layerContent';
+import {isChildOf, type LayerContent} from '../../../../shared/content/layerContent';
 
 const findParent = (layer: LayerContent, all: LayerContent[]): LayerContent | undefined =>
     all.find(candidate => isChildOf(layer.project, candidate.project.name));

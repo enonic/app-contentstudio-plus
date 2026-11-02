@@ -1,6 +1,6 @@
 import {requestJson} from '@enonic/ui-utils/request';
 import type {ContentListJson, ContentSummaryJson} from '../../../resource/json/ContentSummaryJson';
-import {toVariantContent, type VariantContent} from '../views/context/widget/variants/variantContent';
+import {toVariantContent, type VariantContent} from '../shared/content/variantContent';
 import {CONTENT_ROOT, getCmsRestUrl, withParams} from './cms';
 
 export type DuplicateParams = {

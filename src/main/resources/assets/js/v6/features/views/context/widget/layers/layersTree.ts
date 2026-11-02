@@ -1,4 +1,4 @@
-import {getMainParent, isChildOf, type LayerContent, type LayerProject} from './layerContent';
+import {getMainParent, isChildOf, type LayerContent, type LayerProject} from '../../../../shared/content/layerContent';
 
 export type LayerRow = {
     item: LayerContent;

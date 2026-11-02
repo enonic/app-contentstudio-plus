@@ -6,7 +6,7 @@ import {useCardListKeyboard} from '../shared/useCardListKeyboard';
 import {CreateVariantDialog} from './CreateVariantDialog';
 import {DuplicateVariantDialog} from './DuplicateVariantDialog';
 import {VariantCard} from './VariantCard';
-import type {VariantContent} from './variantContent';
+import type {VariantContent} from '../../../../shared/content/variantContent';
 import {useVariantsData} from './useVariantsData';
 
 const VARIANTS_WIDGET_NAME = 'VariantsWidget';

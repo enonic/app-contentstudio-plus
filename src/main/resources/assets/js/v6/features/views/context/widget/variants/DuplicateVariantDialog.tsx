@@ -6,7 +6,7 @@ import {resolveContentDisplay} from '../../../../shared/content/contentDisplay';
 import {parentPath} from '../../../../shared/content/contentPath';
 import {useDialogInitialFocus} from '../../../../shared/lib/hooks/useDialogInitialFocus';
 import {duplicateAndEdit} from './duplicateAndEdit';
-import type {VariantContent} from './variantContent';
+import type {VariantContent} from '../../../../shared/content/variantContent';
 import {getNextAvailableVariantName} from './variantName';
 
 const DUPLICATE_VARIANT_DIALOG_NAME = 'DuplicateVariantDialog';

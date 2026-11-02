@@ -5,7 +5,7 @@ import {type ChangeEvent, type ReactElement, useCallback, useEffect, useMemo, us
 import {resolveContentDisplay} from '../../../../shared/content/contentDisplay';
 import {useDialogInitialFocus} from '../../../../shared/lib/hooks/useDialogInitialFocus';
 import {duplicateAndEdit} from './duplicateAndEdit';
-import type {VariantContent} from './variantContent';
+import type {VariantContent} from '../../../../shared/content/variantContent';
 import {getNextAvailableVariantName, isVariantNameOccupied} from './variantName';
 
 const CREATE_VARIANT_DIALOG_NAME = 'CreateVariantDialog';

@@ -1,5 +1,5 @@
 import {pathName} from '../../../../shared/content/contentPath';
-import type {VariantContent} from './variantContent';
+import type {VariantContent} from '../../../../shared/content/variantContent';
 
 const VARIANT_PREFIX = 'variant-';
 

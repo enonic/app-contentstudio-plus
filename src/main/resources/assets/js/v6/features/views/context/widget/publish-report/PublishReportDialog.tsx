@@ -6,7 +6,7 @@ import {type ReactElement, useEffect, useRef, useState} from 'react';
 import {useDialogInitialFocus} from '../../../../shared/lib/hooks/useDialogInitialFocus';
 import {fetchPublishReportData} from '../../../../api/publish-report';
 import {Comparisons} from './Comparisons';
-import type {ContentVersion} from './contentVersion';
+import type {ContentVersion} from '../../../../shared/content/contentVersion';
 import {printReport} from './printReport';
 
 const PUBLISH_REPORT_DIALOG_NAME = 'PublishReportDialog';

@@ -7,7 +7,7 @@ import {CircleCheck, CircleOff, GitCompare} from 'lucide-react';
 import {type ReactElement, useEffect, useRef, useState} from 'react';
 import {fetchVersionContent} from '../../../../api/publish-report';
 import {formatDateTime} from '../../../../shared/lib/formatDateTime';
-import type {ContentVersion} from './contentVersion';
+import type {ContentVersion} from '../../../../shared/content/contentVersion';
 import {TextAndDate} from './TextAndDate';
 
 const UNCHANGED_HIDDEN_CLASS = 'pr-collapse-unchanged';

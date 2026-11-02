@@ -2,7 +2,7 @@ import {requestJson} from '@enonic/ui-utils/request';
 import {getActiveProjectName} from '@enonic/lib-contentstudio/v6/entities/project/activeProject.store';
 import type {ContentVersionsJson} from '../../../resource/json/ContentVersionJson';
 import {$config} from '../../../shared/config';
-import {type ContentVersion, toContentVersion} from '../views/context/widget/publish-report/contentVersion';
+import {type ContentVersion, toContentVersion} from '../shared/content/contentVersion';
 import {ARCHIVE_ROOT, CONTENT_ROOT, getCmsRestUrl, withParams} from './cms';
 
 export type PublishReportData = {

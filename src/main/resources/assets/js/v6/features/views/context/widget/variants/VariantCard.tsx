@@ -7,7 +7,7 @@ import {resolveContentDisplay} from '../../../../shared/content/contentDisplay';
 import {getPublishedStatusClass, getPublishStatusKey} from '../../../../shared/content/contentStatus';
 import {openContentEditor} from '../../../../shared/content/openContentEditor';
 import type {CardEntry} from '../shared/useCardListKeyboard';
-import type {VariantContent} from './variantContent';
+import type {VariantContent} from '../../../../shared/content/variantContent';
 
 export type VariantCardProps = {
     item: VariantContent;

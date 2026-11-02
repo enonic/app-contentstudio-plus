@@ -1,5 +1,5 @@
-import type {ContentPublishTimesJson, ContentSummaryJson} from '../../../../../../resource/json/ContentSummaryJson';
-import {calcPublishStatus, type PublishStatus, type PublishTimes} from '../../../../shared/content/contentStatus';
+import type {ContentPublishTimesJson, ContentSummaryJson} from '../../../../resource/json/ContentSummaryJson';
+import {calcPublishStatus, type PublishStatus, type PublishTimes} from './contentStatus';
 
 export type VariantContent = {
     id: string;

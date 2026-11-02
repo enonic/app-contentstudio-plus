@@ -1,7 +1,7 @@
 import type {Content as XPContent} from '@enonic-types/lib-content';
-import type {CompareAndPublishStatusJson} from '../../../../../../resource/json/CompareAndPublishStatusJson';
-import type {LayerContentJson} from '../../../../../../resource/json/LayerContentJson';
-import {type ContentStatusClass, type PublishStatus, toPublishStatus} from '../../../../shared/content/contentStatus';
+import type {CompareAndPublishStatusJson} from '../../../../resource/json/CompareAndPublishStatusJson';
+import type {LayerContentJson} from '../../../../resource/json/LayerContentJson';
+import {type ContentStatusClass, type PublishStatus, toPublishStatus} from './contentStatus';
 
 export type CompareStatus = 'NEW' | 'NEWER' | 'OLDER' | 'EQUAL' | 'MOVED' | 'ARCHIVED' | 'UNKNOWN';
 

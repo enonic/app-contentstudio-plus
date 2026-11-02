@@ -2,7 +2,7 @@ import {handleError} from '../../../../../../shared/errors';
 import {ContentServerEventsHandler} from '@enonic/lib-contentstudio/app/event/ContentServerEventsHandler';
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {fetchContent, fetchVariants} from '../../../../api/variants';
-import type {VariantContent} from './variantContent';
+import type {VariantContent} from '../../../../shared/content/variantContent';
 
 export type VariantsData = {
     original: VariantContent | null;

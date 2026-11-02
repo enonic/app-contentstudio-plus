@@ -5,7 +5,7 @@ import {ProjectDeletedEvent} from '@enonic/lib-contentstudio/app/settings/event/
 import {ProjectUpdatedEvent} from '@enonic/lib-contentstudio/app/settings/event/ProjectUpdatedEvent';
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {fetchLayers} from '../../../../api/layers';
-import type {LayerContent} from './layerContent';
+import type {LayerContent} from '../../../../shared/content/layerContent';
 import {filterLayers} from './layersFilter';
 
 export type LayersData = {

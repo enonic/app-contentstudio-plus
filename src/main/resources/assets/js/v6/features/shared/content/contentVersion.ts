@@ -2,7 +2,7 @@ import type {
     ContentVersionActionJson,
     ContentVersionJson,
     ContentVersionPublishInfoJson,
-} from '../../../../../../resource/json/ContentVersionJson';
+} from '../../../../resource/json/ContentVersionJson';
 
 export const PUBLISH_OPERATION = 'content.publish';
 

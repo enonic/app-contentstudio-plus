@@ -3,7 +3,7 @@ import {CircleOff} from 'lucide-react';
 import {type ReactElement, useMemo} from 'react';
 import {formatDateTime} from '../../../../shared/lib/formatDateTime';
 import {buildComparisonPlan} from './comparisonPlan';
-import type {ContentVersion} from './contentVersion';
+import type {ContentVersion} from '../../../../shared/content/contentVersion';
 import {ComparisonBlock} from './ComparisonBlock';
 import {TextAndDate} from './TextAndDate';
 

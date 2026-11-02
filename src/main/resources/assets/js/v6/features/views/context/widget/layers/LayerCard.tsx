@@ -6,7 +6,7 @@ import {type MouseEvent, type ReactElement, type RefObject, useCallback, useLayo
 import {resolveContentDisplay} from '../../../../shared/content/contentDisplay';
 import {openContentEditor} from '../../../../shared/content/openContentEditor';
 import {getPublishStatusKey} from '../../../../shared/content/contentStatus';
-import {getStatusClass, type LayerContent} from './layerContent';
+import {getStatusClass, type LayerContent} from '../../../../shared/content/layerContent';
 import type {CardEntry} from '../shared/useCardListKeyboard';
 
 export type LayerCardProps = {
