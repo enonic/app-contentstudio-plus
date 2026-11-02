@@ -1,13 +1,11 @@
 import {i18n} from '../../../../../../shared/i18n';
-import {ContentEventsProcessor} from '@enonic/lib-contentstudio/app/ContentEventsProcessor';
-import {EditContentEvent} from '@enonic/lib-contentstudio/app/event/EditContentEvent';
-import {PublishStatus} from '@enonic/lib-contentstudio/app/publish/PublishStatus';
 import {ProjectIcon} from '@enonic/lib-contentstudio/v6/shared/ui/icons/ProjectIcon';
 import {Button, Dialog, Tooltip, cn} from '@enonic/ui';
 import {Layers2} from 'lucide-react';
 import {type MouseEvent, type ReactElement, type RefObject, useCallback, useLayoutEffect, useMemo, useRef} from 'react';
-import {LayerContent} from '../../../../../../extension/layers/LayerContent';
 import {resolveContentDisplay} from '../../../../shared/content/contentDisplay';
+import {openContentEditor} from '../../../../shared/content/openContentEditor';
+import {getStatusClass, getStatusKey, type LayerContent} from './layerContent';
 import type {CardEntry} from '../shared/useCardListKeyboard';
 
 export type LayerCardProps = {
@@ -43,20 +41,16 @@ export const LayerCard = ({
 }: LayerCardProps): ReactElement => {
     const isChild = level > 0;
     const isRoot = level === 0;
-    const project = item.getProject();
-    const hasItem = item.hasItem();
-    const hasProjectAccess = !!project.getDisplayName();
-    const content = hasItem ? item.getItem() : null;
+    const {project, item: content} = item;
+    const hasItem = !!content;
+    const hasProjectAccess = !!project.displayName;
     const fieldsetRef = useRef<HTMLFieldSetElement>(null);
     const internalButtonRef = useRef<HTMLButtonElement>(null);
     const buttonRef = actionButtonRef ?? internalButtonRef;
 
-    const statusText = content?.getStatusText() ?? '';
-    const statusClass = content?.getPublishStatus() === PublishStatus.ONLINE
-        ? 'online'
-        : (content?.getStatusClass() ?? '');
-    const isInherited = !!content?.isDataInherited();
-    const isReadOnly = !!content?.isReadOnly();
+    const statusText = content ? i18n(getStatusKey(content)) : '';
+    const statusClass = content ? getStatusClass(content) : '';
+    const isInherited = !!content?.dataInherited;
     const contentDisplay = useMemo(
         () => (content ? resolveContentDisplay(content) : null),
         [content],
@@ -64,18 +58,18 @@ export const LayerCard = ({
 
     type ActionMode = 'edit' | 'open';
 
-    const actionMode: ActionMode = isCurrent && !isReadOnly ? 'edit' : 'open';
+    const actionMode: ActionMode = isCurrent ? 'edit' : 'open';
 
     const actionLabelKey = actionMode === 'edit' ? 'action.edit' : 'action.open';
 
     const handleAction = useCallback((event: MouseEvent<HTMLButtonElement>): void => {
         event.stopPropagation();
         if (!content) return;
-        ContentEventsProcessor.handleEdit(new EditContentEvent([content], project.getName()));
+        openContentEditor(project.name, content.id);
     }, [content, project]);
 
-    const projectLabel = project.getDisplayName() || project.getName();
-    const projectLang = project.getLanguage();
+    const projectLabel = project.displayName || project.name;
+    const projectLang = project.language;
 
     const indentPx = Math.max(level - 1, 0) * LEVEL_INDENT_PX;
 
@@ -144,12 +138,7 @@ export const LayerCard = ({
 
                 {hasItem && content && (
                     <div className="mt-2.5 grid min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-2.5 gap-y-5">
-                        <ProjectIcon
-                            projectName={project.getName()}
-                            language={project.getLanguage()}
-                            hasIcon={!!project.getIcon()}
-                            className="size-6"
-                        />
+                        <ProjectIcon projectName={project.name} language={project.language} className="size-6" />
 
                         <div className="min-w-0">
                             <div className="truncate text-base font-semibold">{contentDisplay?.displayName}</div>

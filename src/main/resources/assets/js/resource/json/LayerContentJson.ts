@@ -1,9 +1,9 @@
-import {Content as XPContent} from '@enonic-types/lib-content';
-import {Project as XPProject} from '@enonic-types/lib-project';
-import {CompareAndPublishStatusJson} from './CompareAndPublishStatusJson';
+import type {Content as XPContent} from '@enonic-types/lib-content';
+import type {Project as XPProject} from '@enonic-types/lib-project';
+import type {CompareAndPublishStatusJson} from './CompareAndPublishStatusJson';
 
 export interface LayerContentJson {
-    item?: XPContent;
-    compareAndPublishStatus?: CompareAndPublishStatusJson;
-    project: XPProject;
+    item?: XPContent | null;
+    compareAndPublishStatus?: CompareAndPublishStatusJson | null;
+    project: Partial<XPProject> & Pick<XPProject, 'id'>;
 }

@@ -57,9 +57,9 @@ export const LayersWidget = ({contentId}: LayersWidgetProps): ReactElement => {
         () => tree.all.find(row => row.isCurrent) ?? null,
         [tree.all],
     );
-    const currentItem = currentRow?.item.hasItem() ? currentRow.item.getItem() : null;
-    const dialogTitle = currentItem?.getDisplayName() || i18n('widget.layers.displayName');
-    const dialogDescription = currentItem?.getPath().toString();
+    const currentItem = currentRow?.item.item;
+    const dialogTitle = currentItem?.displayName || i18n('widget.layers.displayName');
+    const dialogDescription = currentItem?.path;
 
     if (!contentId) {
         return (

@@ -4,7 +4,7 @@ import {ContentDuplicateParams} from '@enonic/lib-contentstudio/app/resource/Con
 import {ContentIcon} from '@enonic/lib-contentstudio/v6/shared/ui/icons/ContentIcon';
 import {Button, Dialog} from '@enonic/ui';
 import {type ReactElement, useCallback, useRef} from 'react';
-import {resolveContentDisplay} from '../../../../shared/content/contentDisplay';
+import {contentDisplayOf, resolveContentDisplay} from '../../../../shared/content/contentDisplay';
 import {useDialogInitialFocus} from '../../../../shared/lib/hooks/useDialogInitialFocus';
 import {duplicateAndEdit} from './duplicateAndEdit';
 import {getNextAvailableVariantName} from './variantName';
@@ -49,7 +49,7 @@ export const DuplicateVariantDialog = ({
     }
 
     const summary = variant.getContentSummary();
-    const display = resolveContentDisplay(variant);
+    const display = resolveContentDisplay(contentDisplayOf(variant));
 
     return (
         <Dialog.Root open={open} onOpenChange={onOpenChange}>

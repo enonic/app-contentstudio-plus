@@ -6,7 +6,7 @@ import {PublishStatus} from '@enonic/lib-contentstudio/app/publish/PublishStatus
 import {ContentIcon} from '@enonic/lib-contentstudio/v6/shared/ui/icons/ContentIcon';
 import {Button, cn} from '@enonic/ui';
 import {type MouseEvent, type ReactElement, useCallback, useLayoutEffect, useMemo, useRef} from 'react';
-import {resolveContentDisplay} from '../../../../shared/content/contentDisplay';
+import {contentDisplayOf, resolveContentDisplay} from '../../../../shared/content/contentDisplay';
 import type {CardEntry} from '../shared/useCardListKeyboard';
 
 export type VariantCardProps = {
@@ -50,7 +50,7 @@ export const VariantCard = ({
         ? 'online'
         : (item.getStatusClass() ?? '');
 
-    const contentDisplay = useMemo(() => resolveContentDisplay(item), [item]);
+    const contentDisplay = useMemo(() => resolveContentDisplay(contentDisplayOf(item)), [item]);
     const summary = item.getContentSummary();
 
     const fieldsetRef = useRef<HTMLFieldSetElement>(null);
