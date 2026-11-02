@@ -1,14 +1,13 @@
 import {handleError} from '../../../../../../shared/errors';
-import type {ContentVersion} from '@enonic/lib-contentstudio/app/ContentVersion';
-import {ContentId} from '@enonic/lib-contentstudio/app/content/ContentId';
-import {DateHelper} from '@enonic/lib-admin-ui/util/DateHelper';
 import {useI18n} from '../../../../../../shared/i18n';
 import {Checkbox, usePrefixedId} from '@enonic/ui';
 import {DiffPatcher} from 'jsondiffpatch';
 import {format} from 'jsondiffpatch/formatters/html';
 import {CircleCheck, CircleOff, GitCompare} from 'lucide-react';
-import {type ReactElement, useEffect, useMemo, useRef, useState} from 'react';
+import {type ReactElement, useEffect, useRef, useState} from 'react';
 import {fetchVersionContent} from '../../../../api/publish-report';
+import {formatDateTime} from '../../../../shared/lib/formatDateTime';
+import type {ContentVersion} from './contentVersion';
 import {TextAndDate} from './TextAndDate';
 
 const UNCHANGED_HIDDEN_CLASS = 'pr-collapse-unchanged';
@@ -23,7 +22,6 @@ export type ComparisonBlockProps = {
 };
 
 export const ComparisonBlock = ({contentId, newer, older, offlineFrom}: ComparisonBlockProps): ReactElement => {
-    const cId = useMemo(() => new ContentId(contentId), [contentId]);
     const [showAll, setShowAll] = useState<boolean>(!older);
     const [diffHtml, setDiffHtml] = useState<string>('');
     const [identical, setIdentical] = useState<boolean>(false);
@@ -41,8 +39,8 @@ export const ComparisonBlock = ({contentId, newer, older, offlineFrom}: Comparis
         let cancelled = false;
 
         Promise.all([
-            fetchVersionContent(cId, newer.getId()),
-            older ? fetchVersionContent(cId, older.getId()) : Promise.resolve(null),
+            fetchVersionContent(contentId, newer.id),
+            older ? fetchVersionContent(contentId, older.id) : Promise.resolve(null),
         ])
             .then(([newerJson, olderJson]) => {
                 if (cancelled) return;
@@ -61,15 +59,15 @@ export const ComparisonBlock = ({contentId, newer, older, offlineFrom}: Comparis
         return () => {
             cancelled = true;
         };
-    }, [cId, newer, older]);
+    }, [contentId, newer, older]);
 
     useEffect(() => {
         if (!diffRef.current) return;
         diffRef.current.classList.toggle(UNCHANGED_HIDDEN_CLASS, !showAll);
     }, [showAll, diffHtml]);
 
-    const newerDate = DateHelper.formatDateTime(newer.getPublishInfo().getTime());
-    const olderDate = older ? DateHelper.formatDateTime(older.getPublishInfo().getTime()) : null;
+    const newerDate = formatDateTime(newer.publishInfo?.time ?? newer.timestamp);
+    const olderDate = older ? formatDateTime(older.publishInfo?.time ?? older.timestamp) : null;
 
     return (
         <div data-component="ComparisonBlock" className="flex flex-col gap-2.5 px-2 sm:px-4 py-3">
@@ -105,7 +103,7 @@ export const ComparisonBlock = ({contentId, newer, older, offlineFrom}: Comparis
             {offlineFrom && (
                 <TextAndDate
                     icon={<CircleOff size={ICON_SIZE} />}
-                    entries={[{text: compareSubtitle, date: DateHelper.formatDateTime(offlineFrom)}]}
+                    entries={[{text: compareSubtitle, date: formatDateTime(offlineFrom)}]}
                 />
             )}
             {identical && <div className="text-sm text-subtle">{identicalText}</div>}

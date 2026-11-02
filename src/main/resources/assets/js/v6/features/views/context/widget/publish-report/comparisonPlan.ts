@@ -1,6 +1,12 @@
-import type {ContentVersion} from '@enonic/lib-contentstudio/app/ContentVersion';
-import type {ContentVersionAction} from '@enonic/lib-contentstudio/app/ContentVersionAction';
-import {ContentOperation} from '@enonic/lib-contentstudio/v6/entities/content/version/versionOperations';
+import {
+    type ContentVersion,
+    findAction,
+    isPublished,
+    isScheduled,
+    isUnpublished,
+    PUBLISH_OPERATION,
+    UNPUBLISH_OPERATION,
+} from './contentVersion';
 
 export type ComparisonItem = {
     newer: ContentVersion;
@@ -18,23 +24,20 @@ export type ComparisonPlan =
           items: ComparisonItem[];
       };
 
-const findAction = (v: ContentVersion, operation: string): ContentVersionAction | undefined =>
-    v.getActions().find((a) => a.getOperation() === operation);
-
-const hasActions = (v: ContentVersion): boolean => v.getActions().length > 0;
+const hasActions = (v: ContentVersion): boolean => v.actions.length > 0;
 
 const isPublishedVersion = (v: ContentVersion): boolean => {
-    if (hasActions(v) && !findAction(v, ContentOperation.PUBLISH)) return false;
-    return v.hasPublishInfo() && v.isPublished() && !v.isScheduled();
+    if (hasActions(v) && !findAction(v, PUBLISH_OPERATION)) return false;
+    return isPublished(v) && !isScheduled(v);
 };
 
 const isUnpublishedVersion = (v: ContentVersion): boolean =>
-    hasActions(v) ? !!findAction(v, ContentOperation.UNPUBLISH) : v.isUnpublished();
+    hasActions(v) ? !!findAction(v, UNPUBLISH_OPERATION) : isUnpublished(v);
 
 const getVersionTimestamp = (v: ContentVersion): Date => {
-    const unpublishTime = findAction(v, ContentOperation.UNPUBLISH)?.getOpTime();
+    const unpublishTime = findAction(v, UNPUBLISH_OPERATION)?.opTime;
     if (unpublishTime) return unpublishTime;
-    return v.hasPublishInfo() && v.getPublishInfo().getTime() ? v.getPublishInfo().getTime() : v.getTimestamp();
+    return v.publishInfo?.time ?? v.timestamp;
 };
 
 export function buildComparisonPlan(
