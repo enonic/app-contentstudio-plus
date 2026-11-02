@@ -1,19 +1,33 @@
-import {ContentSummary} from '@enonic/lib-contentstudio/app/content/ContentSummary';
-import type {ContentSummaryAndCompareStatus} from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
-import type {ContentSummaryJson} from '@enonic/lib-contentstudio/app/content/ContentSummaryJson';
-import {ContentSummaryAndCompareStatusFetcher} from '@enonic/lib-contentstudio/app/resource/ContentSummaryAndCompareStatusFetcher';
 import {requestJson} from '@enonic/ui-utils/request';
+import type {ContentListJson, ContentSummaryJson} from '../../../resource/json/ContentSummaryJson';
+import {toVariantContent, type VariantContent} from '../views/context/widget/variants/variantContent';
 import {CONTENT_ROOT, getCmsRestUrl, withParams} from './cms';
 
-export async function fetchVariants(id: string): Promise<ContentSummaryAndCompareStatus[]> {
-    const url = withParams(getCmsRestUrl(CONTENT_ROOT, 'findVariants'), {id, from: 0, size: -1});
+export type DuplicateParams = {
+    contentId: string;
+    parent: string;
+    name: string;
+};
 
-    const summaries = await requestJson<{contents: ContentSummaryJson[]}>(url).match(
-        (json) => ContentSummary.fromJsonArray(json.contents),
-        (error) => {
-            throw error;
-        },
-    );
+const rethrow = (error: Error): never => {
+    throw error;
+};
 
-    return new ContentSummaryAndCompareStatusFetcher().fetchAndCompareStatus(summaries.map((item) => item.getContentId()));
+export function fetchContent(contentId: string): Promise<VariantContent> {
+    const url = withParams(getCmsRestUrl(CONTENT_ROOT, ''), {id: contentId});
+
+    return requestJson<ContentSummaryJson>(url).match(toVariantContent, rethrow);
+}
+
+export function fetchVariants(contentId: string): Promise<VariantContent[]> {
+    const url = withParams(getCmsRestUrl(CONTENT_ROOT, 'findVariants'), {id: contentId, from: 0, size: -1});
+
+    return requestJson<ContentListJson>(url).match((json) => json.contents.map(toVariantContent), rethrow);
+}
+
+export function duplicateAsVariant({contentId, parent, name}: DuplicateParams): Promise<string> {
+    return requestJson<{taskId: string}>(getCmsRestUrl(CONTENT_ROOT, 'duplicate'), {
+        method: 'POST',
+        body: {contents: [{contentId, includeChildren: false, variant: true, parent, name}]},
+    }).match((json) => json.taskId, rethrow);
 }

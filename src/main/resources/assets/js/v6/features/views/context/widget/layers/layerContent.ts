@@ -1,10 +1,9 @@
 import type {Content as XPContent} from '@enonic-types/lib-content';
 import type {CompareAndPublishStatusJson} from '../../../../../../resource/json/CompareAndPublishStatusJson';
 import type {LayerContentJson} from '../../../../../../resource/json/LayerContentJson';
+import {type ContentStatusClass, type PublishStatus, toPublishStatus} from '../../../../shared/content/contentStatus';
 
 export type CompareStatus = 'NEW' | 'NEWER' | 'OLDER' | 'EQUAL' | 'MOVED' | 'ARCHIVED' | 'UNKNOWN';
-
-export type PublishStatus = 'ONLINE' | 'PENDING' | 'EXPIRED' | 'OFFLINE';
 
 export type LayerProject = {
     name: string;
@@ -30,26 +29,10 @@ export type LayerContent = {
     item?: LayerItem;
 };
 
-export type LayerStatusClass =
-    | 'online'
-    | 'new'
-    | 'modified'
-    | 'pending'
-    | 'expired'
-    | 'offline'
-    | 'archived'
-    | 'moved'
-    | 'unknown';
-
 const COMPARE_STATUSES: readonly CompareStatus[] = ['NEW', 'NEWER', 'OLDER', 'EQUAL', 'MOVED', 'ARCHIVED', 'UNKNOWN'];
-
-const PUBLISH_STATUSES: readonly PublishStatus[] = ['ONLINE', 'PENDING', 'EXPIRED', 'OFFLINE'];
 
 const toCompareStatus = (value: string | undefined): CompareStatus =>
     COMPARE_STATUSES.find(status => status === value) ?? 'UNKNOWN';
-
-const toPublishStatus = (value: string | undefined): PublishStatus =>
-    PUBLISH_STATUSES.find(status => status === value) ?? 'OFFLINE';
 
 const toLayerItem = (content: XPContent, status: CompareAndPublishStatusJson | null | undefined): LayerItem => ({
     id: content._id,
@@ -77,14 +60,14 @@ export const getMainParent = (project: LayerProject): string | undefined => proj
 
 export const isChildOf = (child: LayerProject, parentName: string): boolean => child.parents.includes(parentName);
 
-const COMPARE_STATUS_CLASS: Partial<Record<CompareStatus, LayerStatusClass>> = {
+const COMPARE_STATUS_CLASS: Partial<Record<CompareStatus, ContentStatusClass>> = {
     NEWER: 'modified',
     EQUAL: 'online',
     MOVED: 'moved',
     ARCHIVED: 'archived',
 };
 
-export const getStatusClass = ({compareStatus, publishStatus, publishedOnce}: LayerItem): LayerStatusClass => {
+export const getStatusClass = ({compareStatus, publishStatus, publishedOnce}: LayerItem): ContentStatusClass => {
     if (publishStatus === 'ONLINE') {
         return 'online';
     }
@@ -99,12 +82,3 @@ export const getStatusClass = ({compareStatus, publishStatus, publishedOnce}: La
     }
     return COMPARE_STATUS_CLASS[compareStatus] ?? 'unknown';
 };
-
-const PUBLISH_STATUS_KEY: Record<PublishStatus, string> = {
-    ONLINE: 'status.online',
-    PENDING: 'status.scheduled',
-    EXPIRED: 'status.expired',
-    OFFLINE: 'status.offline',
-};
-
-export const getStatusKey = ({publishStatus}: LayerItem): string => PUBLISH_STATUS_KEY[publishStatus];

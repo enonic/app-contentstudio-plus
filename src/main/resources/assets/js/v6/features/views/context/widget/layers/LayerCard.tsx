@@ -5,7 +5,8 @@ import {Layers2} from 'lucide-react';
 import {type MouseEvent, type ReactElement, type RefObject, useCallback, useLayoutEffect, useMemo, useRef} from 'react';
 import {resolveContentDisplay} from '../../../../shared/content/contentDisplay';
 import {openContentEditor} from '../../../../shared/content/openContentEditor';
-import {getStatusClass, getStatusKey, type LayerContent} from './layerContent';
+import {getPublishStatusKey} from '../../../../shared/content/contentStatus';
+import {getStatusClass, type LayerContent} from './layerContent';
 import type {CardEntry} from '../shared/useCardListKeyboard';
 
 export type LayerCardProps = {
@@ -48,7 +49,7 @@ export const LayerCard = ({
     const internalButtonRef = useRef<HTMLButtonElement>(null);
     const buttonRef = actionButtonRef ?? internalButtonRef;
 
-    const statusText = content ? i18n(getStatusKey(content)) : '';
+    const statusText = content ? i18n(getPublishStatusKey(content.publishStatus)) : '';
     const statusClass = content ? getStatusClass(content) : '';
     const isInherited = !!content?.dataInherited;
     const contentDisplay = useMemo(

@@ -2,12 +2,18 @@ import {showWarning} from '@enonic/lib-admin-ui/notify/MessageBus';
 import {$config} from '../../../../shared/config';
 import {i18n} from '../../../../shared/i18n';
 
+export type OpenContentEditorOptions = {
+    displayAsNew?: boolean;
+};
+
 const openTabs = new Map<string, Window>();
 
-export const getEditContentUrl = (projectName: string, contentId: string): string =>
-    `${$config.get().toolUri}/${projectName}/edit/${contentId}`;
+export const getEditContentUrl = (projectName: string, contentId: string, options: OpenContentEditorOptions = {}): string => {
+    const url = `${$config.get().toolUri}/${projectName}/edit/${contentId}`;
+    return options.displayAsNew ? `${url}?displayAsNew=true` : url;
+};
 
-export function openContentEditor(projectName: string, contentId: string): void {
+export function openContentEditor(projectName: string, contentId: string, options: OpenContentEditorOptions = {}): void {
     const tabName = `edit:${projectName}:${contentId}`;
     const existing = openTabs.get(tabName);
 
@@ -16,7 +22,7 @@ export function openContentEditor(projectName: string, contentId: string): void 
         return;
     }
 
-    const win = window.open(getEditContentUrl(projectName, contentId), tabName);
+    const win = window.open(getEditContentUrl(projectName, contentId, options), tabName);
 
     if (!win) {
         showWarning(i18n('notify.popupBlocker.admin'), false);

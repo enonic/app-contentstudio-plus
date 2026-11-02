@@ -1,5 +1,4 @@
 import {i18n} from '../../../../../../shared/i18n';
-import {ContentSummaryAndCompareStatus} from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import {Button} from '@enonic/ui';
 import {type ReactElement, useCallback, useEffect, useMemo, useState} from 'react';
 import {AppHelper} from '../../../../../../util/AppHelper';
@@ -7,6 +6,7 @@ import {useCardListKeyboard} from '../shared/useCardListKeyboard';
 import {CreateVariantDialog} from './CreateVariantDialog';
 import {DuplicateVariantDialog} from './DuplicateVariantDialog';
 import {VariantCard} from './VariantCard';
+import type {VariantContent} from './variantContent';
 import {useVariantsData} from './useVariantsData';
 
 const VARIANTS_WIDGET_NAME = 'VariantsWidget';
@@ -26,14 +26,14 @@ export const VariantsWidget = ({contentId}: VariantsWidgetProps): ReactElement =
     const activeId = contentId;
     const [expandedId, setExpandedId] = useState<string | null>(activeId);
     const [createDialogOpen, setCreateDialogOpen] = useState<boolean>(false);
-    const [duplicateTarget, setDuplicateTarget] = useState<ContentSummaryAndCompareStatus | null>(null);
+    const [duplicateTarget, setDuplicateTarget] = useState<VariantContent | null>(null);
 
     useEffect(() => {
         setExpandedId(activeId);
     }, [activeId]);
 
     const openCreateDialog = (): void => setCreateDialogOpen(true);
-    const openDuplicateDialog = (target: ContentSummaryAndCompareStatus): void => setDuplicateTarget(target);
+    const openDuplicateDialog = (target: VariantContent): void => setDuplicateTarget(target);
     const closeDuplicateDialog = (open: boolean): void => {
         if (!open) setDuplicateTarget(null);
     };
@@ -44,7 +44,7 @@ export const VariantsWidget = ({contentId}: VariantsWidgetProps): ReactElement =
     );
 
     const handleActiveIndexChange = useCallback((index: number): void => {
-        const id = flatItems[index]?.getId();
+        const id = flatItems[index]?.id;
         if (id) setExpandedId(id);
     }, [flatItems]);
 
@@ -136,9 +136,9 @@ export const VariantsWidget = ({contentId}: VariantsWidgetProps): ReactElement =
                 <VariantCard
                     item={original}
                     isOriginal
-                    isActive={original.getId() === activeId}
-                    isExpanded={expandedId === original.getId()}
-                    onToggle={() => setExpandedId(prev => (prev === original.getId() ? null : original.getId()))}
+                    isActive={original.id === activeId}
+                    isExpanded={expandedId === original.id}
+                    onToggle={() => setExpandedId(prev => (prev === original.id ? null : original.id))}
                     onCreateVariant={openCreateDialog}
                     index={0}
                     registerEntry={registerEntry}
@@ -152,12 +152,12 @@ export const VariantsWidget = ({contentId}: VariantsWidgetProps): ReactElement =
                 <div className="flex flex-col gap-3">
                     {variants.map((variant, idx) => (
                         <VariantCard
-                            key={variant.getId()}
+                            key={variant.id}
                             item={variant}
                             isOriginal={false}
-                            isActive={variant.getId() === activeId}
-                            isExpanded={expandedId === variant.getId()}
-                            onToggle={() => setExpandedId(prev => (prev === variant.getId() ? null : variant.getId()))}
+                            isActive={variant.id === activeId}
+                            isExpanded={expandedId === variant.id}
+                            onToggle={() => setExpandedId(prev => (prev === variant.id ? null : variant.id))}
                             onDuplicate={openDuplicateDialog}
                             index={idx + 1}
                             registerEntry={registerEntry}
