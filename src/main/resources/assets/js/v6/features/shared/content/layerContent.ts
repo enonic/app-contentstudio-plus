@@ -34,17 +34,22 @@ const COMPARE_STATUSES: readonly CompareStatus[] = ['NEW', 'NEWER', 'OLDER', 'EQ
 const toCompareStatus = (value: string | undefined): CompareStatus =>
     COMPARE_STATUSES.find(status => status === value) ?? 'UNKNOWN';
 
-const toLayerItem = (content: XPContent, status: CompareAndPublishStatusJson | null | undefined): LayerItem => ({
-    id: content._id,
-    name: content._name,
-    path: content._path,
-    displayName: content.displayName,
-    type: content.type,
-    compareStatus: toCompareStatus(status?.compareStatus),
-    publishStatus: toPublishStatus(status?.publishStatus),
-    publishedOnce: !!content.publish?.first,
-    dataInherited: content.inherit?.includes('CONTENT') ?? false,
-});
+// XP reports a publish status for content that has never been published; Studio treats it as offline.
+const toLayerItem = (content: XPContent, status: CompareAndPublishStatusJson | null | undefined): LayerItem => {
+    const compareStatus = toCompareStatus(status?.compareStatus);
+
+    return {
+        id: content._id,
+        name: content._name,
+        path: content._path,
+        displayName: content.displayName,
+        type: content.type,
+        compareStatus,
+        publishStatus: compareStatus === 'NEW' ? 'OFFLINE' : toPublishStatus(status?.publishStatus),
+        publishedOnce: !!content.publish?.first,
+        dataInherited: content.inherit?.includes('CONTENT') ?? false,
+    };
+};
 
 export const toLayerContent = (json: LayerContentJson): LayerContent => ({
     project: {

@@ -7,7 +7,7 @@ const BaseBrowsePanel = require('../../page_objects/base.browse.panel');
 const ProjectWizardDialogParentProjectStep = require('./project-wizard-dialog/project.wizard.parent.project.step');
 
 const XPATH = {
-    container: "//div[contains(@id,'SettingsBrowsePanel')]",
+    container: "//div[@data-component='SettingsBrowsePanel']",
     settingsAppContainer: "//div[contains(@id,'ContentAppBar')]",
     appBar: "//div[contains(@id,'ContentAppBar')]",
     appBarTabMenu: "//div[contains(@id,'AppBarTabMenu')]",
@@ -15,7 +15,7 @@ const XPATH = {
     toolbarDiv: `//div[@data-component='Toolbar.Container'  and @aria-label='Project settings menu bar']`,
     itemsTreeGrid: `//div[contains(@id,'SettingsItemsTreeGrid')]`,
     settingsTreeListDataComponent: `//div[@data-component='SettingsTreeList']`,
-    treeListToolbarDiv: `//div[@id='SettingsTreeListToolbarElement']`,
+    treeListToolbarDiv: `//div[@data-component='SettingsTreeListToolbar']`,
 
     projectItemByDisplayName: (displayName) =>
         `//div[@data-component='VirtualizedTreeList.Row' and descendant::div[@data-component='ProjectLabel']//span[contains(@class,'font-semibold') and contains(.,'${displayName}')]]`,
