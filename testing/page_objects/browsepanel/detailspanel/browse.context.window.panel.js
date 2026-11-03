@@ -24,7 +24,7 @@ class BrowseContextWindowPanel extends BaseContextWindowPanel {
     }
 
     async isPanelVisible() {
-        return await this.isElementDisplayed(xpath.container +"//div[contains(@id,'ContextView')]");
+        return await this.isElementDisplayed(xpath.container + "//div[@data-component='ContextPanelView']");
     }
 
     async waitForDetailsPanelClosed() {
@@ -41,13 +41,13 @@ class BrowseContextWindowPanel extends BaseContextWindowPanel {
         });
     }
 
-    waitForDetailsPanelCleared() {
-        let selector = xpath.container + "//div[contains(@id,'ContextView')]";
-        return this.getBrowser().waitUntil(() => {
-            return this.getAttribute(selector, 'class').then(result => {
-                return result.includes('no-selection');
-            })
-        }, {timeout: appConst.shortTimeout, timeoutMsg: 'Browse Context Window should be cleared'});
+    async waitForDetailsPanelCleared() {
+        try {
+            let selector = xpath.container + "//div[@data-component='ContextPanelView']//div[@data-component='PreviewLabel']";
+            await this.waitForElementDisplayed(selector, appConst.shortTimeout);
+        } catch (err) {
+            await this.handleError('Browse Context Window should be cleared', 'err_context_window_cleared', err);
+        }
     }
 
     async waitForWidgetDropdownRoleAttribute(expectedValue) {

@@ -6,7 +6,7 @@ const lib = require('../../libs/elements');
 const appConst = require('../../libs/app_const');
 
 const xpath = {
-    container: `//div[contains(@id,'ArchiveBrowsePanel')]//div[contains(@id,'DockedContextPanel')]`,
+    container: `//div[contains(@id,'ArchiveBrowsePanel')]//div[@data-component='ContextPanelView']`,
 };
 
 class ArchiveBrowseContextPanel extends BaseDetailsPanel {
@@ -28,13 +28,13 @@ class ArchiveBrowseContextPanel extends BaseDetailsPanel {
         });
     }
 
-    waitForContextPanelCleared() {
-        let selector = xpath.container + "//div[contains(@id,'ContextView')]";
-        return this.getBrowser().waitUntil(() => {
-            return this.getAttribute(selector, 'class').then(result => {
-                return result.includes('no-selection');
-            })
-        }, {timeout: appConst.shortTimeout, timeoutMsg: "Context Panel should be cleared"});
+    async waitForContextPanelCleared() {
+        try {
+            let selector = xpath.container + "//div[@data-component='PreviewLabel']";
+            await this.waitForElementDisplayed(selector, appConst.shortTimeout);
+        } catch (err) {
+            await this.handleError('Context Panel should be cleared', 'err_archive_context_panel_cleared', err);
+        }
     }
 }
 

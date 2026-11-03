@@ -6,10 +6,9 @@ const {DROPDOWN} = require('../../../libs/elements');
 const appConst = require('../../../libs/app_const');
 
 const xpath = {
-    container: `//div[contains(@id,'ArchiveBrowsePanel')]//div[contains(@id,'DockedContextPanel')]`,
+    container: `//div[contains(@id,'ArchiveBrowsePanel')]//div[@data-component='ContextPanelView']`,
 };
 
-//  ArchiveBrowsePanel, ContextView:
 class ArchiveContextWindowPanel extends BaseContextWindowPanel {
 
     get container() {
@@ -26,7 +25,7 @@ class ArchiveContextWindowPanel extends BaseContextWindowPanel {
 
     async waitForOpened() {
         try {
-            return await this.waitForElementDisplayed(xpath.container + "//div[contains(@id,'ContextView')]", appConst.shortTimeout);
+            return await this.waitForElementDisplayed(xpath.container, appConst.shortTimeout);
         } catch (err) {
             await this.handleError('Archive Context Window Panel was not loaded', 'err_archive_context_panel_loaded', err);
         }
