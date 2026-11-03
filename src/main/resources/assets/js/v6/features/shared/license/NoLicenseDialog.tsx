@@ -1,8 +1,7 @@
-import {Body} from '@enonic/lib-admin-ui/dom/Body';
-import {i18n} from '../../../../shared/i18n';
-import {LegacyElement} from '../../../../shared/LegacyElement';
-import {Dialog} from '@enonic/ui';
+import {ActionDialog} from '@enonic/ui-kit';
 import {type ReactElement, useCallback, useRef} from 'react';
+import {i18n} from '../../../../shared/i18n';
+import {renderRoot} from '../../../../shared/renderRoot';
 import {useDialogInitialFocus} from '../lib/hooks/useDialogInitialFocus';
 import {LicenseUploadButton} from './LicenseUploadButton';
 
@@ -33,54 +32,43 @@ export const NoLicenseDialog = ({
     }, [onOpenChange]);
 
     return (
-        <Dialog.Root open={open} onOpenChange={handleOpenChange}>
-            <Dialog.Portal>
-                <Dialog.Overlay />
-                <Dialog.Content
+        <ActionDialog.Root open={open} onOpenChange={handleOpenChange}>
+            <ActionDialog.Portal>
+                <ActionDialog.Overlay />
+                <ActionDialog.Content
                     data-component={NO_LICENSE_DIALOG_NAME}
+                    size="medium"
                     onOpenAutoFocus={handleOpenAutoFocus}
-                    className="sm:h-fit md:min-w-120 md:max-w-160 md:max-h-[85vh] gap-8"
                 >
-                    <Dialog.DefaultHeader title={title} description={description} withClose />
-                    <Dialog.Footer className="flex items-center justify-end gap-2.5">
+                    <ActionDialog.DefaultHeader title={title} description={description} withClose />
+                    <ActionDialog.Footer>
                         <LicenseUploadButton
                             buttonRef={uploadButtonRef}
                             dialogShortcut
                             size="lg"
                             onUploadFinished={handleUploadFinished}
                         />
-                    </Dialog.Footer>
-                </Dialog.Content>
-            </Dialog.Portal>
-        </Dialog.Root>
+                    </ActionDialog.Footer>
+                </ActionDialog.Content>
+            </ActionDialog.Portal>
+        </ActionDialog.Root>
     );
 };
 
 NoLicenseDialog.displayName = NO_LICENSE_DIALOG_NAME;
 
-export class NoLicenseDialogElement extends LegacyElement<typeof NoLicenseDialog, NoLicenseDialogProps> {
+export function openNoLicenseDialog(): void {
+    const host = document.createElement('div');
+    document.body.appendChild(host);
 
-    constructor() {
-        super({open: false}, NoLicenseDialog);
-    }
-
-    open(): void {
-        Body.get().appendChild(this);
-        this.setProps({
-            open: true,
-            onOpenChange: (next) => {
+    const root = renderRoot(host, 'no-license-dialog', (
+        <NoLicenseDialog
+            onOpenChange={(next) => {
                 if (!next) {
-                    this.close();
+                    root.unmount();
+                    host.remove();
                 }
-            },
-        });
-    }
-
-    close(): void {
-        this.setProps({open: false});
-        const parent = this.getParentElement();
-        if (parent) {
-            parent.removeChild(this);
-        }
-    }
+            }}
+        />
+    ));
 }

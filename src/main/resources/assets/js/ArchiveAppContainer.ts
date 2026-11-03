@@ -5,11 +5,9 @@ import {Body} from '@enonic/lib-admin-ui/dom/Body';
 import {fetchHasValidLicense} from './v6/features/api/license';
 import {handleError} from './shared/errors';
 import {NoLicenseBannerElement} from './v6/features/shared/license/NoLicenseBannerElement';
-import {NoLicenseDialogElement} from './v6/features/shared/license/NoLicenseDialog';
+import {openNoLicenseDialog} from './v6/features/shared/license/NoLicenseDialog';
 import {ValidLicenseLoadedEvent} from './event/ValidLicenseLoadedEvent';
-import {ArchiveDeleteDialogElement} from './v6/features/shared/dialogs/archive/ArchiveDeleteDialog';
-import {ArchiveRestoreDialogElement} from './v6/features/shared/dialogs/archive/ArchiveRestoreDialog';
-import {ArchiveCompareVersionsDialogElement} from './v6/features/views/context/widget/versions/ArchiveCompareVersionsDialog';
+import {mountArchiveDialogs} from './v6/features/shared/dialogs/archive/mountArchiveDialogs';
 
 export class ArchiveAppContainer
     extends AppContainer {
@@ -61,7 +59,7 @@ export class ArchiveAppContainer
         };
         ValidLicenseLoadedEvent.on(handler);
 
-        new NoLicenseDialogElement().open();
+        openNoLicenseDialog();
     }
 
     private handleValidLicenseLoaded(): void {
@@ -72,9 +70,7 @@ export class ArchiveAppContainer
 
         this.whenRendered(() => {
             super.appendElements();
-            this.appendChild(new ArchiveDeleteDialogElement());
-            this.appendChild(new ArchiveRestoreDialogElement());
-            this.appendChild(new ArchiveCompareVersionsDialogElement());
+            mountArchiveDialogs(this.getHTMLElement());
         });
 
         this.show();

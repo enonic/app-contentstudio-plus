@@ -1,5 +1,4 @@
 import {useI18n} from '../../../../../shared/i18n';
-import {LegacyElement} from '../../../../../shared/LegacyElement';
 import {useStore} from '@nanostores/preact';
 import {type ReactElement} from 'react';
 import {
@@ -26,7 +25,7 @@ export const ArchiveRestoreDialog = (): ReactElement => {
     const dependantsLabel = useI18n('dialog.restore.archive.items.subtitle');
     const actionLabel = useI18n('action.restore');
     const confirmTitle = useI18n('dialog.confirmRestore.title');
-    const confirmDescription = useI18n('dialog.confirmRestore.subtitle');
+    const confirmQuestion = useI18n('dialog.confirmRestore.subtitle');
     const progressTitle = useI18n('field.progress.restoring');
 
     const ready = open && !loading && !submitting && items.length > 0;
@@ -58,16 +57,10 @@ export const ArchiveRestoreDialog = (): ReactElement => {
             dependantsLabel={dependantsLabel}
             actionButtonLabel={actionButtonLabel}
             confirmTitle={confirmTitle}
-            confirmDescription={confirmDescription}
+            confirmQuestion={confirmQuestion}
             progressTitle={progressTitle}
         />
     );
 };
 
 ArchiveRestoreDialog.displayName = ARCHIVE_RESTORE_DIALOG_NAME;
-
-export class ArchiveRestoreDialogElement extends LegacyElement<typeof ArchiveRestoreDialog, Record<string, never>> {
-    constructor() {
-        super({}, ArchiveRestoreDialog);
-    }
-}

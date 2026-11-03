@@ -1,17 +1,17 @@
 import type {TaskId} from '@enonic/lib-admin-ui/task/TaskId';
 import type {ContentSummary} from '@enonic/lib-contentstudio/app/content/ContentSummary';
 import {useAnimatedEllipsis} from '@enonic/lib-contentstudio/v6/shared/lib/hooks/useAnimatedEllipsis';
-import {useI18n} from '../../../../../shared/i18n';
 import {useInfiniteScroll} from '@enonic/lib-contentstudio/v6/shared/lib/hooks/useInfiniteScroll';
 import {useTaskProgress} from '@enonic/lib-contentstudio/v6/entities/task/useTaskProgress';
 import {ContentLabel} from '@enonic/lib-contentstudio/v6/entities/content/ui/content/ContentLabel';
-import {DialogPresetGatedConfirmContent} from '@enonic/lib-contentstudio/v6/shared/ui/dialogs/DialogPreset';
-import {ProgressDialogContent} from '@enonic/lib-contentstudio/v6/shared/ui/dialogs/ProgressDialogContent';
-import {InboundStatusBar} from '@enonic/lib-contentstudio/v6/shared/ui/dialogs/status-bar/InboundStatusBar';
-import {Button, Dialog, ListItem, Separator} from '@enonic/ui';
-import {type ReactElement, useCallback, useEffect, useRef, useState} from 'react';
+import {Dialog, ListItem, Separator} from '@enonic/ui';
+import {ActionDialog, DeleteConfirm, type DialogIntent, Gate, useActionDialog} from '@enonic/ui-kit';
+import {type ReactElement, type ReactNode, type RefObject, useCallback, useEffect, useRef, useState} from 'react';
+import {useI18n} from '../../../../../shared/i18n';
 import {useDialogInitialFocus} from '../../lib/hooks/useDialogInitialFocus';
+import {ProgressBar} from '../../ui/ProgressBar';
 import {ArchiveContentViewItem} from '../../../../../ArchiveContentViewItem';
+import {ArchiveLoadStatus} from './ArchiveLoadStatus';
 
 type View = 'main' | 'confirmation' | 'progress';
 
@@ -24,6 +24,7 @@ export type ArchiveDialogShellProps = {
     ready: boolean;
     loading?: boolean;
     failed?: boolean;
+    intent?: DialogIntent;
     progressDescriptionKey?: string;
     hasMore?: boolean;
     onLoadMoreDescendants?: () => void | Promise<void>;
@@ -35,12 +36,14 @@ export type ArchiveDialogShellProps = {
     dependantsLabel: string;
     actionButtonLabel: string;
     confirmTitle: string;
-    confirmDescription: string;
+    confirmQuestion: string;
     progressTitle: string;
     'data-component': string;
 };
 
-const noop = (): void => undefined;
+const CONTENT_CLASS_NAME = 'h-full sm:h-fit md:max-h-[85vh]';
+
+const preventDefault = (event: Event): void => event.preventDefault();
 
 const getProgressDescription = (
     phaseAware: boolean,
@@ -54,6 +57,68 @@ const getProgressDescription = (
     return resolving ? resolvingDescription : progressDescription;
 };
 
+type GatedConfirmProps = {
+    title: string;
+    question: ReactNode;
+    expected: number;
+    onConfirm: () => void;
+    'data-component': string;
+};
+
+const GatedConfirmParts = ({title, question, expected, onConfirm, gateInputRef}: Omit<GatedConfirmProps, 'data-component'> & {
+    gateInputRef: RefObject<HTMLInputElement | null>;
+}): ReactElement => {
+    const {confirmEnabled} = useActionDialog();
+    const confirmRef = useRef<HTMLButtonElement>(null);
+
+    useEffect(() => {
+        if (confirmEnabled) {
+            confirmRef.current?.focus();
+        }
+    }, [confirmEnabled]);
+
+    return (
+        <>
+            <ActionDialog.DefaultHeader title={title} />
+            <ActionDialog.Body>
+                <div>{question}</div>
+                <Gate>
+                    <Gate.Hint value={expected} />
+                    <Gate.Input ref={gateInputRef} expected={expected} />
+                </Gate>
+            </ActionDialog.Body>
+            <ActionDialog.Footer
+                cancelVariant="outline"
+                confirmRef={confirmRef}
+                onConfirm={onConfirm}
+                closeOnConfirm={false}
+            />
+        </>
+    );
+};
+
+GatedConfirmParts.displayName = 'GatedConfirm.Parts';
+
+const GatedConfirm = ({'data-component': dataComponent, ...props}: GatedConfirmProps): ReactElement => {
+    const gateInputRef = useRef<HTMLInputElement>(null);
+
+    return (
+        <ActionDialog.Content
+            data-component={dataComponent}
+            size="medium"
+            defaultConfirmEnabled={false}
+            onOpenAutoFocus={(event: Event) => {
+                event.preventDefault();
+                gateInputRef.current?.focus();
+            }}
+        >
+            <GatedConfirmParts {...props} gateInputRef={gateInputRef} />
+        </ActionDialog.Content>
+    );
+};
+
+GatedConfirm.displayName = 'GatedConfirm';
+
 export const ArchiveDialogShell = ({
     open,
     items,
@@ -63,6 +128,7 @@ export const ArchiveDialogShell = ({
     ready,
     loading = false,
     failed = false,
+    intent = 'default',
     progressDescriptionKey,
     hasMore = false,
     onLoadMoreDescendants,
@@ -74,7 +140,7 @@ export const ArchiveDialogShell = ({
     dependantsLabel,
     actionButtonLabel,
     confirmTitle,
-    confirmDescription,
+    confirmQuestion,
     progressTitle,
     'data-component': dataComponent,
 }: ArchiveDialogShellProps): ReactElement => {
@@ -111,52 +177,45 @@ export const ArchiveDialogShell = ({
         }
     }, [open]);
 
-    const resetView = (): void => setView('main');
-
     const handleOpenChange = (next: boolean): void => {
         if (!next) {
             onCancel();
-            resetView();
+            setView('main');
         }
     };
 
-    const handleAction = async (): Promise<void> => {
+    const execute = async (): Promise<void> => {
+        setView('progress');
+        const started = await onExecute();
+        if (!started) {
+            setView('main');
+        }
+    };
+
+    const handleAction = (): void => {
         if (total > 1) {
             setView('confirmation');
             return;
         }
-        setView('progress');
-        const started = await onExecute();
-        if (!started) {
-            setView('main');
-        }
+        void execute();
     };
 
-    const handleConfirm = async (): Promise<void> => {
-        setView('progress');
-        const started = await onExecute();
-        if (!started) {
-            setView('main');
-        }
-    };
+    const confirmDataComponent = `${dataComponent}Confirm`;
 
     return (
-        <Dialog.Root open={open} onOpenChange={handleOpenChange}>
-            <Dialog.Portal>
-                <Dialog.Overlay />
+        <ActionDialog.Root open={open} onOpenChange={handleOpenChange}>
+            <ActionDialog.Portal>
+                <ActionDialog.Overlay />
                 {view === 'main' && (
-                    <Dialog.Content
+                    <ActionDialog.Content
                         data-component={dataComponent}
+                        size="wide"
                         onOpenAutoFocus={handleOpenAutoFocus}
-                        className="w-full h-full gap-10 sm:h-fit md:min-w-180 md:max-w-184 md:max-h-[85vh] lg:max-w-220"
+                        className={CONTENT_CLASS_NAME}
                     >
-                        <Dialog.DefaultHeader title={title} description={description} withClose />
-                        <InboundStatusBar
-                            loading={loading}
-                            failed={failed}
-                            errors={{inbound: {count: 0, onIgnore: noop}}}
-                        />
-                        <Dialog.Body className="flex flex-col gap-y-10">
+                        <ActionDialog.DefaultHeader title={title} description={description} withClose />
+                        <ArchiveLoadStatus loading={loading} failed={failed} />
+                        <ActionDialog.Body className="gap-y-10">
                             <ul className="flex flex-col gap-y-2.5">
                                 {items.map((item) => (
                                     <ListItem key={item.getId()} className="pl-0 py-0">
@@ -185,42 +244,60 @@ export const ArchiveDialogShell = ({
                                     {hasMore && <div ref={sentinelRef} aria-hidden className="h-px w-full" />}
                                 </div>
                             )}
-                        </Dialog.Body>
-                        <Dialog.Footer className="flex items-center gap-2.5">
+                        </ActionDialog.Body>
+                        <ActionDialog.Footer>
                             <Dialog.Shortcut asChild>
-                                <Button
-                                    ref={actionButtonRef}
+                                <ActionDialog.Action
                                     data-component="Button"
-                                    variant="solid"
-                                    size="lg"
+                                    ref={actionButtonRef}
                                     label={actionButtonLabel}
+                                    intent={intent}
                                     disabled={!ready}
-                                    onClick={() => void handleAction()}
+                                    closeOnClick={false}
+                                    onClick={handleAction}
                                 />
                             </Dialog.Shortcut>
-                        </Dialog.Footer>
-                    </Dialog.Content>
+                        </ActionDialog.Footer>
+                    </ActionDialog.Content>
                 )}
-                {view === 'confirmation' && (
-                    <DialogPresetGatedConfirmContent
-                        className="sm:h-fit md:min-w-180 md:max-w-184 md:max-h-[85vh] lg:max-w-220"
+                {view === 'confirmation' && (intent === 'danger' ? (
+                    <DeleteConfirm
+                        data-component={confirmDataComponent}
                         title={confirmTitle}
-                        description={confirmDescription}
+                        question={confirmQuestion}
+                        targets={[]}
                         expected={total}
-                        onConfirm={() => void handleConfirm()}
-                        onCancel={resetView}
+                        onConfirm={() => void execute()}
+                        closeOnConfirm={false}
                     />
-                )}
+                ) : (
+                    <GatedConfirm
+                        data-component={confirmDataComponent}
+                        title={confirmTitle}
+                        question={confirmQuestion}
+                        expected={total}
+                        onConfirm={() => void execute()}
+                    />
+                ))}
                 {view === 'progress' && (
-                    <ProgressDialogContent
-                        title={progressTitle}
-                        description={getProgressDescription(phaseAware, resolving, resolvingDescription, progressDescription)}
-                        progress={resolving ? undefined : progress}
-                        className="w-full h-full gap-10 sm:h-fit md:min-w-180 md:max-w-184 md:max-h-[85vh] lg:max-w-220"
-                    />
+                    <ActionDialog.Content
+                        data-component={`${dataComponent}Progress`}
+                        size="wide"
+                        className={CONTENT_CLASS_NAME}
+                        onEscapeKeyDown={preventDefault}
+                        onPointerDownOutside={preventDefault}
+                    >
+                        <ActionDialog.DefaultHeader
+                            title={progressTitle}
+                            description={getProgressDescription(phaseAware, resolving, resolvingDescription, progressDescription)}
+                        />
+                        <ActionDialog.Body className="pb-10">
+                            {!resolving && <ProgressBar value={progress} />}
+                        </ActionDialog.Body>
+                    </ActionDialog.Content>
                 )}
-            </Dialog.Portal>
-        </Dialog.Root>
+            </ActionDialog.Portal>
+        </ActionDialog.Root>
     );
 };
 

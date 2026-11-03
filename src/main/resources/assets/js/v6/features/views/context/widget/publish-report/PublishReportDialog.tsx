@@ -1,6 +1,7 @@
 import {handleError} from '../../../../../../shared/errors';
 import {useI18n} from '../../../../../../shared/i18n';
-import {Button, Dialog} from '@enonic/ui';
+import {Dialog} from '@enonic/ui';
+import {ActionDialog} from '@enonic/ui-kit';
 import {Printer} from 'lucide-react';
 import {type ReactElement, useEffect, useRef, useState} from 'react';
 import {useDialogInitialFocus} from '../../../../shared/lib/hooks/useDialogInitialFocus';
@@ -64,39 +65,39 @@ export const PublishReportDialog = ({
     };
 
     return (
-        <Dialog.Root open={open} onOpenChange={handleOpenChange}>
-            <Dialog.Portal>
-                <Dialog.Overlay />
-                <Dialog.Content
+        <ActionDialog.Root open={open} onOpenChange={handleOpenChange}>
+            <ActionDialog.Portal>
+                <ActionDialog.Overlay />
+                <ActionDialog.Content
                     data-component={PUBLISH_REPORT_DIALOG_NAME}
+                    size="wide"
                     onOpenAutoFocus={handleOpenAutoFocus}
-                    className="w-full h-full max-sm:max-h-none gap-5 sm:h-fit max-sm:p-3 md:max-h-[85vh]"
-                    style={{minWidth: 'min(736px, 100%)', maxWidth: '880px'}}
+                    className="h-full max-sm:max-h-none sm:h-fit max-sm:p-3 md:max-h-[85vh] md:min-w-184"
                 >
-                    <Dialog.DefaultHeader className="max-sm:p-2" title={title} description={path} withClose />
-                    <Dialog.Body className="flex flex-col gap-5 min-h-0">
+                    <ActionDialog.DefaultHeader className="max-sm:p-2" title={title} description={path} withClose />
+                    <ActionDialog.Body className="gap-5 min-h-0">
                         <div className="flex-1 min-h-0 overflow-auto bg-surface-neutral py-3">
                             {versions && (
                                 <Comparisons contentId={contentId} versions={versions} from={from} to={to} />
                             )}
                         </div>
-                    </Dialog.Body>
-                    <Dialog.Footer className="flex items-center justify-end gap-2.5">
+                    </ActionDialog.Body>
+                    <ActionDialog.Footer>
                         <Dialog.Shortcut asChild>
-                            <Button
-                                ref={printButtonRef}
+                            <ActionDialog.Action
                                 data-component="Button"
+                                ref={printButtonRef}
                                 startIcon={Printer}
                                 variant="outline"
-                                size="lg"
                                 label={printLabel}
+                                closeOnClick={false}
                                 onClick={injected ? printReport : () => window.print()}
                             />
                         </Dialog.Shortcut>
-                    </Dialog.Footer>
-                </Dialog.Content>
-            </Dialog.Portal>
-        </Dialog.Root>
+                    </ActionDialog.Footer>
+                </ActionDialog.Content>
+            </ActionDialog.Portal>
+        </ActionDialog.Root>
     );
 };
 

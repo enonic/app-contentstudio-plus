@@ -1,6 +1,7 @@
 import {i18n} from '../../../../../../shared/i18n';
 import {ContentIcon} from '@enonic/lib-contentstudio/v6/shared/ui/icons/ContentIcon';
-import {Button, Dialog} from '@enonic/ui';
+import {Dialog} from '@enonic/ui';
+import {ActionDialog} from '@enonic/ui-kit';
 import {type ReactElement, useCallback, useRef} from 'react';
 import {resolveContentDisplay} from '../../../../shared/content/contentDisplay';
 import {parentPath} from '../../../../shared/content/contentPath';
@@ -38,25 +39,22 @@ export const DuplicateVariantDialog = ({
     }, [variant, siblings, onOpenChange]);
 
     if (!variant) {
-        return <Dialog.Root open={false} />;
+        return <ActionDialog.Root open={false} />;
     }
 
     const display = resolveContentDisplay(variant);
 
     return (
-        <Dialog.Root open={open} onOpenChange={onOpenChange}>
-            <Dialog.Portal>
-                <Dialog.Overlay />
-                <Dialog.Content
-                    className="sm:h-fit md:max-w-180 md:max-h-[85vh] w-full gap-5"
+        <ActionDialog.Root open={open} onOpenChange={onOpenChange}>
+            <ActionDialog.Portal>
+                <ActionDialog.Overlay />
+                <ActionDialog.Content
                     data-component={DUPLICATE_VARIANT_DIALOG_NAME}
+                    size="medium"
                     onOpenAutoFocus={handleOpenAutoFocus}
                 >
-                    <Dialog.DefaultHeader
-                        title={i18n('action.duplicate')}
-                        withClose
-                    />
-                    <Dialog.Body className="flex flex-col gap-2.5 p-2">
+                    <ActionDialog.DefaultHeader title={i18n('action.duplicate')} withClose />
+                    <ActionDialog.Body className="gap-2.5">
                         <div className="flex items-center gap-2.5">
                             <ContentIcon contentType={variant.type} url={variant.iconUrl} />
                             <div className="min-w-0 flex-1">
@@ -64,23 +62,21 @@ export const DuplicateVariantDialog = ({
                                 <div className="truncate text-sm text-subtle">{display.pathString}</div>
                             </div>
                         </div>
-                    </Dialog.Body>
-                    <Dialog.Footer>
+                    </ActionDialog.Body>
+                    <ActionDialog.Footer>
                         <Dialog.Shortcut asChild>
-                            <Button
-                                ref={duplicateButtonRef}
+                            <ActionDialog.Action
                                 data-component="Button"
-                                className="self-end"
-                                size="lg"
-                                variant="solid"
+                                ref={duplicateButtonRef}
                                 label={i18n('action.duplicate')}
+                                closeOnClick={false}
                                 onClick={handleDuplicate}
                             />
                         </Dialog.Shortcut>
-                    </Dialog.Footer>
-                </Dialog.Content>
-            </Dialog.Portal>
-        </Dialog.Root>
+                    </ActionDialog.Footer>
+                </ActionDialog.Content>
+            </ActionDialog.Portal>
+        </ActionDialog.Root>
     );
 };
 

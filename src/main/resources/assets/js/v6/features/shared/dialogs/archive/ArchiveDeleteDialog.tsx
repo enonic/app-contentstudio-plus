@@ -1,5 +1,4 @@
 import {useI18n} from '../../../../../shared/i18n';
-import {LegacyElement} from '../../../../../shared/LegacyElement';
 import {useStore} from '@nanostores/preact';
 import {type ReactElement} from 'react';
 import {
@@ -26,7 +25,7 @@ export const ArchiveDeleteDialog = (): ReactElement => {
     const dependantsLabel = useI18n('dialog.delete.archive.items.subtitle');
     const actionLabel = useI18n('action.delete');
     const confirmTitle = useI18n('dialog.confirmDelete');
-    const confirmDescription = useI18n('dialog.confirmDelete.subtitle');
+    const confirmQuestion = useI18n('dialog.confirmDelete.subtitle');
     const progressTitle = useI18n('field.progress.deleting');
 
     const ready = open && !loading && !submitting && items.length > 0;
@@ -47,6 +46,7 @@ export const ArchiveDeleteDialog = (): ReactElement => {
             ready={ready}
             loading={loading}
             failed={failed}
+            intent="danger"
             hasMore={hasMoreDescendants}
             onLoadMoreDescendants={loadMoreArchiveDeleteDescendants}
             progressDescriptionKey="dialog.deleting"
@@ -58,16 +58,10 @@ export const ArchiveDeleteDialog = (): ReactElement => {
             dependantsLabel={dependantsLabel}
             actionButtonLabel={actionButtonLabel}
             confirmTitle={confirmTitle}
-            confirmDescription={confirmDescription}
+            confirmQuestion={confirmQuestion}
             progressTitle={progressTitle}
         />
     );
 };
 
 ArchiveDeleteDialog.displayName = ARCHIVE_DELETE_DIALOG_NAME;
-
-export class ArchiveDeleteDialogElement extends LegacyElement<typeof ArchiveDeleteDialog, Record<string, never>> {
-    constructor() {
-        super({}, ArchiveDeleteDialog);
-    }
-}
