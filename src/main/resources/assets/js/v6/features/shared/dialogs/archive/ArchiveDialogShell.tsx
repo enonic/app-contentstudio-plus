@@ -4,8 +4,8 @@ import {useAnimatedEllipsis} from '@enonic/lib-contentstudio/v6/shared/lib/hooks
 import {useInfiniteScroll} from '@enonic/lib-contentstudio/v6/shared/lib/hooks/useInfiniteScroll';
 import {useTaskProgress} from '@enonic/lib-contentstudio/v6/entities/task/useTaskProgress';
 import {ContentLabel} from '@enonic/lib-contentstudio/v6/entities/content/ui/content/ContentLabel';
-import {Dialog, ListItem, Separator} from '@enonic/ui';
-import {ActionDialog, DeleteConfirm, type DialogIntent, Gate, useActionDialog} from '@enonic/ui-kit';
+import {Button, Dialog, ListItem, Separator} from '@enonic/ui';
+import {ActionDialog, type DialogIntent, Gate, useActionDialog, useUiKitPhrases} from '@enonic/ui-kit';
 import {type ReactElement, type ReactNode, type RefObject, useCallback, useEffect, useRef, useState} from 'react';
 import {useI18n} from '../../../../../shared/i18n';
 import {useDialogInitialFocus} from '../../lib/hooks/useDialogInitialFocus';
@@ -61,13 +61,15 @@ type GatedConfirmProps = {
     title: string;
     question: ReactNode;
     expected: number;
+    intent: DialogIntent;
     onConfirm: () => void;
     'data-component': string;
 };
 
-const GatedConfirmParts = ({title, question, expected, onConfirm, gateInputRef}: Omit<GatedConfirmProps, 'data-component'> & {
+const GatedConfirmParts = ({title, question, expected, intent, onConfirm, gateInputRef}: Omit<GatedConfirmProps, 'data-component'> & {
     gateInputRef: RefObject<HTMLInputElement | null>;
 }): ReactElement => {
+    const t = useUiKitPhrases();
     const {confirmEnabled} = useActionDialog();
     const confirmRef = useRef<HTMLButtonElement>(null);
 
@@ -87,12 +89,22 @@ const GatedConfirmParts = ({title, question, expected, onConfirm, gateInputRef}:
                     <Gate.Input ref={gateInputRef} expected={expected} />
                 </Gate>
             </ActionDialog.Body>
-            <ActionDialog.Footer
-                cancelVariant="outline"
-                confirmRef={confirmRef}
-                onConfirm={onConfirm}
-                closeOnConfirm={false}
-            />
+            <ActionDialog.Footer>
+                <Dialog.Shortcut shortcut="secondary" asChild>
+                    <Dialog.Close asChild>
+                        <Button variant="outline" size="lg" label={t('enonic.uiKit.dialog.cancel')} />
+                    </Dialog.Close>
+                </Dialog.Shortcut>
+                <Dialog.Shortcut asChild>
+                    <ActionDialog.Action
+                        ref={confirmRef}
+                        label={t(intent === 'danger' ? 'enonic.uiKit.dialog.delete' : 'enonic.uiKit.dialog.confirm')}
+                        intent={intent}
+                        closeOnClick={false}
+                        onClick={onConfirm}
+                    />
+                </Dialog.Shortcut>
+            </ActionDialog.Footer>
         </>
     );
 };
@@ -200,8 +212,6 @@ export const ArchiveDialogShell = ({
         void execute();
     };
 
-    const confirmDataComponent = `${dataComponent}Confirm`;
-
     return (
         <ActionDialog.Root open={open} onOpenChange={handleOpenChange}>
             <ActionDialog.Portal>
@@ -260,25 +270,16 @@ export const ArchiveDialogShell = ({
                         </ActionDialog.Footer>
                     </ActionDialog.Content>
                 )}
-                {view === 'confirmation' && (intent === 'danger' ? (
-                    <DeleteConfirm
-                        data-component={confirmDataComponent}
-                        title={confirmTitle}
-                        question={confirmQuestion}
-                        targets={[]}
-                        expected={total}
-                        onConfirm={() => void execute()}
-                        closeOnConfirm={false}
-                    />
-                ) : (
+                {view === 'confirmation' && (
                     <GatedConfirm
-                        data-component={confirmDataComponent}
+                        data-component={`${dataComponent}Confirm`}
                         title={confirmTitle}
                         question={confirmQuestion}
                         expected={total}
+                        intent={intent}
                         onConfirm={() => void execute()}
                     />
-                ))}
+                )}
                 {view === 'progress' && (
                     <ActionDialog.Content
                         data-component={`${dataComponent}Progress`}
