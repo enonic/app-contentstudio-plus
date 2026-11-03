@@ -11,12 +11,11 @@ import {ArchiveServerEvent} from '@enonic/lib-contentstudio/app/event/ArchiveSer
 import {ContentServerChangeItem} from '@enonic/lib-contentstudio/app/event/ContentServerChangeItem';
 import {ContentServerEventsHandler} from '@enonic/lib-contentstudio/app/event/ContentServerEventsHandler';
 import {getActiveProjectName, onActiveProjectChanged} from '@enonic/lib-contentstudio/v6/entities/project/activeProject.store';
-import {ContextView} from '@enonic/lib-contentstudio/app/view/context/ContextView';
+import type {BrowseHostConfig} from '@enonic/lib-contentstudio/v6/pages/browse/ui/layout/BrowseLayout';
 import Q from 'q';
 import {ArchiveBrowseItemPanel} from './ArchiveBrowseItemPanel';
 import {ArchiveBrowseToolbarElement} from './ArchiveBrowseToolbar';
 import {ArchiveContentViewItem} from './ArchiveContentViewItem';
-import {createArchiveContextView} from './ArchiveContextView';
 import {ArchiveFilterPanel} from './ArchiveFilterPanel';
 import {ArchiveHelper} from './ArchiveHelper';
 import {ArchiveTreeGridActions} from './ArchiveTreeGridActions';
@@ -30,6 +29,7 @@ import {
 } from './v6/features/store/archive-list';
 import {clearSelection, setSelection} from './v6/features/store/archive-selection';
 import {ArchiveTreeListElement} from './v6/features/views/browse/archive/ArchiveTreeListElement';
+import {ARCHIVE_CONTEXT_PANEL, registerArchiveContextWidgets} from './v6/features/views/context/archiveContextWidgets';
 
 export class ArchiveBrowsePanel
     extends ResponsiveBrowsePanel {
@@ -44,8 +44,6 @@ export class ArchiveBrowsePanel
 
     protected selectionWrapper: SelectableListBoxWrapper<ArchiveContentViewItem>;
 
-    protected contextView: ContextView;
-
     protected filterPanel: ArchiveFilterPanel;
 
     doRender(): Q.Promise<boolean> {
@@ -57,6 +55,7 @@ export class ArchiveBrowsePanel
     }
 
     protected initElements(): void {
+        registerArchiveContextWidgets();
         super.initElements();
 
         this.browseToolbar.hide();
@@ -124,10 +123,6 @@ export class ArchiveBrowsePanel
         });
     }
 
-    protected updateContextView(item: ArchiveContentViewItem): Q.Promise<void> {
-        return this.contextView.setItem(item);
-    }
-
     protected createBrowseItemPanel(): BrowseItemPanel {
         return new ArchiveBrowseItemPanel();
     }
@@ -163,8 +158,8 @@ export class ArchiveBrowsePanel
         return new SelectableTreeListBoxKeyNavigator(this.selectionWrapper);
     }
 
-    protected createContextView(): ContextView {
-        return createArchiveContextView();
+    protected getBrowseHostConfig(): BrowseHostConfig {
+        return {storageId: 'archive-layout', contextPanel: ARCHIVE_CONTEXT_PANEL};
     }
 
     protected createFilterPanel(): ArchiveFilterPanel {

@@ -1,11 +1,5 @@
-import {LegacyElement} from '../../../../../../shared/LegacyElement';
-import type {ContentSummaryAndCompareStatus}
-    from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
-import type {ExtensionItemViewType}
-    from '@enonic/lib-contentstudio/app/view/context/ExtensionItemView';
 import {useStore} from '@nanostores/preact';
-import Q from 'q';
-import {type ReactElement} from 'react';
+import type {ReactElement} from 'react';
 import {$archiveContextContent} from '../../../../store/archive-selection';
 import {PublishReportWidget} from './PublishReportWidget';
 
@@ -26,32 +20,3 @@ export const ArchivePublishReportWidget = (): ReactElement | null => {
 };
 
 ArchivePublishReportWidget.displayName = ARCHIVE_PUBLISH_REPORT_WIDGET_NAME;
-
-export class PublishReportWidgetElement
-    extends LegacyElement<typeof ArchivePublishReportWidget>
-    implements ExtensionItemViewType {
-
-    constructor() {
-        super({}, ArchivePublishReportWidget);
-    }
-
-    public layout(): Q.Promise<void> {
-        return Q();
-    }
-
-    public setContentAndUpdateView(_item: ContentSummaryAndCompareStatus): Q.Promise<null | void> {
-        return Q();
-    }
-
-    public fetchExtensionContents(_url: string, _contentId: string): Q.Promise<void> {
-        return Q();
-    }
-
-    public hide(): void {
-        return;
-    }
-
-    public show(): void {
-        return;
-    }
-}

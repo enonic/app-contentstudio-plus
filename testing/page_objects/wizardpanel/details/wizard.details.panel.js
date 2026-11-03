@@ -6,7 +6,7 @@ const lib = require('../../../libs/elements');
 const appConst = require('../../../libs/app_const');
 
 const xpath = {
-    container: `//div[contains(@id,'ContentWizardPanel')]//div[contains(@id,'DockedContextPanel') or contains(@id,'FloatingContextPanel')]`,
+    container: `//div[contains(@id,'ContentWizardPanel')]//div[@data-component='ContextPanelView']`,
     widgetItem: `//div[contains(@id,'ExtensionContentItemView')]`
 };
 
