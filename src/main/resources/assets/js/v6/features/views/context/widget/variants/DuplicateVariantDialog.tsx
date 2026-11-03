@@ -1,12 +1,12 @@
 import {i18n} from '../../../../../../shared/i18n';
-import {ContentSummaryAndCompareStatus} from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
-import {ContentDuplicateParams} from '@enonic/lib-contentstudio/app/resource/ContentDuplicateParams';
 import {ContentIcon} from '@enonic/lib-contentstudio/v6/shared/ui/icons/ContentIcon';
 import {Button, Dialog} from '@enonic/ui';
 import {type ReactElement, useCallback, useRef} from 'react';
 import {resolveContentDisplay} from '../../../../shared/content/contentDisplay';
+import {parentPath} from '../../../../shared/content/contentPath';
 import {useDialogInitialFocus} from '../../../../shared/lib/hooks/useDialogInitialFocus';
 import {duplicateAndEdit} from './duplicateAndEdit';
+import type {VariantContent} from '../../../../shared/content/variantContent';
 import {getNextAvailableVariantName} from './variantName';
 
 const DUPLICATE_VARIANT_DIALOG_NAME = 'DuplicateVariantDialog';
@@ -14,8 +14,8 @@ const DUPLICATE_VARIANT_DIALOG_NAME = 'DuplicateVariantDialog';
 export type DuplicateVariantDialogProps = {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    variant: ContentSummaryAndCompareStatus | null;
-    siblings: ContentSummaryAndCompareStatus[];
+    variant: VariantContent | null;
+    siblings: VariantContent[];
 };
 
 export const DuplicateVariantDialog = ({
@@ -30,17 +30,10 @@ export const DuplicateVariantDialog = ({
     const handleDuplicate = useCallback((): void => {
         if (!variant) return;
 
-        const variantOf = variant.getContentSummary().getVariantOf();
-        if (!variantOf) return;
+        if (!variant.variantOf) return;
 
         const name = getNextAvailableVariantName(siblings);
-        const params = new ContentDuplicateParams(variant.getContentId())
-            .setIncludeChildren(false)
-            .setVariant(true)
-            .setParent(variant.getPath().getParentPath().toString())
-            .setName(name);
-
-        duplicateAndEdit(params, variantOf, name);
+        duplicateAndEdit({contentId: variant.id, parent: parentPath(variant.path), name}, variant.variantOf, name);
         onOpenChange(false);
     }, [variant, siblings, onOpenChange]);
 
@@ -48,7 +41,6 @@ export const DuplicateVariantDialog = ({
         return <Dialog.Root open={false} />;
     }
 
-    const summary = variant.getContentSummary();
     const display = resolveContentDisplay(variant);
 
     return (
@@ -66,10 +58,7 @@ export const DuplicateVariantDialog = ({
                     />
                     <Dialog.Body className="flex flex-col gap-2.5 p-2">
                         <div className="flex items-center gap-2.5">
-                            <ContentIcon
-                                contentType={summary.getType().toString()}
-                                url={summary.getIconUrl()}
-                            />
+                            <ContentIcon contentType={variant.type} url={variant.iconUrl} />
                             <div className="min-w-0 flex-1">
                                 <div className="truncate text-base font-semibold">{display.displayName}</div>
                                 <div className="truncate text-sm text-subtle">{display.pathString}</div>

@@ -1,22 +1,22 @@
 import {i18n} from '../../../../../../shared/i18n';
-import {ContentEventsProcessor} from '@enonic/lib-contentstudio/app/ContentEventsProcessor';
-import {ContentSummaryAndCompareStatus} from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
-import {EditContentEvent} from '@enonic/lib-contentstudio/app/event/EditContentEvent';
-import {PublishStatus} from '@enonic/lib-contentstudio/app/publish/PublishStatus';
+import {getActiveProjectName} from '@enonic/lib-contentstudio/v6/entities/project/activeProject.store';
 import {ContentIcon} from '@enonic/lib-contentstudio/v6/shared/ui/icons/ContentIcon';
 import {Button, cn} from '@enonic/ui';
 import {type MouseEvent, type ReactElement, useCallback, useLayoutEffect, useMemo, useRef} from 'react';
 import {resolveContentDisplay} from '../../../../shared/content/contentDisplay';
+import {getPublishedStatusClass, getPublishStatusKey} from '../../../../shared/content/contentStatus';
+import {openContentEditor} from '../../../../shared/content/openContentEditor';
 import type {CardEntry} from '../shared/useCardListKeyboard';
+import type {VariantContent} from '../../../../shared/content/variantContent';
 
 export type VariantCardProps = {
-    item: ContentSummaryAndCompareStatus;
+    item: VariantContent;
     isActive: boolean;
     isOriginal: boolean;
     isExpanded: boolean;
     onToggle: () => void;
-    onCreateVariant?: (item: ContentSummaryAndCompareStatus) => void;
-    onDuplicate?: (item: ContentSummaryAndCompareStatus) => void;
+    onCreateVariant?: (item: VariantContent) => void;
+    onDuplicate?: (item: VariantContent) => void;
     index?: number;
     registerEntry?: (index: number, entry: CardEntry | null) => void;
 };
@@ -45,13 +45,10 @@ export const VariantCard = ({
     index,
     registerEntry,
 }: VariantCardProps): ReactElement => {
-    const statusText = item.getStatusText();
-    const statusClass = item.getPublishStatus() === PublishStatus.ONLINE
-        ? 'online'
-        : (item.getStatusClass() ?? '');
+    const statusText = i18n(getPublishStatusKey(item.publishStatus));
+    const statusClass = getPublishedStatusClass(item.publishStatus, item.publishedOnce);
 
     const contentDisplay = useMemo(() => resolveContentDisplay(item), [item]);
-    const summary = item.getContentSummary();
 
     const fieldsetRef = useRef<HTMLFieldSetElement>(null);
     const editBtnRef = useRef<HTMLButtonElement>(null);
@@ -73,7 +70,7 @@ export const VariantCard = ({
 
     const handleEdit = useCallback((event: MouseEvent<HTMLButtonElement>): void => {
         event.stopPropagation();
-        ContentEventsProcessor.handleEdit(new EditContentEvent([item]));
+        openContentEditor(getActiveProjectName(), item.id);
     }, [item]);
 
     const handleCreate = useCallback((event: MouseEvent<HTMLButtonElement>): void => {
@@ -104,10 +101,7 @@ export const VariantCard = ({
             )}
 
             <div className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-2.5 gap-y-5">
-                <ContentIcon
-                    contentType={summary.getType().toString()}
-                    url={summary.getIconUrl()}
-                />
+                <ContentIcon contentType={item.type} url={item.iconUrl} />
 
                 <div className="min-w-0">
                     <div className="truncate text-base font-semibold">{contentDisplay.displayName}</div>

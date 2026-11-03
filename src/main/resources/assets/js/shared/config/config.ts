@@ -3,6 +3,7 @@ import type {Phrases} from '@enonic/ui-utils';
 export interface PlusConfig {
     appId: string;
     adminUrl: string;
+    toolUri: string;
     services: {
         contentUrl: string;
         licenseUrl: string;
@@ -18,6 +19,7 @@ export interface RawConfig {
     [key: string]: unknown;
     appId?: unknown;
     adminUrl?: unknown;
+    toolUri?: unknown;
     services?: Record<string, unknown>;
     user?: {key?: unknown};
     phrasesAsJson?: unknown;
@@ -39,6 +41,7 @@ export function parseConfig(raw: RawConfig): PlusConfig {
     return {
         appId: toString(raw.appId),
         adminUrl: toString(raw.adminUrl),
+        toolUri: toString(raw.toolUri),
         services: {
             contentUrl: toString(raw.services?.contentUrl),
             licenseUrl: toString(raw.services?.licenseUrl),

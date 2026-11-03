@@ -1,12 +1,11 @@
 import {i18n} from '../../../../../../shared/i18n';
-import {ContentSummaryAndCompareStatus} from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
-import {ContentDuplicateParams} from '@enonic/lib-contentstudio/app/resource/ContentDuplicateParams';
 import {ContentIcon} from '@enonic/lib-contentstudio/v6/shared/ui/icons/ContentIcon';
 import {Button, Dialog, Input} from '@enonic/ui';
 import {type ChangeEvent, type ReactElement, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {resolveContentDisplay} from '../../../../shared/content/contentDisplay';
 import {useDialogInitialFocus} from '../../../../shared/lib/hooks/useDialogInitialFocus';
 import {duplicateAndEdit} from './duplicateAndEdit';
+import type {VariantContent} from '../../../../shared/content/variantContent';
 import {getNextAvailableVariantName, isVariantNameOccupied} from './variantName';
 
 const CREATE_VARIANT_DIALOG_NAME = 'CreateVariantDialog';
@@ -14,8 +13,8 @@ const CREATE_VARIANT_DIALOG_NAME = 'CreateVariantDialog';
 export type CreateVariantDialogProps = {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    original: ContentSummaryAndCompareStatus | null;
-    variants: ContentSummaryAndCompareStatus[];
+    original: VariantContent | null;
+    variants: VariantContent[];
 };
 
 export const CreateVariantDialog = ({
@@ -55,13 +54,7 @@ export const CreateVariantDialog = ({
         if (!original || !validation.valid) return;
 
         const trimmed = name.trim();
-        const params = new ContentDuplicateParams(original.getContentId())
-            .setIncludeChildren(false)
-            .setVariant(true)
-            .setParent(original.getPath().toString())
-            .setName(trimmed);
-
-        duplicateAndEdit(params, original.getId(), trimmed);
+        duplicateAndEdit({contentId: original.id, parent: original.path, name: trimmed}, original.id, trimmed);
         onOpenChange(false);
     }, [original, name, validation.valid, onOpenChange]);
 
@@ -69,7 +62,6 @@ export const CreateVariantDialog = ({
         return <Dialog.Root open={false} />;
     }
 
-    const summary = original.getContentSummary();
     const display = resolveContentDisplay(original);
 
     return (
@@ -91,10 +83,7 @@ export const CreateVariantDialog = ({
                                 {i18n('widget.variants.dialog.create.original')}
                             </h6>
                             <div className="flex items-center gap-2.5">
-                                <ContentIcon
-                                    contentType={summary.getType().toString()}
-                                    url={summary.getIconUrl()}
-                                />
+                                <ContentIcon contentType={original.type} url={original.iconUrl} />
                                 <div className="min-w-0 flex-1">
                                     <div className="truncate text-base font-semibold">{display.displayName}</div>
                                     <div className="truncate text-sm text-subtle">{display.pathString}</div>

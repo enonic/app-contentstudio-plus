@@ -1,23 +1,34 @@
 import {handleError} from '../../../../../../shared/errors';
-import {ContentId} from '@enonic/lib-contentstudio/app/content/ContentId';
-import {ContentSummaryAndCompareStatus} from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
-import {ContentServerChangeItem} from '@enonic/lib-contentstudio/app/event/ContentServerChangeItem';
 import {ContentServerEventsHandler} from '@enonic/lib-contentstudio/app/event/ContentServerEventsHandler';
-import {ContentSummaryAndCompareStatusFetcher} from '@enonic/lib-contentstudio/app/resource/ContentSummaryAndCompareStatusFetcher';
 import {useCallback, useEffect, useRef, useState} from 'react';
-import {fetchVariants} from '../../../../api/variants';
+import {fetchContent, fetchVariants} from '../../../../api/variants';
+import type {VariantContent} from '../../../../shared/content/variantContent';
 
 export type VariantsData = {
-    original: ContentSummaryAndCompareStatus | null;
-    variants: ContentSummaryAndCompareStatus[];
+    original: VariantContent | null;
+    variants: VariantContent[];
     loading: boolean;
     error: string | null;
     reload: () => void;
 };
 
+type ContentItem = {
+    getId(): string;
+    getContentSummary(): {getVariantOf(): string | undefined} | undefined;
+};
+
+type DeletedItem = {
+    getContentId(): {toString(): string};
+};
+
+const fetchOriginal = async (contentId: string): Promise<VariantContent> => {
+    const content = await fetchContent(contentId);
+    return content.variantOf ? fetchContent(content.variantOf) : content;
+};
+
 export const useVariantsData = (contentId: string): VariantsData => {
-    const [original, setOriginal] = useState<ContentSummaryAndCompareStatus | null>(null);
-    const [variants, setVariants] = useState<ContentSummaryAndCompareStatus[]>([]);
+    const [original, setOriginal] = useState<VariantContent | null>(null);
+    const [variants, setVariants] = useState<VariantContent[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
     const requestIdRef = useRef(0);
@@ -36,26 +47,13 @@ export const useVariantsData = (contentId: string): VariantsData => {
         setLoading(true);
         setError(null);
 
-        const fetcher = new ContentSummaryAndCompareStatusFetcher();
-
-        fetcher
-            .fetch(new ContentId(contentId))
-            .then((content) => {
-                if (requestId !== requestIdRef.current) return null;
-                if (content.isVariant()) {
-                    const originalId = content.getContentSummary().getVariantOf();
-                    return fetcher.fetch(new ContentId(originalId));
-                }
-                return content;
-            })
-            .then((orig) => {
-                if (!orig || requestId !== requestIdRef.current) return;
+        fetchOriginal(contentId)
+            .then(async (orig) => {
+                if (requestId !== requestIdRef.current) return;
                 setOriginal(orig);
-                return fetchVariants(orig.getId())
-                    .then((items) => {
-                        if (requestId !== requestIdRef.current) return;
-                        setVariants(items);
-                    });
+                const items = await fetchVariants(orig.id);
+                if (requestId !== requestIdRef.current) return;
+                setVariants(items);
             })
             .catch((err: unknown) => {
                 if (requestId !== requestIdRef.current) return;
@@ -80,28 +78,29 @@ export const useVariantsData = (contentId: string): VariantsData => {
 
         const isKnown = (id: string): boolean => {
             const {original: orig, variants: vars} = stateRef.current;
-            return orig?.getId() === id || vars.some(v => v.getId() === id);
+            return orig?.id === id || vars.some(v => v.id === id);
         };
 
-        const onUpdated = (items: ContentSummaryAndCompareStatus[]): void => {
+        const onUpdated = (items: ContentItem[]): void => {
             if (items.some(item => isKnown(item.getId()))) load();
         };
 
-        const onDuplicated = (items: ContentSummaryAndCompareStatus[]): void => {
+        const onDuplicated = (items: ContentItem[]): void => {
             const {original: orig} = stateRef.current;
             if (!orig) return;
-            if (items.some(item => item.getContentSummary()?.getVariantOf() === orig.getId())) {
+            if (items.some(item => item.getContentSummary()?.getVariantOf() === orig.id)) {
                 load();
             }
         };
 
-        const onDeleted = (items: ContentServerChangeItem[]): void => {
+        const onDeleted = (items: DeletedItem[]): void => {
             if (items.some(item => isKnown(item.getContentId().toString()))) load();
         };
 
         handler.onContentDuplicated(onDuplicated);
         handler.onContentDeleted(onDeleted);
         handler.onContentUpdated(onUpdated);
+
         return () => {
             handler.unContentDuplicated(onDuplicated);
             handler.unContentDeleted(onDeleted);

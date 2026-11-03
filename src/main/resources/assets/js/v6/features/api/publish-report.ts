@@ -1,65 +1,77 @@
-import type {ContentVersion} from '@enonic/lib-contentstudio/app/ContentVersion';
-import {ContentId} from '@enonic/lib-contentstudio/app/content/ContentId';
-import type {ContentJson} from '@enonic/lib-contentstudio/app/content/ContentJson';
-import {resolveContentSummaries} from '@enonic/lib-contentstudio/v6/entities/content/api/content.api';
-import {fetchContentVersions, fetchVersion}
-    from '@enonic/lib-contentstudio/v6/entities/content/api/versions.api';
-import {ArchiveContentFetcher} from '../../../ArchiveContentFetcher';
+import {requestJson} from '@enonic/ui-utils/request';
+import {getActiveProjectName} from '@enonic/lib-contentstudio/v6/entities/project/activeProject.store';
+import type {ContentVersionsJson} from '../../../resource/json/ContentVersionJson';
+import {$config} from '../../../shared/config';
+import {type ContentVersion, toContentVersion} from '../shared/content/contentVersion';
+import {ARCHIVE_ROOT, CONTENT_ROOT, getCmsRestUrl, withParams} from './cms';
 
 export type PublishReportData = {
     path: string;
     versions: ContentVersion[];
 };
 
-const versionContentCache = new Map<string, Promise<ContentJson>>();
+export type VersionContent = Record<string, unknown>;
 
-export async function fetchPublishReportData(
-    contentId: string,
-    isArchived: boolean,
-): Promise<PublishReportData> {
-    const cId = new ContentId(contentId);
+const VERSION_METADATA_KEYS = [
+    '_id',
+    'creator',
+    'createdTime',
+    'hasChildren',
+    'modifiedTime',
+    'validationErrors',
+    'publish',
+    'workflow',
+    'valid',
+    'originProject',
+    'type',
+    'owner',
+    'modifier',
+];
 
-    const [content, versionsResult] = await Promise.all([
-        isArchived
-            ? new ArchiveContentFetcher().fetch(cId)
-            : resolveContentSummaries([cId]).match(
-                (summaries) => {
-                    const summary = summaries[0];
-                    if (summary == null) {
-                        throw new Error(`Content not found: ${contentId}`);
-                    }
-                    return summary;
-                },
-                (error) => {
-                    throw error;
-                },
-            ),
-        fetchContentVersions({contentId: cId}).match(
-            (result) => result,
-            (error) => {
-                throw error;
-            },
-        ),
-    ]);
+const versionContentCache = new Map<string, Promise<VersionContent>>();
 
-    return {
-        path: content.getPath().toString(),
-        versions: versionsResult.getContentVersions(),
-    };
+const rethrow = (error: Error): never => {
+    throw error;
+};
+
+const fetchContentPath = (contentId: string, isArchived: boolean): Promise<string> => {
+    const url = withParams(getCmsRestUrl(isArchived ? ARCHIVE_ROOT : CONTENT_ROOT, ''), {id: contentId});
+
+    return requestJson<{path: string}>(url).match((json) => json.path, rethrow);
+};
+
+const fetchContentVersions = (contentId: string): Promise<ContentVersion[]> =>
+    requestJson<ContentVersionsJson>(getCmsRestUrl(CONTENT_ROOT, 'getVersions'), {
+        method: 'POST',
+        body: {contentId, size: -1},
+    }).match((json) => json.contentVersions.map(toContentVersion), rethrow);
+
+export async function fetchPublishReportData(contentId: string, isArchived: boolean): Promise<PublishReportData> {
+    const [path, versions] = await Promise.all([fetchContentPath(contentId, isArchived), fetchContentVersions(contentId)]);
+
+    return {path, versions};
 }
 
-export function fetchVersionContent(contentId: ContentId, versionId: string): Promise<ContentJson> {
+const stripMetadata = (content: VersionContent): VersionContent => {
+    const cleaned = {...content};
+    VERSION_METADATA_KEYS.forEach((key) => {
+        delete cleaned[key];
+    });
+    return cleaned;
+};
+
+export function fetchVersionContent(contentId: string, versionId: string): Promise<VersionContent> {
     const cached = versionContentCache.get(versionId);
     if (cached !== undefined) {
         return cached;
     }
 
-    const promise = fetchVersion(contentId.toString(), versionId).match(
-        (content) => content,
-        (error) => {
-            throw error;
-        },
-    );
+    const url = withParams($config.get().services.contentUrl, {
+        contentId,
+        versionId,
+        repositoryId: `com.enonic.cms.${getActiveProjectName()}`,
+    });
+    const promise = requestJson<VersionContent>(url).match(stripMetadata, rethrow);
     versionContentCache.set(versionId, promise);
     return promise;
 }

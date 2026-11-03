@@ -1,9 +1,9 @@
-import type {ContentVersion} from '@enonic/lib-contentstudio/app/ContentVersion';
-import {DateHelper} from '@enonic/lib-admin-ui/util/DateHelper';
 import {useI18n} from '../../../../../../shared/i18n';
 import {CircleOff} from 'lucide-react';
 import {type ReactElement, useMemo} from 'react';
+import {formatDateTime} from '../../../../shared/lib/formatDateTime';
 import {buildComparisonPlan} from './comparisonPlan';
+import type {ContentVersion} from '../../../../shared/content/contentVersion';
 import {ComparisonBlock} from './ComparisonBlock';
 import {TextAndDate} from './TextAndDate';
 
@@ -40,12 +40,12 @@ export const Comparisons = ({contentId, versions, from, to}: ComparisonsProps): 
                 <TextAndDate
                     className="border-b border-bdr-subtle px-2 sm:px-4 py-3"
                     icon={<CircleOff size={ICON_SIZE} />}
-                    entries={[{text: offlineAfterLabel, date: DateHelper.formatDateTime(plan.headingOfflineAt)}]}
+                    entries={[{text: offlineAfterLabel, date: formatDateTime(plan.headingOfflineAt)}]}
                 />
             )}
             {plan.items.map((item, index) => (
                 <div
-                    key={`${item.newer.getId()}-${item.older?.getId() ?? 'single'}-${index}`}
+                    key={`${item.newer.id}-${item.older?.id ?? 'single'}-${index}`}
                     className={index < lastItemIndex || hasFooter ? 'border-b border-bdr-subtle' : ''}
                 >
                     <ComparisonBlock
@@ -60,7 +60,7 @@ export const Comparisons = ({contentId, versions, from, to}: ComparisonsProps): 
                 <TextAndDate
                     className="px-2 sm:px-4 py-3"
                     icon={<CircleOff size={ICON_SIZE} />}
-                    entries={[{text: offlineAfterLabel, date: DateHelper.formatDateTime(plan.footerOfflineAt)}]}
+                    entries={[{text: offlineAfterLabel, date: formatDateTime(plan.footerOfflineAt)}]}
                 />
             )}
         </div>

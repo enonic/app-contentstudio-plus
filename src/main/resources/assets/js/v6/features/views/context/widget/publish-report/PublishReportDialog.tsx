@@ -1,5 +1,4 @@
 import {handleError} from '../../../../../../shared/errors';
-import type {ContentVersion} from '@enonic/lib-contentstudio/app/ContentVersion';
 import {useI18n} from '../../../../../../shared/i18n';
 import {Button, Dialog} from '@enonic/ui';
 import {Printer} from 'lucide-react';
@@ -7,6 +6,7 @@ import {type ReactElement, useEffect, useRef, useState} from 'react';
 import {useDialogInitialFocus} from '../../../../shared/lib/hooks/useDialogInitialFocus';
 import {fetchPublishReportData} from '../../../../api/publish-report';
 import {Comparisons} from './Comparisons';
+import type {ContentVersion} from '../../../../shared/content/contentVersion';
 import {printReport} from './printReport';
 
 const PUBLISH_REPORT_DIALOG_NAME = 'PublishReportDialog';

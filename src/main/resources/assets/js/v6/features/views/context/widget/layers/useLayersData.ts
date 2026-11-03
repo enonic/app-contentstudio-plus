@@ -4,9 +4,9 @@ import {ProjectCreatedEvent} from '@enonic/lib-contentstudio/app/settings/event/
 import {ProjectDeletedEvent} from '@enonic/lib-contentstudio/app/settings/event/ProjectDeletedEvent';
 import {ProjectUpdatedEvent} from '@enonic/lib-contentstudio/app/settings/event/ProjectUpdatedEvent';
 import {useCallback, useEffect, useRef, useState} from 'react';
-import {LayerContent} from '../../../../../../extension/layers/LayerContent';
-import {MultiLayersContentFilter} from '../../../../../../extension/layers/MultiLayersContentFilter';
 import {fetchLayers} from '../../../../api/layers';
+import type {LayerContent} from '../../../../shared/content/layerContent';
+import {filterLayers} from './layersFilter';
 
 export type LayersData = {
     items: LayerContent[];
@@ -37,8 +37,7 @@ export const useLayersData = (contentId: string): LayersData => {
         fetchLayers(contentId)
             .then((rawItems: LayerContent[]) => {
                 if (requestId !== requestIdRef.current) return;
-                const filtered = new MultiLayersContentFilter().filter(rawItems);
-                setItems(filtered);
+                setItems(filterLayers(rawItems));
             })
             .catch((err: unknown) => {
                 if (requestId !== requestIdRef.current) return;
