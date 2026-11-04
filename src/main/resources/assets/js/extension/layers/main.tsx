@@ -7,6 +7,7 @@ import {AppHelper} from '../../util/AppHelper';
 import {getModuleScript, getOptionalAttribute, getRequiredAttribute} from '../../util/ModuleScriptHelper';
 import {LayersWidget} from '../../v6/features/views/context/widget/layers/LayersWidget';
 import {mountExtension} from '../mountExtension';
+import {mountNotifications} from '../mountNotifications';
 
 void (() => {
     const currentScript = getModuleScript('layers');
@@ -16,6 +17,7 @@ void (() => {
     const projectName = getOptionalAttribute(currentScript, 'data-project');
 
     setPhrases(initConfig(configScriptId).phrases);
+    mountNotifications();
     setActiveProjectResolver(() => $projects.get().activeProjectId);
     initProjects(projectName);
 

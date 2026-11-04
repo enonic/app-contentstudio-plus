@@ -1,4 +1,4 @@
-import {showWarning} from '@enonic/lib-admin-ui/notify/MessageBus';
+import {notifyWarning} from '../../../../shared/notifications';
 import {$config} from '../../../../shared/config';
 import {i18n} from '../../../../shared/i18n';
 
@@ -26,7 +26,7 @@ export function openContentEditor(projectName: string, contentId: string, option
     const win = window.open('', tabName);
 
     if (!win) {
-        showWarning(i18n('notify.popupBlocker.admin'), false);
+        notifyWarning(i18n('notify.popupBlocker.admin'), {autoHide: false});
         return;
     }
 

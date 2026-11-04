@@ -7,6 +7,7 @@ import {AppHelper} from '../../util/AppHelper';
 import {getModuleScript, getOptionalAttribute, getRequiredAttribute} from '../../util/ModuleScriptHelper';
 import {VariantsWidget} from '../../v6/features/views/context/widget/variants/VariantsWidget';
 import {mountExtension} from '../mountExtension';
+import {mountNotifications} from '../mountNotifications';
 
 void (() => {
     const currentScript = getModuleScript('variants');
@@ -16,6 +17,7 @@ void (() => {
     const projectName = getOptionalAttribute(currentScript, 'data-project');
 
     setPhrases(initConfig(configScriptId).phrases);
+    mountNotifications();
     setActiveProjectResolver(() => $projects.get().activeProjectId);
     initProjects(projectName);
 

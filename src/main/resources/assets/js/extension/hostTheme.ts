@@ -20,3 +20,15 @@ onMount($theme, () => {
 });
 
 export const $hostTheme: ReadableAtom<HostTheme> = $theme;
+
+/** Mirrors the host theme onto an element, and onto its shadow host when it lives in a shadow root. */
+export const syncTheme = (host: HTMLElement, theme: HostTheme): void => {
+    const isDark = theme === 'dark';
+
+    host.classList.toggle(DARK_CLASS, isDark);
+
+    const root = host.getRootNode();
+    if (root instanceof ShadowRoot) {
+        root.host.classList.toggle(DARK_CLASS, isDark);
+    }
+};

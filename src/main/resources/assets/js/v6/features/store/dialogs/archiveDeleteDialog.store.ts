@@ -1,5 +1,5 @@
-import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
-import {NotifyManager} from '@enonic/lib-admin-ui/notify/NotifyManager';
+import {handleError} from '../../../../shared/errors';
+import {notifyError, notifySuccess} from '../../../../shared/notifications';
 import type {TaskId} from '@enonic/lib-admin-ui/task/TaskId';
 import {i18n} from '../../../../shared/i18n';
 import type {ContentId} from '@enonic/lib-contentstudio/app/content/ContentId';
@@ -106,8 +106,8 @@ export async function executeArchiveDeleteDialog(): Promise<boolean> {
         });
         return true;
     } catch (error) {
-        DefaultErrorHandler.handle(error);
-        NotifyManager.get().showError(i18n('notify.delete.failed'));
+        handleError(error);
+        notifyError(i18n('notify.delete.failed'));
         cancelArchiveDeleteDialog();
         return false;
     }
@@ -126,9 +126,9 @@ export function handleArchiveDeleteTaskComplete(success: boolean, message?: stri
         const successMessage = total > 1
             ? i18n('notify.deleted.success.multiple', total)
             : i18n('notify.deleted.success.single', primaryName);
-        NotifyManager.get().showSuccess(successMessage);
+        notifySuccess(successMessage);
     } else {
-        NotifyManager.get().showError(message || i18n('notify.delete.failed'));
+        notifyError(message || i18n('notify.delete.failed'));
     }
 
     instanceId += 1;
@@ -203,6 +203,6 @@ async function loadDescendants(currentInstance: number): Promise<void> {
     } catch (error) {
         if (currentInstance !== instanceId) return;
         $archiveDeleteDialog.set({...$archiveDeleteDialog.get(), loading: false, failed: true});
-        DefaultErrorHandler.handle(error);
+        handleError(error);
     }
 }

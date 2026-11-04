@@ -1,4 +1,4 @@
-import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
+import {handleError} from '../../../../shared/errors';
 import {ContentPath} from '@enonic/lib-contentstudio/app/content/ContentPath';
 import {ContentQuery} from '@enonic/lib-contentstudio/app/content/ContentQuery';
 import {ContentSummaryAndCompareStatus} from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
@@ -55,7 +55,7 @@ export async function loadArchiveItems(): Promise<void> {
             hasMore: items.length < response.total && !activeFilterQuery,
         });
     } catch (error) {
-        DefaultErrorHandler.handle(error);
+        handleError(error);
     } finally {
         $archiveListLoading.set(false);
     }
@@ -83,7 +83,7 @@ export async function loadMoreArchiveItems(): Promise<void> {
             hasMore: $archiveTreeState.get().rootIds.length < response.total,
         });
     } catch (error) {
-        DefaultErrorHandler.handle(error);
+        handleError(error);
     } finally {
         $archiveListLoading.set(false);
     }
@@ -171,7 +171,7 @@ async function doLoadChildren(parentId: string): Promise<void> {
         $archiveTreeState.set(next);
     } catch (error) {
         $archiveTreeState.set(setLoading($archiveTreeState.get(), parentId, false));
-        DefaultErrorHandler.handle(error);
+        handleError(error);
     }
 }
 

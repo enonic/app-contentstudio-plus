@@ -1,14 +1,8 @@
-import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
-import {showError, showWarning} from '@enonic/lib-admin-ui/notify/MessageBus';
-import {AppError, RequestAbortedError, RequestError} from '@enonic/ui-utils';
+import {RequestAbortedError, RequestError} from '@enonic/ui-utils';
+import {errorMessage, notifyError, notifyWarning} from '../notifications';
 
-// `DefaultErrorHandler` rethrows anything that is not a lib-admin-ui `Exception`.
+/** Logs the error and shows it as a toast: a 4xx as a warning, anything else as an error. Never throws. */
 export function handleError(error: unknown): void {
-    if (!(error instanceof AppError)) {
-        DefaultErrorHandler.handle(error);
-        return;
-    }
-
     console.error(error);
 
     if (error instanceof RequestAbortedError) {
@@ -17,8 +11,8 @@ export function handleError(error: unknown): void {
 
     const isClientError = error instanceof RequestError && error.status >= 400 && error.status < 500;
     if (isClientError) {
-        showWarning(error.message);
+        notifyWarning(error.message);
     } else {
-        showError(error.message);
+        notifyError(errorMessage(error));
     }
 }
