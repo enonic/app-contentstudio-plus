@@ -2,16 +2,16 @@
  * Created  on 20/01/2018
  */
 const Page = require('./page');
-const {BUTTONS} = require('../libs/elements');
 
-// The dialog is rendered by the shared 'DialogPresetGatedConfirmContent' component, so the same page object
-// serves every gated confirmation: 'Confirm delete', 'Confirm restore', 'Confirm archive'...
+// Studio renders its gated confirmations with 'DialogPresetGatedConfirmContent' ('Confirm archive'), the Archive renders
+// them with the ui-kit gate ('Confirm delete', 'Confirm restore'), so the same page object serves both
+const GATED_CONFIRM = `(@data-component='DialogPresetGatedConfirmContent' or @data-component='ArchiveDeleteDialogConfirm' or @data-component='ArchiveRestoreDialogConfirm')`;
 const XPATH = {
-    container: `//div[@data-component='DialogPresetGatedConfirmContent']`,
-    containerByTitle: title => `//div[@data-component='DialogPresetGatedConfirmContent' and descendant::h2[contains(.,'${title}')]]`,
+    container: `//div[${GATED_CONFIRM}]`,
+    containerByTitle: title => `//div[${GATED_CONFIRM} and descendant::h2[contains(.,'${title}')]]`,
     title: `//h2[@data-component='Dialog.Title']`,
     description: `//p[@data-component='Dialog.Description']`,
-    // 'Enter 12 in the field and click Confirm:' - the expected value is in the strong element
+    // 'Enter 12 in the field and click Confirm:' or 'Type 12 to confirm' - the expected value is in the strong element
     expectedValue: `//p/strong`,
     // The input has 'inputmode=numeric' only when a number is expected, so the input is not addressed by that attribute
     valueInput: `//div[@data-component='Input']//input`,
@@ -26,8 +26,9 @@ class ConfirmValueDialog extends Page {
         this.container = title === undefined ? XPATH.container : XPATH.containerByTitle(title);
     }
 
+    // The ui-kit delete confirmation names its button 'Delete', every other confirmation - 'Confirm'
     get confirmButton() {
-        return this.container + BUTTONS.buttonAriaLabel('Confirm');
+        return this.container + `//button[@aria-label='Confirm' or @aria-label='Delete']`;
     }
 
     get cancelButton() {

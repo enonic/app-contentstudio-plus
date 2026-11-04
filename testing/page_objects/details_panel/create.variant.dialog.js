@@ -11,7 +11,7 @@ const selectors = {
     closeButton: `${DIALOG} button[data-component="Dialog.DefaultClose"]`,
     variantNameInput: `${DIALOG} div[data-component="Input"] input`,
     validationMessage: `${DIALOG} div[data-component="Input"] div[class*="text-error"]`,
-    createButton: `${DIALOG} footer[data-component="Dialog.Footer"] button[data-component="Button"]`,
+    createButton: `${DIALOG} footer[data-component="ActionDialog.Footer"] button[data-component="Button"]`,
 };
 
 class CreateVariantDialog extends Page {

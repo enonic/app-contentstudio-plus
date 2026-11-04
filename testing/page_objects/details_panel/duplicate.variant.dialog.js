@@ -12,9 +12,9 @@ const selectors = {
     // The dialog has no Cancel button, it is closed with the 'X' button in the header:
     closeButton: `${DIALOG} button[data-component="Dialog.DefaultClose"]`,
     // The body contains the only item to duplicate - its display name and path:
-    itemDisplayName: `${DIALOG} div[data-component="Dialog.Body"] div[class*="font-semibold"][class*="truncate"]`,
-    itemPath: `${DIALOG} div[data-component="Dialog.Body"] div[class*="text-subtle"][class*="truncate"]`,
-    duplicateButton: `${DIALOG} footer[data-component="Dialog.Footer"] button[data-component="Button"]`,
+    itemDisplayName: `${DIALOG} div[data-component="ActionDialog.Body"] div[class*="font-semibold"][class*="truncate"]`,
+    itemPath: `${DIALOG} div[data-component="ActionDialog.Body"] div[class*="text-subtle"][class*="truncate"]`,
+    duplicateButton: `${DIALOG} footer[data-component="ActionDialog.Footer"] button[data-component="Button"]`,
 };
 
 class DuplicateVariantDialog extends Page {

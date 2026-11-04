@@ -1,6 +1,7 @@
 import {i18n} from '../../../../../../shared/i18n';
 import {ContentIcon} from '@enonic/lib-contentstudio/v6/shared/ui/icons/ContentIcon';
-import {Button, Dialog, Input} from '@enonic/ui';
+import {Dialog, Input} from '@enonic/ui';
+import {ActionDialog} from '@enonic/ui-kit';
 import {type ChangeEvent, type ReactElement, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {resolveContentDisplay} from '../../../../shared/content/contentDisplay';
 import {useDialogInitialFocus} from '../../../../shared/lib/hooks/useDialogInitialFocus';
@@ -59,25 +60,22 @@ export const CreateVariantDialog = ({
     }, [original, name, validation.valid, onOpenChange]);
 
     if (!original) {
-        return <Dialog.Root open={false} />;
+        return <ActionDialog.Root open={false} />;
     }
 
     const display = resolveContentDisplay(original);
 
     return (
-        <Dialog.Root open={open} onOpenChange={onOpenChange}>
-            <Dialog.Portal>
-                <Dialog.Overlay />
-                <Dialog.Content
-                    className="sm:h-fit md:max-w-180 md:max-h-[85vh] w-full gap-5"
+        <ActionDialog.Root open={open} onOpenChange={onOpenChange}>
+            <ActionDialog.Portal>
+                <ActionDialog.Overlay />
+                <ActionDialog.Content
                     data-component={CREATE_VARIANT_DIALOG_NAME}
+                    size="medium"
                     onOpenAutoFocus={handleOpenAutoFocus}
                 >
-                    <Dialog.DefaultHeader
-                        title={i18n('widget.variants.create.text')}
-                        withClose
-                    />
-                    <Dialog.Body className="flex flex-col gap-5 overflow-visible p-2">
+                    <ActionDialog.DefaultHeader title={i18n('widget.variants.create.text')} withClose />
+                    <ActionDialog.Body className="gap-5 overflow-visible">
                         <div className="flex flex-col gap-2">
                             <h6 className="m-0 text-xs font-semibold uppercase tracking-widest text-subtle">
                                 {i18n('widget.variants.dialog.create.original')}
@@ -98,23 +96,21 @@ export const CreateVariantDialog = ({
                             onChange={handleNameChange}
                             error={validation.error}
                         />
-                    </Dialog.Body>
-                    <Dialog.Footer>
+                    </ActionDialog.Body>
+                    <ActionDialog.Footer>
                         <Dialog.Shortcut asChild>
-                            <Button
+                            <ActionDialog.Action
                                 data-component="Button"
-                                className="self-end"
-                                size="lg"
-                                variant="solid"
                                 label={i18n('widget.variants.create.text')}
                                 disabled={!validation.valid}
+                                closeOnClick={false}
                                 onClick={handleCreate}
                             />
                         </Dialog.Shortcut>
-                    </Dialog.Footer>
-                </Dialog.Content>
-            </Dialog.Portal>
-        </Dialog.Root>
+                    </ActionDialog.Footer>
+                </ActionDialog.Content>
+            </ActionDialog.Portal>
+        </ActionDialog.Root>
     );
 };
 

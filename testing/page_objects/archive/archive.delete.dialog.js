@@ -9,11 +9,11 @@ const XPATH = {
     container: `//div[@data-component='ArchiveDeleteDialog']`,
     title: `//header[@data-component='Dialog.DefaultHeader']//h2[@data-component='Dialog.Title']`,
     description: `//header[@data-component='Dialog.DefaultHeader']//p[@data-component='Dialog.Description']`,
-    body: `//div[@data-component='Dialog.Body']`,
+    body: `//div[@data-component='ActionDialog.Body']`,
     // The main items to delete are displayed in the first ul in the body:
-    itemsList: `//div[@data-component='Dialog.Body']/ul`,
+    itemsList: `//div[@data-component='ActionDialog.Body']/ul`,
     // Dependent items are displayed in the ul below the separator:
-    dependantItemsList: `//div[@data-component='Dialog.Body']/div/ul`,
+    dependantItemsList: `//div[@data-component='ActionDialog.Body']/div/ul`,
     listItem: `//div[@data-component='ListItem']`,
     contentLabel: `//div[@data-component='ContentLabel']`,
     primaryText: `//span[contains(@class,'font-semibold')]`,

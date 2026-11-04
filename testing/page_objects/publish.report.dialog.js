@@ -10,8 +10,8 @@ const selectors = {
     // Path of the content is displayed in the description of the header:
     description: `div[data-component="PublishReportDialog"] p[data-component="Dialog.Description"]`,
     closeButton: `div[data-component="PublishReportDialog"] button[data-component="Dialog.DefaultClose"]`,
-    body: `div[data-component="PublishReportDialog"] div[data-component="Dialog.Body"]`,
-    printButton: `div[data-component="PublishReportDialog"] footer[data-component="Dialog.Footer"] button[data-component="Button"]`,
+    body: `div[data-component="PublishReportDialog"] div[data-component="ActionDialog.Body"]`,
+    printButton: `div[data-component="PublishReportDialog"] footer[data-component="ActionDialog.Footer"] button[data-component="Button"]`,
     // The diff container is not rendered for identical versions until 'Show entire content' is checked,
     // so the block is located by its own data-component attribute:
     comparisonBlock: `div[data-component="PublishReportDialog"] div[data-component="ComparisonBlock"]`,
@@ -22,7 +22,7 @@ const selectors = {
     // TextAndDate rows outside of the blocks - 'Item went offline after' in the heading and in the footer of the report:
     offlineRow: `div[data-component="PublishReportDialog"] div[class*="text-sm"][class*="px-4"][class*="py-3"]`,
     // 'No published versions' / 'Content was offline in the selected period' messages:
-    noComparisonsMessage: `div[data-component="Dialog.Body"] div[class*="px-4"][class*="text-subtle"]:not([class*="py-3"])`,
+    noComparisonsMessage: `div[data-component="ActionDialog.Body"] div[class*="px-4"][class*="text-subtle"]:not([class*="py-3"])`,
     // 'Show entire content' checkbox, the input is hidden behind the label:
     showEntireContentCheckbox: `input[id*="pr-show-all-"]`,
     showEntireContentCheckboxLabel: `label[for*="pr-show-all-"]`,

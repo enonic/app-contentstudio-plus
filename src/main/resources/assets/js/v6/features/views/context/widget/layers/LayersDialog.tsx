@@ -1,4 +1,4 @@
-import {Dialog} from '@enonic/ui';
+import {ActionDialog} from '@enonic/ui-kit';
 import {type ReactElement, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useDialogInitialFocus} from '../../../../shared/lib/hooks/useDialogInitialFocus';
 import {LayerCard} from './LayerCard';
@@ -32,16 +32,17 @@ export const LayersDialog = ({open, onOpenChange, rows, title, description}: Lay
     }, []);
 
     return (
-        <Dialog.Root open={open} onOpenChange={onOpenChange}>
-            <Dialog.Portal>
-                <Dialog.Overlay />
-                <Dialog.Content
-                    className="h-full w-full max-sm:max-h-none sm:h-fit md:max-w-180 md:max-h-[85vh] lg:max-w-220 gap-5"
+        <ActionDialog.Root open={open} onOpenChange={onOpenChange}>
+            <ActionDialog.Portal>
+                <ActionDialog.Overlay />
+                <ActionDialog.Content
+                    className="h-full max-sm:max-h-none sm:h-fit md:max-h-[85vh]"
                     data-component={LAYERS_DIALOG_NAME}
+                    size="wide"
                     onOpenAutoFocus={handleOpenAutoFocus}
                 >
-                    <Dialog.DefaultHeader title={title} description={description} withClose />
-                    <Dialog.Body className="flex flex-col gap-5 overflow-y-auto">
+                    <ActionDialog.DefaultHeader title={title} description={description} withClose />
+                    <ActionDialog.Body className="gap-5">
                         {rows.map(row => (
                             <LayerCard
                                 key={row.key}
@@ -55,10 +56,10 @@ export const LayersDialog = ({open, onOpenChange, rows, title, description}: Lay
                                 dialogShortcut
                             />
                         ))}
-                    </Dialog.Body>
-                </Dialog.Content>
-            </Dialog.Portal>
-        </Dialog.Root>
+                    </ActionDialog.Body>
+                </ActionDialog.Content>
+            </ActionDialog.Portal>
+        </ActionDialog.Root>
     );
 };
 
