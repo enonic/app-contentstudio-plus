@@ -7,7 +7,7 @@ const i18n = require('/lib/xp/i18n');
 
 const getPhrases = function (locales) {
     const phrases = {};
-    const bundles = ['i18n/cs-plus'];
+    const bundles = ['i18n/phrases'];
 
     for (const bundleIndex in bundles) {
         const bundlePhrases = i18n.getPhrases(locales, [bundles[bundleIndex]]);
