@@ -1,5 +1,5 @@
 import {handleError} from '../../../../shared/errors';
-import {NotifyManager} from '@enonic/lib-admin-ui/notify/NotifyManager';
+import {notifyError, notifySuccess} from '../../../../shared/notifications';
 import {TaskId} from '@enonic/lib-admin-ui/task/TaskId';
 import {i18n} from '../../../../shared/i18n';
 import type {ContentId} from '@enonic/lib-contentstudio/app/content/ContentId';
@@ -107,7 +107,7 @@ export async function executeArchiveRestoreDialog(): Promise<boolean> {
         return true;
     } catch (error) {
         handleError(error);
-        NotifyManager.get().showError(i18n('notify.restore.failed'));
+        notifyError(i18n('notify.restore.failed'));
         cancelArchiveRestoreDialog();
         return false;
     }
@@ -126,9 +126,9 @@ export function handleArchiveRestoreTaskComplete(success: boolean, message?: str
         const successMessage = total > 1
             ? i18n('notify.restored.success.multiple', total)
             : i18n('notify.restored.success.single', primaryName);
-        NotifyManager.get().showSuccess(successMessage);
+        notifySuccess(successMessage);
     } else {
-        NotifyManager.get().showError(message || i18n('notify.restore.failed'));
+        notifyError(message || i18n('notify.restore.failed'));
     }
 
     instanceId += 1;

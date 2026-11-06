@@ -1,5 +1,5 @@
 import {handleError} from '../../../../../../shared/errors';
-import {NotifyManager} from '@enonic/lib-admin-ui/notify/NotifyManager';
+import {notifySuccess} from '../../../../../../shared/notifications';
 import {fetchVersion} from '@enonic/lib-contentstudio/v6/entities/content/api/versions.api';
 import {loadContentVersions}
     from '@enonic/lib-contentstudio/v6/entities/content/version';
@@ -21,7 +21,7 @@ const createArchiveVersionsConfig = (): VersionsConfig => ({
         fetchVersion,
     },
     notify: {
-        showSuccess: (message) => NotifyManager.get().showSuccess(message),
+        showSuccess: notifySuccess,
     },
     handleError,
 });

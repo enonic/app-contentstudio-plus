@@ -3,6 +3,7 @@ import type {Element} from '@enonic/lib-admin-ui/dom/Element';
 import {whenProjectInitialized} from '@enonic/lib-contentstudio/v6/entities/project/activeProject.store';
 import {$projects, initProjects} from '@enonic/lib-contentstudio/v6/entities/project/projects.store';
 import {setActiveProjectResolver} from '@enonic/lib-contentstudio/v6/shared/lib/url/cms';
+import {mountNotifications} from './extension/mountNotifications';
 import {initConfig} from './shared/config';
 import {setPhrases} from './shared/i18n';
 import {getModuleScript, getRequiredAttribute} from './util/ModuleScriptHelper';
@@ -25,6 +26,7 @@ void (() => {
     const widgetEl: Element = body.findChildById(elemId, true);
     const configScriptId = getRequiredAttribute(currentScript, 'data-config-script-id');
     setPhrases(initConfig(configScriptId).phrases);
+    mountNotifications();
     setActiveProjectResolver(() => $projects.get().activeProjectId);
     initProjects();
 

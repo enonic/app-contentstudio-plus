@@ -7,9 +7,7 @@ import {AppHelper} from '../util/AppHelper';
 import {NoLicenseBanner} from '../v6/features/shared/license/NoLicenseBanner';
 import {fetchHasValidLicense} from '../v6/features/api/license';
 import {ExtensionRoot} from './ExtensionRoot';
-import {$hostTheme, type HostTheme} from './hostTheme';
-
-const DARK_CLASS = 'dark';
+import {$hostTheme, syncTheme} from './hostTheme';
 
 type ExtensionContentProps = {
     contentId: string | null;
@@ -37,17 +35,6 @@ const ExtensionContent = ({contentId, children}: ExtensionContentProps): ReactEl
 };
 
 ExtensionContent.displayName = 'ExtensionContent';
-
-const syncTheme = (host: HTMLElement, theme: HostTheme): void => {
-    const isDark = theme === 'dark';
-
-    host.classList.toggle(DARK_CLASS, isDark);
-
-    const root = host.getRootNode();
-    if (root instanceof ShadowRoot) {
-        root.host.classList.toggle(DARK_CLASS, isDark);
-    }
-};
 
 export type MountExtensionOptions = {
     className: string;
