@@ -29,6 +29,7 @@ const ArchiveTreeListToolbar = ({enabled = true}: ArchiveTreeListToolbarProps): 
     const totalSelected = useStore($selectionCount);
     const isNoneSelected = useStore($isNoneSelected);
     const selectAllPhrase = useI18n('field.selection.selectAll');
+    const refreshLabel = useI18n('action.refresh');
     const deselectAllPhrase = useI18n('field.selection.clear', totalSelected);
     const selectAllLabel = isNoneSelected ? selectAllPhrase : deselectAllPhrase;
 
@@ -61,6 +62,7 @@ const ArchiveTreeListToolbar = ({enabled = true}: ArchiveTreeListToolbarProps): 
 
             <IconButton
                 icon={RefreshCcw}
+                aria-label={refreshLabel}
                 disabled={!enabled}
                 onClick={handleReload}
                 className="max-sm:size-7.5"
