@@ -22,7 +22,7 @@ Only run Gradle when the task specifically requires it. For most changes, `pnpm 
 - **Client legacy** (class-based, jQuery): `src/main/resources/assets/js/` top-level (`Archive*.ts`, `extension/<name>/`)
 - **Client modern** (Preact/TSX, Nanostores, Tailwind): `src/main/resources/assets/js/v6/`
 - **Styles**: `src/main/resources/assets/styles/` — LESS entries listed in `vite.config.ts`
-- **i18n**: `src/main/resources/i18n/cs-plus.properties`
+- **i18n**: `src/main/resources/i18n/phrases.properties`
 - **Sibling deps**: `lib-admin-ui` and `lib-contentstudio` resolve to `.xp/dev/` (unpacked from maven, or replaced via `-Penv` includedBuild)
 
 ## Git & GitHub
