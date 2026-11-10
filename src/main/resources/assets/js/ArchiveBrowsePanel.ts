@@ -18,7 +18,6 @@ import {ArchiveBrowseToolbarElement} from './ArchiveBrowseToolbar';
 import {ArchiveContentViewItem} from './ArchiveContentViewItem';
 import {ArchiveFilterPanel} from './ArchiveFilterPanel';
 import {ArchiveHelper} from './ArchiveHelper';
-import {ArchiveTreeGridActions} from './ArchiveTreeGridActions';
 import {ArchiveTreeListSelectablePanelProxy} from './ArchiveTreeListSelectablePanelProxy';
 import {ArchiveTreeRootList} from './ArchiveTreeRootList';
 import {setContentFilterOpen} from '@enonic/lib-contentstudio/v6/features/search/model/contentFilter.store';
@@ -37,8 +36,6 @@ export class ArchiveBrowsePanel
     protected treeListBox: ArchiveTreeRootList;
 
     protected archiveTreeList: ArchiveTreeListElement;
-
-    protected treeActions: ArchiveTreeGridActions;
 
     protected toolbar: ListBoxToolbar<ArchiveContentViewItem>;
 
@@ -60,12 +57,7 @@ export class ArchiveBrowsePanel
 
         this.browseToolbar.hide();
 
-        this.prependChild(new ArchiveBrowseToolbarElement({
-            toggleFilterPanelAction: this.toggleFilterPanelAction,
-            actions: this.treeActions.getAllActions(),
-        }));
-
-        this.archiveTreeList.setContextMenuActions(this.treeActions.getAllActions());
+        this.prependChild(new ArchiveBrowseToolbarElement());
     }
 
     protected initListeners(): void {
@@ -144,7 +136,6 @@ export class ArchiveBrowsePanel
         });
         this.toolbar.hideAndDisableSelectionToggler();
 
-        this.treeActions = new ArchiveTreeGridActions();
         this.archiveTreeList = new ArchiveTreeListElement();
 
         return new ArchiveTreeListSelectablePanelProxy(this.selectionWrapper, this.archiveTreeList, this.toolbar);
