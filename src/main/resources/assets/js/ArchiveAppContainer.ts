@@ -24,13 +24,11 @@ export class ArchiveAppContainer
         // ! The host hides an inactive widget from outside and sends no event, so visibility is observed.
         const observer = new IntersectionObserver((entries: IntersectionObserverEntry[]) => {
             this.setActive(entries[entries.length - 1].isIntersecting);
+            if (!this.getHTMLElement().isConnected) {
+                observer.disconnect();
+            }
         });
         observer.observe(this.getHTMLElement());
-
-        this.onRemoved(() => {
-            observer.disconnect();
-            this.setActive(false);
-        });
 
         fetchHasValidLicense().then((isValid: boolean) => {
             this.handleValidationCheckResult(isValid);
