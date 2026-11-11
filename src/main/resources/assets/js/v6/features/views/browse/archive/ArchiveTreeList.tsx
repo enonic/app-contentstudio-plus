@@ -23,17 +23,15 @@ import {
     setActive,
     setSelection,
 } from '../../../store/archive-selection';
-import {ArchiveTreeContextMenu, type ArchiveTreeContextMenuProps} from './ArchiveTreeContextMenu';
+import {ArchiveTreeContextMenu} from './ArchiveTreeContextMenu';
 
 type ArchiveFlatNode = FlatNode<ArchiveContentViewItem>;
 
-export type ArchiveTreeListProps = {
-    contextMenuActions?: ArchiveTreeContextMenuProps['actions'];
-};
+export type ArchiveTreeListProps = Record<string, never>;
 
 const ARCHIVE_TREE_LIST_NAME = 'ArchiveTreeList';
 
-export const ArchiveTreeList = ({contextMenuActions = []}: ArchiveTreeListProps): ReactElement => {
+export const ArchiveTreeList = (): ReactElement => {
     const virtuosoRef = useRef<VirtuosoHandle>(null);
     const suppressNextClickForIdRef = useRef<string | null>(null);
     const flatNodes = useStore($archiveFlatNodes);
@@ -159,7 +157,7 @@ export const ArchiveTreeList = ({contextMenuActions = []}: ArchiveTreeListProps)
             {({items, getItemProps, containerProps}) => {
                 const {className: containerClassName, ...restContainerProps} = containerProps;
                 return (
-                    <ArchiveTreeContextMenu actions={contextMenuActions}>
+                    <ArchiveTreeContextMenu>
                         <Virtuoso<ArchiveFlatNode>
                             ref={virtuosoRef}
                             data={items as ArchiveFlatNode[]}

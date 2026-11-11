@@ -14,7 +14,7 @@ const COMMON = {
     TEXT_INPUT: "//input[@type='text']",
     CONTEXT_WINDOW_WIDGET_SELECTOR_SEARCH_INPUT: "//div[@data-component='WidgetsSelector']//input[@aria-label='Search']",
     CONTEXT_WINDOW_TOGGLE_BUTTON: `//button[@aria-label='Hide context panel' or @aria-label='Show context panel']`,
-    CONTENT_APP_BAR_DIV: "//div[contains(@id,'BrowseAppBarElement')]",
+    CONTENT_APP_BAR_DIV: "//*[contains(@id,'BrowseAppBarElement') or @data-component='BrowseAppBar']",
     SELECT_ALL_CHECKBOX_LABEL: "//label[descendant::input[@type='checkbox' and @aria-label='Select all']]",
     // The label of the 'Select all' checkbox switches to 'Clear selection' when there is a selection,
     // so the checkbox is located by the id of the toolbar it belongs to, not by its label

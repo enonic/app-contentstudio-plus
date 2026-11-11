@@ -1,5 +1,5 @@
-import {AppContainer} from '@enonic/lib-contentstudio/app/AppContainer';
-import {AppPanel} from '@enonic/lib-admin-ui/app/AppPanel';
+import type {AppPanel} from '@enonic/lib-admin-ui/app/AppPanel';
+import {DivEl} from '@enonic/lib-admin-ui/dom/DivEl';
 import {ArchiveAppPanel} from './ArchiveAppPanel';
 import {Body} from '@enonic/lib-admin-ui/dom/Body';
 import {fetchHasValidLicense} from './v6/features/api/license';
@@ -10,34 +10,58 @@ import {ValidLicenseLoadedEvent} from './event/ValidLicenseLoadedEvent';
 import {mountArchiveDialogs} from './v6/features/shared/dialogs/archive/mountArchiveDialogs';
 
 export class ArchiveAppContainer
-    extends AppContainer {
+    extends DivEl {
+
+    private appPanel?: AppPanel;
 
     private noLicenseBanner?: NoLicenseBannerElement;
 
+    private active: boolean = false;
+
     constructor() {
-        super('archive-app-container');
+        super('app-container archive-app-container');
 
-        this.onShown(() => {
-            Body.get().addClass('archive');
+        // ! The host hides an inactive widget from outside and sends no event, so visibility is observed.
+        const observer = new IntersectionObserver((entries: IntersectionObserverEntry[]) => {
+            this.setActive(entries[entries.length - 1].isIntersecting);
+            if (!this.getHTMLElement().isConnected) {
+                observer.disconnect();
+            }
         });
+        observer.observe(this.getHTMLElement());
 
-        this.onHidden(() => {
-            Body.get().removeClass('archive');
-        });
-    }
-
-    protected initElements(): void {
         fetchHasValidLicense().then((isValid: boolean) => {
             this.handleValidationCheckResult(isValid);
         }).catch(handleError);
     }
 
-    protected appendElements(): void {
-        //
+    private setActive(active: boolean): void {
+        if (this.active === active) {
+            return;
+        }
+
+        this.active = active;
+        Body.get().toggleClass('archive', active);
+
+        if (active) {
+            this.activateAppPanel();
+        } else {
+            this.appPanel?.unbindKeys();
+        }
     }
 
-    protected createAppPanel(): AppPanel {
-        return new ArchiveAppPanel();
+    private activateAppPanel(): void {
+        if (!this.appPanel) {
+            return;
+        }
+
+        this.show();
+
+        if (!this.appPanel.getPanelShown()) {
+            this.appPanel.handleBrowse();
+        }
+
+        this.appPanel.bindKeys();
     }
 
     private handleValidationCheckResult(isValid: boolean): void {
@@ -66,14 +90,18 @@ export class ArchiveAppContainer
         this.removeClass('no-license');
         this.noLicenseBanner?.remove();
         this.noLicenseBanner = undefined;
-        super.initElements();
+
+        const appPanel = new ArchiveAppPanel();
+        this.appPanel = appPanel;
 
         this.whenRendered(() => {
-            super.appendElements();
+            this.appendChild(appPanel);
             mountArchiveDialogs(this.getHTMLElement());
         });
 
-        this.show();
+        if (this.active) {
+            this.activateAppPanel();
+        }
     }
 
 }

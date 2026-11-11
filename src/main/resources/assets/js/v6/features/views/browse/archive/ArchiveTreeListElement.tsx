@@ -1,4 +1,3 @@
-import {Action} from '@enonic/lib-admin-ui/ui/Action';
 import {LegacyElement} from '../../../../../shared/LegacyElement';
 import {SelectionChange} from '@enonic/lib-admin-ui/util/SelectionChange';
 import {ArchiveContentViewItem} from '../../../../../ArchiveContentViewItem';
@@ -27,10 +26,6 @@ export class ArchiveTreeListElement extends LegacyElement<typeof ArchiveTreeList
 
     onSelectionChanged(listener: (change: SelectionChange<ArchiveContentViewItem>) => void): void {
         this.selectionChangedListeners.push(listener);
-    }
-
-    setContextMenuActions(actions: Action[]): void {
-        this.props.setKey('contextMenuActions', actions);
     }
 
     private notifySelectionChanged(change: SelectionChange<ArchiveContentViewItem>): void {
