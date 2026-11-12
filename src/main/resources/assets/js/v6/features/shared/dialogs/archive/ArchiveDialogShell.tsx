@@ -1,12 +1,12 @@
 import type {ContentSummary} from '@enonic/lib-contentstudio/app/content/ContentSummary';
 import {useAnimatedEllipsis} from '@enonic/lib-contentstudio/v6/shared/lib/hooks/useAnimatedEllipsis';
 import {useInfiniteScroll} from '@enonic/lib-contentstudio/v6/shared/lib/hooks/useInfiniteScroll';
-import {useTaskProgress} from '@enonic/lib-contentstudio/v6/entities/task/useTaskProgress';
 import {ContentLabel} from '@enonic/lib-contentstudio/v6/entities/content/ui/content/ContentLabel';
 import {Button, Dialog, ListItem, Separator} from '@enonic/ui';
 import {ActionDialog, type DialogIntent, Gate, useActionDialog, useUiKitPhrases} from '@enonic/ui-kit';
 import {type ReactElement, type ReactNode, type RefObject, useCallback, useEffect, useRef, useState} from 'react';
 import {useI18n} from '../../../../../shared/i18n';
+import {useTaskProgress} from '../../../../../shared/tasks';
 import {useDialogInitialFocus} from '../../lib/hooks/useDialogInitialFocus';
 import {ProgressBar} from '../../ui/ProgressBar';
 import {ArchiveContentViewItem} from '../../../../../ArchiveContentViewItem';
