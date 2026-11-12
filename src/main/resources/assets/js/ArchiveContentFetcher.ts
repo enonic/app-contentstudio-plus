@@ -1,28 +1,22 @@
-import {ContentSummaryAndCompareStatusFetcher} from '@enonic/lib-contentstudio/app/resource/ContentSummaryAndCompareStatusFetcher';
-import Q from 'q';
-import {ContentQueryRequest} from '@enonic/lib-contentstudio/app/resource/ContentQueryRequest';
-import {ContentSummaryJson} from '@enonic/lib-contentstudio/app/content/ContentSummaryJson';
-import {ContentSummary} from '@enonic/lib-contentstudio/app/content/ContentSummary';
 import {Expand} from '@enonic/lib-admin-ui/rest/Expand';
-import {ContentQueryResult} from '@enonic/lib-contentstudio/app/resource/ContentQueryResult';
-import {ContentSummaryAndCompareStatus} from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
 import {CompareStatus} from '@enonic/lib-contentstudio/app/content/CompareStatus';
-import {ContentQuery} from '@enonic/lib-contentstudio/app/content/ContentQuery';
+import type {ContentId} from '@enonic/lib-contentstudio/app/content/ContentId';
 import {ContentPath} from '@enonic/lib-contentstudio/app/content/ContentPath';
-import {ARCHIVE_ROOT} from './v6/features/api/cms';
-import {FetchResponse} from './FetchResponse';
-import {ContentId} from '@enonic/lib-contentstudio/app/content/ContentId';
-import {ContentResponse} from '@enonic/lib-contentstudio/app/resource/ContentResponse';
+import type {ContentQuery} from '@enonic/lib-contentstudio/app/content/ContentQuery';
+import type {ContentSummary} from '@enonic/lib-contentstudio/app/content/ContentSummary';
+import {ContentSummaryAndCompareStatus} from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
+import type {ContentSummaryJson} from '@enonic/lib-contentstudio/app/content/ContentSummaryJson';
+import {ContentQueryRequest} from '@enonic/lib-contentstudio/app/resource/ContentQueryRequest';
+import type {ContentQueryResult} from '@enonic/lib-contentstudio/app/resource/ContentQueryResult';
+import Q from 'q';
+import type {FetchResponse} from './FetchResponse';
+import {fetchArchivedChildren} from './v6/features/api/archive';
 
-export class ArchiveContentFetcher
-    extends ContentSummaryAndCompareStatusFetcher {
+export class ArchiveContentFetcher {
 
     static readonly FETCH_SIZE: number = 10;
 
-    constructor() {
-        super(ARCHIVE_ROOT);
-    }
-
+    // The query comes from the legacy filter panel, so it goes through its legacy request.
     fetchByQuery(filterQuery: ContentQuery): Q.Promise<FetchResponse> {
         return new ContentQueryRequest<ContentSummaryJson, ContentSummary>(filterQuery)
             .setContentRootPath(ContentPath.ARCHIVE_ROOT)
@@ -35,10 +29,7 @@ export class ArchiveContentFetcher
             });
     }
 
-    fetchContents(parentContentId: ContentId, from: number): Q.Promise<FetchResponse> {
-        return this.fetchChildren(parentContentId, from, ArchiveContentFetcher.FETCH_SIZE)
-            .then((response: ContentResponse<ContentSummaryAndCompareStatus>) => {
-                return {items: response.getContents(), total: response.getMetadata().getTotalHits()};
-            });
+    fetchContents(parentContentId: ContentId | undefined, from: number): Q.Promise<FetchResponse> {
+        return Q(fetchArchivedChildren(parentContentId?.toString(), from, ArchiveContentFetcher.FETCH_SIZE));
     }
 }

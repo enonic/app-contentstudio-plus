@@ -1,7 +1,6 @@
 import {DefaultErrorHandler} from '@enonic/lib-admin-ui/DefaultErrorHandler';
 import {Aggregation} from '@enonic/lib-admin-ui/aggregation/Aggregation';
 import {ContentAggregation} from '@enonic/lib-contentstudio/app/browse/filter/ContentAggregation';
-import {ArchiveServerEvent} from '@enonic/lib-contentstudio/app/event/ArchiveServerEvent';
 import {ARCHIVE_ROOT} from './v6/features/api/cms';
 import {ArchiveAggregation} from './ArchiveAggregation';
 import {ContentBrowseFilterPanel} from '@enonic/lib-contentstudio/app/browse/filter/ContentBrowseFilterPanel';
@@ -9,6 +8,7 @@ import {ArchiveAggregationsFetcher} from './ArchiveAggregationsFetcher';
 import {ArchiveContentViewItem} from './ArchiveContentViewItem';
 import {AppHelper} from '@enonic/lib-admin-ui/util/AppHelper';
 import {$config} from './shared/config';
+import {subscribeToArchiveEvents} from './shared/events';
 import {ArchiveAggregationsDisplayNamesResolver} from './ArchiveAggregationsDisplayNamesResolver';
 
 export class ArchiveFilterPanel
@@ -78,6 +78,6 @@ export class ArchiveFilterPanel
             }
         };
 
-        ArchiveServerEvent.on(() => refreshRequiredHandler());
+        subscribeToArchiveEvents({onArchived: refreshRequiredHandler, onRemoved: refreshRequiredHandler});
     }
 }
