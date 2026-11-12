@@ -1,19 +1,15 @@
 import {handleError} from '../../../../shared/errors';
 import {notifyError, notifySuccess} from '../../../../shared/notifications';
 import {i18n} from '../../../../shared/i18n';
-import type {ContentId} from '@enonic/lib-contentstudio/app/content/ContentId';
 import type {ContentSummary} from '@enonic/lib-contentstudio/app/content/ContentSummary';
-import {DeleteContentRequest} from '@enonic/lib-contentstudio/app/resource/DeleteContentRequest';
-import {GetDescendantsOfContentsRequest} from '@enonic/lib-contentstudio/app/resource/GetDescendantsOfContentsRequest';
 import {computed, map} from 'nanostores';
-import {ArchiveContentFetcher} from '../../../../ArchiveContentFetcher';
 import {ArchiveContentViewItem} from '../../../../ArchiveContentViewItem';
-import {ARCHIVE_ROOT} from '../../api/cms';
+import {deleteArchived, fetchArchivedByIds, fetchArchivedDescendantIds} from '../../api/archive';
 
 type ArchiveDeleteDialogState = {
     open: boolean;
     items: ArchiveContentViewItem[];
-    descendantIds: ContentId[];
+    descendantIds: string[];
     descendants: ContentSummary[];
     descendantWindow: number;
     loading: boolean;
@@ -48,17 +44,15 @@ export const $hasMoreArchiveDeleteDescendants = computed($archiveDeleteDialog, (
     state.descendantWindow < state.descendantIds.length,
 );
 
-const fetcher = new ArchiveContentFetcher();
-
 const DESCENDANT_LOAD_SIZE = 36;
 
 let instanceId = 0;
 
 let loadingMore = false;
 
-const orderSummariesByIds = (summaries: ContentSummary[], orderIds: ContentId[]): ContentSummary[] => {
+const orderSummariesByIds = (summaries: ContentSummary[], orderIds: string[]): ContentSummary[] => {
     const indexById = new Map<string, number>();
-    orderIds.forEach((id, index) => indexById.set(id.toString(), index));
+    orderIds.forEach((id, index) => indexById.set(id, index));
     const indexOf = (item: ContentSummary): number =>
         indexById.get(item.getContentId().toString()) ?? orderIds.length;
     return [...summaries].sort((a, b) => indexOf(a) - indexOf(b));
@@ -91,10 +85,7 @@ export async function executeArchiveDeleteDialog(): Promise<boolean> {
     const pendingPrimaryName = state.items[0]?.getDisplayName() || state.items[0]?.getPath()?.toString();
 
     try {
-        const request = new DeleteContentRequest();
-        request.setContentRootPath(ARCHIVE_ROOT);
-        state.items.forEach((item) => request.addContentPath(item.getPath()));
-        const taskId = (await request.sendAndParse()).toString();
+        const taskId = await deleteArchived(state.items.map((item) => item.getPath().toString()));
 
         $archiveDeleteDialog.set({
             ...$archiveDeleteDialog.get(),
@@ -134,14 +125,14 @@ export function handleArchiveDeleteTaskComplete(success: boolean, message?: stri
     $archiveDeleteDialog.set({...initialState});
 }
 
-async function loadDescendantWindow(allIds: ContentId[], start: number, guardId: number): Promise<void> {
+async function loadDescendantWindow(allIds: string[], start: number, guardId: number): Promise<void> {
     const sliceIds = allIds.slice(start, start + DESCENDANT_LOAD_SIZE);
-    const summaries = sliceIds.length > 0 ? await fetcher.fetchByIds(sliceIds) : [];
+    const summaries = sliceIds.length > 0 ? await fetchArchivedByIds(sliceIds) : [];
 
     if (guardId !== instanceId) return;
 
     const {descendants, descendantIds} = $archiveDeleteDialog.get();
-    const currentIds = new Set(descendantIds.map((id) => id.toString()));
+    const currentIds = new Set(descendantIds);
     const byId = new Map<string, ContentSummary>();
     for (const item of [...(start === 0 ? [] : descendants), ...summaries]) {
         const key = item.getContentId().toString();
@@ -178,15 +169,12 @@ async function loadDescendants(currentInstance: number): Promise<void> {
 
     try {
         const items = $archiveDeleteDialog.get().items;
-        const descendantIds = await new GetDescendantsOfContentsRequest()
-            .setContentPaths(items.map((item) => item.getContentSummary().getPath()))
-            .setContentRootPath(ARCHIVE_ROOT)
-            .sendAndParse();
+        const descendantIds = await fetchArchivedDescendantIds(items.map((item) => item.getPath().toString()));
 
         if (currentInstance !== instanceId) return;
 
         const descendants = descendantIds.length > 0
-            ? await fetcher.fetchByIds(descendantIds.slice(0, DESCENDANT_LOAD_SIZE))
+            ? await fetchArchivedByIds(descendantIds.slice(0, DESCENDANT_LOAD_SIZE))
             : [];
 
         if (currentInstance !== instanceId) return;
