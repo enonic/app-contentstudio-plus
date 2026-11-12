@@ -21,7 +21,7 @@ interface SocketState {
     started: boolean;
 }
 
-interface StudioUrls {
+export interface StudioUrls {
     sharedSocketUrl: string;
     eventsUrl: string;
 }
@@ -42,7 +42,7 @@ function getState(): SocketState {
     return scope[STATE_KEY];
 }
 
-function readStudioUrls(): StudioUrls | undefined {
+export function readStudioUrls(): StudioUrls | undefined {
     try {
         const config: unknown = JSON.parse(document.getElementById(STUDIO_CONFIG_SCRIPT_ID)?.textContent ?? '');
         if (!isRecord(config) || !isRecord(config.services)) return undefined;
