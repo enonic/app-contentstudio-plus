@@ -6,7 +6,7 @@ import {fetchHasValidLicense} from './v6/features/api/license';
 import {handleError} from './shared/errors';
 import {NoLicenseBannerElement} from './v6/features/shared/license/NoLicenseBannerElement';
 import {openNoLicenseDialog} from './v6/features/shared/license/NoLicenseDialog';
-import {ValidLicenseLoadedEvent} from './event/ValidLicenseLoadedEvent';
+import {onValidLicenseLoaded} from './event/validLicenseLoaded';
 import {mountArchiveDialogs} from './v6/features/shared/dialogs/archive/mountArchiveDialogs';
 
 export class ArchiveAppContainer
@@ -77,11 +77,10 @@ export class ArchiveAppContainer
         this.noLicenseBanner = new NoLicenseBannerElement({variant: 'full'});
         this.appendChild(this.noLicenseBanner);
 
-        const handler = (): void => {
-            ValidLicenseLoadedEvent.un(handler);
+        const stopListening = onValidLicenseLoaded(() => {
+            stopListening();
             this.handleValidLicenseLoaded();
-        };
-        ValidLicenseLoadedEvent.on(handler);
+        });
 
         openNoLicenseDialog();
     }

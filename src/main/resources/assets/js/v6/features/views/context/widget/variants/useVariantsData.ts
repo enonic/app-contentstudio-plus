@@ -1,5 +1,5 @@
 import {handleError} from '../../../../../../shared/errors';
-import {ContentServerEventsHandler} from '@enonic/lib-contentstudio/app/event/ContentServerEventsHandler';
+import {type ContentNode, subscribeToContentEvents} from '../../../../../../shared/events';
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {fetchContent, fetchVariants} from '../../../../api/variants';
 import type {VariantContent} from '../../../../shared/content/variantContent';
@@ -10,15 +10,6 @@ export type VariantsData = {
     loading: boolean;
     error: string | null;
     reload: () => void;
-};
-
-type ContentItem = {
-    getId(): string;
-    getContentSummary(): {getVariantOf(): string | undefined} | undefined;
-};
-
-type DeletedItem = {
-    getContentId(): {toString(): string};
 };
 
 const fetchOriginal = async (contentId: string): Promise<VariantContent> => {
@@ -74,38 +65,28 @@ export const useVariantsData = (contentId: string): VariantsData => {
     stateRef.current = {original, variants};
 
     useEffect(() => {
-        const handler = ContentServerEventsHandler.getInstance();
-
         const isKnown = (id: string): boolean => {
             const {original: orig, variants: vars} = stateRef.current;
             return orig?.id === id || vars.some(v => v.id === id);
         };
 
-        const onUpdated = (items: ContentItem[]): void => {
-            if (items.some(item => isKnown(item.getId()))) load();
+        const reloadIfKnown = (ids: string[]): void => {
+            if (ids.some(isKnown)) load();
         };
 
-        const onDuplicated = (items: ContentItem[]): void => {
+        // The event names the copy only; whose variant it is takes a look at the copy itself.
+        const onDuplicated = (nodes: ContentNode[]): void => {
             const {original: orig} = stateRef.current;
             if (!orig) return;
-            if (items.some(item => item.getContentSummary()?.getVariantOf() === orig.id)) {
-                load();
-            }
+
+            Promise.all(nodes.map((node) => fetchContent(node.id)))
+                .then((copies) => {
+                    if (copies.some((copy) => copy.variantOf === orig.id)) load();
+                })
+                .catch(handleError);
         };
 
-        const onDeleted = (items: DeletedItem[]): void => {
-            if (items.some(item => isKnown(item.getContentId().toString()))) load();
-        };
-
-        handler.onContentDuplicated(onDuplicated);
-        handler.onContentDeleted(onDeleted);
-        handler.onContentUpdated(onUpdated);
-
-        return () => {
-            handler.unContentDuplicated(onDuplicated);
-            handler.unContentDeleted(onDeleted);
-            handler.unContentUpdated(onUpdated);
-        };
+        return subscribeToContentEvents({onUpdated: reloadIfKnown, onDeleted: reloadIfKnown, onDuplicated});
     }, [load]);
 
     return {original, variants, loading, error, reload: load};

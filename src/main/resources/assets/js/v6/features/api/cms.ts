@@ -1,4 +1,4 @@
-import {getActiveProjectName} from '@enonic/lib-contentstudio/v6/entities/project/activeProject.store';
+import {getActiveProjectName} from '../../../shared/project';
 import {$config} from '../../../shared/config';
 
 export const CONTENT_ROOT = 'content';

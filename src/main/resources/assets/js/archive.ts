@@ -1,11 +1,14 @@
 import {Body} from '@enonic/lib-admin-ui/dom/Body';
 import {Element} from '@enonic/lib-admin-ui/dom/Element';
-import {whenProjectInitialized} from '@enonic/lib-contentstudio/v6/entities/project/activeProject.store';
+import {getActiveProjectName, onActiveProjectChanged, whenProjectInitialized} from '@enonic/lib-contentstudio/v6/entities/project/activeProject.store';
 import {$projects, initProjects} from '@enonic/lib-contentstudio/v6/entities/project/projects.store';
+import {setPhrases as setStudioPhrases} from '@enonic/lib-contentstudio/v6/shared/i18n';
 import {setActiveProjectResolver} from '@enonic/lib-contentstudio/v6/shared/lib/url/cms';
 import {mountNotifications} from './extension/mountNotifications';
 import {initConfig} from './shared/config';
+import {initLegacyConfig} from './shared/config/legacy';
 import {setPhrases} from './shared/i18n';
+import {setActiveProject} from './shared/project';
 import {getModuleScript, getRequiredAttribute} from './util/ModuleScriptHelper';
 
 // ! Import the app container lazily so v6 config is initialized (initConfig below)
@@ -29,13 +32,18 @@ void (() => {
         throw Error(`Could not find the widget element: ${elemId}`);
     }
     const configScriptId = getRequiredAttribute(currentScript, 'data-config-script-id');
-    setPhrases(initConfig(configScriptId).phrases);
+    const {phrases} = initConfig(configScriptId);
+    setPhrases(phrases);
+    initLegacyConfig(configScriptId);
+    setStudioPhrases(phrases);
     mountNotifications();
     setActiveProjectResolver(() => $projects.get().activeProjectId);
     initProjects();
 
     const renderListener = (): void => {
         whenProjectInitialized(() => {
+            setActiveProject(getActiveProjectName());
+            onActiveProjectChanged(() => setActiveProject(getActiveProjectName()));
             void injectApp(host);
         });
         body.unRendered(renderListener);
