@@ -1,8 +1,5 @@
 import {handleError} from '../../../../../../shared/errors';
-import {ContentServerEventsHandler} from '@enonic/lib-contentstudio/app/event/ContentServerEventsHandler';
-import {ProjectCreatedEvent} from '@enonic/lib-contentstudio/app/settings/event/ProjectCreatedEvent';
-import {ProjectDeletedEvent} from '@enonic/lib-contentstudio/app/settings/event/ProjectDeletedEvent';
-import {ProjectUpdatedEvent} from '@enonic/lib-contentstudio/app/settings/event/ProjectUpdatedEvent';
+import {subscribeToContentEvents, subscribeToProjectChanges} from '../../../../../../shared/events';
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {fetchLayers} from '../../../../api/layers';
 import type {LayerContent} from '../../../../shared/content/layerContent';
@@ -55,23 +52,16 @@ export const useLayersData = (contentId: string): LayersData => {
     }, [load]);
 
     useEffect(() => {
-        ProjectCreatedEvent.on(load);
-        ProjectUpdatedEvent.on(load);
-        ProjectDeletedEvent.on(load);
-
-        const serverEventsHandler = ContentServerEventsHandler.getInstance();
-        const updateHandler = (updated: {getId(): string}[]): void => {
-            if (updated.some(item => item.getId() === contentId)) {
-                load();
-            }
-        };
-        serverEventsHandler.onContentUpdated(updateHandler);
+        const stopProjects = subscribeToProjectChanges(load);
+        const stopContent = subscribeToContentEvents({
+            onUpdated: (ids) => {
+                if (ids.includes(contentId)) load();
+            },
+        });
 
         return () => {
-            ProjectCreatedEvent.un(load);
-            ProjectUpdatedEvent.un(load);
-            ProjectDeletedEvent.un(load);
-            serverEventsHandler.unContentUpdated(updateHandler);
+            stopProjects();
+            stopContent();
         };
     }, [contentId, load]);
 

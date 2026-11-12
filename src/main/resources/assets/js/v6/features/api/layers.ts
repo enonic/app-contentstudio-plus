@@ -1,4 +1,4 @@
-import {getActiveProjectName} from '@enonic/lib-contentstudio/v6/entities/project/activeProject.store';
+import {getActiveProjectName} from '../../../shared/project';
 import {requestJson} from '@enonic/ui-utils/request';
 import type {LayerContentJson} from '../../../resource/json/LayerContentJson';
 import {$config} from '../../../shared/config';

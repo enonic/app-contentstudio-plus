@@ -1,8 +1,6 @@
-import {whenProjectInitialized} from '@enonic/lib-contentstudio/v6/entities/project/activeProject.store';
-import {$projects, initProjects} from '@enonic/lib-contentstudio/v6/entities/project/projects.store';
-import {setActiveProjectResolver} from '@enonic/lib-contentstudio/v6/shared/lib/url/cms';
 import {initConfig} from '../../shared/config';
 import {setPhrases} from '../../shared/i18n';
+import {setActiveProject} from '../../shared/project';
 import {AppHelper} from '../../util/AppHelper';
 import {getModuleScript, getOptionalAttribute, getRequiredAttribute} from '../../util/ModuleScriptHelper';
 import {VariantsWidget} from '../../v6/features/views/context/widget/variants/VariantsWidget';
@@ -18,13 +16,12 @@ void (() => {
 
     setPhrases(initConfig(configScriptId).phrases);
     mountNotifications();
-    setActiveProjectResolver(() => $projects.get().activeProjectId);
-    initProjects(projectName);
+    setActiveProject(projectName);
 
-    whenProjectInitialized(() => mountExtension({
+    mountExtension({
         className: AppHelper.getVariantsExtensionClass(),
         idPrefix: 'VariantsWidget',
         contentId,
         children: <VariantsWidget contentId={contentId} />,
-    }));
+    });
 })();

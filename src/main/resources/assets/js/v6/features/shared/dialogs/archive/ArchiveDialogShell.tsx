@@ -1,4 +1,3 @@
-import type {TaskId} from '@enonic/lib-admin-ui/task/TaskId';
 import type {ContentSummary} from '@enonic/lib-contentstudio/app/content/ContentSummary';
 import {useAnimatedEllipsis} from '@enonic/lib-contentstudio/v6/shared/lib/hooks/useAnimatedEllipsis';
 import {useInfiniteScroll} from '@enonic/lib-contentstudio/v6/shared/lib/hooks/useInfiniteScroll';
@@ -20,7 +19,7 @@ export type ArchiveDialogShellProps = {
     items: ArchiveContentViewItem[];
     descendants: ContentSummary[];
     total: number;
-    taskId: TaskId | undefined;
+    taskId: string | undefined;
     ready: boolean;
     loading?: boolean;
     failed?: boolean;

@@ -1,5 +1,5 @@
 import {requestJson} from '@enonic/ui-utils/request';
-import {getActiveProjectName} from '@enonic/lib-contentstudio/v6/entities/project/activeProject.store';
+import {getActiveProjectName} from '../../../shared/project';
 import type {ContentVersionsJson} from '../../../resource/json/ContentVersionJson';
 import {$config} from '../../../shared/config';
 import {type ContentVersion, toContentVersion} from '../shared/content/contentVersion';
