@@ -8,7 +8,8 @@ export interface StudioNodeJson {
 
 export interface StudioServerEvent {
     type: string;
-    data?: {
+    // `node.permissionsUpdated` carries one node as the data itself, the other node events a `nodes` list.
+    data?: Partial<StudioNodeJson> & {
         nodes?: StudioNodeJson[];
     };
 }
