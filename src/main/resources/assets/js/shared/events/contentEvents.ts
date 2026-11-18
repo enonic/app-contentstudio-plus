@@ -20,7 +20,7 @@ const PROJECT_ROLE_PREFIX = '/identity/roles/cms.project.';
 const DRAFT = 'draft';
 const PROJECT_NODE_EVENT_TYPES = new Set(['node.created', 'node.updated', 'node.deleted']);
 const PROJECT_ROOT_EVENT_TYPES = new Set(['node.updated', 'node.permissionsUpdated']);
-const PROJECTS_CHANGED_DELAY_MS = 300;
+const PROJECTS_CHANGED_DELAY_MS = 1000;
 
 const isUnder = (path: string | undefined, root: string): boolean => !!path && path.startsWith(`${root}/`);
 

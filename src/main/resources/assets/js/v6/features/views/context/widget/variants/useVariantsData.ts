@@ -1,5 +1,5 @@
 import {handleError} from '../../../../../../shared/errors';
-import {type ContentNode, subscribeToContentEvents} from '../../../../../../shared/events';
+import {subscribeToContentEvents} from '../../../../../../shared/events';
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {fetchContent, fetchVariants} from '../../../../api/variants';
 import type {VariantContent} from '../../../../shared/content/variantContent';
@@ -74,14 +74,14 @@ export const useVariantsData = (contentId: string): VariantsData => {
             if (ids.some(isKnown)) load();
         };
 
-        // The event names the copy only; whose variant it is takes a look at the copy itself.
-        const onDuplicated = (nodes: ContentNode[]): void => {
+        const onDuplicated = (): void => {
             const {original: orig} = stateRef.current;
             if (!orig) return;
 
-            Promise.all(nodes.map((node) => fetchContent(node.id)))
-                .then((copies) => {
-                    if (copies.some((copy) => copy.variantOf === orig.id)) load();
+            fetchVariants(orig.id)
+                .then((items) => {
+                    if (stateRef.current.original?.id !== orig.id) return;
+                    if (items.some((item) => !isKnown(item.id))) load();
                 })
                 .catch(handleError);
         };
