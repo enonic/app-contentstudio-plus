@@ -6,7 +6,7 @@ nodeGradle = "7.1.0"
 
 # App
 libMustache = "3.0.0"
-libLicense = "4.0.0"
+libLicense = "4.0.1"
 
 # Test
 junit = "6.1.3"
