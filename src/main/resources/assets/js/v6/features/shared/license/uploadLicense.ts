@@ -1,13 +1,13 @@
 import {notifyError} from '../../../../shared/notifications';
 import {i18n} from '../../../../shared/i18n';
-import {ValidLicenseLoadedEvent} from '../../../../event/ValidLicenseLoadedEvent';
+import {fireValidLicenseLoaded} from '../../../../event/validLicenseLoaded';
 import {postLicense} from '../../api/license';
 
 export async function uploadLicense(file: File): Promise<boolean> {
     try {
         const isValid = await postLicense(file);
         if (isValid) {
-            new ValidLicenseLoadedEvent().fire();
+            fireValidLicenseLoaded();
             window.dispatchEvent(new CustomEvent('ReloadActiveExtensionEvent'));
         } else {
             notifyError(i18n('notify.archive.license.upload.failed'));

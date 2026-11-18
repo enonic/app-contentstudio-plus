@@ -1,6 +1,6 @@
 import {i18n} from '../../../../../../shared/i18n';
-import {getActiveProjectName} from '@enonic/lib-contentstudio/v6/entities/project/activeProject.store';
-import {ContentIcon} from '@enonic/lib-contentstudio/v6/shared/ui/icons/ContentIcon';
+import {getActiveProjectName} from '../../../../../../shared/project';
+import {ContentIcon} from '../../../../shared/icons/ContentIcon';
 import {Button, cn} from '@enonic/ui';
 import {type MouseEvent, type ReactElement, useCallback, useLayoutEffect, useMemo, useRef} from 'react';
 import {resolveContentDisplay} from '../../../../shared/content/contentDisplay';

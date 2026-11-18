@@ -1,6 +1,5 @@
 import {handleError} from '../../../../shared/errors';
 import {notifyError, notifySuccess} from '../../../../shared/notifications';
-import type {TaskId} from '@enonic/lib-admin-ui/task/TaskId';
 import {i18n} from '../../../../shared/i18n';
 import type {ContentId} from '@enonic/lib-contentstudio/app/content/ContentId';
 import type {ContentSummary} from '@enonic/lib-contentstudio/app/content/ContentSummary';
@@ -20,7 +19,7 @@ type ArchiveDeleteDialogState = {
     loading: boolean;
     failed: boolean;
     submitting: boolean;
-    taskId?: TaskId;
+    taskId?: string;
     pendingTotal: number;
     pendingPrimaryName?: string;
 };
@@ -95,7 +94,7 @@ export async function executeArchiveDeleteDialog(): Promise<boolean> {
         const request = new DeleteContentRequest();
         request.setContentRootPath(ARCHIVE_ROOT);
         state.items.forEach((item) => request.addContentPath(item.getPath()));
-        const taskId = await request.sendAndParse();
+        const taskId = (await request.sendAndParse()).toString();
 
         $archiveDeleteDialog.set({
             ...$archiveDeleteDialog.get(),

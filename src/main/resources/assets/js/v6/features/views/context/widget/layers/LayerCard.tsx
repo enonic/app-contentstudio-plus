@@ -1,5 +1,5 @@
 import {i18n} from '../../../../../../shared/i18n';
-import {ProjectIcon} from '@enonic/lib-contentstudio/v6/shared/ui/icons/ProjectIcon';
+import {ProjectIcon} from '../../../../shared/icons/ProjectIcon';
 import {Button, Dialog, Tooltip, cn} from '@enonic/ui';
 import {Layers2} from 'lucide-react';
 import {type MouseEvent, type ReactElement, type RefObject, useCallback, useLayoutEffect, useMemo, useRef} from 'react';
@@ -139,7 +139,7 @@ export const LayerCard = ({
 
                 {hasItem && content && (
                     <div className="mt-2.5 grid min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-2.5 gap-y-5">
-                        <ProjectIcon projectName={project.name} language={project.language} className="size-6" />
+                        <ProjectIcon language={project.language} className="size-6" />
 
                         <div className="min-w-0">
                             <div className="truncate text-base font-semibold">{contentDisplay?.displayName}</div>

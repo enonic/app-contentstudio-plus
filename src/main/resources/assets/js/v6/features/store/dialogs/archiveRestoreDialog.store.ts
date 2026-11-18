@@ -1,6 +1,5 @@
 import {handleError} from '../../../../shared/errors';
 import {notifyError, notifySuccess} from '../../../../shared/notifications';
-import {TaskId} from '@enonic/lib-admin-ui/task/TaskId';
 import {i18n} from '../../../../shared/i18n';
 import type {ContentId} from '@enonic/lib-contentstudio/app/content/ContentId';
 import type {ContentSummary} from '@enonic/lib-contentstudio/app/content/ContentSummary';
@@ -21,7 +20,7 @@ type ArchiveRestoreDialogState = {
     loading: boolean;
     failed: boolean;
     submitting: boolean;
-    taskId?: TaskId;
+    taskId?: string;
     pendingTotal: number;
     pendingPrimaryName?: string;
 };
@@ -95,7 +94,7 @@ export async function executeArchiveRestoreDialog(): Promise<boolean> {
     try {
         const ids = (ArchiveHelper.filterTopMostItems(state.items) as ArchiveContentViewItem[])
             .map((item) => item.getId());
-        const taskId = TaskId.fromString(await restoreArchived(ids));
+        const taskId = await restoreArchived(ids);
 
         $archiveRestoreDialog.set({
             ...$archiveRestoreDialog.get(),

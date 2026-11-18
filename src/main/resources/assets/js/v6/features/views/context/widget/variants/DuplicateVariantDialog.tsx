@@ -1,5 +1,5 @@
 import {i18n} from '../../../../../../shared/i18n';
-import {ContentIcon} from '@enonic/lib-contentstudio/v6/shared/ui/icons/ContentIcon';
+import {ContentIcon} from '../../../../shared/icons/ContentIcon';
 import {Dialog} from '@enonic/ui';
 import {ActionDialog} from '@enonic/ui-kit';
 import {type ReactElement, useCallback, useRef} from 'react';
