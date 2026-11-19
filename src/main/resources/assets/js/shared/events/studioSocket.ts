@@ -22,7 +22,7 @@ interface SocketState {
     started: boolean;
 }
 
-export interface StudioUrls {
+interface StudioUrls {
     sharedSocketUrl: string;
     eventsUrl: string;
 }
@@ -43,7 +43,7 @@ function getState(): SocketState {
     return scope[STATE_KEY];
 }
 
-export function readStudioUrls(): StudioUrls | undefined {
+function readStudioUrls(): StudioUrls | undefined {
     try {
         const config: unknown = JSON.parse(document.getElementById(STUDIO_CONFIG_SCRIPT_ID)?.textContent ?? '');
         if (!isRecord(config) || !isRecord(config.services)) return undefined;

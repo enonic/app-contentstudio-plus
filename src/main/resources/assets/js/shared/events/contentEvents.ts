@@ -6,6 +6,13 @@ export interface ContentNode {
     path: string;
 }
 
+export interface ArchiveEventHandlers {
+    /** Content of the active project was moved to the archive. */
+    onArchived?: () => void;
+    /** Archived items of the active project were restored or deleted; only the topmost ones are listed. */
+    onRemoved?: (ids: string[]) => void;
+}
+
 export interface ContentEventHandlers {
     onUpdated?: (ids: string[]) => void;
     onDeleted?: (ids: string[]) => void;
@@ -70,6 +77,27 @@ function toContentEvent(event: StudioServerEvent, handlers: ContentEventHandlers
             break;
         }
     }
+}
+
+function topmost(nodes: StudioNodeJson[]): StudioNodeJson[] {
+    return nodes.filter((node) => !nodes.some((other) => isUnder(node.path, other.path)));
+}
+
+function toArchiveEvent(event: StudioServerEvent, handlers: ArchiveEventHandlers): void {
+    if (event.type !== 'node.moved' && event.type !== 'node.deleted') return;
+
+    const repo = `${CONTENT_REPO_PREFIX}${getActiveProjectName()}`;
+    const nodes = (event.data?.nodes ?? []).filter((node) => node.repo === repo);
+
+    const removed = nodes.filter((node) => isUnder(node.path, ARCHIVE_ROOT));
+    if (removed.length > 0) handlers.onRemoved?.(uniqueIds(topmost(removed)));
+
+    if (event.type === 'node.moved' && nodes.some((node) => isUnder(node.newPath, ARCHIVE_ROOT))) handlers.onArchived?.();
+}
+
+/** What happens to the archive of the active project. */
+export function subscribeToArchiveEvents(handlers: ArchiveEventHandlers): () => void {
+    return subscribeToStudioEvents((event) => toArchiveEvent(event, handlers));
 }
 
 /** Changes to the content of the active project. Archiving counts as a deletion. */

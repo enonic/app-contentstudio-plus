@@ -1,1 +1,8 @@
-export {type ContentEventHandlers, type ContentNode, subscribeToContentEvents, subscribeToProjectChanges} from './contentEvents';
+export {
+    type ArchiveEventHandlers,
+    type ContentEventHandlers,
+    type ContentNode,
+    subscribeToArchiveEvents,
+    subscribeToContentEvents,
+    subscribeToProjectChanges,
+} from './contentEvents';

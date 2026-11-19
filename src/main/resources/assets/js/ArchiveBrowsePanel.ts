@@ -1,26 +1,22 @@
 import {BrowseItemPanel} from '@enonic/lib-admin-ui/app/browse/BrowseItemPanel';
 import {ViewItem} from '@enonic/lib-admin-ui/app/view/ViewItem';
-import {NodeServerChangeType} from '@enonic/lib-admin-ui/event/NodeServerChange';
 import {SelectableListBoxPanel} from '@enonic/lib-admin-ui/ui/panel/SelectableListBoxPanel';
 import {ListBoxToolbar} from '@enonic/lib-admin-ui/ui/selector/list/ListBoxToolbar';
 import {SelectableListBoxWrapper} from '@enonic/lib-admin-ui/ui/selector/list/SelectableListBoxWrapper';
 import {SelectableTreeListBoxKeyNavigator} from '@enonic/lib-admin-ui/ui/selector/list/SelectableTreeListBoxKeyNavigator';
 import {ResponsiveBrowsePanel} from '@enonic/lib-contentstudio/app/browse/ResponsiveBrowsePanel';
 import {ContentQuery} from '@enonic/lib-contentstudio/app/content/ContentQuery';
-import {ArchiveServerEvent} from '@enonic/lib-contentstudio/app/event/ArchiveServerEvent';
-import {ContentServerChangeItem} from '@enonic/lib-contentstudio/app/event/ContentServerChangeItem';
-import {ContentServerEventsHandler} from '@enonic/lib-contentstudio/app/event/ContentServerEventsHandler';
-import {getActiveProjectName, onActiveProjectChanged} from '@enonic/lib-contentstudio/v6/entities/project/activeProject.store';
 import type {BrowseHostConfig} from '@enonic/lib-contentstudio/v6/pages/browse/ui/layout/BrowseLayout';
 import Q from 'q';
 import {ArchiveBrowseItemPanel} from './ArchiveBrowseItemPanel';
 import {ArchiveBrowseToolbarElement} from './ArchiveBrowseToolbar';
 import {ArchiveContentViewItem} from './ArchiveContentViewItem';
 import {ArchiveFilterPanel} from './ArchiveFilterPanel';
-import {ArchiveHelper} from './ArchiveHelper';
 import {ArchiveTreeListSelectablePanelProxy} from './ArchiveTreeListSelectablePanelProxy';
 import {ArchiveTreeRootList} from './ArchiveTreeRootList';
 import {setContentFilterOpen} from '@enonic/lib-contentstudio/v6/features/search/model/contentFilter.store';
+import {subscribeToArchiveEvents} from './shared/events';
+import {$activeProject} from './shared/project';
 import {
     loadArchiveItems,
     removeArchiveItems,
@@ -70,18 +66,6 @@ export class ArchiveBrowsePanel
             void setArchiveFilterQuery(query ?? null);
         });
 
-        ArchiveServerEvent.on((event: ArchiveServerEvent) => {
-            const type: NodeServerChangeType = event.getNodeChange().getChangeType();
-
-            if (type === NodeServerChangeType.MOVE || type === NodeServerChangeType.DELETE) {
-                const itemsToRemove: ContentServerChangeItem[] =
-                    ArchiveHelper.filterTopMostItems(event.getNodeChange().getChangeItems()) as ContentServerChangeItem[];
-                const ids: string[] = itemsToRemove.map((item) => item.getContentId().toString());
-
-                removeArchiveItems(ids);
-            }
-        });
-
         let isRefreshTriggered = false;
 
         const refreshHandler = (): void => {
@@ -94,21 +78,16 @@ export class ArchiveBrowsePanel
             void loadArchiveItems();
         };
 
-        ContentServerEventsHandler.getInstance().onContentArchived((items: ContentServerChangeItem[]) => {
-            if (items.some((item) => item.getRepo()?.split('.').pop() === getActiveProjectName())) {
-                if (!isRefreshTriggered) {
-                    isRefreshTriggered = true;
-                    this.whenShown(refreshHandler);
-                }
-            }
-        });
-
-        onActiveProjectChanged(() => {
+        const refreshWhenShown = (): void => {
             if (!isRefreshTriggered) {
                 isRefreshTriggered = true;
                 this.whenShown(refreshHandler);
             }
-        });
+        };
+
+        subscribeToArchiveEvents({onArchived: refreshWhenShown, onRemoved: removeArchiveItems});
+
+        $activeProject.listen(refreshWhenShown);
 
         this.archiveTreeList.whenRendered(() => {
             void loadArchiveItems();
