@@ -1,8 +1,4 @@
-import {
-    $isContentFilterDirty,
-    $isContentFilterOpen,
-    setContentFilterOpen,
-} from '@enonic/lib-contentstudio/v6/features/search/model/contentFilter.store';
+import {$isContentFilterOpen, setContentFilterOpen} from '@enonic/lib-contentstudio/v6/features/search/model/contentFilter.store';
 import {ContextToggle} from '@enonic/lib-contentstudio/v6/widgets/browse-toolbar/ContextToggle';
 import {Button, Toggle, Toolbar, Tooltip} from '@enonic/ui';
 import {useStore} from '@nanostores/preact';
@@ -16,13 +12,14 @@ import {
     executeArchiveAction,
     type ArchiveAction,
 } from './v6/features/store/archive-actions';
+import {$isArchiveSearchActive} from './v6/features/store/archive-search';
 
 const ARCHIVE_BROWSE_TOOLBAR_NAME = 'ArchiveBrowseToolbar';
 
 const ArchiveSearchToggle = (): ReactElement => {
     const toggleRef = useRef<HTMLButtonElement>(null);
     const isFilterOpen = useStore($isContentFilterOpen);
-    const isFilterDirty = useStore($isContentFilterDirty);
+    const isFilterDirty = useStore($isArchiveSearchActive);
     const wasFilterOpen = useRef(isFilterOpen);
     const showLabel = useI18n('tooltip.filterPanel.show');
     const hideLabel = useI18n('tooltip.filterPanel.hide');

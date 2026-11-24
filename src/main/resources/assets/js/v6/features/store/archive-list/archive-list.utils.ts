@@ -10,6 +10,7 @@ const PAGE_SIZE = 10;
 
 const pendingChildLoads = new Map<string, Promise<void>>();
 let activeFilter: ArchiveFilter | null = null;
+let lastRootLoad = 0;
 
 /** Replaces the tree with what the filter finds, as a flat list; null brings the tree back. */
 export function setArchiveFilter(filter: ArchiveFilter | null): Promise<void> {
@@ -18,9 +19,7 @@ export function setArchiveFilter(filter: ArchiveFilter | null): Promise<void> {
 }
 
 export async function loadArchiveItems(): Promise<void> {
-    if ($archiveListLoading.get()) {
-        return;
-    }
+    const load = ++lastRootLoad;
 
     $archiveTreeState.set(createTree<ArchivedContent>());
     $archiveListRoot.set({total: 0, hasMore: false});
@@ -30,15 +29,23 @@ export async function loadArchiveItems(): Promise<void> {
         const isFiltered = !!activeFilter;
         const page = activeFilter ? await activeFilter() : await fetchArchivedChildren(undefined, 0, PAGE_SIZE);
 
+        if (load !== lastRootLoad) {
+            return;
+        }
+
         $archiveTreeState.set(addChildren(createTree<ArchivedContent>(), null, toEntries(page.items, isFiltered)));
         $archiveListRoot.set({
             total: page.total,
             hasMore: page.items.length < page.total && !isFiltered,
         });
     } catch (error) {
-        handleError(error);
+        if (load === lastRootLoad) {
+            handleError(error);
+        }
     } finally {
-        $archiveListLoading.set(false);
+        if (load === lastRootLoad) {
+            $archiveListLoading.set(false);
+        }
     }
 }
 
@@ -47,18 +54,29 @@ export async function loadMoreArchiveItems(): Promise<void> {
         return;
     }
 
+    const load = lastRootLoad;
+
     $archiveListLoading.set(true);
 
     try {
         const page = await fetchArchivedChildren(undefined, $archiveTreeState.get().rootIds.length, PAGE_SIZE);
+
+        if (load !== lastRootLoad) {
+            return;
+        }
+
         const next = addChildren($archiveTreeState.get(), null, toEntries(page.items, false));
 
         $archiveTreeState.set(next);
         $archiveListRoot.set({total: page.total, hasMore: next.rootIds.length < page.total});
     } catch (error) {
-        handleError(error);
+        if (load === lastRootLoad) {
+            handleError(error);
+        }
     } finally {
-        $archiveListLoading.set(false);
+        if (load === lastRootLoad) {
+            $archiveListLoading.set(false);
+        }
     }
 }
 

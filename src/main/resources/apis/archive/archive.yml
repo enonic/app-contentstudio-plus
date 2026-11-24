@@ -1,0 +1,4 @@
+kind: "API"
+allow:
+  - "role:system.admin.login"
+  - "role:system.admin"
