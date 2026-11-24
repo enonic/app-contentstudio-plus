@@ -1,5 +1,5 @@
 import {atom, computed} from 'nanostores';
-import {ArchiveContentViewItem} from '../../../../ArchiveContentViewItem';
+import type {ArchivedContent} from '../../shared/content/archivedContent';
 import {$archiveTreeState, getArchiveItem} from '../archive-list/archive-list.store';
 import {getLoadedIds} from './archive-selection.utils';
 
@@ -14,15 +14,15 @@ export const $currentIds = computed([$selection, $activeId], (selection, activeI
 });
 
 export const $currentItems = computed($currentIds, (ids) =>
-    ids.map((id) => getArchiveItem(id)).filter((item): item is ArchiveContentViewItem => !!item),
+    ids.map((id) => getArchiveItem(id)).filter((item): item is ArchivedContent => !!item),
 );
 
-export const $archiveContextContent = computed($currentItems, (items) => items.at(-1)?.getContentSummary() ?? null);
+export const $archiveContextContent = computed($currentItems, (items) => items.at(-1) ?? null);
 
 export const $selectedItems = computed($selection, (selection) =>
     Array.from(selection)
         .map((id) => getArchiveItem(id))
-        .filter((item): item is ArchiveContentViewItem => !!item),
+        .filter((item): item is ArchivedContent => !!item),
 );
 
 export const $selectionCount = computed($selection, (selection) => selection.size);

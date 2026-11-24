@@ -1,23 +1,22 @@
-import type {ContentSummary} from '@enonic/lib-contentstudio/app/content/ContentSummary';
-import {useAnimatedEllipsis} from '@enonic/lib-contentstudio/v6/shared/lib/hooks/useAnimatedEllipsis';
-import {useInfiniteScroll} from '@enonic/lib-contentstudio/v6/shared/lib/hooks/useInfiniteScroll';
-import {ContentLabel} from '@enonic/lib-contentstudio/v6/entities/content/ui/content/ContentLabel';
 import {Button, Dialog, ListItem, Separator} from '@enonic/ui';
 import {ActionDialog, type DialogIntent, Gate, useActionDialog, useUiKitPhrases} from '@enonic/ui-kit';
 import {type ReactElement, type ReactNode, type RefObject, useCallback, useEffect, useRef, useState} from 'react';
 import {useI18n} from '../../../../../shared/i18n';
 import {useTaskProgress} from '../../../../../shared/tasks';
+import type {ArchivedContent} from '../../content/archivedContent';
+import {ArchivedContentLabel} from '../../content/ArchivedContentLabel';
+import {useAnimatedEllipsis} from '../../lib/hooks/useAnimatedEllipsis';
 import {useDialogInitialFocus} from '../../lib/hooks/useDialogInitialFocus';
+import {useInfiniteScroll} from '../../lib/hooks/useInfiniteScroll';
 import {ProgressBar} from '../../ui/ProgressBar';
-import {ArchiveContentViewItem} from '../../../../../ArchiveContentViewItem';
 import {ArchiveLoadStatus} from './ArchiveLoadStatus';
 
 type View = 'main' | 'confirmation' | 'progress';
 
 export type ArchiveDialogShellProps = {
     open: boolean;
-    items: ArchiveContentViewItem[];
-    descendants: ContentSummary[];
+    items: ArchivedContent[];
+    descendants: ArchivedContent[];
     total: number;
     taskId: string | undefined;
     ready: boolean;
@@ -227,10 +226,10 @@ export const ArchiveDialogShell = ({
                         <ActionDialog.Body className="gap-y-10">
                             <ul className="flex flex-col gap-y-2.5">
                                 {items.map((item) => (
-                                    <ListItem key={item.getId()} className="pl-0 py-0">
+                                    <ListItem key={item.id} className="pl-0 py-0">
                                         <ListItem.Content className="flex">
                                             <div className="box-content justify-start flex-1 px-2.5 py-1">
-                                                <ContentLabel content={item.getContentSummary()} variant="normal" />
+                                                <ArchivedContentLabel content={item} />
                                             </div>
                                         </ListItem.Content>
                                     </ListItem>
@@ -241,10 +240,10 @@ export const ArchiveDialogShell = ({
                                     <Separator className="pr-1" label={dependantsLabel} />
                                     <ul className="flex flex-col gap-y-1.5">
                                         {descendants.map((content) => (
-                                            <ListItem key={content.getId()} className="pl-0 py-0">
+                                            <ListItem key={content.id} className="pl-0 py-0">
                                                 <ListItem.Content className="flex">
                                                     <div className="box-content justify-start flex-1 px-2.5 py-1">
-                                                        <ContentLabel content={content} variant="compact" />
+                                                        <ArchivedContentLabel content={content} variant="compact" />
                                                     </div>
                                                 </ListItem.Content>
                                             </ListItem>

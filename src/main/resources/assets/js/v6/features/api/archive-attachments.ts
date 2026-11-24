@@ -1,33 +1,31 @@
-import {computed, task} from 'nanostores';
-import type {AttachmentJson} from '@enonic/lib-contentstudio/app/attachment/AttachmentJson';
-import {Attachments} from '@enonic/lib-contentstudio/app/attachment/Attachments';
-import {ContentId} from '@enonic/lib-contentstudio/app/content/ContentId';
 import {requestJson} from '@enonic/ui-utils/request';
+import {computed, task} from 'nanostores';
 import {$archiveContextContent} from '../store/archive-selection';
 import {ARCHIVE_ROOT, getCmsRestUrl, withParams} from './cms';
 
-export function loadArchiveAttachments(contentId: ContentId): Promise<Attachments | null> {
-    const url = withParams(getCmsRestUrl(ARCHIVE_ROOT, 'getAttachments'), {id: contentId.toString()});
-    return requestJson<AttachmentJson[]>(url).match(
-        (json) => (json.length > 0 ? Attachments.create().fromJson(json).build() : null),
+/** The names of the attachments of an archived item. */
+export function loadArchiveAttachments(contentId: string): Promise<string[]> {
+    const url = withParams(getCmsRestUrl(ARCHIVE_ROOT, 'getAttachments'), {id: contentId});
+    return requestJson<{name: string}[]>(url).match(
+        (json) => json.map(({name}) => name),
         (error) => {
             throw error;
         },
     );
 }
 
-export function getArchiveAttachmentUrl(contentId: ContentId, attachmentName: string): string {
-    return getCmsRestUrl(ARCHIVE_ROOT, `media/${contentId.toString()}/${encodeURIComponent(attachmentName)}`);
+export function getArchiveAttachmentUrl(contentId: string, attachmentName: string): string {
+    return getCmsRestUrl(ARCHIVE_ROOT, `media/${contentId}/${encodeURIComponent(attachmentName)}`);
 }
 
 export const $archiveAttachments = computed($archiveContextContent, (content) =>
     task(async () => {
-        if (!content) return null;
+        if (!content) return [];
         try {
-            return await loadArchiveAttachments(content.getContentId());
+            return await loadArchiveAttachments(content.id);
         } catch (error) {
             console.error(error);
-            return null;
+            return [];
         }
     }),
 );

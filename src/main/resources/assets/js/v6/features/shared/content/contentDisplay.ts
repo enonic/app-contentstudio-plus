@@ -27,6 +27,9 @@ const prettifyUnnamed = (name?: string): string => {
     return `<${capitalizeAll(`${unnamed} ${name.replace(/-/g, ' ').trim()}`)}>`;
 };
 
+export const prettifyPath = (path: string): string =>
+    path.split('/').map(element => (element.startsWith(UNNAMED_PREFIX) ? prettifyUnnamed() : element)).join('/');
+
 export const resolveContentDisplay = (source: ContentDisplaySource): ContentDisplay => {
     const isUnnamed = source.name.startsWith(UNNAMED_PREFIX);
 

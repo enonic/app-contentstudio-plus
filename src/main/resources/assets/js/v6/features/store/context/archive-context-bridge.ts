@@ -1,4 +1,5 @@
 import {$contextContent} from '@enonic/lib-contentstudio/v6/widgets/context-panel/model/contextContent.store';
+import {toLegacySummary} from '../../../../ArchiveLegacyContent';
 import {$currentItems} from '../archive-selection';
 
 // Force lib-cs $contextContent.onMount to run once. Without an active subscriber, the mode-driven
@@ -8,5 +9,5 @@ $contextContent.listen(() => undefined);
 
 $currentItems.subscribe((items) => {
     const last = items.at(-1);
-    $contextContent.set(last?.getContentSummary() ?? null);
+    $contextContent.set(last ? toLegacySummary(last) : null);
 });

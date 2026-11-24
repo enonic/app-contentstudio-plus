@@ -1,17 +1,15 @@
 import {handleError} from '../../../../shared/errors';
 import {notifyError, notifySuccess} from '../../../../shared/notifications';
 import {i18n} from '../../../../shared/i18n';
-import type {ContentSummary} from '@enonic/lib-contentstudio/app/content/ContentSummary';
 import {computed, map} from 'nanostores';
-import {ArchiveContentViewItem} from '../../../../ArchiveContentViewItem';
-import {ArchiveHelper} from '../../../../ArchiveHelper';
+import {type ArchivedContent, filterTopMost} from '../../shared/content/archivedContent';
 import {fetchArchivedByIds, fetchArchivedDescendantIds, restoreArchived} from '../../api/archive';
 
 type ArchiveRestoreDialogState = {
     open: boolean;
-    items: ArchiveContentViewItem[];
+    items: ArchivedContent[];
     descendantIds: string[];
-    descendants: ContentSummary[];
+    descendants: ArchivedContent[];
     descendantWindow: number;
     loading: boolean;
     failed: boolean;
@@ -51,15 +49,14 @@ let instanceId = 0;
 
 let loadingMore = false;
 
-const orderSummariesByIds = (summaries: ContentSummary[], orderIds: string[]): ContentSummary[] => {
+const orderByIds = (items: ArchivedContent[], orderIds: string[]): ArchivedContent[] => {
     const indexById = new Map<string, number>();
     orderIds.forEach((id, index) => indexById.set(id, index));
-    const indexOf = (item: ContentSummary): number =>
-        indexById.get(item.getContentId().toString()) ?? orderIds.length;
-    return [...summaries].sort((a, b) => indexOf(a) - indexOf(b));
+    const indexOf = (item: ArchivedContent): number => indexById.get(item.id) ?? orderIds.length;
+    return [...items].sort((a, b) => indexOf(a) - indexOf(b));
 };
 
-export function openArchiveRestoreDialog(items: ArchiveContentViewItem[]): void {
+export function openArchiveRestoreDialog(items: ArchivedContent[]): void {
     if (items.length === 0) {
         return;
     }
@@ -83,11 +80,10 @@ export async function executeArchiveRestoreDialog(): Promise<boolean> {
     }
 
     const total = state.items.length + state.descendantIds.length;
-    const pendingPrimaryName = state.items[0]?.getDisplayName() || state.items[0]?.getPath()?.toString();
+    const pendingPrimaryName = state.items[0]?.displayName || state.items[0]?.path;
 
     try {
-        const ids = (ArchiveHelper.filterTopMostItems(state.items) as ArchiveContentViewItem[])
-            .map((item) => item.getId());
+        const ids = filterTopMost(state.items).map((item) => item.id);
         const taskId = await restoreArchived(ids);
 
         $archiveRestoreDialog.set({
@@ -130,23 +126,22 @@ export function handleArchiveRestoreTaskComplete(success: boolean, message?: str
 
 async function loadDescendantWindow(allIds: string[], start: number, guardId: number): Promise<void> {
     const sliceIds = allIds.slice(start, start + DESCENDANT_LOAD_SIZE);
-    const summaries = sliceIds.length > 0 ? await fetchArchivedByIds(sliceIds) : [];
+    const loaded = sliceIds.length > 0 ? await fetchArchivedByIds(sliceIds) : [];
 
     if (guardId !== instanceId) return;
 
     const {descendants, descendantIds} = $archiveRestoreDialog.get();
     const currentIds = new Set(descendantIds);
-    const byId = new Map<string, ContentSummary>();
-    for (const item of [...(start === 0 ? [] : descendants), ...summaries]) {
-        const key = item.getContentId().toString();
-        if (currentIds.has(key)) {
-            byId.set(key, item);
+    const byId = new Map<string, ArchivedContent>();
+    for (const item of [...(start === 0 ? [] : descendants), ...loaded]) {
+        if (currentIds.has(item.id)) {
+            byId.set(item.id, item);
         }
     }
 
     $archiveRestoreDialog.set({
         ...$archiveRestoreDialog.get(),
-        descendants: orderSummariesByIds([...byId.values()], descendantIds),
+        descendants: orderByIds([...byId.values()], descendantIds),
         descendantWindow: Math.min(start + DESCENDANT_LOAD_SIZE, descendantIds.length),
     });
 }
@@ -172,7 +167,7 @@ async function loadDescendants(currentInstance: number): Promise<void> {
 
     try {
         const items = $archiveRestoreDialog.get().items;
-        const descendantIds = await fetchArchivedDescendantIds(items.map((item) => item.getPath().toString()));
+        const descendantIds = await fetchArchivedDescendantIds(items.map((item) => item.path));
 
         if (currentInstance !== instanceId) return;
 
@@ -185,7 +180,7 @@ async function loadDescendants(currentInstance: number): Promise<void> {
         $archiveRestoreDialog.set({
             ...$archiveRestoreDialog.get(),
             descendantIds,
-            descendants: orderSummariesByIds(descendants, descendantIds),
+            descendants: orderByIds(descendants, descendantIds),
             descendantWindow: Math.min(DESCENDANT_LOAD_SIZE, descendantIds.length),
             loading: false,
             failed: false,

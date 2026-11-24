@@ -30,6 +30,8 @@ type Props = {
     className?: string;
     contentType: string;
     url?: string | null;
+    /** The content has an uploaded thumbnail, so `url` is a picture whatever the type. */
+    hasThumbnail?: boolean;
 };
 
 const IMAGE_SIZE = 128;
@@ -74,7 +76,7 @@ function withImageSize(url: string): string {
 // The server marks svg type icons painted only with `currentColor`.
 const isColorable = (url: string): boolean => new URLSearchParams(url.substring(url.indexOf('?') + 1)).get('colorable') === 'true';
 
-export const ContentIcon = ({className, contentType, url}: Props): ReactElement => {
+export const ContentIcon = ({className, contentType, url, hasThumbnail = false}: Props): ReactElement => {
     const src = url ? withImageSize(url) : undefined;
     const [isImageBroken, setImageBroken] = useState(false);
 
@@ -82,7 +84,7 @@ export const ContentIcon = ({className, contentType, url}: Props): ReactElement 
         setImageBroken(false);
     }, [src]);
 
-    const isPhoto = IMAGE_CONTENT_TYPES.has(contentType);
+    const isPhoto = IMAGE_CONTENT_TYPES.has(contentType) || hasThumbnail;
     const isCustomTypeGlyph = !isPhoto && !BUILT_IN_ICONS.has(contentType);
 
     if (src && !isImageBroken && (isPhoto || isCustomTypeGlyph)) {

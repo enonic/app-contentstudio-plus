@@ -1,18 +1,7 @@
-import {ContentSummary} from '@enonic/lib-contentstudio/app/content/ContentSummary';
-import {ContentSummaryAndCompareStatus} from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
-import type {ContentSummaryJson} from '@enonic/lib-contentstudio/app/content/ContentSummaryJson';
 import {requestJson} from '@enonic/ui-utils/request';
+import type {ArchivedContentListJson} from '../../../resource/json/ArchivedContentJson';
+import {type ArchivedContent, type ArchivedPage, toArchivedContent} from '../shared/content/archivedContent';
 import {ARCHIVE_ROOT, getCmsRestUrl, withParams} from './cms';
-
-export type ArchivedPage = {
-    items: ContentSummaryAndCompareStatus[];
-    total: number;
-};
-
-type ContentListJson = {
-    contents: ContentSummaryJson[];
-    metadata: {totalHits: number};
-};
 
 const SUMMARY_EXPAND = 1;
 
@@ -30,26 +19,21 @@ export function fetchArchivedChildren(parentId: string | undefined, from: number
         childOrder: '',
     });
 
-    return requestJson<ContentListJson>(url).match(
-        (json) => ({
-            items: ContentSummary.fromJsonArray(json.contents).map((summary) =>
-                ContentSummaryAndCompareStatus.fromContentSummary(summary),
-            ),
-            total: json.metadata.totalHits,
-        }),
+    return requestJson<ArchivedContentListJson>(url).match(
+        (json) => ({items: json.contents.map(toArchivedContent), total: json.metadata.totalHits}),
         rethrow,
     );
 }
 
-export function fetchArchivedByIds(contentIds: string[]): Promise<ContentSummary[]> {
+export function fetchArchivedByIds(contentIds: string[]): Promise<ArchivedContent[]> {
     if (contentIds.length === 0) {
         return Promise.resolve([]);
     }
 
-    return requestJson<ContentListJson>(getCmsRestUrl(ARCHIVE_ROOT, 'resolveByIds'), {
+    return requestJson<ArchivedContentListJson>(getCmsRestUrl(ARCHIVE_ROOT, 'resolveByIds'), {
         method: 'POST',
         body: {contentIds},
-    }).match((json) => ContentSummary.fromJsonArray(json.contents), rethrow);
+    }).match((json) => json.contents.map(toArchivedContent), rethrow);
 }
 
 export function fetchArchivedDescendantIds(contentPaths: string[]): Promise<string[]> {

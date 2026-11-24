@@ -1,35 +1,37 @@
 import {Expand} from '@enonic/lib-admin-ui/rest/Expand';
-import {CompareStatus} from '@enonic/lib-contentstudio/app/content/CompareStatus';
+import type {JsonResponse} from '@enonic/lib-admin-ui/rest/JsonResponse';
 import type {ContentId} from '@enonic/lib-contentstudio/app/content/ContentId';
 import {ContentPath} from '@enonic/lib-contentstudio/app/content/ContentPath';
 import type {ContentQuery} from '@enonic/lib-contentstudio/app/content/ContentQuery';
-import type {ContentSummary} from '@enonic/lib-contentstudio/app/content/ContentSummary';
-import {ContentSummaryAndCompareStatus} from '@enonic/lib-contentstudio/app/content/ContentSummaryAndCompareStatus';
-import type {ContentSummaryJson} from '@enonic/lib-contentstudio/app/content/ContentSummaryJson';
 import {ContentQueryRequest} from '@enonic/lib-contentstudio/app/resource/ContentQueryRequest';
-import type {ContentQueryResult} from '@enonic/lib-contentstudio/app/resource/ContentQueryResult';
 import Q from 'q';
+import {toLegacyViewItem} from './ArchiveLegacyContent';
 import type {FetchResponse} from './FetchResponse';
+import type {ArchivedContentListJson} from './resource/json/ArchivedContentJson';
 import {fetchArchivedChildren} from './v6/features/api/archive';
+import {type ArchivedPage, toArchivedContent} from './v6/features/shared/content/archivedContent';
+
+// The query comes from the legacy filter panel, so it goes through its legacy request.
+export function fetchArchivedByQuery(filterQuery: ContentQuery): Promise<ArchivedPage> {
+    const request = new ContentQueryRequest(filterQuery).setContentRootPath(ContentPath.ARCHIVE_ROOT).setExpand(Expand.SUMMARY);
+
+    return Promise.resolve(request.send()).then((response) => {
+        const json = (response as JsonResponse<ArchivedContentListJson>).getResult();
+        return {items: json.contents.map(toArchivedContent), total: json.metadata.totalHits};
+    });
+}
+
+const toFetchResponse = ({items, total}: ArchivedPage): FetchResponse => ({items: items.map(toLegacyViewItem), total});
 
 export class ArchiveContentFetcher {
 
     static readonly FETCH_SIZE: number = 10;
 
-    // The query comes from the legacy filter panel, so it goes through its legacy request.
     fetchByQuery(filterQuery: ContentQuery): Q.Promise<FetchResponse> {
-        return new ContentQueryRequest<ContentSummaryJson, ContentSummary>(filterQuery)
-            .setContentRootPath(ContentPath.ARCHIVE_ROOT)
-            .setExpand(Expand.SUMMARY)
-            .sendAndParse()
-            .then((result: ContentQueryResult<ContentSummary, ContentSummaryJson>) => {
-                const items: ContentSummaryAndCompareStatus[] = result.getContents().map(
-                    (item: ContentSummary) => ContentSummaryAndCompareStatus.fromContentAndCompareStatus(item, CompareStatus.ARCHIVED));
-                return {items: items, total: result.getMetadata().getTotalHits()};
-            });
+        return Q(fetchArchivedByQuery(filterQuery)).then(toFetchResponse);
     }
 
     fetchContents(parentContentId: ContentId | undefined, from: number): Q.Promise<FetchResponse> {
-        return Q(fetchArchivedChildren(parentContentId?.toString(), from, ArchiveContentFetcher.FETCH_SIZE));
+        return Q(fetchArchivedChildren(parentContentId?.toString(), from, ArchiveContentFetcher.FETCH_SIZE)).then(toFetchResponse);
     }
 }

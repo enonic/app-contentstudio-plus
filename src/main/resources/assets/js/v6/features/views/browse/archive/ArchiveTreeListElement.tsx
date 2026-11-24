@@ -1,6 +1,7 @@
 import {LegacyElement} from '../../../../../shared/LegacyElement';
 import {SelectionChange} from '@enonic/lib-admin-ui/util/SelectionChange';
 import {ArchiveContentViewItem} from '../../../../../ArchiveContentViewItem';
+import {toLegacyViewItem} from '../../../../../ArchiveLegacyContent';
 import {getArchiveItem} from '../../../store/archive-list';
 import {$currentIds} from '../../../store/archive-selection';
 import {ArchiveTreeList, type ArchiveTreeListProps} from './ArchiveTreeList';
@@ -43,7 +44,7 @@ export class ArchiveTreeListElement extends LegacyElement<typeof ArchiveTreeList
             if (!prev.has(id)) {
                 const item = getArchiveItem(id);
                 if (item) {
-                    selected.push(item);
+                    selected.push(toLegacyViewItem(item));
                 }
             }
         });
@@ -52,7 +53,7 @@ export class ArchiveTreeListElement extends LegacyElement<typeof ArchiveTreeList
             if (!next.has(id)) {
                 const item = getArchiveItem(id);
                 if (item) {
-                    deselected.push(item);
+                    deselected.push(toLegacyViewItem(item));
                 }
             }
         });
