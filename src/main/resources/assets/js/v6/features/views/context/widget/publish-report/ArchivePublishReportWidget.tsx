@@ -12,8 +12,8 @@ export const ArchivePublishReportWidget = (): ReactElement | null => {
 
     return (
         <PublishReportWidget
-            contentId={content.getId()}
-            firstPublished={content.getPublishFirstTime() ?? null}
+            contentId={content.id}
+            firstPublished={content.firstPublished ?? null}
             isArchived={true}
         />
     );

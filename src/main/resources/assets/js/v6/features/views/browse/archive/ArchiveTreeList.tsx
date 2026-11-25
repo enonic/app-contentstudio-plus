@@ -1,12 +1,11 @@
 import {cn, ListItem, VirtualizedTreeList} from '@enonic/ui';
-import {ContentLabel} from '@enonic/lib-contentstudio/v6/entities/content/ui/content/ContentLabel';
-import {virtuosoComponents} from '@enonic/lib-contentstudio/v6/features/shared/lists/virtuoso-components';
-import type {FlatNode} from '@enonic/lib-contentstudio/v6/shared/lib/tree-store';
 import {useStore} from '@nanostores/preact';
-import {type ReactElement, useCallback, useEffect, useMemo, useRef} from 'react';
+import {forwardRef, type HTMLAttributes, type ReactElement, useCallback, useEffect, useMemo, useRef} from 'react';
 import type {ListRange, VirtuosoHandle} from 'react-virtuoso';
 import {Virtuoso} from 'react-virtuoso';
-import {ArchiveContentViewItem} from '../../../../../ArchiveContentViewItem';
+import type {ArchivedContent} from '../../../shared/content/archivedContent';
+import {ArchivedContentLabel} from '../../../shared/content/ArchivedContentLabel';
+import type {FlatNode} from '../../../shared/lib/tree';
 import {
     $archiveFlatNodes,
     $archiveListState,
@@ -25,7 +24,21 @@ import {
 } from '../../../store/archive-selection';
 import {ArchiveTreeContextMenu} from './ArchiveTreeContextMenu';
 
-type ArchiveFlatNode = FlatNode<ArchiveContentViewItem>;
+type ArchiveFlatNode = FlatNode<ArchivedContent>;
+
+// The row gap and the padding of the scroll area.
+const virtuosoComponents = {
+    Scroller: forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({children, ...props}, ref) => (
+        <div ref={ref} {...props} className="*:max-sm:px-3.5 *:px-5 *:py-2.5">
+            {children}
+        </div>
+    )),
+    List: forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({children, ...props}, ref) => (
+        <div ref={ref} {...props} className="flex flex-col gap-y-1.5">
+            {children}
+        </div>
+    )),
+};
 
 export type ArchiveTreeListProps = Record<string, never>;
 
@@ -244,7 +257,7 @@ export const ArchiveTreeList = (): ReactElement => {
                                         <VirtualizedTreeList.RowContent>
                                             <ListItem className="p-0">
                                                 <ListItem.Left className="flex-1">
-                                                    <ContentLabel content={data.getContentSummary()} />
+                                                    <ArchivedContentLabel content={data} />
                                                 </ListItem.Left>
                                             </ListItem>
                                         </VirtualizedTreeList.RowContent>

@@ -10,6 +10,7 @@ import type {BrowseHostConfig} from '@enonic/lib-contentstudio/v6/pages/browse/u
 import Q from 'q';
 import {ArchiveBrowseItemPanel} from './ArchiveBrowseItemPanel';
 import {ArchiveBrowseToolbarElement} from './ArchiveBrowseToolbar';
+import {fetchArchivedByQuery} from './ArchiveContentFetcher';
 import {ArchiveContentViewItem} from './ArchiveContentViewItem';
 import {ArchiveFilterPanel} from './ArchiveFilterPanel';
 import {ArchiveTreeListSelectablePanelProxy} from './ArchiveTreeListSelectablePanelProxy';
@@ -20,7 +21,7 @@ import {$activeProject} from './shared/project';
 import {
     loadArchiveItems,
     removeArchiveItems,
-    setArchiveFilterQuery,
+    setArchiveFilter,
 } from './v6/features/store/archive-list';
 import {clearSelection, setSelection} from './v6/features/store/archive-selection';
 import {ArchiveTreeListElement} from './v6/features/views/browse/archive/ArchiveTreeListElement';
@@ -63,7 +64,7 @@ export class ArchiveBrowsePanel
         this.filterPanel.onHidden(() => setContentFilterOpen(false));
 
         this.filterPanel.onSearchEvent((query?: ContentQuery) => {
-            void setArchiveFilterQuery(query ?? null);
+            void setArchiveFilter(query ? () => fetchArchivedByQuery(query) : null);
         });
 
         let isRefreshTriggered = false;
@@ -144,7 +145,7 @@ export class ArchiveBrowsePanel
     protected disableSelectionMode() {
         this.filterPanel.resetConstraints();
         this.hideFilterPanel();
-        void setArchiveFilterQuery(null);
+        void setArchiveFilter(null);
         setSelection([]);
     }
 }

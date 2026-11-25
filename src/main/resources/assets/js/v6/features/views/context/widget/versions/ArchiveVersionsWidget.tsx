@@ -11,6 +11,7 @@ import {VersionsList}
     from '@enonic/lib-contentstudio/v6/widgets/context-panel/widget/versions/VersionsList';
 import {useStore} from '@nanostores/preact';
 import {useMemo, type ReactElement} from 'react';
+import {toLegacySummary} from '../../../../../../ArchiveLegacyContent';
 import {$archiveContextContent} from '../../../../store/archive-selection';
 
 const ARCHIVE_VERSIONS_WIDGET_NAME = 'ArchiveVersionsWidget';
@@ -35,7 +36,7 @@ export const ArchiveVersionsWidget = (): ReactElement | null => {
     return (
         <div data-component={ARCHIVE_VERSIONS_WIDGET_NAME}>
             <VersionsConfigProvider config={config}>
-                <VersionsList content={content} />
+                <VersionsList content={toLegacySummary(content)} />
             </VersionsConfigProvider>
         </div>
     );

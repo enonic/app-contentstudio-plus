@@ -12,5 +12,6 @@ export {
     loadMoreArchiveItems,
     loadMoreChildrenOf,
     removeArchiveItems,
-    setArchiveFilterQuery,
+    setArchiveFilter,
+    type ArchiveFilter,
 } from './archive-list.utils';

@@ -1,19 +1,10 @@
 import {useStore} from '@nanostores/preact';
 import type {ReactElement} from 'react';
-import {Path} from '@enonic/lib-admin-ui/rest/Path';
 import {useI18n} from '../../../../../../shared/i18n';
-import {ContentIcon} from '@enonic/lib-contentstudio/v6/shared/ui/icons/ContentIcon';
+import {ContentIcon} from '../../../../shared/icons/ContentIcon';
 import {$archiveContextContent} from '../../../../store/archive-selection';
 
 const ARCHIVE_DETAILS_WIDGET_CONTENT_SECTION_NAME = 'ArchiveDetailsWidgetContentSection';
-
-function buildOriginalFullPath(originalParentPath: string | null | undefined, originalName: string | null | undefined): string {
-    if (!originalParentPath || !originalName) {
-        return originalParentPath ?? '';
-    }
-    const separator = originalParentPath === Path.DEFAULT_ELEMENT_DIVIDER ? '' : Path.DEFAULT_ELEMENT_DIVIDER;
-    return `${originalParentPath}${separator}${originalName}`;
-}
 
 export const ArchiveDetailsWidgetContentSection = (): ReactElement | null => {
     const content = useStore($archiveContextContent);
@@ -26,8 +17,7 @@ export const ArchiveDetailsWidgetContentSection = (): ReactElement | null => {
 
     if (!content) return null;
 
-    const displayName = content.getDisplayName() ?? '';
-    const originalFullPath = buildOriginalFullPath(content.getOriginalParentPath(), content.getOriginalName());
+    const {displayName, originalPath} = content;
 
     return (
         <section data-component={ARCHIVE_DETAILS_WIDGET_CONTENT_SECTION_NAME}>
@@ -35,7 +25,7 @@ export const ArchiveDetailsWidgetContentSection = (): ReactElement | null => {
                 <div className="flex flex-col gap-1">
                     <dt className="text-xs text-subtle">{iconLabel}</dt>
                     <dd>
-                        <ContentIcon contentType={content.getType().toString()} url={content.getIconUrl()} />
+                        <ContentIcon contentType={content.type} url={content.iconUrl} hasThumbnail={content.hasThumbnail} />
                     </dd>
                 </div>
 
@@ -53,10 +43,10 @@ export const ArchiveDetailsWidgetContentSection = (): ReactElement | null => {
                     </div>
                 )}
 
-                {originalFullPath && (
+                {originalPath && (
                     <div className="flex flex-col gap-1">
                         <dt className="text-xs text-subtle">{pathLabel}</dt>
-                        <dd className="text-sm truncate" title={originalFullPath}>{originalFullPath}</dd>
+                        <dd className="text-sm truncate" title={originalPath}>{originalPath}</dd>
                     </div>
                 )}
             </dl>

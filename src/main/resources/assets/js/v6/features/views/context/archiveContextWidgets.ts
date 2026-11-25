@@ -4,6 +4,8 @@ import type {ContextWidget} from '@enonic/lib-contentstudio/v6/widgets/context-p
 import {setContextWidgets} from '@enonic/lib-contentstudio/v6/widgets/context-panel/model/contextWidgets.store';
 import type {ContextPanelConfig} from '@enonic/lib-contentstudio/v6/widgets/context-panel/ui/ContextPanelView';
 import {History, List, Newspaper} from 'lucide-react';
+import {computed} from 'nanostores';
+import {toLegacySummary} from '../../../../ArchiveLegacyContent';
 import {$config} from '../../../../shared/config';
 import {i18n} from '../../../../shared/i18n';
 import {$archiveContextContent} from '../../store/archive-selection';
@@ -19,7 +21,7 @@ export const ARCHIVE_CONTEXT_PANEL: ContextPanelConfig = {
         [PUBLISH_REPORT_WIDGET_NAME]: ArchivePublishReportWidget,
         [VERSIONS_WIDGET_NAME]: ArchiveVersionsWidget,
     },
-    content: $archiveContextContent,
+    content: computed($archiveContextContent, (content) => (content ? toLegacySummary(content) : null)),
 };
 
 // The archive bundle has its own copy of the widget registry, so this set replaces Studio's.

@@ -5,6 +5,7 @@ import {type DataChangedEvent} from '@enonic/lib-admin-ui/ui/treegrid/DataChange
 import {type SelectionChange} from '@enonic/lib-admin-ui/util/SelectionChange';
 import Q from 'q';
 import {ArchiveContentViewItem} from './ArchiveContentViewItem';
+import {toLegacyViewItem} from './ArchiveLegacyContent';
 import {$archiveListState, getArchiveItem} from './v6/features/store/archive-list';
 import {getCurrentItems} from './v6/features/store/archive-selection';
 import {ArchiveTreeListElement} from './v6/features/views/browse/archive/ArchiveTreeListElement';
@@ -35,7 +36,7 @@ export class ArchiveTreeListSelectablePanelProxy extends SelectableListBoxPanel<
     }
 
     getSelectedItems(): ArchiveContentViewItem[] {
-        return [...getCurrentItems()];
+        return getCurrentItems().map(toLegacyViewItem);
     }
 
     getLastSelectedItem(): ArchiveContentViewItem | undefined {
@@ -54,7 +55,8 @@ export class ArchiveTreeListSelectablePanelProxy extends SelectableListBoxPanel<
     }
 
     getItem(id: string): ArchiveContentViewItem | undefined {
-        return getArchiveItem(id);
+        const item = getArchiveItem(id);
+        return item ? toLegacyViewItem(item) : undefined;
     }
 
     getWrapper(): SelectableListBoxWrapper<ArchiveContentViewItem> {
