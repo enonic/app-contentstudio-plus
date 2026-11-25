@@ -5,19 +5,14 @@ const Page = require('../page');
 const appConst = require('../../libs/app_const');
 
 const XPATH = {
-    container: "//div[contains(@id,'ArchiveFilterPanel')]",
-    // All controls of the panel are rendered by the BrowseFilter component. The legacy panel contains one more
-    // search input(it is not used any longer), so all locators are scoped to this container:
-    browseFilter: "//div[contains(@id,'BrowseFilterElement')]",
+    container: "//div[@data-component='ArchiveFilterPanel']",
     searchInput: "//input[@data-component='SearchField.Input']",
     // 'Clear' button is displayed in the row with the 'Search' title, only when the filter is dirty:
     clearFilterButton: "//div[child::h3[contains(@class,'font-semibold')]]//button",
     // Number of hits - '12 results':
     resultsCounter: "//span[contains(@class,'text-lg')]",
     aggregationGroupTitle: "//h4[contains(@class,'font-semibold')]",
-    // Static aggregation groups(Content Types, Archived, Archived By) show the title in h4,
-    // filterable groups(with a combobox) show it in a div:
-    aggregationGroupByName: name => `//div[child::h4[contains(.,'${name}')] or child::div[contains(@class,'font-semibold') and contains(.,'${name}')]]`,
+    aggregationGroupByName: name => `//section[@data-component='ArchiveFilterSection' and child::h4[normalize-space(.)='${name}']]`,
     checkbox: `//div[@data-component='Checkbox']`,
     checkboxByLabel: label => `//div[@data-component='Checkbox' and descendant::span[contains(.,'${label}')]]`,
     // The input is 'sr-only', so it is not displayed. Its state is in the 'aria-checked' attribute:
@@ -32,15 +27,15 @@ const XPATH = {
 class ArchiveFilterPanel extends Page {
 
     get searchTextInput() {
-        return XPATH.container + XPATH.browseFilter + XPATH.searchInput;
+        return XPATH.container + XPATH.searchInput;
     }
 
     get clearFilterLink() {
-        return XPATH.container + XPATH.browseFilter + XPATH.clearFilterButton;
+        return XPATH.container + XPATH.clearFilterButton;
     }
 
     get resultsCounter() {
-        return XPATH.container + XPATH.browseFilter + XPATH.resultsCounter;
+        return XPATH.container + XPATH.resultsCounter;
     }
 
     get showMoreTypesButton() {
@@ -52,7 +47,7 @@ class ArchiveFilterPanel extends Page {
     }
 
     getAggregationGroupLocator(blockName) {
-        return XPATH.container + XPATH.browseFilter + XPATH.aggregationGroupByName(blockName);
+        return XPATH.container + XPATH.aggregationGroupByName(blockName);
     }
 
     getCheckboxLabelLocator(blockName, label) {
@@ -135,9 +130,9 @@ class ArchiveFilterPanel extends Page {
         return await this.waitForElementNotDisplayed(this.getAggregationGroupLocator(blockName), appConst.mediumTimeout);
     }
 
-    // Titles of the aggregation groups: 'Content Types', 'Archived', 'Archived By'
+    // Titles of the aggregation groups: 'Content Types', 'Archived By', 'Owner', 'Language'
     async getAggregationGroupTitles() {
-        let locator = XPATH.container + XPATH.browseFilter + XPATH.aggregationGroupTitle;
+        let locator = XPATH.container + XPATH.aggregationGroupTitle;
         return await this.getTextInDisplayedElements(locator);
     }
 

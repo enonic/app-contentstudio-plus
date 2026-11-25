@@ -1,3 +1,4 @@
+import {$isContentFilterOpen} from '@enonic/lib-contentstudio/v6/features/search/model/contentFilter.store';
 import {handleError} from '../../../../shared/errors';
 import {fetchArchivedByIds} from '../../api/archive';
 import {searchArchive} from '../../api/archive-search';
@@ -45,7 +46,9 @@ async function applyArchiveSearch(): Promise<void> {
     const search = toParams($archiveSearch.get());
     const filter = $isArchiveSearchActive.get() ? () => loadFoundPage(search) : null;
 
-    await Promise.all([refreshArchiveSearchFacets(), setArchiveFilter(filter)]);
+    const facets = $isContentFilterOpen.get() ? refreshArchiveSearchFacets() : Promise.resolve();
+
+    await Promise.all([facets, setArchiveFilter(filter)]);
 }
 
 function scheduleArchiveSearch(): void {

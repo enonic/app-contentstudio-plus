@@ -11,7 +11,7 @@ import {ArchiveBrowseItemPanel} from './ArchiveBrowseItemPanel';
 import {ArchiveBrowseToolbarElement} from './ArchiveBrowseToolbar';
 import {ArchiveContentViewItem} from './ArchiveContentViewItem';
 import {ArchiveTreeListSelectablePanelProxy} from './ArchiveTreeListSelectablePanelProxy';
-import {ArchiveTreeRootList} from './ArchiveTreeRootList';
+import {ArchiveTreeList} from './ArchiveTreeList';
 import {$isContentFilterOpen, setContentFilterOpen} from '@enonic/lib-contentstudio/v6/features/search/model/contentFilter.store';
 import {subscribeToArchiveEvents} from './shared/events';
 import {$activeProject} from './shared/project';
@@ -25,7 +25,7 @@ import {ARCHIVE_CONTEXT_PANEL, registerArchiveContextWidgets} from './v6/feature
 export class ArchiveBrowsePanel
     extends ResponsiveBrowsePanel {
 
-    protected treeListBox: ArchiveTreeRootList;
+    protected treeListBox: ArchiveTreeList;
 
     protected archiveTreeList: ArchiveTreeListElement;
 
@@ -92,7 +92,7 @@ export class ArchiveBrowsePanel
     }
 
     protected createListBoxPanel(): SelectableListBoxPanel<ViewItem> {
-        this.treeListBox = new ArchiveTreeRootList({scrollParent: this});
+        this.treeListBox = new ArchiveTreeList({scrollParent: this});
 
         this.selectionWrapper = new SelectableListBoxWrapper<ArchiveContentViewItem>(this.treeListBox, {
             className: 'archive-list-box-wrapper',

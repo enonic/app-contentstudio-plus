@@ -6,6 +6,7 @@ const REPO_PREFIX = 'com.enonic.cms.';
 const PROJECT_NAME = /^[a-z0-9][a-z0-9_-]*$/;
 const MAX_COUNT = 100;
 const TYPE_TITLES_TTL_MS = 60000;
+const PRINCIPAL_NAMES_TTL_MS = 60000;
 
 const TEXT_FIELDS = ['displayName^5', '_name^3', '_allText'];
 const SORT = [{field: '_score'}, {field: '_path', direction: 'ASC'}];
@@ -18,6 +19,7 @@ const AGGREGATIONS = [
 ];
 
 const typeTitlesByLocales = {};
+let principalNames = {names: {}, time: 0};
 
 exports.post = (req) => {
     const params = parseParams(req.body);
@@ -211,6 +213,22 @@ const resolveDisplayName = (aggregation, key, locales) => {
 };
 
 const getPrincipalName = (key) => {
+    const now = Date.now();
+
+    if (now - principalNames.time > PRINCIPAL_NAMES_TTL_MS) {
+        principalNames = {names: {}, time: now};
+    }
+
+    const names = principalNames.names;
+
+    if (!Object.prototype.hasOwnProperty.call(names, key)) {
+        names[key] = loadPrincipalName(key);
+    }
+
+    return names[key];
+};
+
+const loadPrincipalName = (key) => {
     try {
         const principal = authLib.getPrincipal(key);
         return principal ? principal.displayName : undefined;

@@ -18,7 +18,7 @@ const ARCHIVE_FILTER_SECTION_NAME = 'ArchiveFilterSection';
 
 const toLabel = ({key, displayName, docCount}: ArchiveBucket): string => `${displayName ?? key} (${docCount})`;
 
-const toId = (...parts: string[]): string => parts.join('-').replace(/[^a-zA-Z0-9_-]/g, '_');
+const toId = (...parts: string[]): string => parts.map(encodeURIComponent).join('-');
 
 const toggle = (keys: string[], key: string, isOn: boolean): string[] =>
     isOn ? [...keys.filter((current) => current !== key), key] : keys.filter((current) => current !== key);
