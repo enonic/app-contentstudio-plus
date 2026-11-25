@@ -25,7 +25,7 @@ export const ArchiveDetailsWidgetContentSection = (): ReactElement | null => {
                 <div className="flex flex-col gap-1">
                     <dt className="text-xs text-subtle">{iconLabel}</dt>
                     <dd>
-                        <ContentIcon contentType={content.type} url={content.iconUrl} />
+                        <ContentIcon contentType={content.type} url={content.iconUrl} hasThumbnail={content.hasThumbnail} />
                     </dd>
                 </div>
 
