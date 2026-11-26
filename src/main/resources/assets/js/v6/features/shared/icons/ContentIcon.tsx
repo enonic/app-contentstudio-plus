@@ -101,7 +101,7 @@ export const ContentIcon = ({className, contentType, url, hasThumbnail = false}:
 
         return (
             <img
-                className={cn('size-6 p-px object-contain', !isPhoto && 'rounded-sm dark:bg-alt', className)}
+                className={cn('size-6 p-px object-contain', !isPhoto && 'rounded-sm group-data-[tone=inverse]:bg-alt dark:bg-alt', className)}
                 alt={contentType}
                 src={src}
                 decoding="async"

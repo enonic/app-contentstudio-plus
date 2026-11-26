@@ -8,6 +8,7 @@ export interface PlusConfig {
         contentUrl: string;
         licenseUrl: string;
         layersUrl: string;
+        archiveUrl: string;
     };
     user: {
         key: string;
@@ -46,6 +47,7 @@ export function parseConfig(raw: RawConfig): PlusConfig {
             contentUrl: toString(raw.services?.contentUrl),
             licenseUrl: toString(raw.services?.licenseUrl),
             layersUrl: toString(raw.services?.layersUrl),
+            archiveUrl: toString(raw.services?.archiveUrl),
         },
         user: {
             key: toString(raw.user?.key),

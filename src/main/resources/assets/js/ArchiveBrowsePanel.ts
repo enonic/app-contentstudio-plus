@@ -5,40 +5,33 @@ import {ListBoxToolbar} from '@enonic/lib-admin-ui/ui/selector/list/ListBoxToolb
 import {SelectableListBoxWrapper} from '@enonic/lib-admin-ui/ui/selector/list/SelectableListBoxWrapper';
 import {SelectableTreeListBoxKeyNavigator} from '@enonic/lib-admin-ui/ui/selector/list/SelectableTreeListBoxKeyNavigator';
 import {ResponsiveBrowsePanel} from '@enonic/lib-contentstudio/app/browse/ResponsiveBrowsePanel';
-import {ContentQuery} from '@enonic/lib-contentstudio/app/content/ContentQuery';
 import type {BrowseHostConfig} from '@enonic/lib-contentstudio/v6/pages/browse/ui/layout/BrowseLayout';
 import Q from 'q';
 import {ArchiveBrowseItemPanel} from './ArchiveBrowseItemPanel';
 import {ArchiveBrowseToolbarElement} from './ArchiveBrowseToolbar';
-import {fetchArchivedByQuery} from './ArchiveContentFetcher';
 import {ArchiveContentViewItem} from './ArchiveContentViewItem';
-import {ArchiveFilterPanel} from './ArchiveFilterPanel';
 import {ArchiveTreeListSelectablePanelProxy} from './ArchiveTreeListSelectablePanelProxy';
-import {ArchiveTreeRootList} from './ArchiveTreeRootList';
-import {setContentFilterOpen} from '@enonic/lib-contentstudio/v6/features/search/model/contentFilter.store';
+import {ArchiveTreeList} from './ArchiveTreeList';
+import {$isContentFilterOpen, setContentFilterOpen} from '@enonic/lib-contentstudio/v6/features/search/model/contentFilter.store';
 import {subscribeToArchiveEvents} from './shared/events';
 import {$activeProject} from './shared/project';
-import {
-    loadArchiveItems,
-    removeArchiveItems,
-    setArchiveFilter,
-} from './v6/features/store/archive-list';
-import {clearSelection, setSelection} from './v6/features/store/archive-selection';
+import {loadArchiveItems, removeArchiveItems} from './v6/features/store/archive-list';
+import {refreshArchiveSearchFacets, resetArchiveSearch} from './v6/features/store/archive-search';
+import {clearSelection} from './v6/features/store/archive-selection';
 import {ArchiveTreeListElement} from './v6/features/views/browse/archive/ArchiveTreeListElement';
+import {ArchiveFilterPanelElement} from './v6/features/views/browse/filter/ArchiveFilterPanel';
 import {ARCHIVE_CONTEXT_PANEL, registerArchiveContextWidgets} from './v6/features/views/context/archiveContextWidgets';
 
 export class ArchiveBrowsePanel
     extends ResponsiveBrowsePanel {
 
-    protected treeListBox: ArchiveTreeRootList;
+    protected treeListBox: ArchiveTreeList;
 
     protected archiveTreeList: ArchiveTreeListElement;
 
     protected toolbar: ListBoxToolbar<ArchiveContentViewItem>;
 
     protected selectionWrapper: SelectableListBoxWrapper<ArchiveContentViewItem>;
-
-    protected filterPanel: ArchiveFilterPanel;
 
     doRender(): Q.Promise<boolean> {
         return super.doRender().then((rendered: boolean) => {
@@ -52,6 +45,7 @@ export class ArchiveBrowsePanel
         registerArchiveContextWidgets();
         super.initElements();
 
+        this.browseLayout.setProps({filterPanel: new ArchiveFilterPanelElement()});
         this.browseToolbar.hide();
 
         this.prependChild(new ArchiveBrowseToolbarElement());
@@ -60,23 +54,13 @@ export class ArchiveBrowsePanel
     protected initListeners(): void {
         super.initListeners();
 
-        this.filterPanel.onShown(() => setContentFilterOpen(true));
-        this.filterPanel.onHidden(() => setContentFilterOpen(false));
-
-        this.filterPanel.onSearchEvent((query?: ContentQuery) => {
-            void setArchiveFilter(query ? () => fetchArchivedByQuery(query) : null);
-        });
-
         let isRefreshTriggered = false;
 
         const refreshHandler = (): void => {
             isRefreshTriggered = false;
             clearSelection();
-            this.filterPanel.reset(true).then(() => {
-                this.hideFilterPanel();
-                this.toggleFilterPanelButton.removeClass('filtered');
-            });
-            void loadArchiveItems();
+            setContentFilterOpen(false);
+            void resetArchiveSearch();
         };
 
         const refreshWhenShown = (): void => {
@@ -86,7 +70,15 @@ export class ArchiveBrowsePanel
             }
         };
 
-        subscribeToArchiveEvents({onArchived: refreshWhenShown, onRemoved: removeArchiveItems});
+        subscribeToArchiveEvents({
+            onArchived: refreshWhenShown,
+            onRemoved: (ids) => {
+                removeArchiveItems(ids);
+                if ($isContentFilterOpen.get()) {
+                    void refreshArchiveSearchFacets();
+                }
+            },
+        });
 
         $activeProject.listen(refreshWhenShown);
 
@@ -100,7 +92,7 @@ export class ArchiveBrowsePanel
     }
 
     protected createListBoxPanel(): SelectableListBoxPanel<ViewItem> {
-        this.treeListBox = new ArchiveTreeRootList({scrollParent: this});
+        this.treeListBox = new ArchiveTreeList({scrollParent: this});
 
         this.selectionWrapper = new SelectableListBoxWrapper<ArchiveContentViewItem>(this.treeListBox, {
             className: 'archive-list-box-wrapper',
@@ -131,21 +123,5 @@ export class ArchiveBrowsePanel
 
     protected getBrowseHostConfig(): BrowseHostConfig {
         return {storageId: 'archive-layout', contextPanel: ARCHIVE_CONTEXT_PANEL};
-    }
-
-    protected createFilterPanel(): ArchiveFilterPanel {
-        return new ArchiveFilterPanel();
-    }
-
-    protected enableSelectionMode() {
-        const selectedItems = this.selectableListBoxPanel.getSelectedItems().map(item => item.getId());
-        this.filterPanel.setSelectedItems(selectedItems);
-    }
-
-    protected disableSelectionMode() {
-        this.filterPanel.resetConstraints();
-        this.hideFilterPanel();
-        void setArchiveFilter(null);
-        setSelection([]);
     }
 }

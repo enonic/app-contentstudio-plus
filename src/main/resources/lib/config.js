@@ -41,6 +41,9 @@ const getConfig = (locales) => {
             layersUrl: portal.apiUrl({
                 api: `${app.name}:layers`,
             }),
+            archiveUrl: portal.apiUrl({
+                api: `${app.name}:archive`,
+            }),
         },
         extensionApiUrl: portal.apiUrl({
             api: 'admin:extension',

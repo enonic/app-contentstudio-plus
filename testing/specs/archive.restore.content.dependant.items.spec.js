@@ -87,7 +87,7 @@ describe('archive.restore.content.dependant.items.spec: tests for archive/restor
             assert.ok(result2.includes(FOLDER_DISPLAY_NAME), 'Expected item should be present in the grid');
         });
 
-    it(`WHEN Filter Panel is opened THEN 'Archived', 'Archived By' aggregation groups should be present`,
+    it(`WHEN Filter Panel is opened THEN 'Archived By' aggregation group should be present`,
         async () => {
             let archiveBrowsePanel = new ArchiveBrowsePanel();
             let archiveFilterPanel = new ArchiveFilterPanel();
@@ -95,8 +95,7 @@ describe('archive.restore.content.dependant.items.spec: tests for archive/restor
             await studioUtils.openArchivePanel();
             await archiveBrowsePanel.clickOnSearchButton();
             await archiveFilterPanel.waitForOpened();
-            // 2. Verify that Archived, Archived By aggregation groups are displayed:
-            await archiveFilterPanel.waitForAggregationGroupDisplayed(appConst.FILTER_PANEL_AGGREGATION_BLOCK.ARCHIVED);
+            // 2. Verify that Archived By aggregation group is displayed:
             await archiveFilterPanel.waitForAggregationGroupDisplayed(appConst.FILTER_PANEL_AGGREGATION_BLOCK.ARCHIVED_BY);
             // 3. The checkbox should not be selected by default:
             let isSelected = await archiveFilterPanel.isCheckboxSelected(appConst.FILTER_PANEL_AGGREGATION_BLOCK.ARCHIVED_BY, 'Me');
