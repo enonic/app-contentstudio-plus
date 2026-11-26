@@ -8,7 +8,7 @@ plugins {
 group = 'com.enonic.app.contentstudio.js_testing'
 
 node {
-    version = '24.15.0'
+    version = '24.22.3'
 }
 
 configurations {
