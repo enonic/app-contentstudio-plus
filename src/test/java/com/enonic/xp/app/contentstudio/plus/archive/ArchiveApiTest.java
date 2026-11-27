@@ -1,11 +1,19 @@
 package com.enonic.xp.app.contentstudio.plus.archive;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 import org.mockito.Mockito;
+
+import com.google.common.io.ByteSource;
 
 import com.enonic.xp.aggregation.Aggregations;
 import com.enonic.xp.aggregation.Bucket;
@@ -35,6 +43,10 @@ import com.enonic.xp.content.Media;
 import com.enonic.xp.content.WorkflowInfo;
 import com.enonic.xp.i18n.LocaleService;
 import com.enonic.xp.i18n.MessageBundle;
+import com.enonic.xp.image.ImageService;
+import com.enonic.xp.image.ReadImageParams;
+import com.enonic.xp.media.ImageOrientation;
+import com.enonic.xp.media.MediaInfoService;
 import com.enonic.xp.schema.content.ContentType;
 import com.enonic.xp.schema.content.ContentTypeName;
 import com.enonic.xp.schema.content.ContentTypeService;
@@ -46,6 +58,7 @@ import com.enonic.xp.task.SubmitLocalTaskParams;
 import com.enonic.xp.task.TaskId;
 import com.enonic.xp.task.TaskService;
 import com.enonic.xp.testing.ScriptRunnerSupport;
+import com.enonic.xp.util.BinaryReference;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -69,6 +82,31 @@ public class ArchiveApiTest
             TASK_REPORTS.clear();
             return reports;
         }
+    }
+
+    public static class GzipProbe
+    {
+        public String read( final ByteSource source )
+            throws IOException
+        {
+            try (InputStream in = new GZIPInputStream( source.openStream() ))
+            {
+                return new String( in.readAllBytes(), StandardCharsets.UTF_8 );
+            }
+        }
+    }
+
+    private static final String SVG = "<svg xmlns=\"http://www.w3.org/2000/svg\"/>";
+
+    private static ByteSource gzip( final String text )
+        throws IOException
+    {
+        final ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        try (GZIPOutputStream out = new GZIPOutputStream( bytes ))
+        {
+            out.write( text.getBytes( StandardCharsets.UTF_8 ) );
+        }
+        return ByteSource.wrap( bytes.toByteArray() );
     }
 
     @Override
@@ -200,7 +238,29 @@ public class ArchiveApiTest
             .valid( true )
             .build();
 
-        final List<Content> all = List.of( folder, article, image, note );
+        final Content page = Content.create()
+            .id( ContentId.from( "e" ) )
+            .name( "page-e" )
+            .parentPath( ContentPath.ROOT )
+            .displayName( "Page E" )
+            .type( ContentTypeName.from( "myapp:note" ) )
+            .valid( true )
+            .attachments( Attachments.from(
+                Attachment.create().name( AttachmentNames.THUMBNAIL ).mimeType( "text/html" ).size( 12 ).build() ) )
+            .build();
+
+        final Content vector = Media.create()
+            .id( ContentId.from( "f" ) )
+            .name( "vector-f.svgz" )
+            .parentPath( ContentPath.ROOT )
+            .displayName( "Vector F" )
+            .type( ContentTypeName.vectorMedia() )
+            .valid( true )
+            .attachments( Attachments.from(
+                Attachment.create().name( "vector-f.svgz" ).label( "source" ).mimeType( "application/gzip" ).size( 56 ).build() ) )
+            .build();
+
+        final List<Content> all = List.of( folder, article, image, note, page, vector );
 
         when( this.contentService.find( any( ContentQuery.class ) ) ).thenAnswer( invocation -> {
             final ContentQuery query = invocation.getArgument( 0 );
@@ -236,6 +296,24 @@ public class ArchiveApiTest
                 .findFirst()
                 .orElseThrow( () -> ContentNotFoundException.create().contentId( id ).build() );
         } );
+
+        final ByteSource gzipped = gzip( SVG );
+        when( this.contentService.getBinary( any( ContentId.class ), any( BinaryReference.class ) ) ).thenAnswer(
+            invocation -> "f".equals( invocation.getArgument( 0 ).toString() )
+                ? gzipped
+                : ByteSource.wrap( "original".getBytes( StandardCharsets.UTF_8 ) ) );
+
+        final MediaInfoService mediaInfoService = Mockito.mock( MediaInfoService.class );
+        when( mediaInfoService.getImageOrientation( any( ByteSource.class ) ) ).thenReturn( ImageOrientation.TopLeft );
+
+        final ImageService imageService = Mockito.mock( ImageService.class );
+        when( imageService.readImage( any( ReadImageParams.class ) ) ).thenAnswer( invocation -> {
+            final ReadImageParams params = invocation.getArgument( 0 );
+            return ByteSource.wrap( ( "scaled to " + params.getScaleSize() ).getBytes( StandardCharsets.UTF_8 ) );
+        } );
+
+        addService( MediaInfoService.class, mediaInfoService );
+        addService( ImageService.class, imageService );
 
         when( this.contentService.getByIds( any( GetContentByIdsParams.class ) ) ).thenAnswer( invocation -> {
             final GetContentByIdsParams params = invocation.getArgument( 0 );

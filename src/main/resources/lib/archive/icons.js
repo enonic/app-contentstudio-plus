@@ -1,3 +1,5 @@
+/*global app, __*/
+
 const adminLib = require('/lib/xp/admin');
 const contentLib = require('/lib/xp/content');
 const ioLib = require('/lib/xp/io');
@@ -5,23 +7,36 @@ const portalLib = require('/lib/xp/portal');
 const common = require('/lib/archive/common');
 
 const CACHE_TTL_MS = common.CACHE_TTL_MS;
-const BRANCH = common.BRANCH;
+const badRequest = common.badRequest;
+const notFound = common.notFound;
 
 const STUDIO_APP = 'com.enonic.app.contentstudio';
+const TYPE_NAME = /^[\w.-]+:[\w.-]+$/;
 const MAX_SUPER_TYPES = 10;
-const ICON_SCALE = 'square(128)';
-const STUDIO_REST_PATH = '/rest-v2/cs';
+const ICON_SIZE = 128;
+const ICON_HEADERS = {
+    'Cache-Control': 'private, max-age=86400',
+    'Content-Security-Policy': "default-src 'none'; style-src 'unsafe-inline'; sandbox",
+    'X-Content-Type-Options': 'nosniff',
+};
+const GZIPPED_ICON_HEADERS = {
+    'Cache-Control': ICON_HEADERS['Cache-Control'],
+    'Content-Security-Policy': ICON_HEADERS['Content-Security-Policy'],
+    'X-Content-Type-Options': ICON_HEADERS['X-Content-Type-Options'],
+    'Content-Encoding': 'gzip',
+};
 const SVG_MIME_TYPE = 'image/svg+xml';
 const SVG_PAINT = '(?:fill|stroke|stop-color|flood-color|lighting-color|color)\\s*[=:]\\s*["\']?\\s*([^"\';)]+)';
 const SVG_NEUTRAL_PAINTS = ['none', 'currentcolor', 'inherit', 'transparent'];
 
 let typeIcons = {icons: {}, time: 0};
 
+const makeApiUrl = (baseUrl, params) => portalLib.apiUrl({api: `${app.name}:archive`, baseUrl, params});
+
 const withIconUrls = (items, project) => {
     const urls = {
         project,
         studio: adminLib.getToolUrl(STUDIO_APP, 'main'),
-        rest: String(adminLib.getHomeToolUrl()).replace(/\/+$/, '') + STUDIO_REST_PATH,
     };
 
     return (items || []).map((item) => {
@@ -36,47 +51,35 @@ const withIconUrls = (items, project) => {
     });
 };
 
-// The icons are still served by Content Studio, at the urls its own content list gives.
 const resolveIconUrl = (item, urls) => {
     try {
-        if (item.thumbnail) {
-            const time = new Date(item.modifiedTime).getTime();
-            return `${urls.rest}/cms/${urls.project}/archive/content/icon/${item.id}?ts=${time || 0}`;
+        if (item.thumbnail || item.isImage) {
+            return makeApiUrl(urls.studio, {icon: item.id, project: urls.project, v: item.modifiedTime || ''});
         }
 
-        if (item.isImage) {
-            return portalLib.imageUrl({
-                id: item.id,
-                scale: ICON_SCALE,
-                project: urls.project,
-                branch: BRANCH,
-                baseUrl: urls.studio,
-            });
-        }
-
-        return makeTypeIconUrl(item.type, urls.rest);
+        return makeTypeIconUrl(item.type, urls.studio);
     } catch (e) {
         return undefined;
     }
 };
 
-const makeTypeIconUrl = (typeName, restUrl) => {
+const makeTypeIconUrl = (typeName, baseUrl) => {
     const icon = getTypeIcon(typeName);
 
     if (!icon) {
         return undefined;
     }
 
-    const params = [];
+    const params = {typeIcon: typeName};
 
     if (icon.version) {
-        params.push(`hash=${encodeURIComponent(icon.version)}`);
+        params.v = icon.version;
     }
     if (icon.colorable) {
-        params.push('colorable=true');
+        params.colorable = 'true';
     }
 
-    return `${restUrl}/schema/content/icon/${typeName}${params.length > 0 ? `?${params.join('&')}` : ''}`;
+    return makeApiUrl(baseUrl, params);
 };
 
 const getTypeIcon = (typeName) => {
@@ -134,4 +137,42 @@ const isColorable = (icon) => {
     return true;
 };
 
+const serveTypeIcon = (typeName) => {
+    if (typeof typeName !== 'string' || !TYPE_NAME.test(typeName)) {
+        return badRequest();
+    }
+
+    const icon = findTypeIcon(typeName);
+
+    if (!icon) {
+        return notFound();
+    }
+
+    return {
+        status: 200,
+        contentType: icon.mimeType,
+        headers: ICON_HEADERS,
+        body: icon.data,
+    };
+};
+
+const serveIcon = (contentId) => {
+    const bean = __.newBean('com.enonic.xp.app.contentstudio.plus.archive.ArchiveIconHandler');
+    bean.setContentId(contentId);
+    bean.setSize(ICON_SIZE);
+
+    if (!bean.load()) {
+        return notFound();
+    }
+
+    return {
+        status: 200,
+        contentType: bean.getMimeType(),
+        headers: bean.isGzipped() ? GZIPPED_ICON_HEADERS : ICON_HEADERS,
+        body: bean.getData(),
+    };
+};
+
 exports.withIconUrls = withIconUrls;
+exports.serveTypeIcon = serveTypeIcon;
+exports.serveIcon = serveIcon;

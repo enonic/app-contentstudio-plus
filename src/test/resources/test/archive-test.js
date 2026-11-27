@@ -52,9 +52,6 @@ assert.mock('/lib/xp/auth', {
 assert.mock('/lib/xp/admin', {
     getToolUrl: function () {
         return STUDIO_URL;
-    },
-    getHomeToolUrl: function () {
-        return '/admin/';
     }
 });
 
@@ -65,8 +62,11 @@ assert.mock('/lib/xp/io', {
 });
 
 assert.mock('/lib/xp/portal', {
-    imageUrl: function (params) {
-        return params.baseUrl + '/_/media:image/' + params.project + ':' + params.branch + '/' + params.id + '/' + params.scale;
+    apiUrl: function (params) {
+        var query = Object.keys(params.params).map(function (key) {
+            return key + '=' + encodeURIComponent(params.params[key]);
+        });
+        return params.baseUrl + '/_/' + params.api.split(':')[1] + '?' + query.join('&');
     }
 });
 
@@ -379,16 +379,65 @@ exports.testGetKeepsTheOrderOfIds = function () {
 
 exports.testItemsGetIconUrls = function () {
     var result = post({action: 'get', project: 'myproject', ids: ['a', 'b', 'c', 'd']});
-    var rest = '/admin/rest-v2/cs';
 
-    assert.assertEquals(rest + '/schema/content/icon/base:folder?hash=2026-02-02T00%3A00%3A00Z', findItem(result, 'a').iconUrl);
-    assert.assertEquals(rest + '/cms/myproject/archive/content/icon/b?ts=1767348000000', findItem(result, 'b').iconUrl);
-    assert.assertEquals('image/png', findItem(result, 'b').thumbnail.mimeType);
-    assert.assertEquals(STUDIO_URL + '/_/media:image/myproject:draft/c/square(128)', findItem(result, 'c').iconUrl);
+    assert.assertEquals(STUDIO_URL + '/_/archive?typeIcon=base%3Afolder&v=2026-02-02T00%3A00%3A00Z', findItem(result, 'a').iconUrl);
     assert.assertEquals(
-        rest + '/schema/content/icon/myapp:note?hash=2026-01-01T00%3A00%3A00Z&colorable=true',
+        STUDIO_URL + '/_/archive?icon=b&project=myproject&v=2026-01-02T10%3A00%3A00Z',
+        findItem(result, 'b').iconUrl
+    );
+    assert.assertEquals('image/png', findItem(result, 'b').thumbnail.mimeType);
+    assert.assertTrue(findItem(result, 'c').iconUrl.indexOf(STUDIO_URL + '/_/archive?icon=c&project=myproject&v=') === 0);
+    assert.assertEquals(
+        STUDIO_URL + '/_/archive?typeIcon=myapp%3Anote&v=2026-01-01T00%3A00%3A00Z&colorable=true',
         findItem(result, 'd').iconUrl
     );
+};
+
+exports.testCompressedVectorIsServedWithItsEncoding = function () {
+    var vector = get({project: 'myproject', icon: 'f'});
+    var probe = __.newBean('com.enonic.xp.app.contentstudio.plus.archive.ArchiveApiTest$GzipProbe');
+
+    assert.assertEquals(200, vector.status);
+    assert.assertEquals('image/svg+xml', vector.contentType);
+    assert.assertEquals('gzip', vector.headers['Content-Encoding']);
+    assert.assertEquals('nosniff', vector.headers['X-Content-Type-Options']);
+    assert.assertEquals('<svg xmlns="http://www.w3.org/2000/svg"/>', String(probe.read(vector.body)));
+};
+
+exports.testThumbnailAndImageAreServedScaled = function () {
+    var image = get({project: 'myproject', icon: 'c'});
+
+    assert.assertEquals(200, image.status);
+    assert.assertEquals('image/png', image.contentType);
+    assert.assertTrue(image.body.size() == 'scaled to 128'.length);
+    assert.assertEquals(ARCHIVE_ROOT_PATH, contexts[0].attributes.contentRootPath);
+
+    var thumbnail = get({project: 'myproject', icon: 'b'});
+
+    assert.assertEquals(200, thumbnail.status);
+    assert.assertEquals('image/png', thumbnail.contentType);
+    assert.assertTrue(thumbnail.body.size() == 'scaled to 128'.length);
+
+    assert.assertTrue(image.headers['Content-Encoding'] === undefined);
+
+    assert.assertEquals(404, get({project: 'myproject', icon: 'a'}).status);
+    assert.assertEquals(404, get({project: 'myproject', icon: 'e'}).status);
+    assert.assertEquals(404, get({project: 'myproject', icon: 'missing'}).status);
+    assert.assertEquals(400, get({project: 'myproject', icon: 'a b'}).status);
+    assert.assertEquals(400, get({icon: 'b'}).status);
+};
+
+exports.testTypeIconIsServedWithTheIconOfSuperType = function () {
+    var result = get({typeIcon: 'myapp:note'});
+
+    assert.assertEquals(200, result.status);
+    assert.assertEquals('image/svg+xml', result.contentType);
+    assert.assertEquals(COLORABLE_SVG, result.body);
+
+    assert.assertEquals(404, get({typeIcon: 'base:structured'}).status);
+    assert.assertEquals(404, get({typeIcon: 'myapp:unknown'}).status);
+    assert.assertEquals(400, get({typeIcon: 'not a type'}).status);
+    assert.assertEquals(0, contexts.length);
 };
 
 exports.testDescendantsAreFoundByThePathsOfIds = function () {
