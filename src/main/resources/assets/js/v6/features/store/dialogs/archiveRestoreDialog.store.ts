@@ -167,7 +167,7 @@ async function loadDescendants(currentInstance: number): Promise<void> {
 
     try {
         const items = $archiveRestoreDialog.get().items;
-        const descendantIds = await fetchArchivedDescendantIds(items.map((item) => item.path));
+        const descendantIds = await fetchArchivedDescendantIds(items.map((item) => item.id));
 
         if (currentInstance !== instanceId) return;
 

@@ -3,6 +3,7 @@ import {ActionDialog, type DialogIntent, Gate, useActionDialog, useUiKitPhrases}
 import {type ReactElement, type ReactNode, type RefObject, useCallback, useEffect, useRef, useState} from 'react';
 import {useI18n} from '../../../../../shared/i18n';
 import {useTaskProgress} from '../../../../../shared/tasks';
+import {getArchiveUrl} from '../../../api/archive';
 import type {ArchivedContent} from '../../content/archivedContent';
 import {ArchivedContentLabel} from '../../content/ArchivedContentLabel';
 import {useAnimatedEllipsis} from '../../lib/hooks/useAnimatedEllipsis';
@@ -170,7 +171,7 @@ export const ArchiveDialogShell = ({
         isLoading: isLoadingMore,
         onLoadMore: handleLoadMore,
     });
-    const {progress, phase, phaseTotal} = useTaskProgress(taskId, {
+    const {progress, phase, phaseTotal} = useTaskProgress(getArchiveUrl(), taskId, {
         onComplete: (resultState, message) => {
             onTaskComplete(resultState === 'SUCCESS', message);
         },

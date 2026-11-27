@@ -4,6 +4,7 @@ export interface ArchivedContentJson extends ContentSummaryJson {
     hasChildren: boolean;
     isValid: boolean;
     thumbnail?: unknown;
+    attachments?: string[] | null;
     workflow?: {state?: string | null} | null;
     language?: string | null;
     creator?: string | null;
@@ -18,6 +19,6 @@ export interface ArchivedContentJson extends ContentSummaryJson {
 }
 
 export interface ArchivedContentListJson {
-    contents: ArchivedContentJson[];
-    metadata: {totalHits: number};
+    items: ArchivedContentJson[];
+    total: number;
 }
