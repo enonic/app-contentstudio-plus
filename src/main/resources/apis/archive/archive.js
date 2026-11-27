@@ -1,6 +1,7 @@
 const common = require('/lib/archive/common');
 const attachmentsLib = require('/lib/archive/attachments');
 const contentsLib = require('/lib/archive/contents');
+const iconsLib = require('/lib/archive/icons');
 const principalsLib = require('/lib/archive/principals');
 const searchLib = require('/lib/archive/search');
 const tasksLib = require('/lib/archive/tasks');
@@ -24,8 +25,16 @@ exports.get = (req) => {
 
     const params = req.params || {};
 
+    if (params.typeIcon !== undefined) {
+        return iconsLib.serveTypeIcon(params.typeIcon);
+    }
+
     if (!isProject(params.project)) {
         return badRequest();
+    }
+
+    if (params.icon !== undefined) {
+        return isContentId(params.icon) ? runInArchive(params.project, () => iconsLib.serveIcon(params.icon)) : badRequest();
     }
 
     if (params.attachment !== undefined) {

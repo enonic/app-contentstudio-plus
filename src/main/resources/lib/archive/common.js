@@ -53,7 +53,6 @@ const runInArchive = (project, callback) => {
     );
 };
 
-exports.BRANCH = BRANCH;
 exports.MAX_COUNT = MAX_COUNT;
 exports.CACHE_TTL_MS = CACHE_TTL_MS;
 exports.ok = ok;
