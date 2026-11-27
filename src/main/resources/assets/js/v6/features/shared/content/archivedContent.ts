@@ -13,6 +13,8 @@ export type ArchivedContent = {
     /** The item has an uploaded thumbnail, so `iconUrl` is a picture whatever the type. */
     hasThumbnail: boolean;
     hasChildren: boolean;
+    /** The names of the item's attachments. */
+    attachments: string[];
     state?: ContentState;
     language?: string;
     creator?: string;
@@ -69,6 +71,7 @@ export const toArchivedContent = (json: ArchivedContentJson): ArchivedContent =>
     iconUrl: json.iconUrl ?? undefined,
     hasThumbnail: !!json.thumbnail,
     hasChildren: json.hasChildren,
+    attachments: json.attachments ?? [],
     state: toState(json),
     language: json.language ?? undefined,
     creator: json.creator ?? undefined,

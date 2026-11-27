@@ -8,10 +8,6 @@ export const ARCHIVE_ROOT = 'archive';
 const joinPath = (...segments: string[]): string =>
     segments.filter(Boolean).join('/').replace(/(^|[^:])\/{2,}/g, '$1/');
 
-export function getRestUrl(path: string): string {
-    return joinPath('/', $config.get().adminUrl, 'rest-v2/cs', path);
-}
-
 export function getCmsRestUrl(contentRoot: string, endpoint: string): string {
     return joinPath('/', $config.get().adminUrl, 'rest-v2/cs/cms', getActiveProjectName(), contentRoot, 'content', endpoint);
 }

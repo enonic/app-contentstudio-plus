@@ -1,5 +1,4 @@
-import {requestJson} from '@enonic/ui-utils/request';
-import {getRestUrl} from './cms';
+import {postArchive} from './archive';
 
 const displayNames = new Map<string, string>();
 const unresolved = new Set<string>();
@@ -9,16 +8,8 @@ export async function fetchPrincipalNames(keys: string[]): Promise<ReadonlyMap<s
     const missing = [...new Set(keys)].filter((key) => !displayNames.has(key) && !unresolved.has(key));
 
     if (missing.length > 0) {
-        const principals = await requestJson<{key: string; displayName: string}[]>(
-            getRestUrl('security/principals/resolveByKeys'),
-            {method: 'POST', body: {keys: missing, memberships: false}},
-        ).match(
-            (json) => json,
-            (error) => {
-                throw error;
-            },
-        );
-        principals.forEach(({key, displayName}) => displayNames.set(key, displayName));
+        const {names} = await postArchive<{names: Record<string, string>}>('principals', {keys: missing});
+        Object.entries(names).forEach(([key, displayName]) => displayNames.set(key, displayName));
         missing.filter((key) => !displayNames.has(key)).forEach((key) => unresolved.add(key));
     }
 

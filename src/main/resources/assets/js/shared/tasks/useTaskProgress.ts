@@ -2,7 +2,6 @@ import {RequestError} from '@enonic/ui-utils';
 import {pollTask, TaskFailedError, taskProgressPercent} from '@enonic/ui-utils/task';
 import type {TaskInfo} from '@enonic/ui-types';
 import {useEffect, useRef, useState} from 'react';
-import {$config} from '../config';
 
 export type TaskResultState = 'SUCCESS' | 'ERROR' | 'WARNING';
 
@@ -23,8 +22,6 @@ interface TaskResult {
 
 const RETRY_DELAY_MS = 2000;
 const IDLE: TaskProgress = {progress: 0};
-
-const getTasksUrl = (): string => `${$config.get().adminUrl.replace(/\/+$/, '')}/rest-v2/cs/tasks`;
 
 const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null;
 
@@ -57,8 +54,8 @@ function readProgress(task: TaskInfo): TaskProgress {
     return {progress: Math.min(100, Math.max(0, taskProgressPercent(task))), phase, phaseTotal};
 }
 
-/** Follows a task by polling it until it ends; a server or network error is retried, a rejected read ends it. */
-export function useTaskProgress(taskId: string | undefined, config: TaskProgressConfig = {}): TaskProgress {
+/** Follows a task by polling it at `tasksUrl` until it ends; a server or network error is retried, a rejected read ends it. */
+export function useTaskProgress(tasksUrl: string, taskId: string | undefined, config: TaskProgressConfig = {}): TaskProgress {
     const [progress, setProgress] = useState<TaskProgress>(IDLE);
     const configRef = useRef(config);
     configRef.current = config;
@@ -76,7 +73,7 @@ export function useTaskProgress(taskId: string | undefined, config: TaskProgress
         };
 
         const poll = (): void => {
-            void pollTask(getTasksUrl(), taskId, {
+            void pollTask(tasksUrl, taskId, {
                 signal,
                 onProgress: (task) => {
                     if (!signal.aborted) setProgress(readProgress(task));
@@ -105,7 +102,7 @@ export function useTaskProgress(taskId: string | undefined, config: TaskProgress
             controller.abort();
             clearTimeout(retry);
         };
-    }, [taskId]);
+    }, [tasksUrl, taskId]);
 
     return progress;
 }

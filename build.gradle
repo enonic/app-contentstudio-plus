@@ -59,6 +59,7 @@ dependencies {
     include "com.enonic.xp:lib-i18n:${xpVersion}"
     include "com.enonic.xp:lib-io:${xpVersion}"
     include "com.enonic.xp:lib-portal:${xpVersion}"
+    include "com.enonic.xp:lib-task:${xpVersion}"
     include libs.lib.mustache
     include libs.lib.license
 

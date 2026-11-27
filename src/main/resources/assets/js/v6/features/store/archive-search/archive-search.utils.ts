@@ -1,8 +1,7 @@
 import {$isContentFilterOpen} from '@enonic/lib-contentstudio/v6/features/search/model/contentFilter.store';
 import {handleError} from '../../../../shared/errors';
-import {fetchArchivedByIds} from '../../api/archive';
 import {searchArchive} from '../../api/archive-search';
-import type {ArchivedContent, ArchivedPage} from '../../shared/content/archivedContent';
+import type {ArchivedPage} from '../../shared/content/archivedContent';
 import {setArchiveFilter} from '../archive-list';
 import {$archiveSearch, $archiveSearchFacets, $isArchiveSearchActive, type ArchiveSearch} from './archive-search.store';
 
@@ -16,13 +15,9 @@ let lastFacetsRequest = 0;
 const toParams = ({text, selection}: ArchiveSearch): ArchiveSearch => ({text: text.trim(), selection});
 
 async function loadFoundPage(search: ArchiveSearch): Promise<ArchivedPage> {
-    const {ids, total} = await searchArchive({...search, count: PAGE_SIZE, aggregations: false});
-    const found = new Map((await fetchArchivedByIds(ids)).map((item) => [item.id, item]));
+    const {items, total} = await searchArchive({...search, count: PAGE_SIZE, aggregations: false});
 
-    return {
-        items: ids.map((id) => found.get(id)).filter((item): item is ArchivedContent => !!item),
-        total,
-    };
+    return {items, total};
 }
 
 /** Counts the hits and the buckets of the current search again, leaving the list as it is. */

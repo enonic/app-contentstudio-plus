@@ -1,6 +1,17 @@
 var assert = require('/lib/xp/testing');
 
 var ARCHIVE_ROOT_PATH = '/archive';
+var STUDIO_URL = '/admin/com.enonic.app.contentstudio/main';
+
+var COLORABLE_SVG = '<svg><path fill="currentColor" stroke="none"/></svg>';
+var COLORED_SVG = '<svg><path fill="currentColor"/><path fill="#ff0000"/></svg>';
+
+var TYPES = {
+    'myapp:article': {superType: 'base:structured', icon: {data: COLORABLE_SVG, mimeType: 'image/svg+xml', modifiedTime: '2026-01-01T00:00:00Z'}},
+    'myapp:note': {superType: 'myapp:article'},
+    'base:structured': {},
+    'base:folder': {icon: {data: COLORED_SVG, mimeType: 'image/svg+xml', modifiedTime: '2026-02-02T00:00:00Z'}}
+};
 
 var contexts = [];
 var queries = [];
@@ -19,6 +30,15 @@ assert.mock('/lib/xp/content', {
     query: function (params) {
         queries.push(params);
         return queryResults.shift() || {total: 0, hits: [], aggregations: {}};
+    },
+    getType: function (name) {
+        return TYPES[name] || null;
+    },
+    getAttachments: function (key) {
+        return key === 'c' ? {'image "c" æ.png': {name: 'image "c" æ.png', mimeType: 'image/png'}} : null;
+    },
+    getAttachmentStream: function (params) {
+        return 'stream of ' + params.key + '/' + params.name;
     }
 });
 
@@ -29,18 +49,79 @@ assert.mock('/lib/xp/auth', {
     }
 });
 
+assert.mock('/lib/xp/admin', {
+    getToolUrl: function () {
+        return STUDIO_URL;
+    },
+    getHomeToolUrl: function () {
+        return '/admin/';
+    }
+});
+
+assert.mock('/lib/xp/io', {
+    readText: function (data) {
+        return data;
+    }
+});
+
+assert.mock('/lib/xp/portal', {
+    imageUrl: function (params) {
+        return params.baseUrl + '/_/media:image/' + params.project + ':' + params.branch + '/' + params.id + '/' + params.scale;
+    }
+});
+
+assert.mock('/lib/xp/task', {
+    get: function (taskId) {
+        if (taskId === 'task-1') {
+            return {id: taskId, application: app.name, state: 'FINISHED', progress: {info: 'done', current: 1, total: 1}};
+        }
+        return taskId === 'task-3' ? {id: taskId, application: 'com.other.app', state: 'RUNNING'} : null;
+    }
+});
+
 var archiveApi = require('/apis/archive/archive');
 
-function post(body, results) {
+function reset(results) {
     contexts = [];
     queries = [];
     principalRequests = [];
     queryResults = results || [];
+}
+
+function post(body, results) {
+    reset(results);
 
     return archiveApi.post({
         body: typeof body === 'string' ? body : JSON.stringify(body),
+        contentType: 'application/json; charset=UTF-8',
         locales: ['no']
     });
+}
+
+function search(body, results) {
+    body.action = 'search';
+    return post(body, results);
+}
+
+function get(params, results) {
+    reset(results);
+    return archiveApi.get({params: params});
+}
+
+function takeReports() {
+    return String(__.newBean('com.enonic.xp.app.contentstudio.plus.archive.ArchiveApiTest$TaskProbe').takeReports()).split('\n');
+}
+
+function ids(items) {
+    return items.map(function (item) {
+        return item.id;
+    });
+}
+
+function findItem(result, id) {
+    return result.body.items.filter(function (item) {
+        return item.id === id;
+    })[0];
 }
 
 function findBucket(result, name, key) {
@@ -56,19 +137,32 @@ function findBucket(result, name, key) {
 exports.testInvalidBodyReturnsBadRequest = function () {
     assert.assertEquals(400, post('not json').status);
     assert.assertEquals(400, post({}).status);
-    assert.assertEquals(400, post({project: 'My Project'}).status);
-    assert.assertEquals(400, post({project: '../system'}).status);
+    assert.assertEquals(400, post({action: 'search'}).status);
+    assert.assertEquals(400, post({action: 'search', project: 'My Project'}).status);
+    assert.assertEquals(400, post({action: 'get', project: '../system', ids: ['a']}).status);
+    assert.assertEquals(400, post({action: 'unknown', project: 'myproject'}).status);
     assert.assertEquals(0, queries.length);
+    assert.assertEquals(0, contexts.length);
+};
+
+exports.testBodyMustBeSentAsJson = function () {
+    var body = JSON.stringify({action: 'delete', project: 'myproject', ids: ['a']});
+
+    reset();
+    assert.assertEquals(400, archiveApi.post({body: body, contentType: 'text/plain'}).status);
+    assert.assertEquals(400, archiveApi.post({body: body, contentType: 'application/x-www-form-urlencoded'}).status);
+    assert.assertEquals(400, archiveApi.post({body: body}).status);
+    assert.assertEquals(0, contexts.length);
 };
 
 exports.testSearchRunsInArchiveOfProject = function () {
-    var result = post({project: 'myproject', count: 10}, [
-        {total: 2, hits: [{id: 'a', score: 1}, {id: 'b', score: 1}], aggregations: {}}
+    var result = search({project: 'myproject', count: 10}, [
+        {total: 5, hits: [{id: 'c', score: 1}, {id: 'missing', score: 1}, {id: 'a', score: 1}], aggregations: {}}
     ]);
 
     assert.assertEquals(200, result.status);
-    assert.assertEquals(2, result.body.total);
-    assert.assertJsonEquals(['a', 'b'], result.body.ids);
+    assert.assertEquals(5, result.body.total);
+    assert.assertJsonEquals(['c', 'a'], ids(result.body.items));
     assert.assertJsonEquals([], result.body.aggregations);
 
     assert.assertEquals(1, contexts.length);
@@ -85,15 +179,15 @@ exports.testSearchRunsInArchiveOfProject = function () {
 };
 
 exports.testCountIsLimited = function () {
-    post({project: 'myproject', count: 5000});
+    search({project: 'myproject', count: 5000});
     assert.assertEquals(100, queries[0].count);
 
-    post({project: 'myproject', count: -3});
+    search({project: 'myproject', count: -3});
     assert.assertEquals(0, queries[0].count);
 };
 
 exports.testTextIsSearchedByNameAndId = function () {
-    post({project: 'myproject', text: '  my text  '});
+    search({project: 'myproject', text: '  my text  '});
 
     var should = queries[0].query.boolean.should;
 
@@ -103,7 +197,7 @@ exports.testTextIsSearchedByNameAndId = function () {
 };
 
 exports.testSelectionBecomesFilters = function () {
-    post({
+    search({
         project: 'myproject',
         selection: {
             contentTypes: ['base:folder', 7],
@@ -120,7 +214,7 @@ exports.testSelectionBecomesFilters = function () {
 };
 
 exports.testAggregationWithSelectionIsCountedWithoutItsOwnFilter = function () {
-    var result = post({
+    var result = search({
         project: 'myproject',
         aggregations: true,
         selection: {
@@ -160,7 +254,7 @@ exports.testAggregationWithSelectionIsCountedWithoutItsOwnFilter = function () {
 };
 
 exports.testBucketsGetDisplayNames = function () {
-    var result = post({project: 'myproject', aggregations: true}, [
+    var result = search({project: 'myproject', aggregations: true}, [
         {
             total: 3,
             hits: [],
@@ -195,9 +289,196 @@ exports.testPrincipalNamesAreRequestedOnce = function () {
         ];
     };
 
-    post({project: 'myproject', aggregations: true}, results());
+    search({project: 'myproject', aggregations: true}, results());
     assert.assertJsonEquals(['user:system:cached'], principalRequests);
 
-    post({project: 'myproject', aggregations: true}, results());
+    search({project: 'myproject', aggregations: true}, results());
     assert.assertJsonEquals([], principalRequests);
+};
+
+exports.testPrincipalsReturnsNamesOfKnownKeys = function () {
+    var result = post({action: 'principals', keys: ['user:system:known', 'user:system:gone', 5]});
+
+    assert.assertEquals(200, result.status);
+    assert.assertJsonEquals({'user:system:known': 'Known User'}, result.body.names);
+    assert.assertEquals(0, contexts.length);
+};
+
+exports.testListRejectsInvalidParams = function () {
+    assert.assertEquals(400, get({}).status);
+    assert.assertEquals(400, get({project: 'My Project'}).status);
+    assert.assertEquals(400, get({project: 'myproject', parentId: 'a b'}).status);
+    assert.assertEquals(0, contexts.length);
+};
+
+exports.testListReturnsArchivedItems = function () {
+    var result = get({project: 'myproject', from: '20', size: '10'}, [
+        {total: 7, hits: [{id: 'a', score: 1}, {id: 'c', score: 1}]}
+    ]);
+
+    assert.assertEquals(200, result.status);
+    assert.assertEquals(7, result.body.total);
+    assert.assertJsonEquals(['a', 'c'], ids(result.body.items));
+
+    assert.assertEquals(1, queries.length);
+    assert.assertEquals('/', queries[0].parent);
+    assert.assertEquals(20, queries[0].start);
+    assert.assertEquals(10, queries[0].count);
+    assert.assertEquals('ids', queries[0].returns);
+
+    assert.assertEquals('com.enonic.cms.myproject', contexts[0].repository);
+    assert.assertEquals(ARCHIVE_ROOT_PATH, contexts[0].attributes.contentRootPath);
+
+    var folder = findItem(result, 'a');
+
+    assert.assertEquals('folder-a', folder.name);
+    assert.assertEquals('Folder A', folder.displayName);
+    assert.assertEquals('/folder-a', folder.path);
+    assert.assertEquals('base:folder', folder.type);
+    assert.assertTrue(folder.hasChildren === true);
+    assert.assertTrue(folder.isValid === true);
+    assert.assertEquals('no', folder.language);
+    assert.assertEquals('user:system:known', folder.owner);
+    assert.assertEquals('user:system:known', folder.archivedBy);
+    assert.assertEquals('2026-01-03T10:00:00Z', folder.archivedTime);
+    assert.assertEquals('2026-01-02T10:00:00Z', folder.modifiedTime);
+    assert.assertEquals('/site', folder.originalParentPath);
+    assert.assertEquals('folder-original', folder.originalName);
+    assert.assertEquals('READY', folder.workflow.state);
+    assert.assertEquals('2026-01-01T12:00:00Z', folder.publish.first);
+    assert.assertEquals(0, folder.childOrder.orderExpressions.length);
+    assert.assertTrue(folder.thumbnail === undefined);
+    assert.assertTrue(folder.isImage === undefined);
+
+    assert.assertJsonEquals([], folder.attachments);
+
+    assert.assertTrue(findItem(result, 'c').hasChildren === false);
+    assert.assertJsonEquals(['image-c.png'], findItem(result, 'c').attachments);
+};
+
+exports.testListOfParentReturnsItsChildren = function () {
+    var result = get({project: 'myproject', parentId: 'a', size: '5000'}, [
+        {total: 1, hits: [{id: 'b', score: 1}]}
+    ]);
+
+    assert.assertEquals('a', queries[0].parent);
+    assert.assertEquals(0, queries[0].start);
+    assert.assertEquals(100, queries[0].count);
+    assert.assertEquals(1, result.body.total);
+    assert.assertJsonEquals(['b'], ids(result.body.items));
+    assert.assertTrue(findItem(result, 'b').isValid === false);
+};
+
+exports.testGetKeepsTheOrderOfIds = function () {
+    var result = post({action: 'get', project: 'myproject', ids: ['c', 'missing', 'b', 'x,y', 'a']});
+
+    assert.assertEquals(200, result.status);
+    assert.assertJsonEquals(['c', 'b', 'a'], ids(result.body.items));
+    assert.assertEquals('com.enonic.cms.myproject', contexts[0].repository);
+};
+
+exports.testItemsGetIconUrls = function () {
+    var result = post({action: 'get', project: 'myproject', ids: ['a', 'b', 'c', 'd']});
+    var rest = '/admin/rest-v2/cs';
+
+    assert.assertEquals(rest + '/schema/content/icon/base:folder?hash=2026-02-02T00%3A00%3A00Z', findItem(result, 'a').iconUrl);
+    assert.assertEquals(rest + '/cms/myproject/archive/content/icon/b?ts=1767348000000', findItem(result, 'b').iconUrl);
+    assert.assertEquals('image/png', findItem(result, 'b').thumbnail.mimeType);
+    assert.assertEquals(STUDIO_URL + '/_/media:image/myproject:draft/c/square(128)', findItem(result, 'c').iconUrl);
+    assert.assertEquals(
+        rest + '/schema/content/icon/myapp:note?hash=2026-01-01T00%3A00%3A00Z&colorable=true',
+        findItem(result, 'd').iconUrl
+    );
+};
+
+exports.testDescendantsAreFoundByThePathsOfIds = function () {
+    var result = post({action: 'descendants', project: 'myproject', ids: ['a', 'c']});
+
+    assert.assertEquals(200, result.status);
+    assert.assertJsonEquals(['b'], result.body.ids);
+    assert.assertEquals(ARCHIVE_ROOT_PATH, contexts[0].attributes.contentRootPath);
+
+    assert.assertJsonEquals([], post({action: 'descendants', project: 'myproject', ids: ['c']}).body.ids);
+    assert.assertEquals(400, post({action: 'descendants', project: 'myproject', ids: []}).status);
+    assert.assertEquals(400, post({action: 'descendants', project: 'myproject', ids: ['a', 'x,y']}).status);
+    assert.assertEquals(400, post({action: 'descendants', ids: ['a']}).status);
+};
+
+exports.testRestoreRunsAsTask = function () {
+    takeReports();
+
+    var result = post({action: 'restore', project: 'myproject', ids: ['a', 'c', 'd']});
+
+    assert.assertEquals(200, result.status);
+    assert.assertEquals('task-1', result.body.taskId);
+    assert.assertEquals(ARCHIVE_ROOT_PATH, contexts[0].attributes.contentRootPath);
+    assert.assertJsonEquals([
+        'Restore content',
+        'Restoring content',
+        '{"phase":"restore","count":4}',
+        '1/4',
+        '2/4',
+        '{"state":"WARNING","message":"2 items have been restored. Item \\"note-d\\" could not be restored."}'
+    ], takeReports());
+
+    post({action: 'restore', project: 'myproject', ids: ['c']});
+    assert.assertEquals('{"state":"SUCCESS","message":"Item \\"image-c.png\\" has been restored."}', takeReports().pop());
+
+    post({action: 'restore', project: 'myproject', ids: ['missing']});
+    assert.assertEquals('{"state":"WARNING","message":"Nothing was restored."}', takeReports().pop());
+
+    assert.assertEquals(400, post({action: 'restore', project: 'myproject', ids: ['a b']}).status);
+    assert.assertEquals(400, post({action: 'restore', project: 'myproject'}).status);
+};
+
+exports.testDeleteRunsAsTaskAndSkipsChildrenOfSelectedParents = function () {
+    takeReports();
+
+    var result = post({action: 'delete', project: 'myproject', ids: ['b', 'a', 'd']});
+
+    assert.assertEquals('task-1', result.body.taskId);
+    assert.assertJsonEquals([
+        'Delete content',
+        'Deleting content',
+        '{"phase":"delete","count":3}',
+        '1/3',
+        '2/3',
+        '{"state":"SUCCESS","message":"2 items have been deleted."}'
+    ], takeReports());
+};
+
+exports.testAttachmentIsServedAsDownload = function () {
+    var name = 'image "c" æ.png';
+    var result = get({project: 'myproject', attachment: 'c', name: name});
+
+    assert.assertEquals(200, result.status);
+    assert.assertEquals('image/png', result.contentType);
+    assert.assertEquals('stream of c/' + name, result.body);
+    assert.assertEquals(
+        'attachment; filename="image _c_ _.png"; filename*=UTF-8\'\'image%20%22c%22%20%C3%A6.png',
+        result.headers['Content-Disposition']
+    );
+    assert.assertEquals('nosniff', result.headers['X-Content-Type-Options']);
+    assert.assertEquals(ARCHIVE_ROOT_PATH, contexts[0].attributes.contentRootPath);
+
+    assert.assertEquals(404, get({project: 'myproject', attachment: 'c', name: 'other.png'}).status);
+    assert.assertEquals(404, get({project: 'myproject', attachment: 'a', name: name}).status);
+    assert.assertEquals(404, get({project: 'myproject', attachment: 'c', name: 'toString'}).status);
+    assert.assertEquals(400, get({project: 'myproject', attachment: 'a b', name: name}).status);
+    assert.assertEquals(400, get({project: 'myproject', attachment: 'c'}).status);
+    assert.assertEquals(400, get({attachment: 'c', name: name}).status);
+};
+
+exports.testTaskIsReadByItsIdInThePath = function () {
+    var api = '/admin/com.enonic.app.contentstudio/main/_/com.enonic.app.contentstudio.plus:archive';
+    var result = archiveApi.get({path: api + '/task-1', params: {}});
+
+    assert.assertEquals(200, result.status);
+    assert.assertEquals('FINISHED', result.body.state);
+    assert.assertEquals('done', result.body.progress.info);
+
+    assert.assertEquals(404, archiveApi.get({path: api + '/task-2', params: {}}).status);
+    assert.assertEquals(404, archiveApi.get({path: api + '/task-3', params: {}}).status);
+    assert.assertEquals(400, archiveApi.get({path: api, params: {}}).status);
+    assert.assertEquals(400, archiveApi.get({path: api + '/', params: {}}).status);
 };

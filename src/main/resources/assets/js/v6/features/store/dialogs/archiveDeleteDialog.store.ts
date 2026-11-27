@@ -83,7 +83,7 @@ export async function executeArchiveDeleteDialog(): Promise<boolean> {
     const pendingPrimaryName = state.items[0]?.displayName || state.items[0]?.path;
 
     try {
-        const taskId = await deleteArchived(state.items.map((item) => item.path));
+        const taskId = await deleteArchived(state.items.map((item) => item.id));
 
         $archiveDeleteDialog.set({
             ...$archiveDeleteDialog.get(),
@@ -166,7 +166,7 @@ async function loadDescendants(currentInstance: number): Promise<void> {
 
     try {
         const items = $archiveDeleteDialog.get().items;
-        const descendantIds = await fetchArchivedDescendantIds(items.map((item) => item.path));
+        const descendantIds = await fetchArchivedDescendantIds(items.map((item) => item.id));
 
         if (currentInstance !== instanceId) return;
 
